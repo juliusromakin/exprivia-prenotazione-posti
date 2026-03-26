@@ -1,0 +1,77 @@
+<div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+  <!-- Calendar Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div class="flex items-center space-x-2">
+      <h2 class="text-lg sm:text-xl font-semibold min-w-[180px]" id="calendar-title">
+        {{ getMonthName() }} {{ currentYear }}
+      </h2>
+      <div class="flex space-x-1">
+        <button
+          type="button"
+          class="text-sm p-2 rounded-lg transition-colors duration-200"
+          [class.text-gray-500]="!isCurrentMonth()"
+          [class.hover:text-gray-900]="!isCurrentMonth()"
+          [class.hover:bg-gray-100]="!isCurrentMonth()"
+          [class.text-gray-300]="isCurrentMonth()"
+          [class.cursor-not-allowed]="isCurrentMonth()"
+          (click)="previousPeriod()"
+          [disabled]="isCurrentMonth()"
+          aria-label="Periodo precedente">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          class="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-100"
+          (click)="nextPeriod()" aria-label="Periodo successivo">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-container w-full max-w-4xl mx-auto">
+    <!-- Calendar Header (Days of Week) -->
+    <div class="grid grid-cols-7 mb-2 text-center text-xs sm:text-sm font-medium" role="row">
+      <div class="py-2" role="columnheader">Lun</div>
+      <div class="py-2" role="columnheader">Mar</div>
+      <div class="py-2" role="columnheader">Mer</div>
+      <div class="py-2" role="columnheader">Gio</div>
+      <div class="py-2" role="columnheader">Ven</div>
+      <div class="py-2 text-red-500" role="columnheader">Sab</div>
+      <div class="py-2 text-red-500" role="columnheader">Dom</div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="grid grid-cols-7 gap-1 sm:gap-2 bg-gray-100 rounded-lg p-2 sm:p-3" role="grid"
+      aria-labelledby="calendar-title">
+      <div *ngFor="let day of getDays()"
+        class="relative aspect-square flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg transition-all duration-200"
+        [class.bg-white]="!day.isToday" 
+        [class.bg-blue-50]="day.isToday" 
+        [class.ring-2]="day.isToday" 
+        [class.ring-blue-500]="day.isToday" 
+        [class.bg-blue-100]="day.isSelected"
+        [class.ring-2]="day.isSelected" 
+        [class.ring-blue-600]="day.isSelected" 
+        [class.bg-red-50]="day.isWeekend"
+        [class.text-red-600]="day.isWeekend" 
+        [class.cursor-pointer]="!day.isDisabled && !day.isWeekend"
+        [class.hover:bg-gray-50]="!day.isDisabled && !day.isWeekend"
+        [class.hover:scale-105]="!day.isDisabled && !day.isWeekend"
+        [class.hover:shadow-md]="!day.isDisabled && !day.isWeekend"
+        [class.hover:z-10]="!day.isDisabled && !day.isWeekend"
+        [class.disabled]="day.isDisabled"
+        (click)="onDateClick(day)"
+        [attr.aria-selected]="day.isSelected" 
+        [attr.aria-disabled]="day.isDisabled || day.isWeekend" 
+        role="gridcell"
+        tabindex="0" 
+        (keydown.enter)="onDateClick(day)" 
+        (keydown.space)="onDateClick(day)">
+        <div class="flex flex-col items-center">
+          <span class="text-xs sm:text-sm font-medium">{{ day.date.getDate() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

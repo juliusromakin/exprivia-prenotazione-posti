@@ -1,0 +1,54 @@
+<app-header></app-header>
+
+<main class="flex min-h-screen items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md p-8 shadow-lg bg-white flex flex-col rounded-xl">
+    <div class="text-center">
+    <div class="relative inline-block">
+        <img src="LogoExprivia.svg" alt="Exprivia Logo"
+          class="h-12 mx-auto mb-4 transform hover:scale-110 transition-transform duration-300">
+      </div>
+    <h1  class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--color-expriviaOrange)] via-[var(--color-expriviaOrange400)] to-[var(--color-expriviaOrange)] bg-clip-text text-transparent animate-gradient ">Recupero Password</h1>
+    <p class="text-gray-500 mt-2">
+      Inserisci l'email associata al tuo account per ricevere il link di reimpostazione.
+    </p>
+</div>
+
+    <form
+      class="flex flex-col gap-6 mt-6"
+      [formGroup]="forgotPwdForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+    >
+  
+      <!-- Campo email -->
+      <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
+        class="transform hover:scale-[1.02] transition-transform duration-300">
+        <div class="relative">
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
+            <lucide-icon name="mail" class="text-gray-400"></lucide-icon>
+          </div>
+          <input matInput formControlName="email" placeholder="nome.cognome@exprivia.com" type="email" autocomplete="email"
+            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-expriviaOrange focus:ring-1 focus:ring-expriviaOrange transition-colors duration-200" />
+        </div>
+        <div *ngIf="forgotPwdForm.get('email')?.hasError('email')" class="text-red-500 text-sm mt-1">
+          Inserisci una mail valida
+        </div>
+      </div>
+
+      <!-- Pulsante -->
+      <button
+        class="bg-expriviaOrange hover:bg-orange-600 transition font-semibold rounded-lg text-white text-sm px-5 py-3 text-center disabled:opacity-50"
+        type="submit"
+        [disabled]="forgotPwdForm.invalid || isLoading"
+      >
+        <ng-container *ngIf="!isLoading">Invia Email</ng-container>
+        <ng-container *ngIf="isLoading">
+          <div class="flex justify-center items-center gap-2">
+            <img src="https://cdn3.emoji.gg/emojis/1420-walking.gif" alt="Caricamento..." class="h-6 w-6" />
+            <span>Invio in corso...</span>
+          </div>
+        </ng-container>
+      </button>
+    </form>
+  </div>
+</main>

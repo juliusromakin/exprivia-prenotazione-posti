@@ -1,0 +1,950 @@
+<!-- Main Container -->
+<div class="max-w-7xl mx-auto p-4 sm:p-6" [style.visibility]="showModal ? 'visible' : 'visible'">
+  <!-- Header Section -->
+  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+          {{ isAdmin ? 'Tutte le Prenotazioni' : 'Le tue Prenotazioni' }}
+        </h1>
+        <p class="text-gray-600 mt-1">
+          {{ isAdmin ? 'Visualizza e gestisci tutte le prenotazioni del sistema' : 'Visualizza e gestisci le tue prenotazioni' }}
+        </p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button 
+          (click)="loadPrenotazioni()"
+          [disabled]="isLoading"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200">
+          <svg *ngIf="!isLoading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <div *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+          {{ isLoading ? 'Aggiornamento...' : 'Aggiorna' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prenotazioni Table Section -->
+  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+    <!-- Loading State -->
+    <div *ngIf="isLoading && prenotazioni.length === 0" class="flex justify-center items-center py-12">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p class="text-gray-500">Caricamento prenotazioni...</p>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading || prenotazioni.length > 0">
+      <!-- Filters and Actions -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
+          <!-- Search Bar -->
+          <div class="relative w-full sm:w-96">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (keyup)="applySearchFilter()"
+              placeholder="Cerca per utente, stanza, postazione, data..." 
+              class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+              <button 
+                *ngIf="searchTerm" 
+                (click)="searchTerm = ''; applySearchFilter()"
+                class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                title="Cancella ricerca">
+                <i class="fas fa-times text-sm"></i>
+              </button>
+              <i class="fas fa-search text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Status Filter Buttons -->
+          <div class="flex items-center space-x-1.5">
+            <button
+              (click)="setStatusFilter('tutti')"
+              [class.bg-blue-600]="statusFilter === 'tutti'"
+              [class.text-white]="statusFilter === 'tutti'"
+              [class.bg-gray-100]="statusFilter !== 'tutti'"
+              [class.text-gray-700]="statusFilter !== 'tutti'"
+              class="min-w-[90px] px-2.5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 hover:bg-blue-500 hover:text-white">
+              Tutti ({{ getStatusFilterCount('tutti') }})
+            </button>
+            <button
+              (click)="setStatusFilter('attive')"
+              [class.bg-green-600]="statusFilter === 'attive'"
+              [class.text-white]="statusFilter === 'attive'"
+              [class.bg-gray-100]="statusFilter !== 'attive'"
+              [class.text-gray-700]="statusFilter !== 'attive'"
+              class="min-w-[90px] px-2.5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 hover:bg-green-500 hover:text-white">
+              Attive ({{ getStatusFilterCount('attive') }})
+            </button>
+            <button
+              (click)="setStatusFilter('scadute')"
+              [class.bg-orange-600]="statusFilter === 'scadute'"
+              [class.text-white]="statusFilter === 'scadute'"
+              [class.bg-gray-100]="statusFilter !== 'scadute'"
+              [class.text-gray-700]="statusFilter !== 'scadute'"
+              class="min-w-[90px] px-2.5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 hover:bg-orange-500 hover:text-white">
+              Scadute ({{ getStatusFilterCount('scadute') }})
+            </button>
+            <button
+              (click)="setStatusFilter('annullate')"
+              [class.bg-red-600]="statusFilter === 'annullate'"
+              [class.text-white]="statusFilter === 'annullate'"
+              [class.bg-gray-100]="statusFilter !== 'annullate'"
+              [class.text-gray-700]="statusFilter !== 'annullate'"
+              class="min-w-[90px] px-2.5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200 hover:bg-red-500 hover:text-white">
+              Annullate ({{ getStatusFilterCount('annullate') }})
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button 
+            (click)="openExportModal()"
+            [disabled]="isExporting || isLoading"
+            class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 cursor-pointer disabled:bg-green-400 disabled:cursor-not-allowed">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Esporta
+          </button>
+          <button 
+            (click)="openNewBookingModal()"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
+            <i class="fas fa-plus mr-2"></i>
+            Nuova Prenotazione
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Pagination Controls -->
+      <div *ngIf="prenotazioni.length > 0" class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <!-- Items per page selector -->
+          <div class="flex items-center gap-2">
+            <label for="itemsPerPageTop" class="text-sm font-medium text-gray-700">Mostra:</label>
+            <select 
+              id="itemsPerPageTop"
+              [(ngModel)]="itemsPerPage" 
+              (ngModelChange)="onItemsPerPageChange($event)"
+              class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
+            </select>
+            <span class="text-sm text-gray-500">elementi per pagina</span>
+          </div>
+
+          <!-- Page info -->
+          <div class="text-sm text-gray-700">
+            Visualizzati {{ getStartIndex() }}-{{ getEndIndex() }} di {{ totalItems }} risultati
+          </div>
+
+          <!-- Pagination controls -->
+          <div class="flex items-center gap-1">
+            <!-- First page -->
+            <button 
+              (click)="goToFirstPage()"
+              [disabled]="currentPage === 1"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Previous page -->
+            <button 
+              (click)="goToPreviousPage()"
+              [disabled]="currentPage === 1"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Page numbers -->
+            <button 
+              *ngFor="let page of pageNumbers"
+              (click)="onPageChange(page)"
+              [class.bg-blue-600]="page === currentPage"
+              [class.text-white]="page === currentPage"
+              [class.text-gray-700]="page !== currentPage"
+              [class.hover:bg-gray-100]="page !== currentPage"
+              class="px-3 py-1 mx-1 text-sm font-medium rounded-md transition-colors duration-200">
+              {{ page }}
+            </button>
+
+            <!-- Next page -->
+            <button 
+              (click)="goToNextPage()"
+              [disabled]="currentPage === totalPages"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+
+            <!-- Last page -->
+            <button 
+              (click)="goToLastPage()"
+              [disabled]="currentPage === totalPages"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Cards (visible on small screens) -->
+      <div class="block sm:hidden space-y-4" id="bookings-mobile">
+        <div *ngFor="let prenotazione of paginatedPrenotazioni; trackBy: trackByPrenotazione" 
+           class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+           <div class="flex justify-between items-start mb-2">
+             <div class="flex-1">
+               <div class="font-medium text-gray-900">
+                 {{ formatDate(prenotazione.data_inizio, 'dd/MM/yyyy') }}
+               </div>
+               <div class="text-sm text-gray-500">
+                 {{ getFormattedTimeRange(prenotazione.data_inizio, prenotazione.data_fine) }}
+               </div>
+             </div>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" 
+              [ngClass]="{
+                'bg-green-100 text-green-800': prenotazione.stato_prenotazione === 'Confermata',
+                'bg-yellow-100 text-yellow-800': prenotazione.stato_prenotazione === 'InAttesa',
+                'bg-red-100 text-red-800': prenotazione.stato_prenotazione === 'Annullata'
+              }">
+              {{ prenotazione.stato_prenotazione }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+            <div>
+              <span class="text-gray-500">Stanza:</span>
+              <div class="font-medium">{{ prenotazione.stanze.nome }}</div>
+            </div>
+            <div>
+              <span class="text-gray-500">Postazione:</span>
+              <div class="font-medium">{{ prenotazione.postazione.nomePostazione }}</div>
+            </div>
+            <div *ngIf="isAdmin" class="col-span-2">
+              <span class="text-gray-500">Utente:</span>
+              <div class="font-medium">{{ prenotazione.users.nome }} {{ prenotazione.users.cognome }}</div>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="relative">
+              <button 
+                type="button"
+                (click)="toggleDropdown(prenotazione.id_prenotazioni!)"
+                class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-colors duration-200"
+                title="Azioni"
+                [disabled]="!prenotazione.id_prenotazioni"
+                [attr.data-prenotazione-id]="prenotazione.id_prenotazioni">
+                <i class="fas fa-ellipsis-v text-sm"></i>
+              </button>
+              
+              <!-- Dropdown Menu -->
+              <div 
+                *ngIf="openDropdownId === prenotazione.id_prenotazioni && prenotazione.id_prenotazioni"
+                class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10"
+                style="top: 100%; transform: translateY(0); max-height: calc(100vh - 100%); overflow: visible;"
+                [style.transform]="'translateY(' + (shouldOpenUpward(prenotazione.id_prenotazioni!) ? '-100%' : '0') + ')'">
+                <div class="py-1">
+                  <button
+                    type="button"
+                    (click)="editPrenotazione(prenotazione)"
+                    class="block w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-edit mr-2"></i>
+                    Modifica
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deletePrenotazione(prenotazione)"
+                    [disabled]="isLoading"
+                    class="block w-full text-left px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-trash mr-2"></i>
+                    Elimina
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State for Mobile -->
+        <div *ngIf="!paginatedPrenotazioni?.length && !isLoading" class="text-center py-12">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <i [class]="searchTerm ? 'fas fa-search text-gray-400 text-xl' : 'fas fa-calendar-times text-gray-400 text-xl'"></i>
+          </div>
+          <h3 class="text-sm font-medium text-gray-900 mb-1">
+            {{ searchTerm ? 'Nessun risultato trovato' : 'Nessuna prenotazione trovata' }}
+          </h3>
+          <p class="text-sm text-gray-500 mb-4">
+            <span *ngIf="searchTerm">
+              Prova a modificare i termini di ricerca o 
+              <button (click)="searchTerm = ''; applySearchFilter()" class="text-blue-600 hover:text-blue-800 underline">
+                cancella i filtri
+              </button>
+            </span>
+            <span *ngIf="!searchTerm">
+              {{ isAdmin ? 'Non ci sono prenotazioni nel sistema.' : 'Non hai ancora effettuato prenotazioni.' }}
+            </span>
+          </p>
+          <button 
+            *ngIf="!searchTerm"
+            (click)="openNewBookingModal()"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+            <i class="fas fa-plus mr-2"></i>
+            Crea la tua prima prenotazione
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Table (hidden on small screens) -->
+      <div class="hidden sm:block overflow-x-auto border border-gray-200 rounded-lg" id="bookings-table">
+        <div class="inline-block min-w-full align-middle">
+          <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                <button 
+                  type="button"
+                  (click)="sortTable('data_inizio')"
+                  class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none transition-colors duration-200"
+                  [class.text-blue-600]="isSortedColumn('data_inizio')">
+                  <span>Data</span>
+                  <i [class]="getSortIcon('data_inizio')"></i>
+                </button>
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                <button 
+                  type="button"
+                  (click)="sortTable('orario')"
+                  class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none transition-colors duration-200"
+                  [class.text-blue-600]="isSortedColumn('orario')">
+                  <span>Orario</span>
+                  <i [class]="getSortIcon('orario')"></i>
+                </button>
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48 hidden lg:table-cell" *ngIf="isAdmin">
+                <button 
+                  type="button"
+                  (click)="sortTable('utente')"
+                  class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none transition-colors duration-200"
+                  [class.text-blue-600]="isSortedColumn('utente')">
+                  <span>Utente</span>
+                  <i [class]="getSortIcon('utente')"></i>
+                </button>
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Stanza</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 hidden md:table-cell">Postazione</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Stato</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Azioni</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let prenotazione of paginatedPrenotazioni; trackBy: trackByPrenotazione" 
+                class="hover:bg-gray-50 transition-colors duration-150">
+              
+              <!-- Data -->
+              <td class="px-3 py-3 text-sm text-gray-900">
+                <div class="font-medium">{{ formatDate(prenotazione.data_inizio, 'dd/MM/yyyy') }}</div>
+              </td>
+              
+              <!-- Orario -->
+              <td class="px-3 py-3 text-sm">
+                <div class="font-medium text-gray-900">
+                  {{ getFormattedTimeRange(prenotazione.data_inizio, prenotazione.data_fine) }}
+                </div>
+              </td>
+
+              <!-- Utente (only for admins) -->
+              <td class="px-3 py-3 hidden lg:table-cell" *ngIf="isAdmin">
+                <div class="text-sm">
+                  <div class="font-medium text-gray-900">
+                    {{ prenotazione.users.nome || 'N/A' }} {{ prenotazione.users.cognome || '' }}
+                  </div>
+                  <div class="text-xs text-gray-500 truncate max-w-[200px]">
+                    {{ prenotazione.users.email || 'N/A' }}
+                  </div>
+                </div>
+              </td>
+
+              <!-- Stanza -->
+              <td class="px-3 py-3 text-sm">
+                <div class="font-medium text-gray-900 truncate">
+                  {{ prenotazione.stanze.nome }}
+                </div>
+                <div class="text-xs text-gray-500">
+                  {{ prenotazione.stanze.tipo_stanza }}
+                </div>
+              </td>
+
+              <!-- Postazione -->
+              <td class="px-3 py-3 text-sm hidden md:table-cell">
+                <div class="font-medium text-gray-900 truncate">
+                  {{ prenotazione.postazione.nomePostazione }}
+                </div>
+                <div class="text-xs text-gray-500">
+                  ID: {{ prenotazione.postazione.id_postazione }}
+                </div>
+              </td>
+
+              <!-- Stato -->
+              <td class="px-3 py-3">
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium" 
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': prenotazione.stato_prenotazione === 'Confermata',
+                    'bg-yellow-100 text-yellow-800': prenotazione.stato_prenotazione === 'InAttesa',
+                    'bg-red-100 text-red-800': prenotazione.stato_prenotazione === 'Annullata'
+                  }">
+                  <i class="fas text-xs mr-1" 
+                     [ngClass]="{
+                       'fa-check': prenotazione.stato_prenotazione === 'Confermata',
+                       'fa-clock': prenotazione.stato_prenotazione === 'InAttesa',
+                       'fa-times': prenotazione.stato_prenotazione === 'Annullata'
+                     }"></i>
+                  <span class="hidden sm:inline">{{ prenotazione.stato_prenotazione }}</span>
+                </span>
+              </td>
+
+              <!-- Azioni -->
+              <td class="px-3 py-3 text-sm">
+                <div class="relative">
+                  <button 
+                    type="button"
+                    (click)="toggleDropdown(prenotazione.id_prenotazioni!)"
+                    class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-colors duration-200"
+                    title="Azioni"
+                    [disabled]="!prenotazione.id_prenotazioni"
+                    [attr.data-prenotazione-id]="prenotazione.id_prenotazioni">
+                    <i class="fas fa-ellipsis-v text-sm"></i>
+                  </button>
+                  
+                  <!-- Dropdown Menu -->
+                  <div 
+                    *ngIf="openDropdownId === prenotazione.id_prenotazioni && prenotazione.id_prenotazioni"
+                    class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10"
+                    style="top: 100%; transform: translateY(0); max-height: calc(100vh - 100%); overflow: visible;"
+                    [style.transform]="'translateY(' + (shouldOpenUpward(prenotazione.id_prenotazioni!) ? '-100%' : '0') + ')'">
+                    <div class="py-1">
+                      <button
+                        type="button"
+                        (click)="editPrenotazione(prenotazione)"
+                        class="block w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifica
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deletePrenotazione(prenotazione)"
+                        [disabled]="isLoading"
+                        class="block w-full text-left px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-trash mr-2"></i>
+                        Elimina
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!paginatedPrenotazioni?.length && !isLoading">
+              <td [attr.colspan]="isAdmin ? 7 : 6" class="px-3 py-12 text-center">
+                <div class="flex flex-col items-center justify-center space-y-4">
+                  <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
+                    <i [class]="searchTerm ? 'fas fa-search text-gray-400 text-xl' : 'fas fa-calendar-times text-gray-400 text-xl'"></i>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-sm font-medium text-gray-900">
+                      {{ searchTerm ? 'Nessun risultato trovato' : 'Nessuna prenotazione trovata' }}
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                      <span *ngIf="searchTerm">
+                        Prova a modificare i termini di ricerca o 
+                        <button (click)="searchTerm = ''; applySearchFilter()" class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                          cancella i filtri
+                        </button>
+                      </span>
+                      <span *ngIf="!searchTerm">
+                        {{ isAdmin ? 'Non ci sono prenotazioni nel sistema.' : 'Non hai ancora effettuato prenotazioni.' }}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="mt-4" *ngIf="!searchTerm">
+                    <button 
+                      (click)="openNewBookingModal()"
+                      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                      <i class="fas fa-plus mr-2"></i>
+                      Crea la tua prima prenotazione
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div *ngIf="prenotazioni.length > 0" class="bg-white border border-gray-200 rounded-lg p-4 mt-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <!-- Items per page selector -->
+          <div class="flex items-center gap-2">
+            <label for="itemsPerPage" class="text-sm font-medium text-gray-700">Mostra:</label>
+            <select 
+              id="itemsPerPage"
+              [(ngModel)]="itemsPerPage" 
+              (ngModelChange)="onItemsPerPageChange($event)"
+              class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
+            </select>
+            <span class="text-sm text-gray-500">elementi per pagina</span>
+          </div>
+
+          <!-- Page info -->
+          <div class="text-sm text-gray-700">
+            Visualizzati {{ getStartIndex() }}-{{ getEndIndex() }} di {{ totalItems }} risultati
+          </div>
+
+          <!-- Pagination controls -->
+          <div class="flex items-center gap-1">
+            <!-- First page -->
+            <button 
+              (click)="goToFirstPage()"
+              [disabled]="currentPage === 1"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Previous page -->
+            <button 
+              (click)="goToPreviousPage()"
+              [disabled]="currentPage === 1"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Page numbers -->
+            <button 
+              *ngFor="let page of pageNumbers"
+              (click)="onPageChange(page)"
+              [class.bg-blue-600]="page === currentPage"
+              [class.text-white]="page === currentPage"
+              [class.text-gray-700]="page !== currentPage"
+              [class.hover:bg-gray-100]="page !== currentPage"
+              class="px-3 py-1 mx-1 text-sm font-medium rounded-md transition-colors duration-200">
+              {{ page }}
+            </button>
+
+            <!-- Next page -->
+            <button 
+              (click)="goToNextPage()"
+              [disabled]="currentPage === totalPages"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+
+            <!-- Last page -->
+            <button 
+              (click)="goToLastPage()"
+              [disabled]="currentPage === totalPages"
+              class="p-2 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+</div>
+
+<!-- New Booking Modal -->
+<div *ngIf="showModal" 
+     style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 99999; display: flex; align-items: center; justify-content: center;"
+     (click)="closeModal()">
+  
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-lg mx-4" 
+       (click)="$event.stopPropagation()">
+    
+    <form [formGroup]="bookingForm" (ngSubmit)="onSubmitModal()">
+      <!-- Header -->
+      <div class="px-6 py-4 bg-blue-50 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900 flex items-center">
+          <i class="fas fa-calendar-plus text-blue-600 mr-2"></i>
+          Nuova Prenotazione
+        </h3>
+      </div>
+      
+      <!-- Body -->
+      <div class="px-6 py-4 max-h-96 overflow-y-auto">
+        <div class="space-y-4">
+          <!-- User Selection (for admins) -->
+          <div *ngIf="isAdmin" class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Utente</label>
+            <div class="relative">
+              <input type="text" 
+                     [(ngModel)]="userSearchTerm"
+                     (ngModelChange)="filterUsers()"
+                     (focus)="showUserDropdown = true"
+                     (blur)="onUserInputBlur()"
+                     placeholder="Cerca utente per nome, cognome o email..."
+                     class="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     [ngModelOptions]="{standalone: true}">
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                <button 
+                  *ngIf="userSearchTerm" 
+                  type="button"
+                  (click)="clearUserSearch()"
+                  class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                  title="Cancella ricerca">
+                  <i class="fas fa-times text-sm"></i>
+                </button>
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+            </div>
+            
+            <!-- User Dropdown -->
+            <div *ngIf="showUserDropdown && filteredUsers.length > 0" 
+                 class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div *ngFor="let user of filteredUsers; trackBy: trackByUser" 
+                   (click)="selectUser(user)"
+                   class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                <div class="font-medium text-gray-900">
+                  {{ user.nome }} {{ user.cognome }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ user.email }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- No results message -->
+            <div *ngIf="showUserDropdown && userSearchTerm && filteredUsers.length === 0" 
+                 class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3">
+              <div class="text-sm text-gray-500 text-center">
+                Nessun utente trovato per "{{ userSearchTerm }}"
+              </div>
+            </div>
+            
+            <!-- Hidden form control for validation -->
+            <input type="hidden" formControlName="userId">
+            
+            <div *ngIf="bookingForm.get('userId')?.invalid && bookingForm.get('userId')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona un utente
+            </div>
+          </div>
+
+          <!-- Date -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+            <input type="date" formControlName="date" 
+                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <div *ngIf="bookingForm.get('date')?.invalid && bookingForm.get('date')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona una data
+            </div>
+          </div>
+
+          <!-- Time Slot -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Orario</label>
+            <select formControlName="timeSlot" 
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">Seleziona orario</option>
+              <option *ngFor="let slot of timeSlots" [value]="slot.start + ' - ' + slot.end">
+                {{ slot.start }} - {{ slot.end }}
+              </option>
+            </select>
+            <div *ngIf="bookingForm.get('timeSlot')?.invalid && bookingForm.get('timeSlot')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona un orario
+            </div>
+          </div>
+
+          <!-- Room Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Stanza</label>
+            <select formControlName="tipoStanza" 
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">Seleziona tipo stanza</option>
+              <option *ngFor="let tipo of tipiStanza" [value]="tipo">
+                {{ tipo }}
+              </option>
+            </select>
+            <div *ngIf="bookingForm.get('tipoStanza')?.invalid && bookingForm.get('tipoStanza')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona un tipo di stanza
+            </div>
+          </div>
+
+          <!-- Room -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Stanza</label>
+            <select formControlName="stanzaId" 
+                    [disabled]="!bookingForm.get('tipoStanza')?.value"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
+              <option value="">Seleziona stanza</option>
+              <option *ngFor="let stanza of filteredStanze" [value]="stanza.id_stanza">
+                {{ stanza.nome }}
+              </option>
+            </select>
+            <div *ngIf="bookingForm.get('stanzaId')?.invalid && bookingForm.get('stanzaId')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona una stanza
+            </div>
+          </div>
+
+          <!-- Workstation -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Postazione</label>
+            <select formControlName="postazioneId" 
+                    [disabled]="!bookingForm.get('stanzaId')?.value"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
+              <option value="">Seleziona postazione</option>
+              <option *ngFor="let postazione of filteredPostazioni" [value]="postazione.id_postazione">
+                {{ postazione.nomePostazione }}
+              </option>
+            </select>
+            <div *ngIf="bookingForm.get('postazioneId')?.invalid && bookingForm.get('postazioneId')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona una postazione
+            </div>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        <div *ngIf="modalErrorMessage" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <p class="text-sm text-red-600">{{ modalErrorMessage }}</p>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+        <button type="button" 
+                (click)="closeModal()"
+                [disabled]="isModalLoading"
+                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 cursor-pointer">
+          Annulla
+        </button>
+        <button type="submit" 
+                [disabled]="isModalLoading || bookingForm.invalid"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+          <span *ngIf="isModalLoading" class="mr-2">
+            <i class="fas fa-spinner fa-spin"></i>
+          </span>
+          {{ isModalLoading ? 'Creazione...' : 'Crea Prenotazione' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Booking Modal -->
+<div *ngIf="showEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" 
+     (click)="closeEditModal()">
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-md mx-4" 
+       (click)="$event.stopPropagation()">
+    
+    <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit()">
+      <!-- Header -->
+      <div class="px-6 py-4 bg-blue-50 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900 flex items-center">
+          <i class="fas fa-edit text-blue-600 mr-2"></i>
+          Modifica Prenotazione
+        </h3>
+      </div>
+      
+      <!-- Body -->
+      <div class="px-6 py-4">
+        <div class="space-y-4">
+          <!-- Booking Details (Read-only) -->
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Dettagli Prenotazione</h4>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span class="text-gray-500">Data:</span>
+                <div class="font-medium">{{ editingPrenotazione ? formatDate(editingPrenotazione.data_inizio, 'dd/MM/yyyy') : '' }}</div>
+              </div>
+              <div>
+                <span class="text-gray-500">Orario:</span>
+                <div class="font-medium">{{ editingPrenotazione ? getFormattedTimeRange(editingPrenotazione.data_inizio, editingPrenotazione.data_fine) : '' }}</div>
+              </div>
+              <div>
+                <span class="text-gray-500">Stanza:</span>
+                <div class="font-medium">{{ editingPrenotazione?.stanze?.nome }}</div>
+              </div>
+              <div>
+                <span class="text-gray-500">Postazione:</span>
+                <div class="font-medium">{{ editingPrenotazione?.postazione?.nomePostazione }}</div>
+              </div>
+              <div *ngIf="isAdmin" class="col-span-2">
+                <span class="text-gray-500">Utente:</span>
+                <div class="font-medium">{{ editingPrenotazione?.users?.nome }} {{ editingPrenotazione?.users?.cognome }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Stato Prenotazione</label>
+            <select formControlName="stato_prenotazione" 
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="Confermata">Confermata</option>
+              <!--<option value="Sospesa">Sospesa</option>-->
+              <option value="Annullata">Annullata</option>
+            </select>
+            <div *ngIf="editForm.get('stato_prenotazione')?.invalid && editForm.get('stato_prenotazione')?.touched" 
+                 class="text-sm text-red-600 mt-1">
+              Seleziona uno stato
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="editErrorMessage" class="text-sm text-red-600 bg-red-50 p-2 rounded">
+            {{ editErrorMessage }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+        <button 
+          type="button"
+          (click)="closeEditModal()"
+          [disabled]="isEditLoading"
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          Annulla
+        </button>
+        <button 
+          type="submit"
+          [disabled]="editForm.invalid || isEditLoading"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          <span *ngIf="isEditLoading" class="mr-2">
+            <i class="fas fa-spinner fa-spin"></i>
+          </span>
+          {{ isEditLoading ? 'Salvataggio...' : 'Salva Modifiche' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div *ngIf="showExportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" 
+     (click)="closeExportModal()">
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-md mx-4" 
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="px-6 py-4 bg-green-50 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900 flex items-center">
+        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Esporta Prenotazioni
+      </h3>
+      <p class="text-sm text-gray-600 mt-1">Seleziona il periodo per l'esportazione in Excel</p>
+    </div>
+    
+    <!-- Body -->
+    <div class="px-6 py-4">
+      <div class="space-y-3">
+        <div *ngFor="let period of exportPeriods" 
+             class="relative">
+          <label class="flex items-start p-4 rounded-lg border cursor-pointer transition-all duration-200"
+                 [class.border-green-500]="selectedExportPeriod === period.value"
+                 [class.bg-green-50]="selectedExportPeriod === period.value"
+                 [class.border-gray-200]="selectedExportPeriod !== period.value"
+                 [class.hover:bg-gray-50]="selectedExportPeriod !== period.value">
+            <input type="radio" 
+                   [value]="period.value" 
+                   [(ngModel)]="selectedExportPeriod"
+                   (change)="selectExportPeriod(period.value)"
+                   class="mt-0.5 h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500">
+            <div class="ml-3 flex-1">
+              <div class="text-sm font-medium text-gray-900">
+                {{ period.label }}
+              </div>
+              <div class="text-sm text-gray-500 mt-1">
+                {{ period.description }}
+              </div>
+              <div class="text-xs text-gray-400 mt-1">
+                Disponibili: {{ getBookingsByPeriod(period.value).length }} prenotazioni
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isExporting" class="mt-4 p-4 bg-blue-50 rounded-lg">
+        <div class="flex items-center">
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+          <span class="text-sm text-blue-700">Generazione file Excel in corso...</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+      <button type="button" 
+              (click)="closeExportModal()"
+              [disabled]="isExporting"
+              class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+        Annulla
+      </button>
+      <button type="button"
+              (click)="confirmExport()"
+              [disabled]="!selectedExportPeriod || isExporting"
+              class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+        <svg *ngIf="!isExporting" class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <div *ngIf="isExporting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+        {{ isExporting ? 'Esportazione...' : 'Esporta Excel' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Toast Notifications -->
+<div class="fixed top-4 right-4 z-50 space-y-2" id="toast-container">
+  <!-- Toast notifications will be dynamically positioned here -->
+</div>
+
+<p-toast position="top-right" 
+         [showTransitionOptions]="'300ms ease-out'"
+         [hideTransitionOptions]="'250ms ease-in'">
+</p-toast>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [show]="showDeleteConfirmation"
+  [isLoading]="isLoading"
+  [type]="'danger'"
+  [icon]="'trash'"
+  [data]="{
+    title: 'Conferma Eliminazione Prenotazione',
+    message: getPrenotazioneDeleteConfirmationMessage(),
+    confirmButtonText: 'Elimina',
+    cancelButtonText: 'Annulla'
+  }"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteConfirmation()">
+</app-confirmation-modal>

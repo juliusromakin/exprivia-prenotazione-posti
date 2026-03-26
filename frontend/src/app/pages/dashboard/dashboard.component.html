@@ -1,0 +1,146 @@
+<!-- Dashboard Layout -->
+<div
+  class="flex flex-col min-h-screen bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
+>
+  <!-- Header per utenti non admin -->
+  <ng-container *ngIf="!isAdmin">
+    <app-header></app-header>
+  </ng-container>
+
+  <!-- Main Content Area -->
+  <div class="flex flex-1 pt-14 sm:pt-16 md:pt-0">
+    <!-- Sidebar per admin -->
+    <app-sidebar *ngIf="isAdmin"></app-sidebar>
+    
+    <!-- Main Content with margin for fixed sidebar -->
+    <main class="flex-1 flex flex-col bg-white transition-all duration-200"
+          [ngClass]="{
+            'ml-sidebar-expanded': isAdmin && !isSidebarCollapsed,
+            'ml-sidebar-collapsed': isAdmin && isSidebarCollapsed
+          }">
+      <!-- Header Section per admin -->
+      <div
+        *ngIf="isAdmin"
+        class="px-8 py-6 bg-cover bg-center border-b border-gray-200"
+      >
+        <div class="flex justify-between items-center">
+          <div class="space-y-1">
+            <h1 class="text-2xl font-semibold text-gray-900">
+              Benvenuto, {{ currentUser?.nome }}
+            </h1>
+            <p class="text-sm text-gray-500">
+              {{ currentDate | date : "EEEE d MMMM yyyy" }} - {{ currentTime }}
+            </p>
+          </div>
+
+          <!-- Notifications -->
+          <div class="flex items-center gap-4">
+            <button
+              class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+            >
+              <lucide-icon name="bell" class="w-6 h-6" />
+              <span
+                *ngIf="notificationCount > 0"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+              >
+                {{ notificationCount }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content for non-admin users -->
+      <div
+      *ngIf="!isAdmin" class="flex-1 px-8 py-6 space-y-6 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
+      >
+        <ng-container *ngIf="isHomeRoute()">
+          <app-prenotazione-posizione></app-prenotazione-posizione>
+        </ng-container>
+
+        <!-- Router outlet per i componenti child -->
+        <div class="w-full">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+
+      <!-- Dashboard Content for admin -->
+      <div
+        *ngIf="isAdmin" class="flex-1 px-8 py-6 space-y-8 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
+      >
+        <!-- Dashboard Overview -->
+        <ng-container *ngIf="isHomeRoute()">
+          <!-- Welcome Header -->
+          <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Amministratore</h2>
+                <p class="text-gray-600">Panoramica completa del sistema di prenotazioni</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Actions Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            <!-- New Booking -->
+            <button routerLink="prenotazione-posizione" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+              <div class="flex items-center justify-between mb-6">
+                <div class="p-4 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                  <lucide-icon name="plus" class="w-7 h-7 text-blue-600" />
+                </div>
+                <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Nuova Prenotazione</h3>
+              <p class="text-sm text-gray-500">Crea prenotazioni personali o per altri utenti</p>
+            </button>
+
+            <!-- Manage Bookings -->
+            <button routerLink="bookings" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+              <div class="flex items-center justify-between mb-6">
+                <div class="p-4 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
+                  <lucide-icon name="calendar" class="w-7 h-7 text-green-600" />
+                </div>
+                <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Gestione Prenotazioni</h3>
+              <p class="text-sm text-gray-500">Visualizza e gestisci tutte le prenotazioni del sistema</p>
+            </button>
+
+            <!-- User Management -->
+            <button routerLink="user-management" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+              <div class="flex items-center justify-between mb-6">
+                <div class="p-4 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
+                  <lucide-icon name="users" class="w-7 h-7 text-purple-600" />
+                </div>
+                <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Gestione Utenti</h3>
+              <p class="text-sm text-gray-500">Amministra utenti, ruoli e permessi del sistema</p>
+            </button>
+          </div>
+
+          <!-- Statistics Section -->
+          <div class="grid grid-cols-1 gap-8">
+            <!-- Statistics -->
+            <button routerLink="statistiche" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+              <div class="flex items-center justify-between mb-6">
+                <div class="p-4 bg-orange-50 rounded-lg group-hover:bg-orange-100 transition-colors">
+                  <i class="fas fa-chart-bar text-orange-600 text-2xl"></i>
+                </div>
+                <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Statistiche Avanzate</h3>
+              <p class="text-sm text-gray-500">Visualizza report dettagliati e analisi del sistema di prenotazioni</p>
+            </button>
+          </div>
+        </ng-container>
+        
+        <!-- Router outlet per i componenti child -->
+        <div class="w-full">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+

@@ -1,0 +1,114 @@
+<header class="w-full bg-white fixed md:sticky top-0 z-[var(--z-50)] border-b border-gray-100 shadow-[var(--shadow-sm)]" role="banner">
+    <div class="mx-auto container px-4 md:px-8 flex h-14 sm:h-16 items-center justify-between">
+        <!-- Logo -->
+        <div class="cursor-pointer hover:opacity-80 transition-[var(--transition-opacity)]" [routerLink]="isAuthenticated ? ['/dashboard/'] : ['/']" role="link" aria-label="Torna alla home">
+            <img class="h-6 sm:h-8 w-auto" src="LogoExprivia.svg" alt="Exprivia Logo" width="120" height="32">
+        </div>
+
+        <!-- Navigation for authenticated users -->
+        <ng-container *ngIf="isAuthenticated">
+            <!-- Desktop Navigation -->
+            <div class="flex items-center gap-4">
+                <!-- Desktop User Menu -->
+                <div class="hidden md:flex items-center gap-6">
+                    <!-- User Profile with Hover Effect -->
+                    <div class="flex items-center gap-4">
+                        <div class="relative group">
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] cursor-pointer">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-expriviaBlue)] text-white font-medium">
+                                    {{ currentUser ? ((currentUser.nome ? (currentUser.nome | slice:0:1) : '') + (currentUser.cognome ? (currentUser.cognome | slice:0:1) : '')) : '' }}
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-500">Benvenuto,</span>
+                                    <span class="text-[var(--color-expriviaBlue)] font-medium text-sm">{{ currentUser?.nome }} {{ currentUser?.cognome }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 mt-1 w-48 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[var(--transition-all)] z-50">
+                                <div class="py-1">
+                                    <a [routerLink]="['/dashboard/update-user']" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-[var(--transition-colors)]">
+                                        <lucide-icon name="user" class="w-4 h-4 mr-3 text-gray-500" />
+                                        <span>Profilo</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logout Button -->
+                        <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-lg)] text-red-600 hover:bg-red-50 transition-[var(--transition-all)] cursor-pointer">
+                            <lucide-icon name="log-out" class="w-5 h-5" />
+                            <span class="font-medium">Logout</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button (click)="toggleMenu()" class="p-2 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)]">
+                        <lucide-icon name="menu" class="w-5 h-5 text-gray-700" />
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Navigation for non-authenticated users -->
+        <div *ngIf="!isAuthenticated" class="flex items-center gap-3">
+            <a [routerLink]="['/accedi']" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-expriviaOrange)] rounded-[var(--radius-lg)] hover:bg-[var(--color-expriviaOrange400)] transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
+                Accedi
+            </a>
+            <a [routerLink]="['/registrazione']" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
+                Registrati
+            </a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu (outside main container) -->
+    <div *ngIf="isMenuOpen && isAuthenticated" class="md:hidden fixed inset-0 z-[var(--z-50)] bg-black/50" (click)="isMenuOpen = false">
+        <div class="absolute inset-x-0 top-16 m-4 bg-white rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] overflow-hidden transition-[var(--transition-all)]" (click)="$event.stopPropagation()">
+            <!-- User Info -->
+            <div class="p-6 bg-[var(--color-expriviaBlue)] text-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-xl">
+                        {{ (currentUser?.nome || 'U')[0] }}{{ (currentUser?.cognome || '')[0] }}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-lg">{{ currentUser?.nome }} {{ currentUser?.cognome }}</p>
+                        <p class="text-sm opacity-90">{{ currentUser?.email }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Links -->
+            <nav class="p-2">
+                <ng-container *ngFor="let navItem of navItems">
+                    <!-- Single level items -->
+                    <ng-container *ngIf="!navItem.children && isNavItemVisible(navItem)">
+                        <a [routerLink]="[navItem.route]" class="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-lg)] text-gray-700 hover:bg-[var(--color-expriviaOrange)] hover:text-white transition-[var(--transition-all)]">
+                            <lucide-icon [name]="navItem.icon" class="w-5 h-5" />
+                            <span>{{ navItem.label }}</span>
+                        </a>
+                    </ng-container>
+
+                    <!-- Items with children -->
+                    <ng-container *ngIf="navItem.children && isNavItemVisible(navItem)">
+                        <div class="px-4 py-2 text-sm font-medium text-gray-500">
+                            {{ navItem.label }}
+                        </div>
+                        <ng-container *ngFor="let childItem of navItem.children">
+                            <a *ngIf="isNavItemVisible(childItem)" [routerLink]="[childItem.route]" class="flex items-center gap-3 px-8 py-3 rounded-[var(--radius-lg)] text-gray-700 hover:bg-[var(--color-expriviaOrange)] hover:text-white transition-[var(--transition-all)]">
+                                <lucide-icon [name]="childItem.icon" class="w-5 h-5" />
+                                <span>{{ childItem.label }}</span>
+                            </a>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+
+                <button (click)="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-[var(--radius-lg)] text-red-600 hover:bg-red-50 transition-[var(--transition-all)] cursor-pointer">
+                    <lucide-icon name="log-out" class="w-5 h-5" />
+                    <span>Disconnetti</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+</header>

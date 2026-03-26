@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Sezione che definisce il genitore del progetto, di solito usato per ereditare
+    configurazioni generali -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath /> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- Le informazioni sul progetto (identificativo, versione, tipo di pacchetto) -->
+    <groupId>com.prenotazioni.exprivia</groupId>
+    <artifactId>exprv</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging> <!-- Questo indica che il pacchetto finale sarà un file WAR -->
+    <name>exprv</name>
+    <description>Demo project for Spring Boot</description>
+    <url />
+
+    <!-- Dettagli su licenze, sviluppatori e SCM (gestione del codice sorgente), che sono opzionali -->
+    <licenses>
+        <license />
+    </licenses>
+    <developers>
+        <developer />
+    </developers>
+    <scm>
+        <connection />
+        <developerConnection />
+        <tag />
+        <url />
+    </scm>
+
+    <!-- Definisce la versione di Java da utilizzare per il progetto -->
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <!-- Sezione delle dipendenze -->
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+
+        <!-- Dipendenza di Spring Data JPA per interagire con un database relazionale (come
+        PostgreSQL) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Dipendenza per abilitare le funzionalità di Spring Web (REST API, controller, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Dipendenza per il server Tomcat, configurato come 'provided' per non essere incluso nel
+        WAR finale -->
+
+        <!-- Rimossa perché il Jar non parte altrimenti -->
+        <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>  Questa dipendenza viene fornita dal container in cui il WAR verrà
+            eseguito 
+        </dependency>  -->
+
+        <!-- Dipendenza per il testing (JUnit, Mockito, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope> <!-- Solo per i test -->
+        </dependency>
+
+        <!-- Dipendenza per il driver di PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope> <!-- Runtime, quindi non sarà incluso nel build finale ma necessario a
+            runtime -->
+        </dependency>
+
+        <!-- Dipendenza per MapStruct, una libreria per la generazione automatica di mapper tra
+        oggetti -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+
+        <!-- Dipendenza per il processore di MapStruct, necessario durante la compilazione -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.5.5.Final</version>
+            <scope>provided</scope> <!-- Solo durante la compilazione, non incluso nel WAR finale -->
+        </dependency>
+
+        <!-- Dipendenza per il modulo di Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Dipendenza per Springdoc OpenAPI UI, per la generazione automatica della documentazione
+        delle API REST -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.5</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Dipendenza per l'Email Service - Recupero Password -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- Dipendenza per Jakarta Servlet API, necessaria per applicazioni web -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope> <!-- Non incluso nel WAR finale, fornito dal server di applicazioni -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <!-- Sezione per la configurazione dei plugin Maven -->
+   <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.10.1</version>
+            <configuration>
+                <source>17</source>
+                <target>17</target>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>1.18.30</version>
+                    </path>
+                    <path>
+                        <groupId>org.mapstruct</groupId>
+                        <artifactId>mapstruct-processor</artifactId>
+                        <version>1.5.3.Final</version>
+                    </path>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok-mapstruct-binding</artifactId>
+                        <version>0.2.0</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+
+        <plugin>  <!-- Opzionale, ma meglio specificarlo per evitare errori -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+
+    </plugins>
+</build>
+
+</project>
