@@ -1,59 +1,24 @@
-#Immagine del beckend
-
-# Usa un'immagine base con Java 17 <java.version>17</java.version>
-# FROM openjdk:17
-
-# Imposta la directory di lavoro
-# WORKDIR /backend
-
-#Creazione file .jar  (-DskipTests skippa i test)
-# RUN mvn package -DskipTests 
-
-# Copia il file JAR compilato nell'immagine
-# COPY exprv/target/exprv-0.0.1-SNAPSHOT.jar /backend
-
-# Espone la porta 8080
-# EXPOSE 8080
-
-# Avvia l'applicazione
-# CMD ["java", "-jar", "exprv-0.0.1-SNAPSHOT.jar"]
-
-###################################################################################################
-
-# Usa un'immagine base con Java 17
-#FROM openjdk:17
-
-# Imposta la directory di lavoro
-#WORKDIR /backend
-
-# Copia il file JAR compilato nell’immagine
-#COPY exprv/target/exprv-0.0.1-SNAPSHOT.jar /backend/
-
-# Espone la porta 8080
-#EXPOSE 8080
-
-# Avvia l’applicazione
-#CMD ["java", "-jar", "exprv-0.0.1-SNAPSHOT.jar"]
-
-##############################################################
-
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
-
+# Fase 1: Build con Maven
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copia tutto il progetto Maven
-COPY . /app
+# Copia il file pom.xml e scarica le dipendenze
+COPY pom.xml .
+# Corretto: mvn invece di mvc
+RUN mvn dependency:go-offline
 
-# Compila il progetto
+# Copia il codice sorgente e compila
+COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Fase finale
-FROM openjdk:17
+# Fase 2: Immagine di esecuzione
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /backend
 
-#Copia il JAR dalla build precedente
-COPY --from=builder /app/target/exprv-0.0.1-SNAPSHOT.jar /backend/
+# Copia il jar generato dalla fase di build
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "exprv-0.0.1-SNAPSHOT.jar"]
+# Comando di avvio
+ENTRYPOINT ["java", "-jar", "app.jar"]
