@@ -6,12 +6,9 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "email"
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "email")
 public class UserDTO {
 
     private Integer id_user;
@@ -32,10 +29,10 @@ public class UserDTO {
         this.email = email;
     }
 
-    public UserDTO(Users user) {
+    public UserDTO(User user) {
         this.id_user = user.getId_user();
-        this.nome = user.getNome();
-        this.cognome = user.getCognome();
+        this.nome = user.getName();
+        this.cognome = user.getLastName();
         this.email = user.getEmail();
         this.authorities = user.getAuthorities().stream()
                 .map(Authority::getName)
@@ -73,7 +70,6 @@ public class UserDTO {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     public Set<String> getAuthorities() {
         return authorities;

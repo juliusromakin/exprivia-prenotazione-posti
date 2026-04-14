@@ -20,7 +20,7 @@ import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
@@ -85,7 +85,7 @@ public class AdminService {
             throw new IllegalArgumentException("Esiste già un utente con questa email!");
         }
 
-        Users user = userMapper.toEntity(userRegistrationDTO);
+        User user = userMapper.toEntity(userRegistrationDTO);
         user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
         Set<Authority> authorities = new HashSet<>();
@@ -107,8 +107,7 @@ public class AdminService {
         }
 
         user.setAuthorities(authorities);
-        user.setEnabled(true);
-        user.setCreatoIl(LocalDateTime.now());
+        user.setCreatdDate(LocalDateTime.now());
 
         user = userRepository.save(user);
         return userMapper.toDto(user);
@@ -134,12 +133,12 @@ public class AdminService {
             throw new AccessDeniedException("Accesso negato: solo un amministratore può aggiornare un utente");
         }
 
-        Users existingUser = userRepository.findById(id)
+        User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utente con ID " + id + " non trovato"));
 
         if (updates.containsKey("email")) {
             String newEmail = (String) updates.get("email");
-            Optional<Users> userWithSameEmail = userRepository.findByEmail(newEmail);
+            Optional<User> userWithSameEmail = userRepository.findByEmail(newEmail);
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
                 throw new IllegalArgumentException("Email già in uso");
             }
@@ -148,10 +147,10 @@ public class AdminService {
         updates.forEach((key, value) -> {
             switch (key) {
                 case "nome":
-                    existingUser.setNome((String) value);
+                    existingUser.setName((String) value);
                     break;
                 case "cognome":
-                    existingUser.setCognome((String) value);
+                    existingUser.setLastName((String) value);
                     break;
                 case "email":
                     existingUser.setEmail((String) value);
@@ -191,14 +190,11 @@ public class AdminService {
                     }
                     existingUser.setAuthorities(authorities);
                     break;
-                case "enabled":
-                    existingUser.setEnabled((Boolean) value);
-                    break;
             }
         });
 
-        existingUser.setAggiornatoIl(LocalDateTime.now());
-        Users updatedUser = userRepository.save(existingUser);
+        existingUser.setUpdatedDate(LocalDateTime.now());
+        User updatedUser = userRepository.save(existingUser);
         return new AdminDTO(updatedUser);
     }
 

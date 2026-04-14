@@ -33,7 +33,7 @@ import com.prenotazioni.exprivia.exprv.dto.AdminCreatePrenotazioneDTO;
 import com.prenotazioni.exprivia.exprv.entity.Postazioni;
 import com.prenotazioni.exprivia.exprv.entity.Prenotazioni;
 import com.prenotazioni.exprivia.exprv.entity.Stanze;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.enumerati.stato_prenotazione;
 import com.prenotazioni.exprivia.exprv.mapper.PrenotazioniMapper;
 import com.prenotazioni.exprivia.exprv.repository.PostazioniRepository;
@@ -60,7 +60,7 @@ public class PrenotazioniService {
 
     @Autowired
     private PrenotazioniMapper prenotazioniMapper;
-    
+
     @Autowired
     private EmailService emailService;
 
@@ -161,8 +161,8 @@ public class PrenotazioniService {
     /**
      * Aggiorna una Prenotazione esistente con i valori specificati
      *
-     * @param id      ID dell'utente da aggiornare
-     * @param updates mappa dei campi da aggiornare
+     * @param id            ID dell'utente da aggiornare
+     * @param updates       mappa dei campi da aggiornare
      * @param isAdminAction indica se l'azione è stata effettuata dall'admin
      * @return UserDTO dell'utente aggiornato
      * @throws EntityNotFoundException se l'utente non esiste
@@ -195,7 +195,8 @@ public class PrenotazioniService {
                             LocalDateTime dateTime = parseDateTime(value.toString());
                             existingPrenotazioni.setDataInizio(dateTime);
                         } catch (Exception e) {
-                            throw new IllegalArgumentException("Formato data_inizio non valido: " + value.toString() + " - " + e.getMessage());
+                            throw new IllegalArgumentException(
+                                    "Formato data_inizio non valido: " + value.toString() + " - " + e.getMessage());
                         }
                     }
                     break;
@@ -205,7 +206,8 @@ public class PrenotazioniService {
                             LocalDateTime dateTime = parseDateTime(value.toString());
                             existingPrenotazioni.setDataFine(dateTime);
                         } catch (Exception e) {
-                            throw new IllegalArgumentException("Formato data_fine non valido: " + value.toString() + " - " + e.getMessage());
+                            throw new IllegalArgumentException(
+                                    "Formato data_fine non valido: " + value.toString() + " - " + e.getMessage());
                         }
                     }
                     break;
@@ -237,7 +239,7 @@ public class PrenotazioniService {
                     } else {
                         throw new IllegalArgumentException("Formato user non valido");
                     }
-                    Users user = userRepository.findById(idUser)
+                    User user = userRepository.findById(idUser)
                             .orElseThrow(() -> new EntityNotFoundException("User con ID " + idUser + " non trovato"));
                     existingPrenotazioni.setUsers(user);
                     break;
@@ -267,40 +269,40 @@ public class PrenotazioniService {
         });
 
         Prenotazioni updatedPrenotazioni = prenotazioniRepository.save(existingPrenotazioni);
-        
+
         // Send cancellation email if status changed to Annullata
-        if (originalState != stato_prenotazione.Annullata && 
-            updatedPrenotazioni.getStato_prenotazione() == stato_prenotazione.Annullata) {
-            
+        if (originalState != stato_prenotazione.Annullata &&
+                updatedPrenotazioni.getStato_prenotazione() == stato_prenotazione.Annullata) {
+
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             String startDateTime = updatedPrenotazioni.getDataInizio().format(formatter);
             String endDateTime = updatedPrenotazioni.getDataFine().format(formatter);
-            
+
             if (isAdminAction) {
                 // Admin cancelled the booking
                 emailService.sendBookingCancelledByAdminEmail(
-                    updatedPrenotazioni.getUsers().getEmail(),
-                    updatedPrenotazioni.getUsers().getNome() + " " + updatedPrenotazioni.getUsers().getCognome(),
-                    updatedPrenotazioni.getStanze().getNome(),
-                    updatedPrenotazioni.getPostazione().getNomePostazione(),
-                    startDateTime,
-                    endDateTime
-                );
-                System.out.println("DEBUG - Email di annullamento admin inoltrata per: " + updatedPrenotazioni.getUsers().getEmail());
+                        updatedPrenotazioni.getUsers().getEmail(),
+                        updatedPrenotazioni.getUsers().getName() + " " + updatedPrenotazioni.getUsers().getLastName(),
+                        updatedPrenotazioni.getStanze().getNome(),
+                        updatedPrenotazioni.getPostazione().getNomePostazione(),
+                        startDateTime,
+                        endDateTime);
+                System.out.println("DEBUG - Email di annullamento admin inoltrata per: "
+                        + updatedPrenotazioni.getUsers().getEmail());
             } else {
                 // User cancelled their own booking
                 emailService.sendBookingCancellationEmail(
-                    updatedPrenotazioni.getUsers().getEmail(),
-                    updatedPrenotazioni.getUsers().getNome() + " " + updatedPrenotazioni.getUsers().getCognome(),
-                    updatedPrenotazioni.getStanze().getNome(),
-                    updatedPrenotazioni.getPostazione().getNomePostazione(),
-                    startDateTime,
-                    endDateTime
-                );
-                System.out.println("DEBUG - Email di annullamento utente inoltrata per: " + updatedPrenotazioni.getUsers().getEmail());
+                        updatedPrenotazioni.getUsers().getEmail(),
+                        updatedPrenotazioni.getUsers().getName() + " " + updatedPrenotazioni.getUsers().getLastName(),
+                        updatedPrenotazioni.getStanze().getNome(),
+                        updatedPrenotazioni.getPostazione().getNomePostazione(),
+                        startDateTime,
+                        endDateTime);
+                System.out.println("DEBUG - Email di annullamento utente inoltrata per: "
+                        + updatedPrenotazioni.getUsers().getEmail());
             }
         }
-        
+
         return prenotazioniMapper.toDto(updatedPrenotazioni);
     }
 
@@ -320,10 +322,10 @@ public class PrenotazioniService {
 
         // Store details for email
         String userEmail = prenotazione.getUsers().getEmail();
-        String userName = prenotazione.getUsers().getNome() + " " + prenotazione.getUsers().getCognome();
+        String userName = prenotazione.getUsers().getName() + " " + prenotazione.getUsers().getLastName();
         String roomName = prenotazione.getStanze().getNome();
         String positionName = prenotazione.getPostazione().getNomePostazione();
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String startDateTime = prenotazione.getDataInizio().format(formatter);
         String endDateTime = prenotazione.getDataFine().format(formatter);
@@ -333,14 +335,13 @@ public class PrenotazioniService {
 
         // Send deletion email notification
         emailService.sendBookingDeletedByAdminEmail(
-            userEmail,
-            userName,
-            roomName,
-            positionName,
-            startDateTime,
-            endDateTime
-        );
-        
+                userEmail,
+                userName,
+                roomName,
+                positionName,
+                startDateTime,
+                endDateTime);
+
         System.out.println("DEBUG - Email di eliminazione admin inoltrata per: " + userEmail);
     }
 
@@ -349,16 +350,17 @@ public class PrenotazioniService {
         System.out.println("DEBUG - Fetching prenotazioni for email: " + email);
         List<Prenotazioni> prenotazioni = prenotazioniRepository.findByUserEmail(email);
         System.out.println("DEBUG - Found " + prenotazioni.size() + " prenotazioni");
-        
+
         // Debug each prenotazione
         prenotazioni.forEach(p -> {
             System.out.println("\nDEBUG - Prenotazione ID: " + p.getId_prenotazioni());
             System.out.println("DEBUG - User object: " + (p.getUsers() != null ? p.getUsers().toString() : "null"));
             System.out.println("DEBUG - User ID: " + (p.getUsers() != null ? p.getUsers().getId_user() : "null"));
             System.out.println("DEBUG - User Email: " + (p.getUsers() != null ? p.getUsers().getEmail() : "null"));
-            System.out.println("DEBUG - User Name: " + (p.getUsers() != null ? p.getUsers().getNome() : "null"));
-            System.out.println("DEBUG - User Surname: " + (p.getUsers() != null ? p.getUsers().getCognome() : "null"));
-            System.out.println("DEBUG - Postazione: " + (p.getPostazione() != null ? p.getPostazione().getNomePostazione() : "null"));
+            System.out.println("DEBUG - User Name: " + (p.getUsers() != null ? p.getUsers().getName() : "null"));
+            System.out.println("DEBUG - User Surname: " + (p.getUsers() != null ? p.getUsers().getLastName() : "null"));
+            System.out.println("DEBUG - Postazione: "
+                    + (p.getPostazione() != null ? p.getPostazione().getNomePostazione() : "null"));
             System.out.println("DEBUG - Stanza: " + (p.getStanze() != null ? p.getStanze().getNome() : "null"));
         });
 
@@ -368,16 +370,18 @@ public class PrenotazioniService {
                 System.out.println("DEBUG - Initializing user data for prenotazione " + p.getId_prenotazioni());
                 // Force access to all user properties
                 p.getUsers().getEmail();
-                p.getUsers().getNome();
-                p.getUsers().getCognome();
+                p.getUsers().getName();
+                p.getUsers().getLastName();
                 p.getUsers().getId_user();
             }
-            if (p.getPostazione() != null) p.getPostazione().getNomePostazione();
-            if (p.getStanze() != null) p.getStanze().getNome();
+            if (p.getPostazione() != null)
+                p.getPostazione().getNomePostazione();
+            if (p.getStanze() != null)
+                p.getStanze().getNome();
         });
 
         List<PrenotazioniDTO> dtos = prenotazioniMapper.toDtoList(prenotazioni);
-        
+
         // Debug the DTOs before returning
         System.out.println("\n=== FINAL DTO DEBUG ===");
         dtos.forEach(dto -> {
@@ -390,13 +394,13 @@ public class PrenotazioniService {
             } else {
                 System.out.println("DEBUG - DTO User is NULL!");
             }
-            
+
             if (dto.getPostazione() != null) {
                 System.out.println("DEBUG - DTO Postazione: " + dto.getPostazione().getNomePostazione());
             } else {
                 System.out.println("DEBUG - DTO Postazione is NULL!");
             }
-            
+
             if (dto.getStanze() != null) {
                 System.out.println("DEBUG - DTO Stanza: " + dto.getStanze().getNome());
             } else {
@@ -476,7 +480,8 @@ public class PrenotazioniService {
      * 
      */
     public List<PrenotazioniDTO> getPrenotazioniByDay(LocalDateTime data) {
-        // Usa la nuova query per trovare solo le prenotazioni che iniziano in quel giorno
+        // Usa la nuova query per trovare solo le prenotazioni che iniziano in quel
+        // giorno
         List<Prenotazioni> prenotazioniGiornaliere = prenotazioniRepository.findByDataInizioOnDay(data.toLocalDate());
         return prenotazioniMapper.toDtoList(prenotazioniGiornaliere);
     }
@@ -590,7 +595,7 @@ public class PrenotazioniService {
         System.out.println("DEBUG - Email utente: " + userEmail);
 
         // Recupera l'utente dal database
-        Users user = userRepository.findByEmail(userEmail)
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
         System.out.println("DEBUG - Utente trovato: " + user.getEmail());
 
@@ -604,7 +609,8 @@ public class PrenotazioniService {
                 .orElseThrow(() -> new EntityNotFoundException("Stanza non trovata"));
         System.out.println("DEBUG - Stanza trovata: " + stanza.getNome());
 
-        System.out.println("DEBUG - Date ricevute - Inizio: " + request.getData_inizio() + ", Fine: " + request.getData_fine());
+        System.out.println(
+                "DEBUG - Date ricevute - Inizio: " + request.getData_inizio() + ", Fine: " + request.getData_fine());
         // Validazione delle date
         validateDates(request.getData_inizio(), request.getData_fine());
         System.out.println("DEBUG - Date validate con successo");
@@ -632,15 +638,14 @@ public class PrenotazioniService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String startDateTime = savedPrenotazione.getDataInizio().format(formatter);
         String endDateTime = savedPrenotazione.getDataFine().format(formatter);
-        
+
         emailService.sendBookingConfirmationEmail(
-            user.getEmail(),
-            user.getNome() + " " + user.getCognome(),
-            stanza.getNome(),
-            postazione.getNomePostazione(),
-            startDateTime,
-            endDateTime
-        );
+                user.getEmail(),
+                user.getName() + " " + user.getLastName(),
+                stanza.getNome(),
+                postazione.getNomePostazione(),
+                startDateTime,
+                endDateTime);
         System.out.println("DEBUG - Richiesta email di conferma inoltrata per: " + user.getEmail());
 
         // Converti e restituisci il DTO
@@ -658,7 +663,7 @@ public class PrenotazioniService {
     @Transactional
     public PrenotazioniDTO creaPrenotazioneAdmin(AdminCreatePrenotazioneDTO request) {
         // Recupera l'utente specificato nel request
-        Users user = userRepository.findById(request.getId_user())
+        User user = userRepository.findById(request.getId_user())
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
 
         // Recupera la postazione
@@ -692,15 +697,14 @@ public class PrenotazioniService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String startDateTime = savedPrenotazione.getDataInizio().format(formatter);
         String endDateTime = savedPrenotazione.getDataFine().format(formatter);
-        
+
         emailService.sendBookingConfirmationEmail(
-            user.getEmail(),
-            user.getNome() + " " + user.getCognome(),
-            stanza.getNome(),
-            postazione.getNomePostazione(),
-            startDateTime,
-            endDateTime
-        );
+                user.getEmail(),
+                user.getNome() + " " + user.getCognome(),
+                stanza.getNome(),
+                postazione.getNomePostazione(),
+                startDateTime,
+                endDateTime);
         System.out.println("DEBUG - Richiesta email di conferma inoltrata per: " + user.getEmail());
 
         // Converti e restituisci il DTO
@@ -742,8 +746,8 @@ public class PrenotazioniService {
      */
     public List<SelectOptionDTO> getStanzeOptions() {
         return stanzeRepository.findAll().stream()
-            .map(stanza -> new SelectOptionDTO(stanza.getId_stanza(), stanza.getNome()))
-            .toList();
+                .map(stanza -> new SelectOptionDTO(stanza.getId_stanza(), stanza.getNome()))
+                .toList();
     }
 
     /**
@@ -751,45 +755,43 @@ public class PrenotazioniService {
      */
     public List<SelectOptionDTO> getPostazioniByStanzaOptions(Integer idStanza) {
         return postazioniRepository.findByStanzaId(idStanza).stream()
-            .map(postazione -> new SelectOptionDTO(postazione.getId_postazione(), postazione.getNomePostazione()))
-            .toList();
+                .map(postazione -> new SelectOptionDTO(postazione.getId_postazione(), postazione.getNomePostazione()))
+                .toList();
     }
 
     /**
      * Recupera le fasce orarie disponibili per una postazione in una data specifica
+     * 
      * @return Lista di orari disponibili nel formato HH:mm
      */
     public List<String> getOrariDisponibili(Integer idPostazione, LocalDate data) {
         // La nostra finestra lavorativa è 09:00 - 18:00
         List<String> tuttiOrari = List.of(
-            "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
-            "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
-            "17:00", "17:30"
-        );
-        
+                "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
+                "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
+                "17:00", "17:30");
+
         // Recupera le prenotazioni esistenti per quella postazione in quella data
         LocalDateTime inizioGiornata = data.atTime(9, 0);
         LocalDateTime fineGiornata = data.atTime(18, 0);
-        
+
         List<Prenotazioni> prenotazioniEsistenti = prenotazioniRepository.findByPostazioneAndDateRange(
-            idPostazione, inizioGiornata, fineGiornata);
+                idPostazione, inizioGiornata, fineGiornata);
 
         // Filtra gli orari già prenotati
         return tuttiOrari.stream()
-            .filter(orario -> !isOrarioPrenotato(orario, prenotazioniEsistenti, data))
-            .toList();
+                .filter(orario -> !isOrarioPrenotato(orario, prenotazioniEsistenti, data))
+                .toList();
     }
 
     private boolean isOrarioPrenotato(String orario, List<Prenotazioni> prenotazioni, LocalDate data) {
         LocalDateTime dataOrario = data.atTime(
-            Integer.parseInt(orario.split(":")[0]), 
-            Integer.parseInt(orario.split(":")[1])
-        );
+                Integer.parseInt(orario.split(":")[0]),
+                Integer.parseInt(orario.split(":")[1]));
 
-        return prenotazioni.stream().anyMatch(p -> 
-            (dataOrario.isEqual(p.getDataInizio()) || dataOrario.isAfter(p.getDataInizio())) &&
-            dataOrario.isBefore(p.getDataFine())
-        );
+        return prenotazioni.stream()
+                .anyMatch(p -> (dataOrario.isEqual(p.getDataInizio()) || dataOrario.isAfter(p.getDataInizio())) &&
+                        dataOrario.isBefore(p.getDataFine()));
     }
 
     /**
@@ -797,35 +799,36 @@ public class PrenotazioniService {
      */
     public Map<String, List<Map<String, Object>>> getStanzeEPostazioni() {
         List<Stanze> stanze = stanzeRepository.findAll();
-        
+
         Map<String, List<Map<String, Object>>> result = new HashMap<>();
         List<Map<String, Object>> stanzeList = new ArrayList<>();
-        
+
         for (Stanze stanza : stanze) {
             Map<String, Object> stanzaMap = new HashMap<>();
             stanzaMap.put("id", stanza.getId_stanza());
             stanzaMap.put("nome", stanza.getNome());
-            
+
             List<Map<String, Object>> postazioniList = postazioniRepository.findByStanzaId(stanza.getId_stanza())
-                .stream()
-                .map(p -> {
-                    Map<String, Object> postazione = new HashMap<>();
-                    postazione.put("id", p.getId_postazione());
-                    postazione.put("nome", p.getNomePostazione());
-                    return postazione;
-                })
-                .collect(Collectors.toList());
-            
+                    .stream()
+                    .map(p -> {
+                        Map<String, Object> postazione = new HashMap<>();
+                        postazione.put("id", p.getId_postazione());
+                        postazione.put("nome", p.getNomePostazione());
+                        return postazione;
+                    })
+                    .collect(Collectors.toList());
+
             stanzaMap.put("postazioni", postazioniList);
             stanzeList.add(stanzaMap);
         }
-        
+
         result.put("stanze", stanzeList);
         return result;
     }
 
     public List<PrenotazioniDTO> getPrenotazioniByDayAndPostazione(LocalDate giorno, Integer postazioneId) {
-        List<Prenotazioni> prenotazioni = prenotazioniRepository.findByDataInizioOnDayAndPostazione(giorno, postazioneId);
+        List<Prenotazioni> prenotazioni = prenotazioniRepository.findByDataInizioOnDayAndPostazione(giorno,
+                postazioneId);
         return prenotazioniMapper.toDtoList(prenotazioni);
     }
 

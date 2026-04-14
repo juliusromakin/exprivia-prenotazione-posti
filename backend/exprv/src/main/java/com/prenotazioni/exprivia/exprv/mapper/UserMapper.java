@@ -15,7 +15,7 @@ import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
 /**
  * Mapper per la conversione tra l'entità Users e i vari DTO.
@@ -27,16 +27,16 @@ public interface UserMapper {
      * Converte un'entità Users in UserDTO.
      */
     @Mapping(target = "id_user", source = "id_user")
-    @Mapping(target = "nome", source = "nome")
-    @Mapping(target = "cognome", source = "cognome")
+    @Mapping(target = "nome", source = "name")
+    @Mapping(target = "cognome", source = "lastName")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "authorities", source = "authorities", qualifiedByName = "authoritiesToStrings")
-    UserDTO toDto(Users user);
+    UserDTO toDto(User user);
 
     /**
      * Converte un'entità Users in AdminDTO.
      */
-    default AdminDTO toAdminDto(Users user) {
+    default AdminDTO toAdminDto(User user) {
         if (user == null) {
             return null;
         }
@@ -47,52 +47,49 @@ public interface UserMapper {
      * Converte un UserDTO in entità Users.
      */
     @Mapping(target = "id_user", ignore = true)
-    @Mapping(target = "nome", source = "nome")
-    @Mapping(target = "cognome", source = "cognome")
+    @Mapping(target = "name", source = "nome")
+    @Mapping(target = "lastName", source = "cognome")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "enabled", constant = "true")
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatoIl", ignore = true)
-    @Mapping(target = "aggiornatoIl", ignore = true)
-    Users toEntity(UserDTO userDTO);
+    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    User toEntity(UserDTO userDTO);
 
     /**
      * Converte un UserRegistrationDTO in entità Users.
      */
     @Mapping(target = "id_user", ignore = true)
-    @Mapping(target = "nome", source = "nome")
-    @Mapping(target = "cognome", source = "cognome")
+    @Mapping(target = "name", source = "nome")
+    @Mapping(target = "lastName", source = "cognome")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", source = "password")
-    @Mapping(target = "enabled", constant = "true")
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatoIl", ignore = true)
-    @Mapping(target = "aggiornatoIl", ignore = true)
-    Users toEntity(UserRegistrationDTO registrationDTO);
+    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    User toEntity(UserRegistrationDTO registrationDTO);
 
     /**
      * Aggiorna un'entità Users esistente con i dati del DTO.
      */
-    @Mapping(target = "nome", source = "nome")
-    @Mapping(target = "cognome", source = "cognome")
+    @Mapping(target = "name", source = "nome")
+    @Mapping(target = "lastName", source = "cognome")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatoIl", ignore = true)
-    @Mapping(target = "aggiornatoIl", ignore = true)
-    void updateUserFromDto(UserDTO userDTO, @MappingTarget Users user);
+    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    void updateUserFromDto(UserDTO userDTO, @MappingTarget User user);
 
     /**
      * Converte una lista di entità Users in una lista di UserDTO.
      */
-    List<UserDTO> toDtoList(List<Users> users);
+    List<UserDTO> toDtoList(List<User> users);
 
     /**
      * Converte una lista di entità Users in una lista di AdminDTO.
      */
-    default List<AdminDTO> toAdminDtoList(List<Users> users) {
+    default List<AdminDTO> toAdminDtoList(List<User> users) {
         if (users == null) {
             return null;
         }

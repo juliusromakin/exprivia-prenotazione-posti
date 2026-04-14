@@ -16,7 +16,7 @@ import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
@@ -51,7 +51,7 @@ public class UserService {
      * @return Lista di AdminDTO
      */
     public List<AdminDTO> cercaTutti() {
-        List<Users> usersList = userRepository.findAll();
+        List<User> usersList = userRepository.findAll();
         return userMapper.toAdminDtoList(usersList);
     }
 
@@ -61,7 +61,7 @@ public class UserService {
      * @return AdminDTO
      */
     public AdminDTO cercaSingolo(Integer id) {
-        Users user = userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con id " + id + " non trovato"));
         return new AdminDTO(user);
     }
@@ -73,7 +73,7 @@ public class UserService {
      * @return AdminDTO
      */
     public AdminDTO cercaPerEmail(String email) {
-        Users user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
         return new AdminDTO(user);
     }
@@ -93,13 +93,13 @@ public class UserService {
      * @throws IllegalArgumentException se i dati forniti non sono validi
      */
     public UserDTO aggiornaUser(Integer id, Map<String, Object> updates) {
-        Users existingUser = userRepository.findById(id)
+        User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con ID " + id + " non trovato"));
 
         // Verifica email duplicata
         if (updates.containsKey("email")) {
             String newEmail = (String) updates.get("email");
-            Optional<Users> userWithSameEmail = userRepository.findByEmail(newEmail);
+            Optional<User> userWithSameEmail = userRepository.findByEmail(newEmail);
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
                 throw new IllegalArgumentException("Email già in uso");
             }
@@ -109,15 +109,15 @@ public class UserService {
         if (updates.containsKey("password")) {
             String currentPassword = (String) updates.get("currentPassword");
             String newPassword = (String) updates.get("password");
-            
+
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
                 throw new IllegalArgumentException("La password attuale è richiesta per modificare la password");
             }
-            
+
             if (newPassword == null || newPassword.trim().isEmpty()) {
                 throw new IllegalArgumentException("La nuova password non può essere vuota");
             }
-            
+
             // Verifica che la password attuale corrisponda a quella nel database
             if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
                 throw new IllegalArgumentException("Password attuale non corretta");
@@ -128,10 +128,10 @@ public class UserService {
         updates.forEach((key, value) -> {
             switch (key) {
                 case "nome":
-                    existingUser.setNome((String) value);
+                    existingUser.setName((String) value);
                     break;
                 case "cognome":
-                    existingUser.setCognome((String) value);
+                    existingUser.setLastName((String) value);
                     break;
                 case "email":
                     existingUser.setEmail((String) value);
@@ -147,8 +147,8 @@ public class UserService {
             }
         });
 
-        existingUser.setAggiornatoIl(LocalDateTime.now());
-        Users updatedUser = userRepository.save(existingUser);
+        existingUser.setUpdatedDate(LocalDateTime.now());
+        User updatedUser = userRepository.save(existingUser);
         return userMapper.toDto(updatedUser);
     }
 
@@ -170,10 +170,10 @@ public class UserService {
      *
      * @param email Email dell'utente da eliminare
      * @throws EntityNotFoundException se l'utente non esiste
-     * @throws AccessDeniedException se l'utente non ha i permessi necessari
+     * @throws AccessDeniedException   se l'utente non ha i permessi necessari
      */
     public void eliminaAccountPersonale(String email) {
-        Users user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
 
         // Verifica che l'utente stia eliminando il proprio account
@@ -193,14 +193,14 @@ public class UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName(); // Ottieni l'email dell'utente autenticato
 
-        Users user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
 
         return userMapper.toDto(user); // Restituisci il DTO dell'utente
     }
 
     public UserDTO findByEmail(String email) {
-        Users user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
         return userMapper.toDto(user);
     }
@@ -218,13 +218,13 @@ public class UserService {
             throw new IllegalArgumentException("Email già registrata");
         }
 
-        Users user = new Users();
+        User user = new User();
         user.setEmail(userRegistrationDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-        user.setNome(userRegistrationDTO.getNome());
-        user.setCognome(userRegistrationDTO.getCognome());
+        user.setName(userRegistrationDTO.getNome());
+        user.setLastName(userRegistrationDTO.getCognome());
 
-        Users savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
     }
 

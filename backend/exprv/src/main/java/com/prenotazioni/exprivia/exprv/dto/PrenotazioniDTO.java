@@ -8,18 +8,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.prenotazioni.exprivia.exprv.entity.CosaDurata;
 import com.prenotazioni.exprivia.exprv.entity.Postazioni;
 import com.prenotazioni.exprivia.exprv.entity.Stanze;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.enumerati.stato_prenotazione;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PrenotazioniDTO {
     private Integer id_prenotazioni;
-    
+
     // Per la creazione usiamo gli ID
     private Integer id_user;
     private Integer id_postazione;
     private Integer id_stanza;
-    
+
     // Per le risposte includiamo oggetti semplificati
     private UserInfo users;
     private PostazioneInfo postazione;
@@ -38,38 +38,68 @@ public class PrenotazioniDTO {
         private String cognome;
         private String email;
         private Boolean enabled;
-        
-        public UserInfo() {}
-        
-        public UserInfo(Users user) {
+
+        public UserInfo() {
+        }
+
+        public UserInfo(User user) {
             if (user != null) {
                 this.id_user = user.getId_user();
-                this.nome = user.getNome();
-                this.cognome = user.getCognome();
+                this.nome = user.getName();
+                this.cognome = user.getLastName();
                 this.email = user.getEmail();
-                this.enabled = user.getEnabled();
             }
         }
 
         // Getters and setters
-        public Integer getId_user() { return id_user; }
-        public void setId_user(Integer id_user) { this.id_user = id_user; }
-        public String getNome() { return nome; }
-        public void setNome(String nome) { this.nome = nome; }
-        public String getCognome() { return cognome; }
-        public void setCognome(String cognome) { this.cognome = cognome; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public Boolean getEnabled() { return enabled; }
-        public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+        public Integer getId_user() {
+            return id_user;
+        }
+
+        public void setId_user(Integer id_user) {
+            this.id_user = id_user;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public String getCognome() {
+            return cognome;
+        }
+
+        public void setCognome(String cognome) {
+            this.cognome = cognome;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 
     public static class PostazioneInfo {
         private Integer id_postazione;
         private String nomePostazione;
-        
-        public PostazioneInfo() {}
-        
+
+        public PostazioneInfo() {
+        }
+
         public PostazioneInfo(Postazioni postazione) {
             if (postazione != null) {
                 this.id_postazione = postazione.getId_postazione();
@@ -78,19 +108,31 @@ public class PrenotazioniDTO {
         }
 
         // Getters and setters
-        public Integer getId_postazione() { return id_postazione; }
-        public void setId_postazione(Integer id_postazione) { this.id_postazione = id_postazione; }
-        public String getNomePostazione() { return nomePostazione; }
-        public void setNomePostazione(String nomePostazione) { this.nomePostazione = nomePostazione; }
+        public Integer getId_postazione() {
+            return id_postazione;
+        }
+
+        public void setId_postazione(Integer id_postazione) {
+            this.id_postazione = id_postazione;
+        }
+
+        public String getNomePostazione() {
+            return nomePostazione;
+        }
+
+        public void setNomePostazione(String nomePostazione) {
+            this.nomePostazione = nomePostazione;
+        }
     }
 
     public static class StanzaInfo {
         private Integer id_stanza;
         private String nome;
         private String tipo_stanza;
-        
-        public StanzaInfo() {}
-        
+
+        public StanzaInfo() {
+        }
+
         public StanzaInfo(Stanze stanza) {
             if (stanza != null) {
                 this.id_stanza = stanza.getId_stanza();
@@ -100,12 +142,29 @@ public class PrenotazioniDTO {
         }
 
         // Getters and setters
-        public Integer getId_stanza() { return id_stanza; }
-        public void setId_stanza(Integer id_stanza) { this.id_stanza = id_stanza; }
-        public String getNome() { return nome; }
-        public void setNome(String nome) { this.nome = nome; }
-        public String getTipo_stanza() { return tipo_stanza; }
-        public void setTipo_stanza(String tipo_stanza) { this.tipo_stanza = tipo_stanza; }
+        public Integer getId_stanza() {
+            return id_stanza;
+        }
+
+        public void setId_stanza(Integer id_stanza) {
+            this.id_stanza = id_stanza;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public String getTipo_stanza() {
+            return tipo_stanza;
+        }
+
+        public void setTipo_stanza(String tipo_stanza) {
+            this.tipo_stanza = tipo_stanza;
+        }
     }
 
     public PrenotazioniDTO() {
@@ -122,7 +181,7 @@ public class PrenotazioniDTO {
     }
 
     // Costruttore completo per le risposte
-    public PrenotazioniDTO(Integer id_prenotazioni, Users users, Postazioni postazione, Stanze stanze,
+    public PrenotazioniDTO(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
             stato_prenotazione stato_prenotazione, LocalDateTime data_inizio, LocalDateTime data_fine) {
         this.id_prenotazioni = id_prenotazioni;
         this.users = new UserInfo(users);
