@@ -8,18 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByEmail(String email);
 
-    Optional<Users> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    Optional<Users> findByEmailIgnoreCase(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 
-    Optional<Users> findByVerificationCode(String verificationCode);
+    Optional<User> findByVerificationCode(String verificationCode);
 
     @Modifying
     @Transactional

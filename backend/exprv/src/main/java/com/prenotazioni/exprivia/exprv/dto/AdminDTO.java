@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class AdminDTO {
     private Integer id_user;
@@ -17,15 +17,13 @@ public class AdminDTO {
     private LocalDateTime creatoIl;
     private LocalDateTime aggiornatoIl;
 
-
-    public AdminDTO(Users user) {
+    public AdminDTO(User user) {
         this.id_user = user.getId_user();
-        this.nome = user.getNome();
-        this.cognome = user.getCognome();
+        this.nome = user.getName();
+        this.cognome = user.getLastName();
         this.email = user.getEmail();
-        this.enabled = user.getEnabled();
-        this.creatoIl = user.getCreatoIl();
-        this.aggiornatoIl = user.getAggiornatoIl();
+        this.creatoIl = user.getCreatdDate();
+        this.aggiornatoIl = user.getUpdatedDate();
         this.authorities = user.getAuthorities()
                 .stream()
                 .map(Authority::getName)

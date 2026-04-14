@@ -51,12 +51,8 @@ public class User {
     private LocalDateTime creatdDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_authority", 
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id_user"), 
-        inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "authority_name")
-    )
-    private Set<Authority1> authorities = new HashSet<>();
+    @JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id_user"), inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "authority_name"))
+    private Set<Authority> authorities = new HashSet<>();
 
     public User() {
     }
@@ -129,20 +125,20 @@ public class User {
         this.creatdDate = creatdDate;
     }
 
-    public Set<Authority1> getAuthorities() {
+    public Set<Authority> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(Set<Authority1> authorities) {
+    public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
     }
 
-    public User addAuthority(Authority1 authority) {
+    public User addAuthority(Authority authority) {
         this.authorities.add(authority);
         return this;
     }
 
-    public User removeAuthority(Authority1 authority) {
+    public User removeAuthority(Authority authority) {
         this.authorities.remove(authority);
         return this;
     }
