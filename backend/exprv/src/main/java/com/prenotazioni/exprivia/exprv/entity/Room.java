@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 
 import jakarta.persistence.Column;
@@ -46,6 +47,7 @@ public class Room {
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "room")
+    @JsonIgnore
     private List<Workspace> workspaces = new ArrayList<>();
 
     public Room() {
