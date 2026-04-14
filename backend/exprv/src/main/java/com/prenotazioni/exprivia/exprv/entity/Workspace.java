@@ -1,11 +1,13 @@
 package com.prenotazioni.exprivia.exprv.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.WorkspaceStatus;
 
 import jakarta.persistence.Column;
@@ -51,19 +53,21 @@ public class Workspace {
     private Room room;
 
     @OneToMany(mappedBy = "workspace")
-    private Reservation reservations;
+    @JsonIgnore
+    private List<Reservation> reservations = new ArrayList<>();
 
     public Workspace() {
     }
 
     public Workspace(Integer id_workspace, String name, Integer capacity, LocalDateTime createdDate,
-            LocalDateTime updatedDate, WorkspaceStatus workspaceStatus) {
+            LocalDateTime updatedDate, WorkspaceStatus workspaceStatus, List<Reservation> reservations) {
         this.id_workspace = id_workspace;
         this.name = name;
         this.capacity = capacity;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
         this.workspaceStatus = workspaceStatus;
+        this.reservations = reservations;
     }
 
     public Integer getId_workspace() {
