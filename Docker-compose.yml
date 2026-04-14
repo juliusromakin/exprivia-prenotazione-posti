@@ -9,6 +9,8 @@ services:
       POSTGRES_PASSWORD: prenotazioni
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/exprv/backup/PrenotazioniDB.backup:/tmp/PrenotazioniDB.backup:ro
+      - ./init/restore.sh:/docker-entrypoint-initdb.d/restore.sh:ro
     ports:
       - "10020:5432"
     networks:
