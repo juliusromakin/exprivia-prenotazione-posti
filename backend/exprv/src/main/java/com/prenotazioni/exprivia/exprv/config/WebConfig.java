@@ -27,8 +27,11 @@ public class WebConfig {
         // Permette l'invio delle credenziali (cookie, autenticazione HTTP)
         config.setAllowCredentials(true);
 
-        // Permette le richieste solo dall'origine specificata
-        config.addAllowedOrigin("http://localhost:4200");
+        // Permette le richieste solo dall'origine specificata (Aggiunto porta 10000 per Docker)
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:4200",
+                "http://localhost:10000"
+        ));
 
         // Autorizza gli header specificati nelle richieste
         config.setAllowedHeaders(Arrays.asList(

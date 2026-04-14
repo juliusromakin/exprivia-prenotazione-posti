@@ -2,10 +2,9 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copia il file pom.xml e scarica le dipendenze
+# Copia il file pom.xml e scarica le dipendenze (cache layer)
 COPY pom.xml .
-# Corretto: mvn invece di mvc
-RUN mvn dependency:go-offline
+RUN mvn dependency:go-offline -B
 
 # Copia il codice sorgente e compila
 COPY src ./src
@@ -18,7 +17,7 @@ WORKDIR /backend
 # Copia il jar generato dalla fase di build
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 10010
 
 # Comando di avvio
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -19,13 +19,12 @@ services:
       context: ./backend/exprv
     container_name: PrenotazioniBackend
     ports:
-      - "10010:8080"
+      - "10010:10010"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/prenotazioni
       - SPRING_DATASOURCE_USERNAME=prenotazioni
       - SPRING_DATASOURCE_PASSWORD=prenotazioni
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       - db
     networks:

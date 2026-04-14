@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { TokenService } from '../auth/token.service';
 
@@ -7,11 +7,11 @@ import { TokenService } from '../auth/token.service';
 })
 export class AxiosService {
   private axiosInstance: AxiosInstance;
-  private tokenService = new TokenService();
+  private tokenService = inject(TokenService);
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:8080',
+      baseURL: '',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -43,7 +43,7 @@ export class AxiosService {
         if (error.response?.status === 401) {
           // Token expired or invalid
           this.tokenService.clearToken();
-          window.location.href = '/login';
+          window.location.href = '/accedi';
         }
         return Promise.reject(error);
       }

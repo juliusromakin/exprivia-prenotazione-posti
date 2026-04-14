@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/configuration/security",
                                 "/webjars/**")
                         .permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         // Test Endpoints DA VEDERE SE METTERLI ONLY ADMIN O AUTHENTICATED
                         .requestMatchers("/api/prenotazioni/postazioni/9/orari-disponibili").permitAll()

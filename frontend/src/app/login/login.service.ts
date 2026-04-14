@@ -26,19 +26,12 @@ export class LoginService {
     private navigationService = inject(NavigationService);
 
     login(credentials: Login): Observable<User | null> {
-        return from(this.axiosService.post<User>("/auth/login", credentials)).pipe(
-            mergeMap((user) => {
-                if (!user) {
-                    return EMPTY;
+        return this.authJwtService.login(credentials).pipe(
+            mergeMap(() => this.authService.identity(true)),
+            tap((authenticatedUser) => {
+                if (authenticatedUser) {
+                    this.authService.authenticate(authenticatedUser);
                 }
-                return this.authJwtService.login(credentials).pipe(
-                    mergeMap(() => this.authService.identity(true)),
-                    tap((authenticatedUser) => {
-                        if (authenticatedUser) {
-                            this.authService.authenticate(authenticatedUser);
-                        }
-                    })
-                );
             }),
             catchError((error) => {
                 const errorDetails = {

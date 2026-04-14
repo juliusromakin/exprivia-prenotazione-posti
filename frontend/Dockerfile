@@ -16,8 +16,12 @@ RUN npm run build --configuration=production --project=exprivia
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-# Cambiato: serve solo la sottocartella browser
+# Copia la configurazione personalizzata di Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copia l'app compilata - serve solo la sottocartella browser
 COPY --from=build /app/dist/exprivia/browser /usr/share/nginx/html
 
-# (Opzionale) Se hai un file nginx.conf personalizzato
-#COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

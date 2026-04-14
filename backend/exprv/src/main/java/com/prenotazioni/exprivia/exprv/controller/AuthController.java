@@ -17,7 +17,7 @@ import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.service.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired

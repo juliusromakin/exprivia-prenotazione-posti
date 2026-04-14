@@ -7,6 +7,8 @@ import { TokenService } from "./token.service";
 interface AuthResponse {
   token: string;
   email: string;
+  nome: string;
+  cognome: string;
   authorities: string[];
 }
 
@@ -16,7 +18,7 @@ interface AuthResponse {
 export class AuthJwtService {
   private axiosService = inject(AxiosService);
   private tokenService = inject(TokenService);
-  private loginUrl = '/auth/login';
+  private loginUrl = '/api/auth/login';
 
   constructor() { }
 

@@ -28,17 +28,51 @@ public interface PrenotazioniRepository extends JpaRepository<Prenotazioni, Inte
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT p FROM Prenotazioni p WHERE p.postazione.id_postazione = :postazioneId " +
-           "AND p.stato_prenotazione != 'Annullata' " +
-           "AND (p.dataInizio < :endTime AND p.dataFine > :startTime)")
+    @Query("SELECT p FROM Prenotazioni p " +
+           "JOIN p.postazione po " +
+           "JOIN po.stanze s " +
+           "WHERE p.stato_prenotazione != 'Annullata' " +
+           "AND (p.dataInizio < :endTime AND p.dataFine > :startTime) " +
+           "AND (" +
+           "  po.id_postazione = :postazioneId " +
+           "  OR " +
+           "  (s.tipo_stanza = com.prenotazioni.exprivia.exprv.enumerati.tipo_stanza.MeetingRoom " +
+           "   AND s.id_stanza = (SELECT po2.stanze.id_stanza FROM Postazioni po2 WHERE po2.id_postazione = :postazioneId))" +
+           ")")
     List<Prenotazioni> findOverlappingBookings(
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime,
             @Param("postazioneId") Integer postazioneId);
 
+    @Query("SELECT p FROM Prenotazioni p " +
+           "JOIN p.postazione po " +
+           "JOIN po.stanze s " +
+           "WHERE p.stato_prenotazione != 'Annullata' " +
+           "AND p.dataInizio >= :startDate AND p.dataInizio < :endDate " +
+           "AND (" +
+           "  po.id_postazione = :postazioneId " +
+           "  OR " +
+           "  (s.tipo_stanza = com.prenotazioni.exprivia.exprv.enumerati.tipo_stanza.MeetingRoom " +
+           "   AND s.id_stanza = (SELECT po2.stanze.id_stanza FROM Postazioni po2 WHERE po2.id_postazione = :postazioneId))" +
+           ")")
+    List<Prenotazioni> findByPostazioneAndDateRange(
+            @Param("postazioneId") Integer postazioneId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
     @Query("SELECT p FROM Prenotazioni p WHERE DATE(p.dataInizio) = DATE(:giorno)")
     List<Prenotazioni> findByDataInizioOnDay(@Param("giorno") LocalDate giorno);
 
-    @Query("SELECT p FROM Prenotazioni p WHERE DATE(p.dataInizio) = DATE(:giorno) AND p.postazione.id_postazione = :postazioneId AND p.stato_prenotazione != 'Annullata'")
+    @Query("SELECT p FROM Prenotazioni p " +
+           "JOIN p.postazione po " +
+           "JOIN po.stanze s " +
+           "WHERE p.stato_prenotazione != 'Annullata' " +
+           "AND DATE(p.dataInizio) = DATE(:giorno) " +
+           "AND (" +
+           "  po.id_postazione = :postazioneId " +
+           "  OR " +
+           "  (s.tipo_stanza = com.prenotazioni.exprivia.exprv.enumerati.tipo_stanza.MeetingRoom " +
+           "   AND s.id_stanza = (SELECT po2.stanze.id_stanza FROM Postazioni po2 WHERE po2.id_postazione = :postazioneId))" +
+           ")")
     List<Prenotazioni> findByDataInizioOnDayAndPostazione(@Param("giorno") LocalDate giorno, @Param("postazioneId") Integer postazioneId);
 }

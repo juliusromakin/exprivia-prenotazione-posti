@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { CommonModule, DatePipe } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { AuthService } from "@core/auth/auth.service";
@@ -70,11 +70,18 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   // Map duration label to minutes
   readonly durationMap: { [key: string]: number } = {
-    'Giornata Intera': 600,
-    '4h': 240,
-    '2h': 120,
-    '1h': 60,
-    '30m': 30
+    'Giornata Intera': 540,
+    '4 ore': 240,
+    '2 ore': 120,
+    '1 ora': 60,
+    '30 minuti': 30,
+    // Supporto nomi backup
+    'Postazione - Giornata intera': 540,
+    'Sala Riunione - Giornata intera': 540,
+    'Sala Riunione - 30 min': 30,
+    'Sala Riunione - 60 min': 60,
+    'Sala Riunione - 120 min': 120,
+    'Sala Riunione - 4 ore': 240
   };
 
   // Add new properties for confirmation modal
@@ -85,75 +92,120 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   showCancelConfirmation = false;
   prenotazioneToCancel: Prenotazione | null = null;
 
-  get availableDurations(): string[] {
-    if (!this.state.selectedDates || this.state.selectedDates.length === 0) {
-      return [];
-    }
-
-    const durations = new Set<string>();
-    
-    // Controlla se la data selezionata è oggi per applicare filtri temporali
-    const selectedDate = this.state.selectedDates[0];
-    const today = new Date();
-    const isToday = selectedDate && this.isSameDay(selectedDate, today);
-    
-    // Se è oggi, controlla se è ancora possibile prenotare certi orari
-    if (isToday) {
-      const currentHour = today.getHours();
-      const currentMinute = today.getMinutes();
-      const currentTimeInMinutes = currentHour * 60 + currentMinute;
-      
-      // Controlla se la giornata intera è ancora possibile (08:00)
-      if ((8 * 60) > (currentTimeInMinutes + 30)) {
-        durations.add('Giornata Intera');
-      }
-      
-      // Controlla le altre durate
-      const checkDuration = (durationLabel: string, minutes: number) => {
-        // Trova l'orario più tardi possibile per questa durata
-        const latestStartHour = 18 - (minutes / 60);
-        const latestStartMinutes = latestStartHour * 60;
-        
-        if (latestStartMinutes > (currentTimeInMinutes + 30)) {
-          durations.add(durationLabel);
-        }
-      };
-      
-      checkDuration('4h', 240);
-      checkDuration('2h', 120);
-      checkDuration('1h', 60);
-      checkDuration('30m', 30);
-    } else {
-      // Per le date future, tutte le durate sono disponibili
-      durations.add('Giornata Intera');
-      durations.add('4h');
-      durations.add('2h');
-      durations.add('1h');
-      durations.add('30m');
-    }
-
-    return Array.from(durations);
-  }
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private prenotazionePosizioneService: PrenotazionePosizioneService,
     private toastService: ToastService,
+    private adminService: AdminService,
     private datePipe: DatePipe,
-    private adminService: AdminService
+    private cdr: ChangeDetectorRef
   ) {
     this.bookingForm = this.fb.group({
-      userId: [''], // Campo opzionale per la selezione utente (solo admin)
+      selectedDate: [null, Validators.required],
       tipo_stanza: ["", Validators.required],
       id_stanza: [null, Validators.required],
-      id_postazione: ["", Validators.required],
       slotDuration: ["", Validators.required],
       timeSlot: ["", Validators.required],
-      selectedDate: [null, Validators.required],
-      note: [""]
+      id_postazione: ["", Validators.required],
+      userId: [null]
     });
   }
+
+  private getDurationInMinutes(durationName: string | null | undefined): number {
+    if (!durationName) return 0;
+    const name = String(durationName).trim().toLowerCase();
+    
+    // Regex molto inclusive per evitare problemi di encoding o caratteri speciali
+    if (/intera/i.test(name) || /giorn/i.test(name)) return 540;
+    if (/4.*ore/i.test(name) || /4h/i.test(name)) return 240;
+    if (/2.*ore/i.test(name) || /2h/i.test(name) || /120.*min/i.test(name)) return 120;
+    if (/1.*ora/i.test(name) || /1h/i.test(name) || /60.*min/i.test(name)) return 60;
+    if (/30.*min/i.test(name) || /30m/i.test(name)) return 30;
+    
+    return 0;
+  }
+
+  isFullDay(duration: string | null | undefined): boolean {
+    if (!duration) return false;
+    const name = String(duration).trim().toLowerCase();
+    // Match super-permissivo per Giornata Intera
+    return /intera/i.test(name) || /giorn/i.test(name);
+  }
+
+  isMeetingRoom(): boolean {
+    return this.bookingForm.get('tipo_stanza')?.value === 'MeetingRoom';
+  }
+
+  get availableDurations(): string[] {
+    const durations = new Set<string>();
+    const now = new Date();
+    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+    const selectedDate = this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0];
+    
+    if (!selectedDate) return [];
+    
+    const isToday = this.isSameDay(selectedDate, now);
+
+    const checkAndAddDuration = (name: string, mins: number) => {
+      if (isToday) {
+        // Se è oggi, calcola se c'è abbastanza tempo rimasto per questa durata
+        const latestStartHour = 18 - (mins / 60);
+        const latestStartInMinutes = latestStartHour * 60;
+        if (latestStartInMinutes > (currentTimeInMinutes + 30)) {
+          durations.add(name);
+        }
+      } else {
+        // Se è un giorno futuro, aggiungi sempre
+        durations.add(name);
+      }
+    };
+
+    // Unifichiamo e normalizziamo i nomi delle durate (da DB e da Hardcoded)
+    const allPossibleNames = new Set([
+      ...Object.keys(this.durationMap),
+      ...this.coseDurata.map(cd => cd.nome)
+    ]);
+
+    allPossibleNames.forEach(name => {
+      if (!name) return;
+      const trimmedName = name.trim();
+      const mins = this.getDurationInMinutes(trimmedName);
+      
+      if (mins > 0) {
+        // NORMALIZZAZIONE: Mappiamo i nomi complessi o sporchi a nomi standard "puliti"
+        let normalizedName = trimmedName;
+        if (this.isFullDay(trimmedName)) normalizedName = 'Giornata Intera';
+        else if (mins === 240) normalizedName = '4 ore';
+        else if (mins === 120) normalizedName = '2 ore';
+        else if (mins === 60) normalizedName = '1 ora';
+        else if (mins === 30) normalizedName = '30 minuti';
+
+        if (normalizedName === 'Giornata Intera') {
+          // Logica specifica per giornata intera (solo se si può iniziare entro le 09:30)
+          if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) {
+            durations.add(normalizedName);
+          }
+        } else {
+          checkAndAddDuration(normalizedName, mins);
+        }
+      }
+    });
+
+    // Fallback di sicurezza se non è stato trovato nulla
+    if (durations.size === 0 && !isToday) {
+      durations.add('Giornata Intera');
+      durations.add('4 ore');
+      durations.add('1 ora');
+    }
+
+    return Array.from(durations).sort((a, b) => {
+      const minsA = this.getDurationInMinutes(a);
+      const minsB = this.getDurationInMinutes(b);
+      return minsB - minsA; // Ordina per durata decrescente
+    });
+  }
+
 
   ngOnInit(): void {
     this.checkUserRole();
@@ -169,11 +221,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private loadPrenotazioneInfo(): void {
     this.state.isLoading = true;
-    this.prenotazionePosizioneService.getStanzeWithPostazioni()
+    this.prenotazionePosizioneService.getPrenotazioneInfo()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: { stanze: StanzaWithPostazioni[] }) => {
+        next: (response) => {
           this.state.stanze = response.stanze;
+          this.coseDurata = response.coseDurata;
           this.tipiStanza = [...new Set(response.stanze.map((s: StanzaWithPostazioni) => s.tipo_stanza))].filter(Boolean) as string[];
           this.state.isLoading = false;
         },
@@ -182,7 +235,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           this.state.errorMessage = "Errore nel caricamento delle informazioni";
           this.showErrorToast(
             'Errore di Caricamento', 
-            'Impossibile caricare le informazioni delle stanze. Ricarica la pagina per riprovare.'
+            'Impossibile caricare le informazioni delle stanze o dell\'orario. Ricarica la pagina per riprovare.'
           );
           this.state.isLoading = false;
         }
@@ -250,7 +303,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           console.log('Stanze filtrate per tipo:', stanzeFiltrate);
 
           // Generate base list of postazioni for this room type
-          this.state.postazioniDisponibili = stanzeFiltrate
+          const allPostazioni = stanzeFiltrate
             .flatMap(stanza => {
               console.log('Elaborazione stanza:', stanza);
               return stanza.postazioni
@@ -263,6 +316,23 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
                   tipo_stanza: stanza.tipo_stanza
                 }));
             });
+
+          if (this.isMeetingRoom()) {
+            // Per le MeetingRoom, mostriamo solo una voce per stanza
+            const uniqueStanze = new Map<number, any>();
+            allPostazioni.forEach(p => {
+              if (!uniqueStanze.has(p.stanza_id)) {
+                uniqueStanze.set(p.stanza_id, {
+                  ...p,
+                  nomePostazione: p.stanza_nome // Usiamo il nome della stanza come nome visualizzato
+                });
+              }
+            });
+            this.state.postazioniDisponibili = Array.from(uniqueStanze.values());
+          } else {
+            this.state.postazioniDisponibili = allPostazioni;
+          }
+          
           console.log('Postazioni disponibili aggiornate:', this.state.postazioniDisponibili);
         } else {
           this.state.postazioniDisponibili = [];
@@ -278,22 +348,25 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           id_postazione: ""
         });
         
-        // Generate available time slots when duration is selected
+          // Generate available time slots when duration is selected
         if (duration && this.state.selectedDates.length > 0) {
           this.loadAvailableTimeSlotsForDuration(duration);
           
           // If "Giornata Intera" is selected, automatically set the time slot and update postazioni availability
-          if (duration === 'Giornata Intera') {
+          if (this.isFullDay(duration)) {
             this.bookingForm.patchValue({
-              timeSlot: "08:00 - 18:00"
+              timeSlot: "09:00 - 18:00"
             });
             // Trigger postazioni availability check
             setTimeout(() => {
               this.updatePostazioniAvailability();
+              this.cdr.detectChanges();
             }, 100);
           }
+          this.cdr.detectChanges();
         } else {
           this.state.availableTimeSlots = [];
+          this.cdr.detectChanges();
         }
       });
 
@@ -346,11 +419,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
     const slots: { startTime: string; endTime: string }[] = [];
-    const startHour = 8;
+    const startHour = 9;
     const endHour = 18;
     
     // Map duration to minutes
-    const durationMinutes = this.durationMap[duration];
+    const durationMinutes = this.getDurationInMinutes(duration);
     if (!durationMinutes) {
       this.state.availableTimeSlots = [];
       return;
@@ -363,10 +436,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     const currentMinute = today.getMinutes();
     const currentTimeInMinutes = currentHour * 60 + currentMinute;
 
-    if (duration === 'Giornata Intera') {
+    if (this.isFullDay(duration)) {
       // Only add full day if available
-      if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) {
-        slots.push({ startTime: '08:00', endTime: '18:00' });
+      if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) {
+        slots.push({ startTime: '09:00', endTime: '18:00' });
       }
     } else {
       // Generate slots based on duration
@@ -393,7 +466,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.state.availableTimeSlots = slots;
+    this.state.availableTimeSlots = [...slots];
+    this.cdr.detectChanges();
     console.log('Generated time slots for duration:', { duration, slots });
   }
 
@@ -511,10 +585,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         const startDateTime = new Date(selectedDate);
         const endDateTime = new Date(selectedDate);
 
-        // Support both '08:00 - 18:00' and 'Giornata Intera' as input
+        // Support both '09:00 - 18:00' and 'Giornata Intera' as input
         let startHour, startMinute, endHour, endMinute;
-        if (selectedTimeSlot === '08:00 - 18:00' || selectedTimeSlot === 'Giornata Intera') {
-          startHour = '08'; startMinute = '00'; endHour = '18'; endMinute = '00';
+        const normalizedSlot = selectedTimeSlot.trim();
+        
+        if (normalizedSlot === '09:00 - 18:00' || this.isFullDay(normalizedSlot)) {
+          startHour = '09'; startMinute = '00'; endHour = '18'; endMinute = '00';
         } else {
           [startHour, startMinute] = selectedTimeSlot.split(' - ')[0].split(':');
           [endHour, endMinute] = selectedTimeSlot.split(' - ')[1].split(':');
@@ -575,7 +651,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
               this.clearAllToasts(); // Clear any existing toasts
               this.showSuccessToast(
                 'Prenotazione Confermata!', 
-                `La postazione è stata prenotata per ${this.formatDate(selectedDate, 'dd/MM/yyyy')} dalle ${selectedTimeSlot === '08:00 - 18:00' ? 'Giornata Intera' : selectedTimeSlot}`
+                `La postazione è stata prenotata per ${this.formatDate(selectedDate, 'dd/MM/yyyy')} dalle ${this.isFullDay(selectedTimeSlot) || selectedTimeSlot === '09:00 - 18:00' ? 'Giornata Intera' : selectedTimeSlot}`
               );
               
               // Reset form and reload data
