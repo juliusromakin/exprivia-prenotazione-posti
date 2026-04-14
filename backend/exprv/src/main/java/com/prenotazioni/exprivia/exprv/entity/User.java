@@ -48,7 +48,7 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "created_date")
-    private LocalDateTime creatdDate;
+    private LocalDateTime createdDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id_user"), inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "authority_name"))
@@ -64,7 +64,7 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.creatdDate = createdDate;
+        this.createdDate = createdDate;
         this.updatedDate = updatedDate;
 
     }
@@ -117,12 +117,12 @@ public class User {
         this.updatedDate = updatedDate;
     }
 
-    public LocalDateTime getCreatdDate() {
-        return creatdDate;
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreatdDate(LocalDateTime creatdDate) {
-        this.creatdDate = creatdDate;
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
     public Set<Authority> getAuthorities() {
