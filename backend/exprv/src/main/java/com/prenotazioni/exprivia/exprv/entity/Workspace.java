@@ -48,6 +48,9 @@ public class Workspace {
     @Column(name = "workspace_status")
     private WorkspaceStatus workspaceStatus;
 
+    @Column(name = "is_active")
+    private Boolean is_active = true;
+
     @ManyToOne
     @JoinColumn(name = "id_room")
     private Room room;
@@ -59,15 +62,13 @@ public class Workspace {
     public Workspace() {
     }
 
-    public Workspace(Integer id_workspace, String name, Integer capacity, LocalDateTime createdDate,
-            LocalDateTime updatedDate, WorkspaceStatus workspaceStatus, List<Reservation> reservations) {
+    public Workspace(Integer id_workspace, String name, Integer capacity, WorkspaceStatus workspaceStatus, Room room, Boolean is_active) {
         this.id_workspace = id_workspace;
         this.name = name;
         this.capacity = capacity;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
         this.workspaceStatus = workspaceStatus;
-        this.reservations = reservations;
+        this.room = room;
+        this.is_active = is_active;
     }
 
     public Integer getId_workspace() {
@@ -124,6 +125,14 @@ public class Workspace {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
 }

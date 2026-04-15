@@ -20,9 +20,21 @@ public class ReservationDuration {
     @Column(name = "minutes")
     private Integer minutes;
 
+    @Column(name = "is_active")
+    private Boolean is_active = true;
+
     @OneToMany(mappedBy = "reservationDuration")
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
+
+    public ReservationDuration() {
+    }
+
+    public ReservationDuration(String name, Integer minutes, Boolean is_active) {
+        this.name = name;
+        this.minutes = minutes;
+        this.is_active = is_active;
+    }
 
     public String getName() {
         return name;
@@ -38,6 +50,14 @@ public class ReservationDuration {
 
     public void setMinutes(Integer minutes) {
         this.minutes = minutes;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
 }

@@ -30,12 +30,16 @@ public class Authority implements Serializable {
     @JsonIgnore
     private List<User> users = new ArrayList<>();
 
+    @Column(name = "is_active")
+    private Boolean is_active = true;
+
     // Costruttori
     public Authority() {
     }
 
-    public Authority(String name) {
+    public Authority(String name, Boolean is_active) {
         this.name = name;
+        this.is_active = is_active;
     }
 
     public String getName() {
@@ -44,5 +48,13 @@ public class Authority implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 }

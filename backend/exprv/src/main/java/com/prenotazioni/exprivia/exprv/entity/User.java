@@ -52,6 +52,9 @@ public class User {
     @Column(name = "created_date")
     private LocalDateTime creatdDate;
 
+    @Column(name = "is_active")
+    private Boolean is_active = true;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id_user"), inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "authority_name"))
     private Set<Authority> authorities = new HashSet<>();
@@ -63,16 +66,13 @@ public class User {
     public User() {
     }
 
-    public User(Integer id_user, String name, String lastName, String email, String password, LocalDateTime updatedDate,
-            LocalDateTime createdDate) {
+    public User(Integer id_user, String name, String lastName, String email, String password, Boolean is_active) {
         this.id_user = id_user;
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.creatdDate = createdDate;
-        this.updatedDate = updatedDate;
-
+        this.is_active = is_active;
     }
 
     public Integer getId_user() {
@@ -147,6 +147,14 @@ public class User {
     public User removeAuthority(Authority authority) {
         this.authorities.remove(authority);
         return this;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
 }

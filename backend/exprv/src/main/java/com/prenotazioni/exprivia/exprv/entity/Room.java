@@ -46,6 +46,9 @@ public class Room {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
+    @Column(name = "is_active")
+    private Boolean is_active = true;
+
     @OneToMany(mappedBy = "room")
     @JsonIgnore
     private List<Workspace> workspaces = new ArrayList<>();
@@ -53,14 +56,12 @@ public class Room {
     public Room() {
     }
 
-    public Room(Integer id_room, String name, RoomType room_type, Integer capacity, LocalDateTime createdDate,
-            LocalDateTime updatedDate) {
+    public Room(Integer id_room, String name, RoomType room_type, Integer capacity, Boolean is_active) {
         this.id_room = id_room;
         this.name = name;
         this.room_type = room_type;
         this.capacity = capacity;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
+        this.is_active = is_active;
     }
 
     public Integer getId_room() {
@@ -109,6 +110,14 @@ public class Room {
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
 }
