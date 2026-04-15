@@ -1,283 +1,87 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.prenotazioni.exprivia.exprv.entity.CosaDurata;
-import com.prenotazioni.exprivia.exprv.entity.Postazioni;
-import com.prenotazioni.exprivia.exprv.entity.Stanze;
-import com.prenotazioni.exprivia.exprv.entity.User;
-import com.prenotazioni.exprivia.exprv.enumerati.stato_prenotazione;
+import com.prenotazioni.exprivia.exprv.enumerati.ReservationStatus;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReservationDTO {
-    private Integer id_prenotazioni;
+    private Integer id_reservation;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private ReservationStatus statusReservation;
 
-    // Per la creazione usiamo gli ID
-    private Integer id_user;
-    private Integer id_postazione;
-    private Integer id_stanza;
-
-    // Per le risposte includiamo oggetti semplificati
-    private UserInfo users;
-    private PostazioneInfo postazione;
-    private StanzaInfo stanze;
-
-    private stato_prenotazione stato_prenotazione;
-    private LocalDateTime data_inizio;
-    private LocalDateTime data_fine;
-
-    private Set<CosaDurata> coseDurata = new HashSet<>();
-
-    // Inner classes per JSON serialization
-    public static class UserInfo {
-        private Integer id_user;
-        private String name;
-        private String lastName;
-        private String email;
-        private Boolean enabled;
-
-        public UserInfo() {
-        }
-
-        public UserInfo(User user) {
-            if (user != null) {
-                this.id_user = user.getId_user();
-                this.name = user.getName();
-                this.lastName = user.getLastName();
-                this.email = user.getEmail();
-            }
-        }
-
-        // Getters and setters
-        public Integer getId_user() {
-            return id_user;
-        }
-
-        public void setId_user(Integer id_user) {
-            this.id_user = id_user;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public Boolean getEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(Boolean enabled) {
-            this.enabled = enabled;
-        }
-    }
-
-    public static class PostazioneInfo {
-        private Integer id_postazione;
-        private String nomePostazione;
-
-        public PostazioneInfo() {
-        }
-
-        public PostazioneInfo(Postazioni postazione) {
-            if (postazione != null) {
-                this.id_postazione = postazione.getId_postazione();
-                this.nomePostazione = postazione.getNomePostazione();
-            }
-        }
-
-        // Getters and setters
-        public Integer getId_postazione() {
-            return id_postazione;
-        }
-
-        public void setId_postazione(Integer id_postazione) {
-            this.id_postazione = id_postazione;
-        }
-
-        public String getNomePostazione() {
-            return nomePostazione;
-        }
-
-        public void setNomePostazione(String nomePostazione) {
-            this.nomePostazione = nomePostazione;
-        }
-    }
-
-    public static class StanzaInfo {
-        private Integer id_stanza;
-        private String nome;
-        private String tipo_stanza;
-
-        public StanzaInfo() {
-        }
-
-        public StanzaInfo(Stanze stanza) {
-            if (stanza != null) {
-                this.id_stanza = stanza.getId_stanza();
-                this.nome = stanza.getNome();
-                this.tipo_stanza = stanza.getTipo_stanza() != null ? stanza.getTipo_stanza().toString() : null;
-            }
-        }
-
-        // Getters and setters
-        public Integer getId_stanza() {
-            return id_stanza;
-        }
-
-        public void setId_stanza(Integer id_stanza) {
-            this.id_stanza = id_stanza;
-        }
-
-        public String getNome() {
-            return nome;
-        }
-
-        public void setNome(String nome) {
-            this.nome = nome;
-        }
-
-        public String getTipo_stanza() {
-            return tipo_stanza;
-        }
-
-        public void setTipo_stanza(String tipo_stanza) {
-            this.tipo_stanza = tipo_stanza;
-        }
-    }
+    private Integer workspaceId;
+    private Integer userId;
+    private String durationName;
 
     public ReservationDTO() {
     }
 
-    // Costruttore per la creazione
-    public ReservationDTO(Integer id_user, Integer id_postazione, Integer id_stanza,
-            LocalDateTime data_inizio, LocalDateTime data_fine) {
-        this.id_user = id_user;
-        this.id_postazione = id_postazione;
-        this.id_stanza = id_stanza;
-        this.data_inizio = data_inizio;
-        this.data_fine = data_fine;
+    public ReservationDTO(Integer id_reservation, LocalDateTime startDate, LocalDateTime endDate,
+            ReservationStatus statusReservation, Integer workspaceId, Integer userId, String durationName) {
+        this.id_reservation = id_reservation;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.statusReservation = statusReservation;
+        this.workspaceId = workspaceId;
+        this.userId = userId;
+        this.durationName = durationName;
     }
 
-    // Costruttore completo per le risposte
-    public ReservationDTO(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
-            stato_prenotazione stato_prenotazione, LocalDateTime data_inizio, LocalDateTime data_fine) {
-        this.id_prenotazioni = id_prenotazioni;
-        this.users = new UserInfo(users);
-        this.postazione = new PostazioneInfo(postazione);
-        this.stanze = new StanzaInfo(stanze);
-        this.stato_prenotazione = stato_prenotazione;
-        this.data_inizio = data_inizio;
-        this.data_fine = data_fine;
+    public Integer getId_reservation() {
+        return id_reservation;
     }
 
-    // Getters e Setters
-    public Integer getId_prenotazioni() {
-        return id_prenotazioni;
+    public void setId_reservation(Integer id_reservation) {
+        this.id_reservation = id_reservation;
     }
 
-    public void setId_prenotazioni(Integer id_prenotazioni) {
-        this.id_prenotazioni = id_prenotazioni;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
-    public Integer getId_user() {
-        return id_user;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
-    public void setId_user(Integer id_user) {
-        this.id_user = id_user;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public Integer getId_postazione() {
-        return id_postazione;
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 
-    public void setId_postazione(Integer id_postazione) {
-        this.id_postazione = id_postazione;
+    public ReservationStatus getStatusReservation() {
+        return statusReservation;
     }
 
-    public Integer getId_stanza() {
-        return id_stanza;
+    public void setStatusReservation(ReservationStatus statusReservation) {
+        this.statusReservation = statusReservation;
     }
 
-    public void setId_stanza(Integer id_stanza) {
-        this.id_stanza = id_stanza;
+    public Integer getWorkspaceId() {
+        return workspaceId;
     }
 
-    public UserInfo getUsers() {
-        return users;
+    public void setWorkspaceId(Integer workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
-    public void setUsers(UserInfo users) {
-        this.users = users;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public PostazioneInfo getPostazione() {
-        return postazione;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public void setPostazione(PostazioneInfo postazione) {
-        this.postazione = postazione;
+    public String getDurationName() {
+        return durationName;
     }
 
-    public StanzaInfo getStanze() {
-        return stanze;
+    public void setDurationName(String durationName) {
+        this.durationName = durationName;
     }
 
-    public void setStanze(StanzaInfo stanze) {
-        this.stanze = stanze;
-    }
-
-    public stato_prenotazione getStato_prenotazione() {
-        return stato_prenotazione;
-    }
-
-    public void setStato_prenotazione(stato_prenotazione stato_prenotazione) {
-        this.stato_prenotazione = stato_prenotazione;
-    }
-
-    public LocalDateTime getData_inizio() {
-        return data_inizio;
-    }
-
-    public void setData_inizio(LocalDateTime data_inizio) {
-        this.data_inizio = data_inizio;
-    }
-
-    public LocalDateTime getData_fine() {
-        return data_fine;
-    }
-
-    public void setData_fine(LocalDateTime data_fine) {
-        this.data_fine = data_fine;
-    }
-
-    public Set<CosaDurata> getCoseDurata() {
-        return coseDurata;
-    }
-
-    public void setCoseDurata(Set<CosaDurata> coseDurata) {
-        this.coseDurata = coseDurata;
-    }
 }
