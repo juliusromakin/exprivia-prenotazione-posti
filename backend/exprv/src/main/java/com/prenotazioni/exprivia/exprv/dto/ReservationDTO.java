@@ -12,7 +12,7 @@ import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.enumerati.stato_prenotazione;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PrenotazioniDTO {
+public class ReservationDTO {
     private Integer id_prenotazioni;
 
     // Per la creazione usiamo gli ID
@@ -34,8 +34,8 @@ public class PrenotazioniDTO {
     // Inner classes per JSON serialization
     public static class UserInfo {
         private Integer id_user;
-        private String nome;
-        private String cognome;
+        private String name;
+        private String lastName;
         private String email;
         private Boolean enabled;
 
@@ -45,8 +45,8 @@ public class PrenotazioniDTO {
         public UserInfo(User user) {
             if (user != null) {
                 this.id_user = user.getId_user();
-                this.nome = user.getName();
-                this.cognome = user.getLastName();
+                this.name = user.getName();
+                this.lastName = user.getLastName();
                 this.email = user.getEmail();
             }
         }
@@ -60,20 +60,20 @@ public class PrenotazioniDTO {
             this.id_user = id_user;
         }
 
-        public String getNome() {
-            return nome;
+        public String getName() {
+            return name;
         }
 
-        public void setNome(String nome) {
-            this.nome = nome;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public String getCognome() {
-            return cognome;
+        public String getLastName() {
+            return lastName;
         }
 
-        public void setCognome(String cognome) {
-            this.cognome = cognome;
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
         }
 
         public String getEmail() {
@@ -167,11 +167,11 @@ public class PrenotazioniDTO {
         }
     }
 
-    public PrenotazioniDTO() {
+    public ReservationDTO() {
     }
 
     // Costruttore per la creazione
-    public PrenotazioniDTO(Integer id_user, Integer id_postazione, Integer id_stanza,
+    public ReservationDTO(Integer id_user, Integer id_postazione, Integer id_stanza,
             LocalDateTime data_inizio, LocalDateTime data_fine) {
         this.id_user = id_user;
         this.id_postazione = id_postazione;
@@ -181,7 +181,7 @@ public class PrenotazioniDTO {
     }
 
     // Costruttore completo per le risposte
-    public PrenotazioniDTO(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
+    public ReservationDTO(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
             stato_prenotazione stato_prenotazione, LocalDateTime data_inizio, LocalDateTime data_fine) {
         this.id_prenotazioni = id_prenotazioni;
         this.users = new UserInfo(users);

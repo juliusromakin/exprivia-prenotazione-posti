@@ -3,36 +3,32 @@ package com.prenotazioni.exprivia.exprv.dto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "email")
 public class UserDTO {
-
     private Integer id_user;
-    private String nome;
-    private String cognome;
+    private String name;
+    private String lastName;
     private String email;
     private Set<String> authorities;
 
-    // Costruttore vuoto
     public UserDTO() {
+
     }
 
-    // Costruttore con parametri
-    public UserDTO(Integer id_user, String nome, String cognome, String email, String password, Boolean enabled) {
+    public UserDTO(Integer id_user, String name, String lastName, String email, Set<String> authorities) {
         this.id_user = id_user;
-        this.nome = nome;
-        this.cognome = cognome;
+        this.name = name;
+        this.lastName = lastName;
         this.email = email;
+        this.authorities = authorities;
     }
 
     public UserDTO(User user) {
         this.id_user = user.getId_user();
-        this.nome = user.getName();
-        this.cognome = user.getLastName();
+        this.name = user.getName();
+        this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.authorities = user.getAuthorities().stream()
                 .map(Authority::getName)
@@ -47,20 +43,20 @@ public class UserDTO {
         this.id_user = id_user;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String nome) {
+        this.name = nome;
     }
 
-    public String getCognome() {
-        return cognome;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {

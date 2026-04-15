@@ -107,7 +107,7 @@ public class AdminService {
         }
 
         user.setAuthorities(authorities);
-        user.setCreatdDate(LocalDateTime.now());
+        user.setCreatedDate(LocalDateTime.now());
 
         user = userRepository.save(user);
         return userMapper.toDto(user);

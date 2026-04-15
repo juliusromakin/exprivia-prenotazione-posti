@@ -123,12 +123,12 @@ public class User {
         this.updatedDate = updatedDate;
     }
 
-    public LocalDateTime getCreatdDate() {
-        return creatdDate;
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreatdDate(LocalDateTime creatdDate) {
-        this.creatdDate = creatdDate;
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
     public Set<Authority> getAuthorities() {
