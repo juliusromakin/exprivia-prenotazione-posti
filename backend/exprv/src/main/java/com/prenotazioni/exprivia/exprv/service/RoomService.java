@@ -42,4 +42,18 @@ public class RoomService {
         roomRepository.save(existingRoom);
         return roomMapper.toDTO(existingRoom);
     }
+
+    public void softDeleteRoom(Integer id) {
+        Room existingRoom = roomRepository.findById(id)
+                .orElseThrow(() -> new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+        existingRoom.setIs_active(false);
+        roomRepository.save(existingRoom);
+    }
+
+    public void hardDeleteRoom(Integer id) {
+        if (!roomRepository.existsById(id)) {
+            throw new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND);
+        }
+        roomRepository.deleteById(id);
+    }
 }
