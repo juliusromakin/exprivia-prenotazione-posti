@@ -50,7 +50,7 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "created_date")
-    private LocalDateTime creatdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "is_active")
     private Boolean is_active = true;
