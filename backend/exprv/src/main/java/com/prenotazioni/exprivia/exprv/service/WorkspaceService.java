@@ -41,10 +41,8 @@ public class WorkspaceService {
     }
 
     public WorkspaceDTO createWorkspace(WorkspaceDTO workspaceDTO) {
-        // Converto il DTO in Entity
         Workspace workspace = workspaceMapper.toEntity(workspaceDTO);
 
-        // Associo la Room manualmente (il mapper la ignora per evitare conflitti)
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
                     .orElseThrow(() -> new AppException("Stanza con ID " + workspaceDTO.getRoomId() + " non trovata",
@@ -60,10 +58,8 @@ public class WorkspaceService {
         Workspace existingWorkspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new AppException("Postazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
 
-        // Aggiorno i campi base dal DTO
         workspaceMapper.updateWorkspaceFromDto(workspaceDTO, existingWorkspace);
 
-        // Se il frontend ha cambiato la stanza, aggiorno la relazione manualmente
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
                     .orElseThrow(() -> new AppException("Stanza con ID " + workspaceDTO.getRoomId() + " non trovata",

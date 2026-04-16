@@ -1,5 +1,7 @@
 package com.prenotazioni.exprivia.exprv.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -76,6 +78,18 @@ public class ReservationService {
                         () -> new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND)));
     }
 
+    public List<ReservationDTO> findReservationsByUserEmail(String email) {
+        return reservationMapper.toDtoList(reservationRepository.findByUserEmail(email));
+    }
+
+    public List<ReservationDTO> findReservationsByDay(LocalDate date) {
+        return reservationMapper.toDtoList(reservationRepository.findByStartDateOnDay(date));
+    }
+
+    public List<ReservationDTO> findReservationsByDayAndWorkspace(LocalDate date, Integer workspaceId) {
+        return reservationMapper.toDtoList(reservationRepository.findByStartDateOnDayAndWorkspace(date, workspaceId));
+    }
+
     public ReservationDTO createReservation(ReservationDTO reservationDTO) {
         validateReservationDTO(reservationDTO);
 
@@ -129,6 +143,31 @@ public class ReservationService {
             throw new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND);
         }
         reservationRepository.deleteById(id);
+    }
+
+    public List<String> getAvailableTimes(Integer workspaceId, LocalDate data) {
+        List<String> tuttiOrari = List.of(
+                "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
+                "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
+                "17:00", "17:30");
+
+        LocalDateTime inizioGiornata = data.atTime(9, 0);
+        LocalDateTime fineGiornata = data.atTime(18, 0);
+        List<Reservation> prenotazioniEsistenti = reservationRepository.findByWorkspaceAndDateRange(
+                workspaceId, inizioGiornata, fineGiornata);
+
+        return tuttiOrari.stream()
+                .filter(orario -> !isOrarioPrenotato(orario, prenotazioniEsistenti, data))
+                .toList();
+    }
+
+    private boolean isOrarioPrenotato(String orario, List<Reservation> prenotazioni, LocalDate data) {
+        int hour = Integer.parseInt(orario.split(":")[0]);
+        int minute = Integer.parseInt(orario.split(":")[1]);
+        LocalDateTime dataOrario = data.atTime(hour, minute);
+        return prenotazioni.stream()
+                .anyMatch(r -> (dataOrario.isEqual(r.getStartDate()) || dataOrario.isAfter(r.getStartDate())) &&
+                        dataOrario.isBefore(r.getEndDate()));
     }
 
 }
