@@ -33,7 +33,8 @@ public class ReservationDurationService {
     }
 
     public ReservationDurationDTO createDuration(ReservationDurationDTO durationDTO) {
-        // Verifica che non esista già una durata con lo stesso nome (è la chiave primaria)
+        // Verifica che non esista già una durata con lo stesso nome (è la chiave
+        // primaria)
         if (reservationDurationRepository.existsByName(durationDTO.getName())) {
             throw new AppException("Esiste già una durata con il nome '" + durationDTO.getName() + "'",
                     HttpStatus.CONFLICT);
