@@ -5,27 +5,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class AdminDTO {
     private Integer id_user;
-    private String nome;
-    private String cognome;
+    private String name;
+    private String lastName;
     private String email;
     private Boolean enabled;
     private Set<String> authorities;
     private LocalDateTime creatoIl;
     private LocalDateTime aggiornatoIl;
 
-
-    public AdminDTO(Users user) {
+    public AdminDTO(User user) {
         this.id_user = user.getId_user();
-        this.nome = user.getNome();
-        this.cognome = user.getCognome();
+        this.name = user.getName();
+        this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.enabled = user.getEnabled();
-        this.creatoIl = user.getCreatoIl();
-        this.aggiornatoIl = user.getAggiornatoIl();
+        this.creatoIl = user.getCreatedDate();
+        this.aggiornatoIl = user.getUpdatedDate();
         this.authorities = user.getAuthorities()
                 .stream()
                 .map(Authority::getName)
@@ -40,20 +38,20 @@ public class AdminDTO {
         this.id_user = id_user;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCognome() {
-        return cognome;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {

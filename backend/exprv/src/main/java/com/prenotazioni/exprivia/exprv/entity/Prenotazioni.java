@@ -35,7 +35,7 @@ public class Prenotazioni {
 
     @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
-    private Users users;
+    private User users;
 
     @ManyToOne
     @JoinColumn(name = "id_postazione", referencedColumnName = "id_postazione")
@@ -67,7 +67,7 @@ public class Prenotazioni {
     }
 
     // Costruttore
-    public Prenotazioni(Integer id_prenotazioni, Users users, Postazioni postazione, Stanze stanze,
+    public Prenotazioni(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
             stato_prenotazione stato_prenotazione, LocalDateTime dataInizio, LocalDateTime dataFine) {
         this.id_prenotazioni = id_prenotazioni;
         this.users = users;
@@ -88,11 +88,11 @@ public class Prenotazioni {
         this.id_prenotazioni = id_prenotazioni;
     }
 
-    public Users getUsers() {
+    public User getUsers() {
         return users;
     }
 
-    public void setUsers(Users users) {
+    public void setUsers(User users) {
         this.users = users;
     }
 

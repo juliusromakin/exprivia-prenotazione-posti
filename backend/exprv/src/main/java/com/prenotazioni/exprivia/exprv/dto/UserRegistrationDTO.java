@@ -5,36 +5,36 @@ import java.util.Set;
 
 public class UserRegistrationDTO {
 
-    private String nome;
-    private String cognome;
+    private String name;
+    private String lastName;
     private String email;
     private String password;
     private Set<String> authorities;
 
     // private Set<String> authorities
 
-    public UserRegistrationDTO(String nome, String cognome, String email, String password, Set<String> authorities) {
-        this.nome = nome;
-        this.cognome = cognome;
+    public UserRegistrationDTO(String name, String lastName, String email, String password, Set<String> authorities) {
+        this.name = name;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCognome() {
-        return cognome;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -73,8 +73,8 @@ public class UserRegistrationDTO {
     @Override
     public String toString() {
         return "UserRegistrationDTO{" +
-                "nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
+                "nome='" + name + '\'' +
+                ", cognome='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", authorities=" + authorities +
                 '}';

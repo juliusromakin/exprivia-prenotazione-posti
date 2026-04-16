@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.AuthResponseDTO;
@@ -23,7 +24,7 @@ import com.prenotazioni.exprivia.exprv.dto.ResetPasswordRequest;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
@@ -56,17 +57,15 @@ public class AuthService {
         this.emailService = emailService;
     }
 
-    /**
-     * Autenticazione dell'utente
-     */
     public AuthResponseDTO login(CredentialsDto credentialsDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(credentialsDto.email(), credentialsDto.password()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            Users user = userRepository.findByEmail(credentialsDto.email())
-                    .orElseThrow(() -> new AppException("Utente sconosciuto", HttpStatus.NOT_FOUND));
+
+            User user = userRepository.findByEmail(credentialsDto.email())
+                    .orElseThrow(() -> new AppException("Utente non trovato", HttpStatus.NOT_FOUND));
 
             String jwt = jwtTokenProvider.generateToken(authentication);
 
@@ -82,97 +81,96 @@ public class AuthService {
             }
         } catch (BadCredentialsException e) {
             throw new AppException("Credenziali non valide", HttpStatus.BAD_REQUEST);
+        } catch (AppException e) {
+            throw e;
         } catch (Exception e) {
-            throw new AppException("Errore durante l'autenticazione", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new AppException("Errore durante l'autenticazione: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    /**
-     * Validazione dati di registrazione
-     */
-    private void validateRegistrationData(UserRegistrationDTO registrationDTO) {
-        if (registrationDTO.getNome() == null || registrationDTO.getNome().isEmpty()) {
-            throw new IllegalArgumentException("Il nome non può essere nullo!");
-        }
-        if (registrationDTO.getCognome() == null || registrationDTO.getCognome().isEmpty()) {
-            throw new IllegalArgumentException("Il cognome non può essere nullo!");
-        }
-        if (registrationDTO.getEmail() == null || registrationDTO.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("La mail non può essere nulla!");
-        }
-        if (registrationDTO.getPassword() == null || registrationDTO.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("La password non può essere nulla!");
-        }
-    }
-
-    /**
-     * Crea un nuovo utente
-     */
+    @Transactional
     public UserDTO creaUtente(UserRegistrationDTO registrationDTO) {
         validateRegistrationData(registrationDTO);
 
         if (userRepository.findByEmail(registrationDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Esiste già un utente con questa email!");
+            throw new AppException("Esiste già un utente con questa email!", HttpStatus.BAD_REQUEST);
         }
 
-        Users user = userMapper.toEntity(registrationDTO);
+        User user = userMapper.toEntity(registrationDTO);
+        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Verifica basata sul tuo file User.java:
+        // 1. Il metodo corretto è setIs_active(Boolean)
+        user.setIs_active(true);
 
-        // Assegna il ruolo predefinito "ROLE_USER"
+        // 2. Non serve user.setCreatedDate(...) perché hai @CreationTimestamp nella
+        // entity
+        // Hibernate gestirà la data automaticamente al primo save.
+
         Authority userAuthority = authorityRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Ruolo ROLE_USER non trovato"));
+                .orElseThrow(() -> new AppException("Ruolo ROLE_USER non trovato nel sistema",
+                        HttpStatus.INTERNAL_SERVER_ERROR));
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(userAuthority);
         user.setAuthorities(authorities);
 
-        user.setEnabled(true);
-        user.setCreatoIl(LocalDateTime.now());
-
-        user = userRepository.save(user);
-        return userMapper.toDto(user);
+        User savedUser = userRepository.save(user);
+        return userMapper.toDto(savedUser);
     }
 
-    /**
-     * Gestione password dimenticata
-     */
-    public ResponseEntity<?> forgotPassword(EmailDTO emailDTO) {
-        String email = emailDTO.email().trim();
-        Optional<Users> userOpt = userRepository.findByEmailIgnoreCase(email);
-
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Email Non Trovata Nel Sistema");
+    public ResponseEntity<String> forgotPassword(EmailDTO emailDTO) {
+        if (emailDTO.email() == null || emailDTO.email().isBlank()) {
+            return ResponseEntity.badRequest().body("L'email è obbligatoria");
         }
 
-        String token = passwordResetService.createResetToken(email);
-        emailService.sendPasswordResetEmail(email, token);
+        String email = emailDTO.email().trim();
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
-        return ResponseEntity.ok("Email Inviata, Controlla la Posta elettronica");
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email non trovata nel sistema");
+        }
+
+        try {
+            String token = passwordResetService.createResetToken(email);
+            emailService.sendPasswordResetEmail(email, token);
+            return ResponseEntity.ok("Email inviata, controlla la tua posta elettronica");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Errore durante l'invio dell'email");
+        }
     }
 
-    /**
-     * Reset della password
-     */
-    public ResponseEntity<?> resetPassword(ResetPasswordRequest resetRequest) {
-        Optional<Users> userOpt = passwordResetService.validateToken(resetRequest.token());
+    @Transactional
+    public ResponseEntity<String> resetPassword(ResetPasswordRequest resetRequest) {
+        if (resetRequest.token() == null || resetRequest.newPassword() == null
+                || resetRequest.newPassword().isBlank()) {
+            return ResponseEntity.badRequest().body("Dati mancanti per il reset");
+        }
+
+        Optional<User> userOpt = passwordResetService.validateToken(resetRequest.token());
 
         if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Token non valido o scaduto");
         }
 
-        Users user = userOpt.get();
-
-        if (resetRequest.newPassword() == null || resetRequest.newPassword().isEmpty()) {
-            return ResponseEntity.badRequest().body("La password non può essere vuota");
-        }
-
-        String hashedPassword = passwordEncoder.encode(resetRequest.newPassword());
-        user.setPassword(hashedPassword);
+        User user = userOpt.get();
+        user.setPassword(passwordEncoder.encode(resetRequest.newPassword()));
         userRepository.save(user);
 
         passwordResetService.invalidateToken(resetRequest.token());
 
         return ResponseEntity.ok("Password aggiornata con successo");
+    }
+
+    private void validateRegistrationData(UserRegistrationDTO registrationDTO) {
+        if (registrationDTO.getName() == null || registrationDTO.getName().isBlank())
+            throw new AppException("Il nome non può essere vuoto", HttpStatus.BAD_REQUEST);
+        if (registrationDTO.getLastName() == null || registrationDTO.getLastName().isBlank())
+            throw new AppException("Il cognome non può essere vuoto", HttpStatus.BAD_REQUEST);
+        if (registrationDTO.getEmail() == null || registrationDTO.getEmail().isBlank())
+            throw new AppException("La mail non può essere vuota", HttpStatus.BAD_REQUEST);
+        if (registrationDTO.getPassword() == null || registrationDTO.getPassword().length() < 6)
+            throw new AppException("La password deve contenere almeno 6 caratteri", HttpStatus.BAD_REQUEST);
     }
 }

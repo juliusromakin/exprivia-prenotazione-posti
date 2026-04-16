@@ -1,44 +1,38 @@
 package com.prenotazioni.exprivia.exprv.entity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "authority")
-public class Authority implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@Table(name = "reservation_duration")
+public class ReservationDuration {
 
     @Id
-    @Column(name = "authority_name", length = 50, nullable = false)
-    @NotNull
-    @Size(max = 50)
+    @Column(name = "duration_name")
     private String name;
 
-    @ManyToMany(mappedBy = "authorities")
-    @JsonIgnore
-    private List<User> users = new ArrayList<>();
+    @Column(name = "minutes")
+    private Integer minutes;
 
     @Column(name = "is_active")
     private Boolean is_active = true;
 
-    // Costruttori
-    public Authority() {
+    @OneToMany(mappedBy = "reservationDuration")
+    @JsonIgnore
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public ReservationDuration() {
     }
 
-    public Authority(String name, Boolean is_active) {
+    public ReservationDuration(String name, Integer minutes, Boolean is_active) {
         this.name = name;
+        this.minutes = minutes;
         this.is_active = is_active;
     }
 
@@ -50,6 +44,14 @@ public class Authority implements Serializable {
         this.name = name;
     }
 
+    public Integer getMinutes() {
+        return minutes;
+    }
+
+    public void setMinutes(Integer minutes) {
+        this.minutes = minutes;
+    }
+
     public Boolean getIs_active() {
         return is_active;
     }
@@ -57,4 +59,5 @@ public class Authority implements Serializable {
     public void setIs_active(Boolean is_active) {
         this.is_active = is_active;
     }
+
 }
