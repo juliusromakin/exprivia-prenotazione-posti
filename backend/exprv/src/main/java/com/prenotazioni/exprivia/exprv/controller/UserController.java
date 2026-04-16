@@ -21,7 +21,7 @@ import com.prenotazioni.exprivia.exprv.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
-@RequestMapping("/api/utenti")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
@@ -38,10 +38,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/aggiorna/{id}")
+    @PutMapping("/updateUser/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
         try {
-            UserDTO updatedUser = userService.aggiornaUser(id, updates);
+            UserDTO updatedUser = userService.updateUser(id, updates);
             return ResponseEntity.ok(updatedUser);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato");
@@ -52,7 +52,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/elimina-account")
+    @DeleteMapping("/deleteUser")
     public ResponseEntity<?> deleteOwnAccount() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,7 +64,8 @@ public class UserController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accesso negato");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'eliminazione dell'account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore durante l'eliminazione dell'account");
         }
     }
 }

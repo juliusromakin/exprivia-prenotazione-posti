@@ -92,7 +92,7 @@ public class UserService {
      * @throws EntityNotFoundException  se l'utente non esiste
      * @throws IllegalArgumentException se i dati forniti non sono validi
      */
-    public UserDTO aggiornaUser(Integer id, Map<String, Object> updates) {
+    public UserDTO updateUser(Integer id, Map<String, Object> updates) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con ID " + id + " non trovato"));
 
@@ -221,8 +221,8 @@ public class UserService {
         User user = new User();
         user.setEmail(userRegistrationDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-        user.setName(userRegistrationDTO.getNome());
-        user.setLastName(userRegistrationDTO.getCognome());
+        user.setName(userRegistrationDTO.getName());
+        user.setLastName(userRegistrationDTO.getLastName());
 
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
