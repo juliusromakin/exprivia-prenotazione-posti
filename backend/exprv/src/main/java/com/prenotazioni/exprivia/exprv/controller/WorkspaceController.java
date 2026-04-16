@@ -1,6 +1,7 @@
 package com.prenotazioni.exprivia.exprv.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.dto.WorkspaceDTO;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.service.WorkspaceService;
@@ -37,6 +39,16 @@ public class WorkspaceController {
     public ResponseEntity<List<WorkspaceDTO>> getWorkspacesByRoomId(@PathVariable("roomId") Integer roomId) {
         List<WorkspaceDTO> workspaces = workspaceService.findWorkspacesByRoomId(roomId);
         return ResponseEntity.ok(workspaces);
+    }
+
+    @GetMapping("/options/{roomId}")
+    public ResponseEntity<List<SelectOptionDTO>> getWorkspaceOptions(@PathVariable("roomId") Integer roomId) {
+        return ResponseEntity.ok(workspaceService.getWorkspaceOptionsByRoom(roomId));
+    }
+
+    @GetMapping("/rooms-with-workspaces")
+    public ResponseEntity<Map<String, List<Map<String, Object>>>> getRoomsWithWorkspaces() {
+        return ResponseEntity.ok(workspaceService.getRoomsWithWorkspaces());
     }
 
     @GetMapping("/{id}")

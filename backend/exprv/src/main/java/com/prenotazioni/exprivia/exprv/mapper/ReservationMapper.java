@@ -10,7 +10,9 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 import com.prenotazioni.exprivia.exprv.dto.ReservationDTO;
+import com.prenotazioni.exprivia.exprv.dto.UserSummaryDTO;
 import com.prenotazioni.exprivia.exprv.entity.Reservation;
+import com.prenotazioni.exprivia.exprv.entity.User;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReservationMapper {
@@ -20,7 +22,19 @@ public interface ReservationMapper {
     @Mapping(source = "workspace.id_workspace", target = "workspaceId")
     @Mapping(source = "user.id_user", target = "userId")
     @Mapping(source = "reservationDuration.name", target = "durationName")
+    @Mapping(source = "user", target = "userSummary")
     ReservationDTO toDto(Reservation reservation);
+
+    default UserSummaryDTO toUserSummaryDto(User user) {
+        if (user == null) {
+            return null;
+        }
+        return new UserSummaryDTO(
+                user.getId_user(),
+                user.getName(),
+                user.getLastName(),
+                user.getEmail());
+    }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "workspace", ignore = true)

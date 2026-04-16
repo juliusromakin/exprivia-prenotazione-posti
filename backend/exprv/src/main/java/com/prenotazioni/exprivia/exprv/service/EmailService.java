@@ -24,6 +24,16 @@ public class EmailService {
     }
 
     @Async("emailTaskExecutor")
+    public void sendVerificationEmail(String toEmail, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Verifica il tuo account");
+        message.setText("Benvenuto! Il tuo codice di verifica è: " + code + "\n\nInseriscilo nell'applicazione per attivare il tuo profilo.");
+
+        mailSender.send(message);
+    }
+
+    @Async("emailTaskExecutor")
     public void sendBookingConfirmationEmail(String toEmail, String userName, String roomName, 
                                            String positionName, String startDateTime, String endDateTime) {
         try {

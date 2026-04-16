@@ -12,7 +12,7 @@ import org.mapstruct.Named;
 
 import com.prenotazioni.exprivia.exprv.dto.PrenotazioniDTO;
 import com.prenotazioni.exprivia.exprv.entity.Prenotazioni;
-import com.prenotazioni.exprivia.exprv.entity.Users;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.entity.Postazioni;
 import com.prenotazioni.exprivia.exprv.entity.Stanze;
 
@@ -53,7 +53,7 @@ public interface PrenotazioniMapper {
 
     // Custom mapping methods
     @Named("usersToUserInfo")
-    default PrenotazioniDTO.UserInfo usersToUserInfo(Users users) {
+    default PrenotazioniDTO.UserInfo usersToUserInfo(User users) {
         return new PrenotazioniDTO.UserInfo(users);
     }
 

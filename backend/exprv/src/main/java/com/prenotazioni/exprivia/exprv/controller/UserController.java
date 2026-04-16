@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
+import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.service.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -39,9 +40,9 @@ public class UserController {
     }
 
     @PutMapping("/updateUser/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDTO updateDTO) {
         try {
-            UserDTO updatedUser = userService.updateUser(id, updates);
+            UserDTO updatedUser = userService.updateUser(id, updateDTO);
             return ResponseEntity.ok(updatedUser);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato");

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
-import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
+import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
@@ -86,66 +86,43 @@ public class UserService {
     /**
      * Aggiorna un utente con i dati forniti
      *
-     * @param id      ID dell'utente da aggiornare
-     * @param updates mappa dei campi da aggiornare
+     * @param id        ID dell'utente da aggiornare
+     * @param updateDTO DTO con i dati da aggiornare
      * @return UserDTO dell'utente aggiornato
      * @throws EntityNotFoundException  se l'utente non esiste
      * @throws IllegalArgumentException se i dati forniti non sono validi
      */
-    public UserDTO updateUser(Integer id, Map<String, Object> updates) {
+    public UserDTO updateUser(Integer id, UserUpdateDTO updateDTO) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con ID " + id + " non trovato"));
 
         // Verifica email duplicata
-        if (updates.containsKey("email")) {
-            String newEmail = (String) updates.get("email");
-            Optional<User> userWithSameEmail = userRepository.findByEmail(newEmail);
+        if (updateDTO.getEmail() != null) {
+            Optional<User> userWithSameEmail = userRepository.findByEmail(updateDTO.getEmail());
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
                 throw new IllegalArgumentException("Email già in uso");
             }
         }
 
-        // Verifica password attuale se si sta tentando di cambiare la password
-        if (updates.containsKey("password")) {
-            String currentPassword = (String) updates.get("currentPassword");
-            String newPassword = (String) updates.get("password");
+        // Verifica password se si tenta di cambiarla
+        if (updateDTO.getNewPassword() != null && !updateDTO.getNewPassword().trim().isEmpty()) {
+            String currentPassword = updateDTO.getCurrentPassword();
 
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
                 throw new IllegalArgumentException("La password attuale è richiesta per modificare la password");
-            }
-
-            if (newPassword == null || newPassword.trim().isEmpty()) {
-                throw new IllegalArgumentException("La nuova password non può essere vuota");
             }
 
             // Verifica che la password attuale corrisponda a quella nel database
             if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
                 throw new IllegalArgumentException("Password attuale non corretta");
             }
+
+            // Imposta la nuova password cifrata
+            existingUser.setPassword(passwordEncoder.encode(updateDTO.getNewPassword()));
         }
 
-        // Aggiorna i campi
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "nome":
-                    existingUser.setName((String) value);
-                    break;
-                case "cognome":
-                    existingUser.setLastName((String) value);
-                    break;
-                case "email":
-                    existingUser.setEmail((String) value);
-                    break;
-                case "password":
-                    existingUser.setPassword(passwordEncoder.encode((String) value));
-                    break;
-                case "currentPassword":
-                    // Non fare nulla - questo campo è solo per la verifica
-                    break;
-                default:
-                    throw new IllegalArgumentException("Campo non valido per l'aggiornamento: " + key);
-            }
-        });
+        // Usa il mapper per gli altri campi generici
+        userMapper.updateEntityFromUserUpdateDto(updateDTO, existingUser);
 
         existingUser.setUpdatedDate(LocalDateTime.now());
         User updatedUser = userRepository.save(existingUser);
@@ -191,41 +168,18 @@ public class UserService {
 
     public UserDTO getDetailsForAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // Ottieni l'email dell'utente autenticato
+        String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
 
-        return userMapper.toDto(user); // Restituisci il DTO dell'utente
+        return userMapper.toDto(user);
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
         return userMapper.toDto(user);
-    }
-
-    public UserDTO creaUser(UserRegistrationDTO userRegistrationDTO) {
-        if (userRegistrationDTO.getEmail() == null || userRegistrationDTO.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("L'email è obbligatoria");
-        }
-
-        if (userRegistrationDTO.getPassword() == null || userRegistrationDTO.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("La password è obbligatoria");
-        }
-
-        if (userRepository.findByEmail(userRegistrationDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email già registrata");
-        }
-
-        User user = new User();
-        user.setEmail(userRegistrationDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-        user.setName(userRegistrationDTO.getName());
-        user.setLastName(userRegistrationDTO.getLastName());
-
-        User savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
     }
 
 }

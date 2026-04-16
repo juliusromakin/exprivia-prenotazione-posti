@@ -1,7 +1,12 @@
 package com.prenotazioni.exprivia.exprv.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -21,13 +26,13 @@ import com.prenotazioni.exprivia.exprv.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class AdminService {
+public class AdminService1 {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public AdminService(UserRepository userRepository, UserMapper userMapper,
+    public AdminService1(UserRepository userRepository, UserMapper userMapper,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -57,7 +62,7 @@ public class AdminService {
             throw new IllegalArgumentException("È necessario specificare almeno un ruolo per l'utente");
         }
 
-        // Il Mapper fa quasi tutto al posto nostro!
+        // Il Mapper fa tutto: inietta i ruoli, nome, cognome, email.
         User user = userMapper.toEntity(adminCreateUserDTO);
         
         user.setPassword(passwordEncoder.encode(adminCreateUserDTO.getPassword()));

@@ -1,9 +1,19 @@
 package com.prenotazioni.exprivia.exprv.service;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +22,7 @@ import com.prenotazioni.exprivia.exprv.entity.Reservation;
 import com.prenotazioni.exprivia.exprv.entity.ReservationDuration;
 import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
+import com.prenotazioni.exprivia.exprv.enumerati.ReservationStatus;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.ReservationMapper;
 import com.prenotazioni.exprivia.exprv.repository.ReservationDurationRepository;
@@ -26,15 +37,17 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final ReservationDurationRepository durationRepository;
     private final ReservationMapper reservationMapper;
+    private final EmailService emailService;
 
     public ReservationService(ReservationRepository reservationRepository, WorkspaceRepository workspaceRepository,
             UserRepository userRepository, ReservationDurationRepository durationRepository,
-            ReservationMapper reservationMapper) {
+            ReservationMapper reservationMapper, EmailService emailService) {
         this.reservationRepository = reservationRepository;
         this.workspaceRepository = workspaceRepository;
         this.userRepository = userRepository;
         this.durationRepository = durationRepository;
         this.reservationMapper = reservationMapper;
+        this.emailService = emailService;
     }
 
     public void validateReservationDTO(ReservationDTO reservationDTO) {
@@ -106,8 +119,14 @@ public class ReservationService {
         reservation.setUser(user);
         reservation.setWorkspace(workspace);
         reservation.setReservationDuration(duration);
+        reservation.setStatusReservation(ReservationStatus.CONFIRMED); // Default status
 
-        return reservationMapper.toDto(reservationRepository.save(reservation));
+        Reservation savedReservation = reservationRepository.save(reservation);
+        
+        // Invio email di conferma
+        sendStatusEmail(savedReservation, null);
+
+        return reservationMapper.toDto(savedReservation);
     }
 
     public ReservationDTO updateReservation(Integer id, ReservationDTO reservationDTO) {
@@ -135,13 +154,24 @@ public class ReservationService {
 
         validateReservationDTO(reservationDTO);
 
-        return reservationMapper.toDto(reservationRepository.save(existingReservation));
+        ReservationStatus oldStatus = existingReservation.getStatusReservation();
+        Reservation savedReservation = reservationRepository.save(existingReservation);
+        
+        // Se lo stato è cambiato in DENIED, invia email
+        if (oldStatus != ReservationStatus.DENIED && savedReservation.getStatusReservation() == ReservationStatus.DENIED) {
+            sendStatusEmail(savedReservation, true); // Admin action
+        }
+
+        return reservationMapper.toDto(savedReservation);
     }
 
     public void deleteReservation(Integer id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND);
-        }
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+        
+        // Notifica cancellazione via email prima di eliminare
+        sendStatusEmail(reservation, true); // Considerata azione admin se fatta da questo service generico
+        
         reservationRepository.deleteById(id);
     }
 
@@ -168,6 +198,70 @@ public class ReservationService {
         return prenotazioni.stream()
                 .anyMatch(r -> (dataOrario.isEqual(r.getStartDate()) || dataOrario.isAfter(r.getStartDate())) &&
                         dataOrario.isBefore(r.getEndDate()));
+    }
+
+    private void sendStatusEmail(Reservation reservation, Boolean isAdminAction) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String startStr = reservation.getStartDate().format(formatter);
+        String endStr = reservation.getEndDate().format(formatter);
+        String userName = reservation.getUser().getName() + " " + reservation.getUser().getLastName();
+        String roomName = reservation.getWorkspace().getRoom().getName();
+        String workspaceName = reservation.getWorkspace().getName();
+
+        if (reservation.getStatusReservation() == ReservationStatus.CONFIRMED && isAdminAction == null) {
+            emailService.sendBookingConfirmationEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+        } else if (reservation.getStatusReservation() == ReservationStatus.DENIED) {
+            emailService.sendBookingCancelledByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+        } else if (isAdminAction != null && isAdminAction) {
+            emailService.sendBookingDeletedByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+        }
+    }
+
+    public byte[] exportReservationsToExcel(LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findByStartDateOnDay(date);
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Prenotazioni " + date.toString());
+
+            // Header Style
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            XSSFFont headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "User", "Room", "Workspace", "Start", "End", "Status"};
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            int rowIdx = 1;
+            for (Reservation r : reservations) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(r.getId_reservation());
+                row.createCell(1).setCellValue(r.getUser().getEmail());
+                row.createCell(2).setCellValue(r.getWorkspace().getRoom().getName());
+                row.createCell(3).setCellValue(r.getWorkspace().getName());
+                row.createCell(4).setCellValue(r.getStartDate().format(dtf));
+                row.createCell(5).setCellValue(r.getEndDate().format(dtf));
+                row.createCell(6).setCellValue(r.getStatusReservation().toString());
+            }
+
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new AppException("Errore durante la generazione del file Excel: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

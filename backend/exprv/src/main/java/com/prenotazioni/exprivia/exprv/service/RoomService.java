@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
+import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.RoomMapper;
@@ -24,6 +25,12 @@ public class RoomService {
 
     public List<RoomDTO> findAllRooms() {
         return roomMapper.toDtoList(roomRepository.findAll());
+    }
+
+    public List<SelectOptionDTO> getRoomOptions() {
+        return roomRepository.findAll().stream()
+                .map(room -> new SelectOptionDTO(room.getId_room(), room.getName()))
+                .toList();
     }
 
     public RoomDTO findRoomById(Integer id) {

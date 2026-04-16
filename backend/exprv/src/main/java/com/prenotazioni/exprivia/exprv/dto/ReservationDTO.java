@@ -13,12 +13,13 @@ public class ReservationDTO {
     private Integer workspaceId;
     private Integer userId;
     private String durationName;
+    private UserSummaryDTO userSummary; // Dettagli utente in inglese
 
     public ReservationDTO() {
     }
 
     public ReservationDTO(Integer id_reservation, LocalDateTime startDate, LocalDateTime endDate,
-            ReservationStatus statusReservation, Integer workspaceId, Integer userId, String durationName) {
+            ReservationStatus statusReservation, Integer workspaceId, Integer userId, String durationName, UserSummaryDTO userSummary) {
         this.id_reservation = id_reservation;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -26,6 +27,7 @@ public class ReservationDTO {
         this.workspaceId = workspaceId;
         this.userId = userId;
         this.durationName = durationName;
+        this.userSummary = userSummary;
     }
 
     public Integer getId_reservation() {
@@ -82,6 +84,14 @@ public class ReservationDTO {
 
     public void setDurationName(String durationName) {
         this.durationName = durationName;
+    }
+
+    public UserSummaryDTO getUserSummary() {
+        return userSummary;
+    }
+
+    public void setUserSummary(UserSummaryDTO userSummary) {
+        this.userSummary = userSummary;
     }
 
 }

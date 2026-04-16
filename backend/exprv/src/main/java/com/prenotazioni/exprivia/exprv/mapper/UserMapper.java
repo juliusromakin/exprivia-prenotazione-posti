@@ -11,9 +11,12 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import com.prenotazioni.exprivia.exprv.dto.AdminCreateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
+import com.prenotazioni.exprivia.exprv.dto.AdminUpdateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
-import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
+import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
+import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
@@ -49,21 +52,38 @@ public interface UserMapper {
     User toEntity(UserDTO userDTO);
 
     /**
-     * Converte un UserRegistrationDTO in entità User.
+     * Converte un AdminCreateUserDTO in entità User (per creazioni tramite Admin).
      */
     @Mapping(target = "id_user", ignore = true)
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "lastName", source = "lastName")
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "password", source = "password")
+    @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    @Mapping(target = "authorities", source = "authorities", qualifiedByName = "stringsToAuthorities")
+    User toEntity(AdminCreateUserDTO adminCreateUserDTO);
+
+    /**
+     * Converte un UserSignupDTO in entità User (per registrazioni pubbliche
+     * standard).
+     */
+    @Mapping(target = "id_user", ignore = true)
+    @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
+    @Mapping(target = "authorities", ignore = true) // Niente ruoli per sicurezza!
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    @Mapping(target = "is_active", ignore = true) // Gestito di default nel DB
+    User toEntity(UserSignupDTO userSignupDTO);
+
+    /**
+     * Aggiorna profilo utente da parte dell'utente stesso
+     */
+    @Mapping(target = "id_user", ignore = true)
+    @Mapping(target = "password", ignore = true) // Gestita separatamente
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    User toEntity(UserRegistrationDTO registrationDTO);
+    @Mapping(target = "is_active", ignore = true)
+    void updateEntityFromUserUpdateDto(UserUpdateDTO updateDTO, @MappingTarget User user);
 
-    /**
-     * Aggiorna un'entità User esistente con i dati del DTO.
-     */
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
@@ -118,4 +138,10 @@ public interface UserMapper {
                 })
                 .collect(Collectors.toSet());
     }
+
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    @Mapping(target = "authorities", source = "authorities", qualifiedByName = "stringsToAuthorities")
+    void updateEntityFromAdminDto(AdminUpdateUserDTO adminUpdateDTO, @MappingTarget User user);
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
+import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.service.RoomService;
 
@@ -36,7 +37,11 @@ public class RoomController {
     @GetMapping()
     public List<RoomDTO> getAllRooms() {
         return roomService.findAllRooms();
-        // Chiama Il Servizio Scritto in precedenza per ottenere tutte le stanze
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<List<SelectOptionDTO>> getRoomOptions() {
+        return ResponseEntity.ok(roomService.getRoomOptions());
     }
 
     // Richiesta GET per ricevere una stanza in base all'ID

@@ -1,24 +1,23 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
-import java.util.HashSet;
 import java.util.Set;
 
-public class UserRegistrationDTO {
-
+public class AdminUpdateUserDTO {
     private String name;
     private String lastName;
     private String email;
-    private String password;
     private Set<String> authorities;
+    private Boolean is_active;
 
-    // private Set<String> authorities
+    public AdminUpdateUserDTO() {
+    }
 
-    public UserRegistrationDTO(String name, String lastName, String email, String password, Set<String> authorities) {
+    public AdminUpdateUserDTO(String name, String lastName, String email, Set<String> authorities, Boolean is_active) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
         this.authorities = authorities;
+        this.is_active = is_active;
     }
 
     public String getName() {
@@ -45,19 +44,7 @@ public class UserRegistrationDTO {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public Set<String> getAuthorities() {
-        if (authorities == null) {
-            authorities = new HashSet<>();
-        }
-
         return authorities;
     }
 
@@ -65,19 +52,11 @@ public class UserRegistrationDTO {
         this.authorities = authorities;
     }
 
-    public UserRegistrationDTO() {
-        this.authorities = new HashSet<>();
+    public Boolean getIs_active() {
+        return is_active;
     }
 
-    // ToString per debug
-    @Override
-    public String toString() {
-        return "UserRegistrationDTO{" +
-                "nome='" + name + '\'' +
-                ", cognome='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", authorities=" + authorities +
-                '}';
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
-
 }

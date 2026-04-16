@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.prenotazioni.exprivia.exprv.entity.CosaDurata;
 import com.prenotazioni.exprivia.exprv.entity.Postazioni;
 import com.prenotazioni.exprivia.exprv.entity.Stanze;
+import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.entity.Users;
 import com.prenotazioni.exprivia.exprv.enumerati.stato_prenotazione;
 
@@ -50,6 +51,16 @@ public class PrenotazioniDTO {
                 this.cognome = user.getCognome();
                 this.email = user.getEmail();
                 this.enabled = user.getEnabled();
+            }
+        }
+
+        public UserInfo(User user) {
+            if (user != null) {
+                this.id_user = user.getId_user();
+                this.nome = user.getName();
+                this.cognome = user.getLastName();
+                this.email = user.getEmail();
+                this.enabled = user.getIs_active();
             }
         }
 
@@ -183,7 +194,7 @@ public class PrenotazioniDTO {
     }
 
     // Costruttore completo per le risposte
-    public PrenotazioniDTO(Integer id_prenotazioni, Users users, Postazioni postazione, Stanze stanze,
+    public PrenotazioniDTO(Integer id_prenotazioni, User users, Postazioni postazione, Stanze stanze,
             stato_prenotazione stato_prenotazione, LocalDateTime data_inizio, LocalDateTime data_fine) {
         this.id_prenotazioni = id_prenotazioni;
         this.users = new UserInfo(users);

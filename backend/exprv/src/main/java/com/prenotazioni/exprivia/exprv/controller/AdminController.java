@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prenotazioni.exprivia.exprv.dto.AdminCreateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
+import com.prenotazioni.exprivia.exprv.dto.AdminUpdateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
-import com.prenotazioni.exprivia.exprv.dto.UserRegistrationDTO;
 import com.prenotazioni.exprivia.exprv.service.AdminService;
 import com.prenotazioni.exprivia.exprv.service.UserService;
 
@@ -50,9 +51,9 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody UserRegistrationDTO registrationDTO) {
+    public ResponseEntity<?> createUser(@RequestBody AdminCreateUserDTO registrationDTO) {
         try {
-            UserDTO newUser = userService.creaUser(registrationDTO);
+            UserDTO newUser = adminService.creaUtenteAdmin(registrationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -60,9 +61,9 @@ public class AdminController {
     }
 
     @PutMapping("/utente/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody AdminUpdateUserDTO updateDTO) {
         try {
-            AdminDTO updatedUser = adminService.aggiornaUserByAdmin(id, updates);
+            AdminDTO updatedUser = adminService.aggiornaUserByAdmin(id, updateDTO);
             return ResponseEntity.ok(updatedUser);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato");
@@ -82,7 +83,7 @@ public class AdminController {
     }
 
     @PostMapping("/crea_utente")
-    public ResponseEntity<?> register(@RequestBody UserRegistrationDTO userRegistrationDTO) {
+    public ResponseEntity<?> register(@RequestBody AdminCreateUserDTO userRegistrationDTO) {
         try {
             UserDTO newUser = adminService.creaUtenteAdmin(userRegistrationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);

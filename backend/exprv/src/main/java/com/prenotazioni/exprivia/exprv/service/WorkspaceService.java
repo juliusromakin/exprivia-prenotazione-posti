@@ -1,10 +1,15 @@
 package com.prenotazioni.exprivia.exprv.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.dto.WorkspaceDTO;
 import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
@@ -38,6 +43,41 @@ public class WorkspaceService {
 
     public List<WorkspaceDTO> findWorkspacesByRoomId(Integer roomId) {
         return workspaceMapper.toDtoList(workspaceRepository.findByRoomId(roomId));
+    }
+
+    public List<SelectOptionDTO> getWorkspaceOptionsByRoom(Integer roomId) {
+        return workspaceRepository.findByRoomId(roomId).stream()
+                .map(w -> new SelectOptionDTO(w.getId_workspace(), w.getName()))
+                .toList();
+    }
+
+    public Map<String, List<Map<String, Object>>> getRoomsWithWorkspaces() {
+        List<Room> rooms = roomRepository.findAll();
+
+        Map<String, List<Map<String, Object>>> result = new HashMap<>();
+        List<Map<String, Object>> roomsList = new ArrayList<>();
+
+        for (Room room : rooms) {
+            Map<String, Object> roomMap = new HashMap<>();
+            roomMap.put("id", room.getId_room());
+            roomMap.put("name", room.getName());
+
+            List<Map<String, Object>> workspacesList = workspaceRepository.findByRoomId(room.getId_room())
+                    .stream()
+                    .map(w -> {
+                        Map<String, Object> workspaceMap = new HashMap<>();
+                        workspaceMap.put("id", w.getId_workspace());
+                        workspaceMap.put("name", w.getName());
+                        return workspaceMap;
+                    })
+                    .collect(Collectors.toList());
+
+            roomMap.put("workspaces", workspacesList);
+            roomsList.add(roomMap);
+        }
+
+        result.put("rooms", roomsList);
+        return result;
     }
 
     public WorkspaceDTO createWorkspace(WorkspaceDTO workspaceDTO) {
