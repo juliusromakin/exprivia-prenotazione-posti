@@ -30,6 +30,23 @@
               </app-calendar>
             </div>
           </div>
+
+          <!-- Planimetria interattiva -->
+          <div class="bg-gray-50 rounded-lg p-4 mt-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-1">4. Seleziona la postazione dalla piantina</h4>
+            <p *ngIf="!bookingForm.get('timeSlot')?.value" class="text-xs text-gray-400 mb-2">
+              <i class="fas fa-info-circle mr-1"></i>Completa i passaggi precedenti per vedere le postazioni disponibili.
+            </p>
+            <p *ngIf="bookingForm.get('timeSlot')?.value && bookingForm.get('id_postazione')?.value" class="text-xs text-green-600 font-medium mb-2">
+              <i class="fas fa-check-circle mr-1"></i>
+              Postazione selezionata: {{ getPostazioneNome(bookingForm.get('id_postazione')?.value) }}
+            </p>
+            <app-planimetria-inline
+              [postazioniDisponibili]="state.postazioniDisponibili"
+              [selectedPostazioneId]="getSelectedPostazioneId()"
+              (postazioneSelected)="onPostazioneSelectedFromPlanimetria($event)">
+            </app-planimetria-inline>
+          </div>
         </div>
 
         <div class="flex flex-col gap-4">
@@ -144,7 +161,7 @@
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                   <option value="">Selezione durata</option>
                   <option *ngFor="let duration of availableDurations" [value]="duration">
-                    {{ isFullDay(duration) ? 'Giornata Intera  (09:00 - 18:00)' : (duration === '4h' ? '4 ore' : (duration === '2h' ? '2 ore' : (duration === '1h' ? '1 ora' : (duration === '30m' ? '30 minuti' : duration)))) }}
+                    {{ isFullDay(duration) ? 'Giornata Intera (9 ore)' : (duration === '4h' ? '4 ore' : (duration === '2h' ? '2 ore' : (duration === '1h' ? '1 ora' : (duration === '30m' ? '30 minuti' : duration)))) }}
                   </option>
                 </select>
               </div>
@@ -152,9 +169,9 @@
                 Nessuna fascia oraria disponibile per questa data.
               </div>
               <div *ngIf="bookingForm.get('slotDuration')?.value && state.availableTimeSlots.length > 0">
-                <!-- Show specific time slot selection only if NOT "Giornata Intera" -->
-                <div *ngIf="!isFullDay(bookingForm.get('slotDuration')?.value)">
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Seleziona orario specifico</label>
+                <!-- Show specific time slot selection -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Seleziona fascia oraria specifica</label>
                   <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     <button type="button"
                       *ngFor="let slot of state.availableTimeSlots"
@@ -168,11 +185,6 @@
                     </button>
                   </div>
                 </div>
-                <!-- Show confirmation message for "Giornata Intera" -->
-                <div *ngIf="isFullDay(bookingForm.get('slotDuration')?.value)" class="text-green-700 font-medium bg-green-50 p-3 rounded-lg">
-                  <i class="fas fa-check-circle mr-2"></i>
-                  Giornata Intera selezionata
-                </div>
               </div>
               <div *ngIf="bookingForm.get('slotDuration')?.value && state.availableTimeSlots.length === 0" class="text-sm text-red-600 mt-2">
                 <ng-container *ngIf="isTodaySelected()">
@@ -185,37 +197,19 @@
             </div>
           </div>
 
-          <!-- Postazione Selection -->
-          <div class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">4. {{ isMeetingRoom() ? 'Seleziona la sala' : 'Seleziona la postazione' }}</h4>
-            <div *ngIf="!bookingForm.get('timeSlot')?.value" class="text-sm text-gray-500 mb-2">
-              <i class="fas fa-info-circle mr-1"></i>
-              Seleziona prima un orario
+          <!-- Postazione selezionata - riepilogo -->
+          <div *ngIf="bookingForm.get('timeSlot')?.value" class="p-4 bg-gray-50 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Postazione selezionata</h4>
+            <div *ngIf="!bookingForm.get('id_postazione')?.value" class="text-sm text-gray-500">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              Clicca sulla piantina per scegliere una postazione
             </div>
-            <div *ngIf="bookingForm.get('timeSlot')?.value && state.postazioniDisponibili.length > 0">
-              <select formControlName="id_postazione"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                <option value="">{{ isMeetingRoom() ? 'Seleziona sala' : 'Seleziona postazione' }}</option>
-                <!-- Available postazioni first -->
-                <optgroup label="Disponibili" *ngIf="hasAvailablePostazioni()">
-                  <option *ngFor="let postazione of getAvailablePostazioni()" 
-                          [value]="postazione.id_postazione">
-                    {{ isMeetingRoom() ? postazione.stanza_nome : (postazione.nomePostazione + ' - ' + postazione.stanza_nome) }}
-                  </option>
-                </optgroup>
-                <!-- Unavailable postazioni last -->
-                <optgroup label="Non disponibili" *ngIf="hasUnavailablePostazioni()">
-                  <option *ngFor="let postazione of getUnavailablePostazioni()" 
-                          [value]="postazione.id_postazione"
-                          [disabled]="true"
-                          [ngStyle]="{ color: 'gray' }">
-                    {{ isMeetingRoom() ? postazione.stanza_nome : (postazione.nomePostazione + ' - ' + postazione.stanza_nome) }}
-                  </option>
-                </optgroup>
-              </select>
-            </div>
-            <div *ngIf="bookingForm.get('timeSlot')?.value && state.postazioniDisponibili.length === 0" class="text-sm text-red-600">
-              Nessuna postazione trovata per il tipo di stanza selezionato
+            <div *ngIf="bookingForm.get('id_postazione')?.value" class="flex items-center text-sm text-green-700 font-medium bg-green-50 rounded-lg px-3 py-2">
+              <i class="fas fa-check-circle mr-2"></i>
+              {{ getPostazioneNome(bookingForm.get('id_postazione')?.value) }}
+              <button type="button" class="ml-auto text-gray-400 hover:text-red-500" (click)="bookingForm.patchValue({id_postazione: '', id_stanza: null})">
+                <i class="fas fa-times text-xs"></i>
+              </button>
             </div>
           </div>
 
@@ -243,7 +237,7 @@
             <p *ngIf="!bookingForm.valid">Compila tutti i campi obbligatori:</p>
             <li *ngIf="state.selectedDates.length === 0">Seleziona una data</li>
             <li *ngIf="!bookingForm.get('tipo_stanza')?.value">Seleziona il tipo di stanza</li>
-            <li *ngIf="!bookingForm.get('id_postazione')?.value">{{ isMeetingRoom() ? 'Seleziona una sala' : 'Seleziona una postazione' }}</li>
+            <li *ngIf="!bookingForm.get('id_postazione')?.value">Seleziona una postazione dalla piantina</li>
             <li *ngIf="!bookingForm.get('timeSlot')?.value">Seleziona una fascia oraria</li>
           </div>
         </div>

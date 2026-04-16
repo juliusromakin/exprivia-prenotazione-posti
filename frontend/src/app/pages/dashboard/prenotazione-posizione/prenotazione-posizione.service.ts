@@ -16,7 +16,7 @@ import { CosaDurata } from '@core/models/cosa-durata.model';
 })
 export class PrenotazionePosizioneService {
     private readonly ORARI_LAVORATIVI = {
-        INIZIO: 9,
+        INIZIO: 8,
         FINE: 18
     };
 
@@ -276,9 +276,16 @@ export class PrenotazionePosizioneService {
             }
         }
 
-        // Special handling for full day slot
-        const fullDayAvailable = isSlotAvailable(9, endHour);
-        if (fullDayAvailable) {
+        // Special handling for full day slots (9 ore)
+        const fullDay8Available = isSlotAvailable(8, 17);
+        if (fullDay8Available) {
+            const slot = { startTime: '08:00', endTime: '17:00' };
+            if (!slots.some(s => s.startTime === slot.startTime && s.endTime === slot.endTime)) {
+                slots.push(slot);
+            }
+        }
+        const fullDay9Available = isSlotAvailable(9, 18);
+        if (fullDay9Available) {
             const fullDaySlot = { startTime: '09:00', endTime: '18:00' };
             if (!slots.some(s => s.startTime === fullDaySlot.startTime && s.endTime === fullDaySlot.endTime)) {
                 slots.push(fullDaySlot);

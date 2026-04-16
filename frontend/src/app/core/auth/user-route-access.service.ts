@@ -9,7 +9,6 @@ export const UserRouteAccessService: CanActivateFn = (
 ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree => {
   const authService = inject(AuthService);
   const router = inject(Router);
-
   const authorities = route.data['authorities'] as string[];
 
   // Se non ci sono autorità richieste, permetti l'accesso

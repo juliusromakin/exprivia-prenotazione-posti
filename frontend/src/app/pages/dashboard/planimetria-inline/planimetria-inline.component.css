@@ -1,0 +1,263 @@
+.planimetria-inline-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: white;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+.planimetria-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Legenda */
+.planimetria-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(255,255,255,0.8);
+}
+
+.legend-dot.available  { background: #10b981; animation: pulse-dot 2s infinite; }
+.legend-dot.unavailable{ background: #ef4444; opacity: .75; }
+.legend-dot.selected   { background: #3b82f6; }
+
+/* ── Zoom controls ───────────────────────────────────────────────────── */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.zoom-btn:hover:not([disabled]) {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.zoom-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.zoom-btn.reset {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.zoom-btn.reset:hover {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: white;
+}
+
+.zoom-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  min-width: 38px;
+  text-align: center;
+}
+
+/* ── Messaggio vuoto ─────────────────────────────────────────────────── */
+.no-markers-msg {
+  padding: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+/* ── Viewport (contenitore fisso con overflow hidden) ────────────────── */
+.planimetria-viewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  cursor: default;
+  background: #f9fafb;
+}
+
+.planimetria-viewport.dragging {
+  cursor: grabbing !important;
+}
+
+.planimetria-viewport.zoomable {
+  cursor: zoom-in;
+}
+
+/* ── Layer trasformabile ─────────────────────────────────────────────── */
+.planimetria-transform-layer {
+  width: 100%;
+  transform-origin: center center;
+  transition: transform 0.15s ease;
+  will-change: transform;
+}
+
+/* ── Immagine e container ────────────────────────────────────────────── */
+.planimetria-container {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+}
+
+.planimetria-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* ── Marker ──────────────────────────────────────────────────────────── */
+.floor-plan-marker {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  /* La scala viene gestita inline per compensare lo zoom del parent */
+  transform-origin: center center;
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  border: 1.5px solid rgba(255,255,255,.9);
+  transition: filter 0.2s;
+}
+
+.floor-plan-marker.available  { background: #10b981; animation: pulse-border 2s infinite; }
+.floor-plan-marker.unavailable{ background: #ef4444; cursor: not-allowed; opacity: .75; }
+.floor-plan-marker.selected   {
+  background: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.4), 0 2px 8px rgba(0,0,0,.4);
+  animation: none;
+}
+
+.floor-plan-marker:hover:not(.unavailable) {
+  filter: brightness(1.15);
+  z-index: 10;
+}
+
+.marker-label {
+  font-size: 8px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 20px;
+  text-overflow: ellipsis;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────── */
+.marker-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17,24,39,.92);
+  color: white;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s, visibility .2s;
+  pointer-events: none;
+  z-index: 20;
+  min-width: 130px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.marker-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: rgba(17,24,39,.92);
+}
+
+.floor-plan-marker:hover .marker-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip-name   { font-weight: 600; font-size: 12px; }
+.tooltip-room   { font-size: 11px; opacity: .75; }
+.tooltip-status { font-size: 11px; font-weight: 500; margin-top: 2px; }
+.tooltip-status.available   { color: #6ee7b7; }
+.tooltip-status.unavailable { color: #fca5a5; }
+
+/* ── Hint pan ────────────────────────────────────────────────────────── */
+.pan-hint {
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 5px 0;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ── Animazioni ──────────────────────────────────────────────────────── */
+@keyframes pulse-border {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.6); }
+  70%  { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+
+@keyframes pulse-dot {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.6); }
+  70%  { box-shadow: 0 0 0 4px rgba(16,185,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
