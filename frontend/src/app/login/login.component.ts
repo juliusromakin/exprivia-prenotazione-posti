@@ -99,7 +99,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (user) => {
             if (user) {
-              const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/dashboard';
+              const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
               this.router.navigateByUrl(returnUrl);
             }
           },

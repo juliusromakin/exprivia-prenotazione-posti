@@ -1,0 +1,90 @@
+<div class="planimetria-inline-wrapper">
+
+  <!-- Header: legenda + controlli zoom -->
+  <div class="planimetria-toolbar">
+    <!-- Legenda -->
+    <div class="planimetria-legend">
+      <div class="legend-item">
+        <div class="legend-dot available"></div>
+        <span>Disponibile</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot unavailable"></div>
+        <span>Non disponibile</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot selected"></div>
+        <span>Selezionata</span>
+      </div>
+    </div>
+
+    <!-- Controlli zoom -->
+    <div class="zoom-controls">
+      <button type="button" class="zoom-btn" (click)="zoomIn()" title="Zoom in">
+        <i class="fas fa-search-plus"></i>
+      </button>
+      <span class="zoom-label">{{ (scale * 100).toFixed(0) }}%</span>
+      <button type="button" class="zoom-btn" (click)="zoomOut()" [disabled]="scale <= 1" title="Zoom out">
+        <i class="fas fa-search-minus"></i>
+      </button>
+      <button type="button" class="zoom-btn reset" (click)="resetZoom()" *ngIf="isZoomed" title="Reimposta">
+        <i class="fas fa-compress-arrows-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messaggio se non ci sono postazioni da mostrare -->
+  <div *ngIf="markers.length === 0" class="no-markers-msg">
+    <i class="fas fa-info-circle mr-2"></i>
+    Seleziona tipo di stanza, data e orario per vedere le postazioni disponibili sulla planimetria.
+  </div>
+
+  <!-- Viewport con overflow hidden, riceve la rotella -->
+  <div #mapViewport
+       class="planimetria-viewport"
+       [class.dragging]="isDragging"
+       [class.zoomable]="!isZoomed"
+       (wheel)="onWheel($event)"
+       (mousedown)="onMouseDown($event)"
+       (touchstart)="onTouchStart($event)"
+       (touchmove)="onTouchMove($event)"
+       (touchend)="onTouchEnd()">
+
+    <!-- Layer trasformabile -->
+    <div class="planimetria-transform-layer" [style.transform]="transformStyle">
+
+      <!-- Planimetria con marker -->
+      <div class="planimetria-container">
+        <img src="Planimetria.png" alt="Planimetria ufficio" class="planimetria-img" draggable="false">
+
+        <div *ngFor="let marker of markers"
+             class="floor-plan-marker"
+             [class.available]="marker.available"
+             [class.unavailable]="!marker.available"
+             [class.selected]="marker.selected"
+             [style.left.%]="marker.x"
+             [style.top.%]="marker.y"
+             [style.transform]="'scale(' + (1 / scale) + ')'"
+             (click)="selezionaMarker(marker, $event)">
+          <span class="marker-label">{{ marker.label }}</span>
+          <div class="marker-tooltip">
+            <span class="tooltip-name">{{ getTooltipLine1(marker.tooltip) }}</span>
+            <span class="tooltip-room">{{ getTooltipLine2(marker.tooltip) }}</span>
+            <span class="tooltip-status"
+                  [class.available]="marker.available"
+                  [class.unavailable]="!marker.available">
+              {{ marker.available ? 'Disponibile — clicca per selezionare' : 'Non disponibile' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Hint pan quando zoomato -->
+  <div *ngIf="isZoomed" class="pan-hint">
+    <i class="fas fa-hand-paper mr-1"></i> Trascina per spostarti
+  </div>
+
+</div>

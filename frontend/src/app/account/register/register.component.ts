@@ -5,7 +5,6 @@ import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { RegisterService, RegisterUserData } from './register.service';
-import { LoginService } from '../../login/login.service';
 import { authAnimations } from '../../shared/animations/auth.animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
@@ -78,7 +77,6 @@ export class RegisterComponent {
 
   constructor(
     private registerService: RegisterService,
-    private loginService: LoginService,
     private toastService: ToastService,
     private router: Router,
     private fb: FormBuilder
@@ -111,10 +109,10 @@ export class RegisterComponent {
     if (!control || !this.registerForm) {
       return null;
     }
-    
+
     const password = this.registerForm.get('password')?.value;
     const confirmPassword = control.value;
-    
+
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
@@ -185,59 +183,38 @@ export class RegisterComponent {
         password: formData.password
       };
 
-      // Register the user and then automatically log them in
+      // Esegui la registrazione e porta alla pagina di login
       this.registerService.register(userData)
         .pipe(
-          switchMap(() => {
-            // After successful registration, automatically log the user in
-            return this.loginService.login({
-              email: userData.email,
-              password: userData.password
-            });
-          }),
           catchError(error => {
-            console.error('Registration or login error:', error);
-            
-            // Check if error is from registration or login phase
-            if (error.originalError) {
-              // This is likely a login error after successful registration
-              this.showWarningToast(
-                'Registrazione Completata',
-                'Si è verificato un errore durante il login automatico. Puoi effettuare il login manualmente.'
-              );
-              // Navigate to login page if auto-login fails
-              this.router.navigate(['/accedi']);
-              return throwError(() => new Error('Auto-login failed'));
-            } else {
-              // This is a registration error
-              let errorMessage = 'Errore durante la registrazione. Riprova più tardi.';
-              
-              // Check for specific error cases
-              if (error.response?.status === 400 && 
-                  (error.response?.data === 'Esiste già un utente con questa email!' ||
-                   error.response?.data?.toLowerCase().includes('email già esistente') ||
-                   error.response?.data?.toLowerCase().includes('email already exists'))) {
-                errorMessage = 'Questa email è già registrata. Per favore, utilizza un\'altra email o accedi al tuo account esistente.';
-                this.registerForm.get('email')?.setErrors({ emailExists: true });
-              } else if (error.response?.data) {
-                // Use the error message from the backend if available
-                errorMessage = error.response.data;
-              }
-              
-              this.showErrorToast('Errore Registrazione', errorMessage);
-              return throwError(() => new Error(errorMessage));
+            console.error('Registration error:', error);
+
+            // This is a registration error
+            let errorMessage = 'Errore durante la registrazione. Riprova più tardi.';
+
+            // Check for specific error cases
+            if (error.response?.status === 400 &&
+              (error.response?.data === 'Esiste già un utente con questa email!' ||
+                error.response?.data?.toLowerCase().includes('email già esistente') ||
+                error.response?.data?.toLowerCase().includes('email already exists'))) {
+              errorMessage = 'Questa email è già registrata. Per favore, utilizza un\'altra email o accedi al tuo account esistente.';
+              this.registerForm.get('email')?.setErrors({ emailExists: true });
+            } else if (error.response?.data) {
+              // Use the error message from the backend if available
+              errorMessage = error.response.data;
             }
+
+            this.showErrorToast('Errore Registrazione', errorMessage);
+            return throwError(() => new Error(errorMessage));
           }),
           finalize(() => {
             this.isLoading = false;
           })
         )
         .subscribe({
-          next: (user) => {
-            if (user) {
-              // Navigate to dashboard after successful auto-login
-              this.router.navigate(['/dashboard']);
-            }
+          next: () => {
+            this.showSuccessToast('Registrazione Completata', 'Account creato con successo. Ora puoi effettuare il login.');
+            this.router.navigate(['/accedi']);
           }
         });
     }

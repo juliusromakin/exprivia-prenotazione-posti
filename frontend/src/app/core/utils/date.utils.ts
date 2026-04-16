@@ -32,25 +32,25 @@ export class DateUtils {
         const week: Date[] = [];
         const current = new Date(date);
         current.setDate(current.getDate() - current.getDay());
-        
+
         for (let i = 0; i < 7; i++) {
             week.push(new Date(current));
             current.setDate(current.getDate() + 1);
         }
-        
+
         return week;
     }
 
-    static getTimeSlots(startHour: number = 9, endHour: number = 18, intervalMinutes: number = 30): string[] {
+    static getTimeSlots(startHour: number = 8, endHour: number = 18, intervalMinutes: number = 30): string[] {
         const slots: string[] = [];
         const current = new Date();
         current.setHours(startHour, 0, 0);
-        
+
         while (current.getHours() < endHour) {
             slots.push(current.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
             current.setMinutes(current.getMinutes() + intervalMinutes);
         }
-        
+
         return slots;
     }
 } 
