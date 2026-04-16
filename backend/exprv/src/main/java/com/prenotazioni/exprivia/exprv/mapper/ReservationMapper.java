@@ -15,6 +15,8 @@ import com.prenotazioni.exprivia.exprv.entity.Reservation;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReservationMapper {
 
+    List<ReservationDTO> toDtoList(List<Reservation> reservationList);
+
     @Mapping(source = "workspace.id_workspace", target = "workspaceId")
     @Mapping(source = "user.id_user", target = "userId")
     @Mapping(source = "reservationDuration.name", target = "durationName")
@@ -32,8 +34,4 @@ public interface ReservationMapper {
     @Mapping(target = "reservationDuration", ignore = true)
     void updateReservationFromDto(ReservationDTO reservationDTO, @MappingTarget Reservation reservation);
 
-    @Mapping(source = "workspace.id_workspace", target = "workspaceId")
-    @Mapping(source = "user.id_user", target = "userId")
-    @Mapping(source = "reservationDuration.name", target = "durationName")
-    List<ReservationDTO> toDtoList(List<Reservation> reservationList);
 }

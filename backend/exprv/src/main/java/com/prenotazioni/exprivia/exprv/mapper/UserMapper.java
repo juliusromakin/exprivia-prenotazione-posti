@@ -18,23 +18,19 @@ import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 /**
- * Mapper per la conversione tra l'entità Users e i vari DTO.
+ * Mapper per la conversione tra l'entità User e i vari DTO.
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
     /**
-     * Converte un'entità Users in UserDTO.
+     * Converte un'entità User in UserDTO.
      */
-    @Mapping(target = "id_user", source = "id_user")
-    @Mapping(target = "nome", source = "name")
-    @Mapping(target = "cognome", source = "lastName")
-    @Mapping(target = "email", source = "email")
     @Mapping(target = "authorities", source = "authorities", qualifiedByName = "authoritiesToStrings")
     UserDTO toDto(User user);
 
     /**
-     * Converte un'entità Users in AdminDTO.
+     * Converte un'entità User in AdminDTO.
      */
     default AdminDTO toAdminDto(User user) {
         if (user == null) {
@@ -44,20 +40,16 @@ public interface UserMapper {
     }
 
     /**
-     * Converte un UserDTO in entità Users.
+     * Converte un UserDTO in entità User.
      */
-    @Mapping(target = "id_user", ignore = true)
-    @Mapping(target = "name", source = "nome")
-    @Mapping(target = "lastName", source = "cognome")
-    @Mapping(target = "email", source = "email")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     User toEntity(UserDTO userDTO);
 
     /**
-     * Converte un UserRegistrationDTO in entità Users.
+     * Converte un UserRegistrationDTO in entità User.
      */
     @Mapping(target = "id_user", ignore = true)
     @Mapping(target = "name", source = "nome")
@@ -65,24 +57,21 @@ public interface UserMapper {
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", source = "password")
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     User toEntity(UserRegistrationDTO registrationDTO);
 
     /**
-     * Aggiorna un'entità Users esistente con i dati del DTO.
+     * Aggiorna un'entità User esistente con i dati del DTO.
      */
-    @Mapping(target = "name", source = "nome")
-    @Mapping(target = "lastName", source = "cognome")
-    @Mapping(target = "email", source = "email")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "creatdDate", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     void updateUserFromDto(UserDTO userDTO, @MappingTarget User user);
 
     /**
-     * Converte una lista di entità Users in una lista di UserDTO.
+     * Converte una lista di entità User in una lista di UserDTO.
      */
     List<UserDTO> toDtoList(List<User> users);
 
