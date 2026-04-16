@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,7 +78,7 @@ public class RoomController {
     // Gestisce Le Richieste PUT per aggiornare una Stanza tramite ID
     @PutMapping("/updateroom/{id}")
     public ResponseEntity<?> updateRoom(@PathVariable("id") Integer id_room,
-            @RequestBody RoomDTO roomDTO) { // Modificato: ora accetta RoomDTO
+            @RequestBody RoomDTO roomDTO) {
         try {
             RoomDTO updatedRoom = roomService.updateRoom(id_room, roomDTO);
             return ResponseEntity.ok(updatedRoom);
@@ -100,6 +101,7 @@ public class RoomController {
     }
 
     // Hard Delete (Eliminazione definitiva)
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/harddeleteroom/{id}")
     public ResponseEntity<String> hardDeleteRoom(@PathVariable Integer id) {
         try {

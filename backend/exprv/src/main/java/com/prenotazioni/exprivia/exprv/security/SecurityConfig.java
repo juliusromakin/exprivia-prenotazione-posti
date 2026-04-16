@@ -16,7 +16,7 @@ import com.prenotazioni.exprivia.exprv.security.jwt.JwtAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity // Abilita l'uso di @PreAuthorize nei controller
 public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // Endpoint Pubblici (Swagger e Auth)
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -55,35 +55,27 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Test Endpoints DA VEDERE SE METTERLI ONLY ADMIN O AUTHENTICATED
-                        .requestMatchers("/api/prenotazioni/postazioni/9/orari-disponibili").permitAll()
-
-                        // Admin only endpoints
-                        .requestMatchers("/api/prenotazioni/export/giorno/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                        .requestMatchers("/api/prenotazioni/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                        // Endpoint solo per ADMIN
                         .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers("/api/prenotazioni/admin/**", "/api/reservation/admin/**")
+                        .hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers("/api/prenotazioni/export/**", "/api/reservation/export/**")
+                        .hasAuthority(AuthoritiesConstants.ADMIN)
 
-                        // Authenticated user endpoints
-                        .requestMatchers("/api/utenti/**").authenticated()
-                        .requestMatchers("/api/postazioni/**").authenticated()
-                        .requestMatchers("/api/stanze/**").authenticated()
-                        .requestMatchers("/api/prenotazioni/**").authenticated()
-                        .requestMatchers("/api/cose-durata/**").authenticated()
-                        .requestMatchers("/api/stats/prenotazioni**").authenticated()
-                        .requestMatchers("/api/stats/stanze**").authenticated());
+                        // Endpoint per utenti Autenticati (Mappatura Italiano + Inglese)
+                        .requestMatchers("/api/user/**", "/api/utenti/**").authenticated()
+                        .requestMatchers("/api/room/**", "/api/stanze/**").authenticated()
+                        .requestMatchers("/api/workspace/**", "/api/postazioni/**").authenticated()
+                        .requestMatchers("/api/reservation/**", "/api/prenotazioni/**").authenticated()
 
-        /*
-         * Per Test ho commentato questa riga sottostante per vedere il funzionamento di
-         * swagger
-         * direttamente dal backend senza bisogno di token jwt (senza accesso)
-         * 
-         * Se messa online la riga sottostante (" .anyRequest().authenticated()); ") va
-         * scommentata
-         * 
-         */
-        // .anyRequest().authenticated());
+                        // Altri endpoint specifici
+                        .requestMatchers("/api/cose-durata/**", "/api/reservation-duration/**").authenticated()
+                        .requestMatchers("/api/stats/**").authenticated()
 
-        // Add JWT filter before UsernamePasswordAuthenticationFilter
+                        // Qualsiasi altra richiesta deve essere autenticata
+                        .anyRequest().authenticated());
+
+        // Aggiunge il filtro JWT prima del filtro di autenticazione standard
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
