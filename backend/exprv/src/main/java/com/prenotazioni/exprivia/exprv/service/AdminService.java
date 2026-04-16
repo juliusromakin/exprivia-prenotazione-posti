@@ -55,10 +55,10 @@ public class AdminService {
      * Validazione Dati Dell'utente
      */
     private void validateUserData(UserRegistrationDTO userRegistrationDTO) {
-        if (userRegistrationDTO.getNome() == null || userRegistrationDTO.getNome().isEmpty()) {
+        if (userRegistrationDTO.getName() == null || userRegistrationDTO.getName().isEmpty()) {
             throw new IllegalArgumentException("Il nome non può essere nullo!");
         }
-        if (userRegistrationDTO.getCognome() == null || userRegistrationDTO.getCognome().isEmpty()) {
+        if (userRegistrationDTO.getLastName() == null || userRegistrationDTO.getLastName().isEmpty()) {
             throw new IllegalArgumentException("Il cognome non può essere nullo!");
         }
         if (userRegistrationDTO.getEmail() == null || userRegistrationDTO.getEmail().isEmpty()) {

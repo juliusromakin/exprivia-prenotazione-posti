@@ -52,8 +52,8 @@ public interface UserMapper {
      * Converte un UserRegistrationDTO in entità User.
      */
     @Mapping(target = "id_user", ignore = true)
-    @Mapping(target = "name", source = "nome")
-    @Mapping(target = "lastName", source = "cognome")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", source = "password")
     @Mapping(target = "authorities", ignore = true)

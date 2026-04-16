@@ -700,7 +700,7 @@ public class PrenotazioniService {
 
         emailService.sendBookingConfirmationEmail(
                 user.getEmail(),
-                user.getNome() + " " + user.getCognome(),
+                user.getName() + " " + user.getLastName(),
                 stanza.getNome(),
                 postazione.getNomePostazione(),
                 startDateTime,
