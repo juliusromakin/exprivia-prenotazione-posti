@@ -19,8 +19,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmailIgnoreCase(String email);
 
-    Optional<User> findByVerificationCode(String verificationCode);
-
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO user_authority (user_id, authority) VALUES (:userId, :authority)", nativeQuery = true)

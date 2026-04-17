@@ -13,24 +13,41 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     public void sendPasswordResetEmail(String toEmail, String token) {
-        String resetUrl = "http://localhost:4200/reset-password?token=" + token; // ← URL frontend
+        try {
+            String resetUrl = "http://localhost:4200/reset-password?token=" + token; // ← URL frontend
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Reset della password");
-        message.setText("Clicca sul seguente link per reimpostare la tua password:\n\n" + resetUrl);
+            System.out.println("DEBUG - Token di reset password per " + toEmail + ": " + token);
+            System.out.println("DEBUG - Link di reset: " + resetUrl);
 
-        mailSender.send(message);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("Reset della password");
+            message.setText("Clicca sul seguente link per reimpostare la tua password:\n\n" + resetUrl);
+
+            mailSender.send(message);
+            System.out.println("DEBUG - Email di reset inviata con successo.");
+        } catch (Exception e) {
+            System.err.println("ERRORE - Invio email reset password fallito (SMTP non configurato?). Token: " + token);
+        }
     }
 
     @Async("emailTaskExecutor")
     public void sendVerificationEmail(String toEmail, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Verifica il tuo account");
-        message.setText("Benvenuto! Il tuo codice di verifica è: " + code + "\n\nInseriscilo nell'applicazione per attivare il tuo profilo.");
+        try {
+            System.out.println("**************************************************");
+            System.out.println("DEBUG - CODICE DI VERIFICA PER " + toEmail + ": " + code);
+            System.out.println("**************************************************");
 
-        mailSender.send(message);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("Verifica il tuo account");
+            message.setText("Benvenuto! Il tuo codice di verifica è: " + code + "\n\nInseriscilo nell'applicazione per attivare il tuo profilo.");
+
+            mailSender.send(message);
+            System.out.println("DEBUG - Email di verifica inviata con successo.");
+        } catch (Exception e) {
+            System.err.println("ERRORE - Invio email verifica fallito (SMTP non configurato?). Codice: " + code);
+        }
     }
 
     @Async("emailTaskExecutor")

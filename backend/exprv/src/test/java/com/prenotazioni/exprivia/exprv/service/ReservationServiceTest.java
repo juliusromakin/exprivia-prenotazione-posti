@@ -93,7 +93,7 @@ public class ReservationServiceTest {
         when(workspaceRepository.findById(1)).thenReturn(Optional.of(workspace));
         when(durationRepository.findByName(anyString())).thenReturn(Optional.of(new ReservationDuration()));
         when(reservationMapper.toEntity(any(ReservationDTO.class))).thenReturn(reservation);
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        doReturn(reservation).when(reservationRepository).save(any(Reservation.class));
         when(reservationMapper.toDto(any(Reservation.class))).thenReturn(reservationDTO);
 
         // Act
