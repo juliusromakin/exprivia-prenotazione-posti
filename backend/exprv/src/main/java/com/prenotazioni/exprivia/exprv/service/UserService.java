@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
+import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
@@ -45,83 +47,81 @@ public class UserService {
     }
 
     /**
-     * Recupera tutti gli utenti dal database come AdminDTO (per utenti con
-     * ruolo ADMIN)
+     * Retrieves all users from the database as AdminDTO (for ADMIN role users)
      *
-     * @return Lista di AdminDTO
+     * @return List of AdminDTO
      */
-    public List<AdminDTO> cercaTutti() {
+    public List<AdminDTO> findAllUsers() {
         List<User> usersList = userRepository.findAll();
         return userMapper.toAdminDtoList(usersList);
     }
 
     /**
-     * Recupera un utente con l'id come AdminDTO (per utenti con ruolo ADMIN)
+     * Retrieves a user by ID as AdminDTO (for ADMIN role users)
      *
      * @return AdminDTO
      */
-    public AdminDTO cercaSingolo(Integer id) {
+    public AdminDTO findUserById(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Utente con id " + id + " non trovato"));
+                .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
         return new AdminDTO(user);
     }
 
     /**
-     * Recupera un utente tramite email come AdminDTO (per utenti con ruolo
-     * ADMIN)
+     * Retrieves a user by email as AdminDTO (for ADMIN role users)
      *
      * @return AdminDTO
      */
-    public AdminDTO cercaPerEmail(String email) {
+    public AdminDTO findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
+                .orElseThrow(
+                        () -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
         return new AdminDTO(user);
     }
 
     public Authority getAuthorityByName(String name) {
         return authorityRepository.findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("Authority not found with name: " + name));
+                .orElseThrow(() -> new AppException("Authority not found with name: " + name, HttpStatus.NOT_FOUND));
     }
 
     /**
-     * Aggiorna un utente con i dati forniti
+     * Updates a user with provided data
      *
-     * @param id        ID dell'utente da aggiornare
-     * @param updateDTO DTO con i dati da aggiornare
-     * @return UserDTO dell'utente aggiornato
-     * @throws EntityNotFoundException  se l'utente non esiste
-     * @throws IllegalArgumentException se i dati forniti non sono validi
+     * @param id        ID of the user to update
+     * @param updateDTO DTO with update data
+     * @return UserDTO of the updated user
+     * @throws AppException if data is invalid or user doesn't exist
      */
     public UserDTO updateUser(Integer id, UserUpdateDTO updateDTO) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Utente con ID " + id + " non trovato"));
+                .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
 
-        // Verifica email duplicata
+        // Check for duplicate email
         if (updateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(updateDTO.getEmail());
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
-                throw new IllegalArgumentException("Email già in uso");
+                throw new AppException("Email already in use", HttpStatus.BAD_REQUEST);
             }
         }
 
-        // Verifica password se si tenta di cambiarla
+        // Verify password if attempting to change
         if (updateDTO.getNewPassword() != null && !updateDTO.getNewPassword().trim().isEmpty()) {
             String currentPassword = updateDTO.getCurrentPassword();
 
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
-                throw new IllegalArgumentException("La password attuale è richiesta per modificare la password");
+                throw new AppException("Current password is required to change password", HttpStatus.BAD_REQUEST);
             }
 
-            // Verifica che la password attuale corrisponda a quella nel database
+            // Verify current password matches DB
             if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
-                throw new IllegalArgumentException("Password attuale non corretta");
+                throw new AppException("Incorrect current password", HttpStatus.BAD_REQUEST);
             }
 
-            // Imposta la nuova password cifrata
+            // Set new encrypted password
             existingUser.setPassword(passwordEncoder.encode(updateDTO.getNewPassword()));
         }
 
-        // Usa il mapper per gli altri campi generici
+        // Use mapper for other generic fields
         userMapper.updateEntityFromUserUpdateDto(updateDTO, existingUser);
 
         existingUser.setUpdatedDate(LocalDateTime.now());
@@ -130,33 +130,32 @@ public class UserService {
     }
 
     /**
-     * Elimina un utente dal sistema
+     * Deletes a user from the system
      *
-     * @param id ID dell'utente da eliminare
-     * @throws EntityNotFoundException se l'utente non esiste
+     * @param id ID of the user to delete
+     * @throws AppException if user doesn't exist
      */
-    public void eliminaUser(Integer id) {
+    public void deleteUser(Integer id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("Utente con ID " + id + " non trovato");
+            throw new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
         userRepository.deleteById(id);
     }
 
     /**
-     * Elimina l'account personale dell'utente autenticato
+     * Deletes the authenticated user's personal account
      *
-     * @param email Email dell'utente da eliminare
-     * @throws EntityNotFoundException se l'utente non esiste
-     * @throws AccessDeniedException   se l'utente non ha i permessi necessari
+     * @param email Email of the user to delete
+     * @throws AppException if user doesn't exist
      */
-    public void eliminaAccountPersonale(String email) {
+    public void deletePersonalAccount(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-        // Verifica che l'utente stia eliminando il proprio account
+        // Verify user is deleting their own account
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!email.equals(authentication.getName())) {
-            throw new AccessDeniedException("Non hai il permesso di eliminare questo account");
+            throw new AppException("You do not have permission to delete this account", HttpStatus.FORBIDDEN);
         }
 
         userRepository.delete(user);
@@ -171,14 +170,14 @@ public class UserService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
+                .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
 
         return userMapper.toDto(user);
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Utente con email " + email + " non trovato"));
+                .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
         return userMapper.toDto(user);
     }
 

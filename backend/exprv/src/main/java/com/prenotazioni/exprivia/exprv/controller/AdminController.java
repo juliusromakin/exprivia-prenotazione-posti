@@ -18,13 +18,12 @@ import com.prenotazioni.exprivia.exprv.dto.AdminCreateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminUpdateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
+import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.service.AdminService;
 import com.prenotazioni.exprivia.exprv.service.UserService;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/users")
 public class AdminController {
 
     private final UserService userService;
@@ -35,60 +34,72 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/utenti")
-    public ResponseEntity<List<AdminDTO>> getAllUsers() {
-        return ResponseEntity.ok(userService.cercaTutti());
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            return ResponseEntity.ok(userService.findAllUsers());
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @GetMapping("/utente/{id}")
-    public ResponseEntity<AdminDTO> getUserById(@PathVariable Integer id) {
-        return ResponseEntity.ok(userService.cercaSingolo(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(userService.findUserById(id));
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @GetMapping("/utente/email/{email}")
-    public ResponseEntity<AdminDTO> getUserByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(userService.cercaPerEmail(email));
+    @GetMapping("/email/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+        try {
+            return ResponseEntity.ok(userService.findUserByEmail(email));
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<?> createUser(@RequestBody AdminCreateUserDTO registrationDTO) {
         try {
-            UserDTO newUser = adminService.creaUtenteAdmin(registrationDTO);
+            UserDTO newUser = adminService.createUserByAdmin(registrationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PutMapping("/utente/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody AdminUpdateUserDTO updateDTO) {
         try {
-            AdminDTO updatedUser = adminService.aggiornaUserByAdmin(id, updateDTO);
+            AdminDTO updatedUser = adminService.updateUserByAdmin(id, updateDTO);
             return ResponseEntity.ok(updatedUser);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/utente/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
         try {
-            userService.eliminaUser(id);
+            userService.deleteUser(id);
             return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato");
-        }
-    }
-
-    @PostMapping("/crea_utente")
-    public ResponseEntity<?> register(@RequestBody AdminCreateUserDTO userRegistrationDTO) {
-        try {
-            UserDTO newUser = adminService.creaUtenteAdmin(userRegistrationDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
