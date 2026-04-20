@@ -1,3 +1,5 @@
+// core/auth/auth.guard.ts
+
 import { inject } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, map, take, switchMap, of } from 'rxjs';
@@ -14,7 +16,8 @@ export const AuthGuard = (
     take(1),
     switchMap(isAuthenticated => {
       if (!isAuthenticated) {
-        return of(router.createUrlTree(['/accedi'], { 
+        // CORREZIONE: Cambiato da /accedi a /login
+        return of(router.createUrlTree(['/login'], {
           queryParams: { returnUrl: state.url }
         }));
       }
@@ -23,17 +26,17 @@ export const AuthGuard = (
         take(1),
         map(user => {
           if (!user) {
-            return router.createUrlTree(['/accedi'], { 
+            // CORREZIONE: Cambiato da /accedi a /login
+            return router.createUrlTree(['/login'], {
               queryParams: { returnUrl: state.url }
             });
           }
 
           const authorities = route.data['authorities'] as string[];
-          
+
           if (!authorities || authorities.length === 0) {
-            // If we're authenticated and there are no authority requirements,
-            // redirect to the default authenticated route
-            if (state.url === '/accedi' || state.url === '/') {
+            // Se siamo autenticati nella home o login, andiamo alla dashboard di prenotazione
+            if (state.url === '/login' || state.url === '/') {
               return router.createUrlTree(['/dashboard/prenotazione-posizione']);
             }
             return true;
@@ -43,8 +46,6 @@ export const AuthGuard = (
             return true;
           }
 
-          // If user is authenticated but doesn't have required authorities,
-          // redirect to forbidden page
           return router.createUrlTree(['/forbidden']);
         })
       );

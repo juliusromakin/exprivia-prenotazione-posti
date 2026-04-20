@@ -1,9 +1,10 @@
 import { Workspace } from './workspace.model';
+import { RoomType } from './enums';
 
 export interface Room {
-    id: number;
+    id?: number;
     name: string;
-    roomType: string;
+    roomType: RoomType | string;
     capacity: number;
     isActive: boolean;
     workspaces?: Workspace[];

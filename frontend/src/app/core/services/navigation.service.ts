@@ -1,8 +1,11 @@
+// frontend/src/app/core/services/navigation.service.ts
+
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { Router } from "@angular/router";
+// IMPORTANTE: Usa l'enum per evitare errori di digitazione sui ruoli!
+import { UserRole } from "../models";
 
-// Interfaccia per gli elementi di navigazione
 export interface NavItem {
   label: string;
   icon: string;
@@ -16,76 +19,75 @@ export interface NavItem {
   providedIn: "root",
 })
 export class NavigationService {
-  // Lista degli elementi di navigazione
+
   private readonly navigationItems: NavItem[] = [
     {
       label: "Dashboard",
       icon: "home",
       route: "/dashboard",
-      authorities: ["ROLE_ADMIN"],
+      authorities: [UserRole.ADMIN],
     },
     {
       label: "Utenti",
       icon: "users",
       route: "/dashboard/user-management",
       adminOnly: true,
-      authorities: ["ROLE_ADMIN"],
+      authorities: [UserRole.ADMIN],
     },
     {
       label: "Prenotazioni",
       icon: "calendar",
       route: "/dashboard/bookings",
-      authorities: ["ROLE_ADMIN"],
+      // CORREZIONE LOGICA: Anche gli utenti devono poter vedere le loro prenotazioni!
+      authorities: [UserRole.ADMIN, UserRole.USER],
     },
     {
       label: "Prenota",
       icon: "layout-dashboard",
+      // TODO: Quando tradurrai i nomi dei componenti/pagine della UI, ricordati di cambiare questa rotta (es. /dashboard/book-workspace)
       route: "/dashboard/prenotazione-posizione",
-      authorities: ["ROLE_USER", "ROLE_ADMIN"],
+      authorities: [UserRole.USER, UserRole.ADMIN],
     },
     {
       label: "Statistiche",
       icon: "ChartBar",
+      // TODO: Anche qui, valuta se tradurre in /dashboard/statistics in futuro
       route: "/dashboard/statistiche",
       adminOnly: true,
-      authorities: ["ROLE_ADMIN"],
+      authorities: [UserRole.ADMIN],
     },
     {
       label: "Aggiorna Profilo",
       icon: "user",
       route: "/dashboard/update-user",
-      authorities: ["ROLE_USER", "ROLE_ADMIN"],
+      authorities: [UserRole.USER, UserRole.ADMIN],
     },
   ];
 
-  // Subject per gestire gli aggiornamenti della navigazione
   private navigationSubject = new BehaviorSubject<NavItem[]>(
     this.navigationItems
   );
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  // Metodo per ottenere gli elementi di navigazione come Observable
   getNavigationItems(): Observable<NavItem[]> {
     return this.navigationSubject.asObservable();
   }
 
-  // Metodo per verificare se una route è attiva
   isRouteActive(route: string): boolean {
     const currentRoute = this.router.url.replace(/\/$/, "");
     const checkRoute = route.replace(/\/$/, "");
 
+    // Aggiornata la mappa delle rotte per includere eventuali percorsi dinamici
     const routeMap: { [key: string]: (route: string) => boolean } = {
       "": () => currentRoute === "" || currentRoute === "/",
       "/dashboard": () => currentRoute === "/dashboard",
-      "/dashboard/user-management": () =>
-        currentRoute === "/dashboard/user-management",
+      "/dashboard/user-management": () => currentRoute === "/dashboard/user-management",
       "/dashboard/bookings": () => currentRoute === "/dashboard/bookings",
-      "/dashboard/prenotazione-posizione": () =>
-        currentRoute === "/dashboard/prenotazione-posizione",
+      // Mantenute in italiano per ora per non rompere il routing attuale
+      "/dashboard/prenotazione-posizione": () => currentRoute === "/dashboard/prenotazione-posizione",
       "/dashboard/statistiche": () => currentRoute === "/dashboard/statistiche",
-      "/dashboard/management": () =>
-        currentRoute.startsWith("/dashboard/management"),
+      "/dashboard/management": () => currentRoute.startsWith("/dashboard/management"),
     };
 
     return routeMap[checkRoute]
@@ -93,7 +95,6 @@ export class NavigationService {
       : currentRoute === checkRoute || currentRoute.startsWith(checkRoute);
   }
 
-  // Metodo per filtrare gli elementi di navigazione in base alle autorizzazioni
   filterNavigationByAuthorities(userAuthorities: string[]): NavItem[] {
     return this.navigationItems
       .map((item) => this.filterNavItem(item, userAuthorities))
@@ -104,7 +105,6 @@ export class NavigationService {
     item: NavItem,
     userAuthorities: string[]
   ): NavItem | null {
-    // Verifica se l'utente ha le autorizzazioni necessarie
     const hasAuthority =
       !item.authorities ||
       item.authorities.some((auth) => userAuthorities.includes(auth));
@@ -113,16 +113,13 @@ export class NavigationService {
       return null;
     }
 
-    // Copia l'elemento di navigazione
     const filteredItem: NavItem = { ...item };
 
-    // Filtra i figli se presenti
     if (filteredItem.children) {
       filteredItem.children = filteredItem.children
         .map((child) => this.filterNavItem(child, userAuthorities))
         .filter((child) => child !== null) as NavItem[];
 
-      // Se non ci sono figli dopo il filtraggio, restituisci null
       if (filteredItem.children.length === 0) {
         return null;
       }
@@ -131,13 +128,11 @@ export class NavigationService {
     return filteredItem;
   }
 
-  // Metodo per aggiornare gli elementi di navigazione in base alle autorizzazioni
   updateNavigationItems(userAuthorities: string[]): void {
     const filteredItems = this.filterNavigationByAuthorities(userAuthorities);
     this.navigationSubject.next(filteredItems);
   }
 
-  // Metodo per resettare gli elementi di navigazione durante il logout
   resetNavigationItems(): void {
     this.navigationSubject.next([]);
   }

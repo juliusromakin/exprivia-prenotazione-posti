@@ -1,8 +1,9 @@
+
 import { Injectable } from "@angular/core";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
 import { AxiosService } from "./axios.service";
-import { User, AdminCreateUserRequest } from "../models";
+import { User, AdminCreateUserRequest, AdminUpdateUserRequest } from "../models";
 
 @Injectable({
     providedIn: "root",
@@ -28,7 +29,7 @@ export class AdminService {
         return from(this.axiosService.post<User>(this.baseUrl, user));
     }
 
-    updateUser(id: number, updates: Partial<User>): Observable<User> {
+    updateUser(id: number, updates: AdminUpdateUserRequest): Observable<User> {
         return from(this.axiosService.put<User>(`${this.baseUrl}/${id}`, updates));
     }
 

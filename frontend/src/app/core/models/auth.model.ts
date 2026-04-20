@@ -12,7 +12,7 @@ export interface Credentials {
     password: string;
 }
 
-export interface PasswordReset {
+export interface ResetPasswordRequest {
     token: string;
-    password: string;
-} 
+    newPassword: string;
+}

@@ -1,31 +1,18 @@
 import { ReservationDuration } from './reservation-duration.model';
-
-export enum ReservationStatus {
-    CONFIRMED = 'CONFIRMED',
-    NOT_CONFIRMED = 'NOT_CONFIRMED',
-    DENIED = 'DENIED'
-}
+import { ReservationStatus } from './enums';
+import { UserSummary } from './user.model';
 
 export interface TimeSlot {
     startTime: string;
     endTime: string;
 }
 
-// Simplified user info from backend (UserSummaryDTO)
-export interface UserSummary {
-    id: number;
-    name: string;
-    lastName: string;
-    email: string;
-}
 
-// Simplified workspace info from backend
 export interface WorkspaceSummary {
     id: number;
     name: string;
 }
 
-// Simplified room info from backend
 export interface RoomSummary {
     id: number;
     name: string;
@@ -45,23 +32,26 @@ export interface Reservation {
     roomSummary?: RoomSummary;
 }
 
+// Modello per la creazione di una nuova prenotazione (POST)
 export interface ReservationRequest {
     workspaceId: number;
     userId: number;
-    startDate: string;
-    endDate: string;
+    startDate: string | Date; // Accetta Date per facilitare i form Angular
+    endDate: string | Date;
     durationName: string;
 }
 
+// Modello per la risposta specifica
 export interface ReservationResponse extends Reservation {
-    id: number;
+    id: number; // Qui l'ID è sempre garantito perché arriva dal DB
 }
 
+// Modello per i filtri UI
 export interface ReservationFilter {
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: Date | string;
+    endDate?: Date | string;
     workspaceId?: number;
     roomId?: number;
     userId?: number;
     status?: ReservationStatus;
-} 
+}

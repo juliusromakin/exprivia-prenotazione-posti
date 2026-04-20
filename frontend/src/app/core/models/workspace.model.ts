@@ -1,18 +1,11 @@
-import { Room } from './room.model';
-import { WorkspaceStatus } from './enums';
-
-export interface RoomWorkspace {
-    id: number;
-    name: string;
-    workspaces: Workspace[];
-}
+import { WorkspaceStatus, RoomType } from './enums';
 
 export interface Workspace {
     id?: number;
-    name?: string;
-    roomId?: number;
+    name: string;
+    roomId: number;
     capacity?: number;
-    workspaceStatus?: WorkspaceStatus;
+    status?: WorkspaceStatus;
     isActive?: boolean;
 }
 
@@ -21,5 +14,27 @@ export interface WorkspaceWithRoom extends Workspace {
     name: string;
     roomId: number;
     roomName?: string;
-    roomType?: string;
+    roomType?: RoomType | string;
+}
+
+export interface RoomWorkspace {
+    id: number;
+    name: string;
+    workspaces: Workspace[];
+}
+
+export interface WorkspaceAvailability {
+    id: string | number;
+    name: string;
+    status: WorkspaceStatus | string;
+    selected: boolean;
+}
+
+export interface FloorPlanMarker {
+    id: string;
+    x: number;
+    y: number;
+    room: string;
+    workstation: string;
+    available: boolean;
 }

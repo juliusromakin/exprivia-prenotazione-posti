@@ -1,8 +1,11 @@
+// frontend/src/app/core/services/reservation.service.ts
+
 import { Injectable } from '@angular/core';
 import { Observable, from, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AxiosService } from './axios.service';
-import { Reservation, ReservationRequest } from '@core/models';
+// IMPORTANTE: Import dai modelli centralizzati
+import { Reservation, ReservationRequest } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +16,7 @@ export class ReservationService {
     constructor(private axiosService: AxiosService) { }
 
     /**
-     * Retrieves all reservations
+     * Recupera tutte le prenotazioni
      */
     getReservations(): Observable<Reservation[]> {
         return from(this.axiosService.get<Reservation[]>(this.BASE_URL)).pipe(
@@ -25,7 +28,7 @@ export class ReservationService {
     }
 
     /**
-     * Retrieves reservations for a specific user email
+     * Recupera le prenotazioni per una specifica email utente
      */
     getReservationsByEmail(email: string): Observable<Reservation[]> {
         return from(this.axiosService.get<Reservation[]>(`${this.BASE_URL}/user?email=${email}`)).pipe(
@@ -37,7 +40,7 @@ export class ReservationService {
     }
 
     /**
-     * Retrieves a specific reservation by ID
+     * Recupera una prenotazione specifica tramite ID
      */
     getReservationById(id: number): Observable<Reservation> {
         return from(this.axiosService.get<Reservation>(`${this.BASE_URL}/${id}`)).pipe(
@@ -49,7 +52,7 @@ export class ReservationService {
     }
 
     /**
-     * Retrieves reservations for a specific day
+     * Recupera le prenotazioni per un giorno specifico (formato stringa YYYY-MM-DD)
      */
     getReservationsByDay(date: string): Observable<Reservation[]> {
         return from(this.axiosService.get<Reservation[]>(`${this.BASE_URL}/day?date=${date}`)).pipe(
@@ -61,7 +64,7 @@ export class ReservationService {
     }
 
     /**
-     * Retrieves available time slots for a workspace on a specific date
+     * Recupera gli slot orari disponibili per una postazione in una certa data
      */
     getAvailableTimeSlots(date: Date, workspaceId: number): Observable<string[]> {
         const formattedDate = date.toISOString().split('T')[0];
@@ -76,7 +79,7 @@ export class ReservationService {
     }
 
     /**
-     * Creates a new reservation
+     * Crea una nuova prenotazione
      */
     createReservation(reservation: ReservationRequest): Observable<Reservation> {
         return from(this.axiosService.post<Reservation>(this.BASE_URL, reservation)).pipe(
@@ -89,7 +92,7 @@ export class ReservationService {
     }
 
     /**
-     * Updates an existing reservation
+     * Aggiorna una prenotazione esistente
      */
     updateReservation(id: number, updates: Reservation): Observable<Reservation> {
         return from(this.axiosService.put<Reservation>(`${this.BASE_URL}/${id}`, updates)).pipe(
@@ -102,7 +105,7 @@ export class ReservationService {
     }
 
     /**
-     * Deletes a reservation
+     * Elimina una prenotazione
      */
     deleteReservation(id: number): Observable<void> {
         return from(this.axiosService.delete(`${this.BASE_URL}/${id}`)).pipe(
@@ -115,25 +118,30 @@ export class ReservationService {
     }
 
     /**
-     * Exports daily reservations to Excel format
+     * Esporta le prenotazioni giornaliere in formato Excel
      */
     exportReservationsDaily(date: Date): Observable<Blob> {
         const formattedDate = date.toISOString().split('T')[0];
-    
+
         return from(this.axiosService.get<Blob>(
             `${this.BASE_URL}/export-excel?date=${formattedDate}`,
             { responseType: 'blob' }
-        ));
+        )).pipe(
+            catchError(error => {
+                console.error('Error exporting reservations:', error);
+                return throwError(() => new Error('Unable to export Excel file'));
+            })
+        );
     }
 
     /**
-     * Retrieves reservations for a specific day and workspace
+     * Recupera le prenotazioni per giorno e postazione specifica
      */
     getReservationsByDayAndWorkspace(date: string, workspaceId: number): Observable<Reservation[]> {
         return from(this.axiosService.get<Reservation[]>(`${this.BASE_URL}/day-workspace?date=${date}&workspaceId=${workspaceId}`)).pipe(
             catchError(error => {
-                console.error('Error retrieving reservations for the day and workspace:', error);
-                return throwError(() => new Error('Unable to retrieve reservations for the day and workspace'));
+                console.error('Error retrieving reservations for day and workspace:', error);
+                return throwError(() => new Error('Unable to retrieve reservations for specific workspace'));
             })
         );
     }

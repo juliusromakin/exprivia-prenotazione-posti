@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { AxiosService } from './axios.service';
-import { ReservationDuration, ReservationDurationDTO } from '../models/reservation-duration.model';
+import { ReservationDuration, ReservationDurationDTO } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -9,7 +9,7 @@ import { ReservationDuration, ReservationDurationDTO } from '../models/reservati
 export class ReservationDurationService {
     private readonly BASE_URL = '/api/reservation-duration';
 
-    constructor(private axiosService: AxiosService) {}
+    constructor(private axiosService: AxiosService) { }
 
     getAllDurations(): Observable<ReservationDuration[]> {
         return from(this.axiosService.get<ReservationDuration[]>(this.BASE_URL));
@@ -34,4 +34,4 @@ export class ReservationDurationService {
     getDurationsByReservation(reservationId: number): Observable<ReservationDuration[]> {
         return from(this.axiosService.get<ReservationDuration[]>(`${this.BASE_URL}/reservation/${reservationId}`));
     }
-}
+}

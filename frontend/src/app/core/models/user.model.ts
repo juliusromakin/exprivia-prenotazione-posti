@@ -11,10 +11,24 @@ export interface User {
     updatedDate?: string | Date;
 }
 
+export interface UserSummary {
+    id: number;
+    name: string;
+    lastName: string;
+    email: string;
+}
+
 export interface UserRegistration {
     name: string;
     lastName: string;
     email: string;
+    password?: string;
+}
+
+export interface UserUpdate {
+    name?: string;
+    lastName?: string;
+    email?: string;
     password?: string;
 }
 
@@ -23,14 +37,14 @@ export interface AdminCreateUserRequest {
     lastName: string;
     email: string;
     password?: string;
-    authorities: string[]; // Il Set<String> di Java diventa un array di stringhe in TS
+    authorities: string[];
     enabled: boolean;
 }
 
-// 3. Se in futuro ti serve, puoi fare anche quello per l'aggiornamento (PUT)
 export interface AdminUpdateUserRequest {
     name?: string;
     lastName?: string;
+    email?: string;
+    authorities?: string[];
     enabled?: boolean;
-    // magari qui la password non serve
 }

@@ -18,14 +18,12 @@ export class AxiosService {
       }
     });
 
-    // Add request interceptor to add token to all requests
     this.axiosInstance.interceptors.request.use(
       (config) => {
         const token = this.tokenService.getToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-        // Ensure Content-Type is set correctly for all requests
         if (config.data && typeof config.data === 'object') {
           config.headers['Content-Type'] = 'application/json';
         }
@@ -36,14 +34,12 @@ export class AxiosService {
       }
     );
 
-    // Add response interceptor to handle 401 errors
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Token expired or invalid
           this.tokenService.clearToken();
-          window.location.href = '/accedi';
+          window.location.href = '/login';
         }
         return Promise.reject(error);
       }
