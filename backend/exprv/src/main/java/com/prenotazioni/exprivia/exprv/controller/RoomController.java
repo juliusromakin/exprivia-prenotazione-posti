@@ -23,7 +23,7 @@ import com.prenotazioni.exprivia.exprv.service.RoomService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
-@RequestMapping("/api/room")
+@RequestMapping("/api/rooms")
 public class RoomController {
 
     private final RoomService roomService;
@@ -32,8 +32,7 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    // Gestione Richieste Get Per Ottenere Tutte Le Stanze
-    @GetMapping()
+    @GetMapping
     public List<RoomDTO> getAllRooms() {
         return roomService.findAllRooms();
     }
@@ -43,20 +42,18 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomOptions());
     }
 
-    // Richiesta GET per ricevere una stanza in base all'ID
-    @GetMapping("/{id_room}")
-    public ResponseEntity<RoomDTO> getRoomByID(@PathVariable("id_room") Integer id_room) {
+    @GetMapping("/{id}")
+    public ResponseEntity<RoomDTO> getRoomById(@PathVariable("id") Integer id) {
         try {
-            RoomDTO roomDTO = roomService.findRoomById(id_room);
+            RoomDTO roomDTO = roomService.findRoomById(id);
             return ResponseEntity.ok(roomDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
-    // Richiesta POST per creare una stanza
     @Transactional
-    @PostMapping("/createRoom")
+    @PostMapping
     public ResponseEntity<?> createRoom(@RequestBody RoomDTO roomDTO) {
         try {
             RoomDTO newRoom = roomService.createRoom(roomDTO);
@@ -66,25 +63,11 @@ public class RoomController {
         }
     }
 
-    /*
-     * @PostMapping("/crea_Postazione")
-     * public ResponseEntity<?> creaPostazione(@RequestBody Postazioni postazioni) {
-     * System.out.println("Ricevuto: " + postazioni.getStanze() + ", " +
-     * postazioni.getStato_postazione());
-     * try {
-     * Postazioni newPostazioni = PostazioniService.creaPostazione(postazioni);
-     * return ResponseEntity.ok(newPostazioni);
-     * } catch (IllegalArgumentException e) {
-     * return ResponseEntity.badRequest().body(e.getMessage());
-     * }
-     * }
-     */
-    // Gestisce Le Richieste PUT per aggiornare una Stanza tramite ID
-    @PutMapping("/updateroom/{id}")
-    public ResponseEntity<?> updateRoom(@PathVariable("id") Integer id_room,
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRoom(@PathVariable("id") Integer id,
             @RequestBody RoomDTO roomDTO) {
         try {
-            RoomDTO updatedRoom = roomService.updateRoom(id_room, roomDTO);
+            RoomDTO updatedRoom = roomService.updateRoom(id, roomDTO);
             return ResponseEntity.ok(updatedRoom);
         } catch (AppException e) {
             return ResponseEntity.status(e.getHttpStatus()).body(null);
@@ -93,9 +76,8 @@ public class RoomController {
         }
     }
 
-    // Soft Delete
-    @DeleteMapping("/deleteroom/{id}")
-    public ResponseEntity<String> softDeleteRoom(@PathVariable Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteRoom(@PathVariable Integer id) {
         try {
             roomService.softDeleteRoom(id);
             return ResponseEntity.noContent().build();
@@ -104,9 +86,8 @@ public class RoomController {
         }
     }
 
-    // Hard Delete (Eliminazione definitiva)
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/harddeleteroom/{id}")
+    @DeleteMapping("/{id}/hard")
     public ResponseEntity<String> hardDeleteRoom(@PathVariable Integer id) {
         try {
             roomService.hardDeleteRoom(id);

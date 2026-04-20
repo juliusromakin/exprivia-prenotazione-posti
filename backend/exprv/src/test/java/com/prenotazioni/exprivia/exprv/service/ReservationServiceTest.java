@@ -71,12 +71,12 @@ public class ReservationServiceTest {
         workspace.setRoom(room);
 
         reservation = new Reservation();
-        reservation.setId_reservation(1);
+        reservation.setId(1);
         reservation.setUser(user);
         reservation.setWorkspace(workspace);
         reservation.setStartDate(LocalDateTime.now().plusHours(1));
         reservation.setEndDate(LocalDateTime.now().plusHours(2));
-        reservation.setStatusReservation(ReservationStatus.CONFIRMED);
+        reservation.setStatus(ReservationStatus.CONFIRMED);
 
         reservationDTO = new ReservationDTO();
         reservationDTO.setUserId(1);
@@ -100,7 +100,7 @@ public class ReservationServiceTest {
         reservationService.createReservation(reservationDTO);
 
         // Assert
-        assertEquals(ReservationStatus.CONFIRMED, reservation.getStatusReservation(), "Lo stato deve essere CONFIRMED di default");
+        assertEquals(ReservationStatus.CONFIRMED, reservation.getStatus(), "Lo stato deve essere CONFIRMED di default");
         verify(emailService, times(1)).sendBookingConfirmationEmail(anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
     }
 

@@ -82,8 +82,8 @@ export class RegisterComponent {
     private fb: FormBuilder
   ) {
     this.registerForm = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(2)]],
-      cognome: ['', [Validators.required, Validators.minLength(2)]],
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
@@ -177,8 +177,8 @@ export class RegisterComponent {
 
       const formData = this.registerForm.value;
       const userData: RegisterUserData = {
-        nome: formData.nome,
-        cognome: formData.cognome,
+        name: formData.name,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password
       };

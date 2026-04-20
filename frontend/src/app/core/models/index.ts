@@ -1,15 +1,10 @@
-// Enums
-export enum StatoPostazione {
-  DISPONIBILE = "Disponibile",
-  OCCUPATO = "Occupato",
-  MANUTENZIONE = "Manutenzione",
-}
-
-export enum TipoStanza {
-  MEETINGROOM = "MEETINGROOM",
-  OPENSPACE = "OPENSPACE",
-  UFFICIO = "UFFICIO",
-}
+export * from "./user.model";
+export * from "./room.model";
+export * from "./workspace.model";
+export * from "./reservation.model";
+export * from "./auth.model";
+export * from "./reservation-duration.model";
+export * from "./enums";
 
 export interface WorkspaceAvailability {
   id: string;
@@ -26,21 +21,3 @@ export interface FloorPlanMarker {
   workstation: string;
   available: boolean;
 }
-
-export interface User {
-  id_user?: number;
-  nome: string;
-  cognome: string;
-  email: string;
-  password?: string;
-  enabled: boolean;
-  authorities: string[];
-  creatoIl?: string;
-  aggiornatoIl?: string;
-}
-
-export * from "./user.model";
-export * from "./stanza.model";
-export * from "./postazione.model";
-export * from "./prenotazione.model";
-export * from "./auth.model";

@@ -24,14 +24,14 @@
           <div class="w-full sm:w-1/2">
             <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
               class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-              <label class="block text-sm font-medium mb-1" for="nome">Nome *</label>
-              <input matInput id="nome" formControlName="nome" placeholder="Nome"
+              <label class="block text-sm font-medium mb-1" for="name">Nome *</label>
+              <input matInput id="name" formControlName="name" placeholder="Nome"
                 class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
-                aria-required="true" [attr.aria-invalid]="registerForm.get('nome')?.invalid"
-                [attr.aria-describedby]="registerForm.get('nome')?.invalid ? 'nome-error' : null" />
+                aria-required="true" [attr.aria-invalid]="registerForm.get('name')?.invalid"
+                [attr.aria-describedby]="registerForm.get('name')?.invalid ? 'name-error' : null" />
               <div
-                *ngIf="registerForm.get('nome')?.invalid && (registerForm.get('nome')?.dirty || registerForm.get('nome')?.touched)"
-                class="text-xs text-red-600 mt-1" id="nome-error" role="alert">
+                *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)"
+                class="text-xs text-red-600 mt-1" id="name-error" role="alert">
                 Il nome è obbligatorio.
               </div>
             </div>
@@ -40,14 +40,14 @@
           <div class="w-full sm:w-1/2">
             <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
               class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-              <label class="block text-sm font-medium mb-1" for="cognome">Cognome *</label>
-              <input matInput id="cognome" formControlName="cognome" placeholder="Cognome"
+              <label class="block text-sm font-medium mb-1" for="lastName">Cognome *</label>
+              <input matInput id="lastName" formControlName="lastName" placeholder="Cognome"
                 class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
-                aria-required="true" [attr.aria-invalid]="registerForm.get('cognome')?.invalid"
-                [attr.aria-describedby]="registerForm.get('cognome')?.invalid ? 'cognome-error' : null" />
+                aria-required="true" [attr.aria-invalid]="registerForm.get('lastName')?.invalid"
+                [attr.aria-describedby]="registerForm.get('lastName')?.invalid ? 'lastName-error' : null" />
               <div
-                *ngIf="registerForm.get('cognome')?.invalid && (registerForm.get('cognome')?.dirty || registerForm.get('cognome')?.touched)"
-                class="text-xs text-red-600 mt-1" id="cognome-error" role="alert">
+                *ngIf="registerForm.get('lastName')?.invalid && (registerForm.get('lastName')?.dirty || registerForm.get('lastName')?.touched)"
+                class="text-xs text-red-600 mt-1" id="lastName-error" role="alert">
                 Il cognome è obbligatorio.
               </div>
             </div>

@@ -98,7 +98,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     try {
       await this.userManagementService.loadUsers();
     } catch (error) {
-      this.toastService.showError("Errore di Caricamento", "Errore nel caricamento degli utenti");
+      this.toastService.showError("Loading Error", "Error loading users");
     }
   }
 
@@ -123,8 +123,8 @@ export class UserListComponent implements OnInit, OnDestroy {
     if (this.searchTerm.trim()) {
       const searchLower = this.searchTerm.toLowerCase();
       filtered = filtered.filter(user =>
-        user.nome?.toLowerCase().includes(searchLower) ||
-        user.cognome?.toLowerCase().includes(searchLower) ||
+        user.name?.toLowerCase().includes(searchLower) ||
+        user.lastName?.toLowerCase().includes(searchLower) ||
         user.email?.toLowerCase().includes(searchLower)
       );
     }
@@ -135,7 +135,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   createUser(): void {
-    this.modalData = { title: "Nuovo Utente", user: {} };
+    this.modalData = { title: "New User", user: {} };
     this.showModal = true;
   }
 
@@ -147,25 +147,25 @@ export class UserListComponent implements OnInit, OnDestroy {
 
     try {
       this.isModalLoading = true;
-      if (this.modalData.user.id_user) {
+      if (this.modalData.user.id) {
         // Edit mode
-        await this.userManagementService.updateUser(this.modalData.user.id_user!, userData);
-        this.toastService.showSuccess("Utente Aggiornato", "Utente aggiornato con successo");
+        await this.userManagementService.updateUser(this.modalData.user.id!, userData);
+        this.toastService.showSuccess("User Updated", "User updated successfully");
       } else {
         // Create mode
         await this.userManagementService.createUser(userData);
-        this.toastService.showSuccess("Utente Creato", "Utente creato con successo");
+        this.toastService.showSuccess("User Created", "User created successfully");
       }
       this.closeModal();
     } catch (error) {
-      this.toastService.showError("Errore Operazione", this.modalData.user.id_user ? "Errore durante l'aggiornamento dell'utente" : "Errore durante la creazione dell'utente");
+      this.toastService.showError("Operation Error", this.modalData.user.id ? "Error updating user" : "Error creating user");
     } finally {
       this.isModalLoading = false;
     }
   }
 
   editUser(user: User): void {
-    this.modalData = { title: "Modifica Utente", user: { ...user } };
+    this.modalData = { title: "Edit User", user: { ...user } };
     this.showModal = true;
   }
 
@@ -182,16 +182,16 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   async confirmDelete(): Promise<void> {
-    if (!this.userToDelete || !this.userToDelete.id_user) {
+    if (!this.userToDelete || !this.userToDelete.id) {
       return;
     }
 
     try {
-      await this.userManagementService.deleteUser(this.userToDelete.id_user);
-      this.toastService.showSuccess("Utente Eliminato", "Utente eliminato con successo");
+      await this.userManagementService.deleteUser(this.userToDelete.id);
+      this.toastService.showSuccess("User Deleted", "User deleted successfully");
       this.closeDeleteConfirmation();
     } catch (error) {
-      this.toastService.showError("Errore Eliminazione", "Errore durante l'eliminazione dell'utente");
+      this.toastService.showError("Deletion Error", "Error deleting user");
       this.closeDeleteConfirmation();
     }
   }
@@ -320,7 +320,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   shouldOpenUpward(userId: number): boolean {
     // Use a simple heuristic: check if we're in the last few rows of the table
-    const index = this.paginatedUsers.findIndex(u => u.id_user === userId);
+    const index = this.paginatedUsers.findIndex(u => u.id === userId);
     const totalItems = this.paginatedUsers.length;
     
     // If we're in the last 2 items of the current page, open upward
@@ -353,16 +353,15 @@ export class UserListComponent implements OnInit, OnDestroy {
     const isAdmin = user.authorities && user.authorities.includes('ROLE_ADMIN');
     
     const message = [
-      `Sei sicuro di voler eliminare l'utente ${user.nome} ${user.cognome}?`,
+      `Are you sure you want to delete the user ${user.name} ${user.lastName}?`,
       '',
-      `Nome: ${user.nome} ${user.cognome}`,
+      `Name: ${user.name} ${user.lastName}`,
       `Email: ${user.email}`,
-      `Ruolo: ${isAdmin ? 'Amministratore' : 'Dipendente'}`,
+      `Role: ${isAdmin ? 'Administrator' : 'Employee'}`,
       '',
-      'Questa azione non può essere annullata.'
+      'This action cannot be undone.'
     ];
 
     return message.join('<br>');
   }
 }
-

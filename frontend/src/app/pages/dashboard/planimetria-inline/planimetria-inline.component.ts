@@ -21,6 +21,14 @@ interface MarkerPosition {
   selected: boolean;
 }
 
+export interface PlanimetriaWorkspace {
+  id?: number;
+  name: string;
+  roomId: number;
+  roomName: string;
+  isAvailable?: boolean;
+}
+
 @Component({
   selector: "app-planimetria-inline",
   standalone: true,
@@ -29,9 +37,9 @@ interface MarkerPosition {
   styleUrls: ["./planimetria-inline.component.css"],
 })
 export class PlanimetriaInlineComponent implements OnChanges {
-  @Input() postazioniDisponibili: { id_postazione: number; nomePostazione: string; stanza_id: number; stanza_nome: string; isAvailable?: boolean }[] = [];
-  @Input() selectedPostazioneId: number | null = null;
-  @Output() postazioneSelected = new EventEmitter<number>();
+  @Input() availableWorkspaces: PlanimetriaWorkspace[] = [];
+  @Input() selectedWorkspaceId: number | null = null;
+  @Output() workspaceSelected = new EventEmitter<number>();
 
   @ViewChild("mapViewport") mapViewport!: ElementRef<HTMLDivElement>;
 
@@ -89,7 +97,7 @@ export class PlanimetriaInlineComponent implements OnChanges {
     if (newScale === this.scale) return;
 
     if (event && this.mapViewport) {
-      // Zoom centrato sul cursore del mouse
+      // Zoom dynamic based on cursor
       const rect = this.mapViewport.nativeElement.getBoundingClientRect();
       const mouseX = event.clientX - rect.left - rect.width / 2;
       const mouseY = event.clientY - rect.top - rect.height / 2;
@@ -101,7 +109,6 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
     this.scale = newScale;
 
-    // Quando si torna a scale=1 resetta la traslazione
     if (this.scale <= 1) {
       this.translateX = 0;
       this.translateY = 0;
@@ -114,7 +121,6 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
   onMouseDown(event: MouseEvent): void {
     if (!this.isZoomed) return;
-    // Solo tasto sinistro
     if (event.button !== 0) return;
     event.preventDefault();
     this.isDragging = true;
@@ -152,7 +158,6 @@ export class PlanimetriaInlineComponent implements OnChanges {
       this.dragStartTranslateX = this.translateX;
       this.dragStartTranslateY = this.translateY;
     } else if (event.touches.length === 2) {
-      // Pinch start
       this.lastTouchDist = this.getTouchDistance(event);
     }
   }
@@ -195,7 +200,7 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
   // ─── Markers ─────────────────────────────────────────────────────────────────
 
-  private coordinatePostazioni: { id: number; x: number; y: number; label: string }[] = [
+  private workspaceCoordinates: { id: number; x: number; y: number; label: string }[] = [
     { id: 1,  x: 33.1,  y: 26.2, label: "Gastone" },
     { id: 2,  x: 14.25, y: 30.7, label: "Leonardo" },
     { id: 3,  x: 43.8,  y: 24.6, label: "3" },
@@ -241,32 +246,31 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
   private buildMarkers(): void {
     this.markers = [];
-    const disponibiliMap = new Map<number, { nomePostazione: string; stanza_nome: string; isAvailable?: boolean }>();
-    for (const p of this.postazioniDisponibili) {
-      disponibiliMap.set(p.id_postazione, p);
+    const availableMap = new Map<any, any>();
+    for (const w of this.availableWorkspaces) {
+      availableMap.set(w.id, w);
     }
-    for (const coord of this.coordinatePostazioni) {
-      if (!disponibiliMap.has(coord.id)) continue;
-      const p = disponibiliMap.get(coord.id)!;
+    for (const coord of this.workspaceCoordinates) {
+      if (!availableMap.has(coord.id)) continue;
+      const w = availableMap.get(coord.id)!;
       this.markers.push({
         id: String(coord.id),
         label: coord.label,
-        tooltip: `${p.nomePostazione}\n${p.stanza_nome}`,
+        tooltip: `${w.name}\n${w.roomName}`,
         x: coord.x,
         y: coord.y,
-        available: p.isAvailable !== false,
-        selected: this.selectedPostazioneId === coord.id,
+        available: w.isAvailable !== false,
+        selected: this.selectedWorkspaceId === coord.id,
       });
     }
   }
 
-  selezionaMarker(marker: MarkerPosition, event: MouseEvent): void {
-    // Ignora il click se era un drag
+  selectMarker(marker: MarkerPosition, event: MouseEvent): void {
     if (this.isDragging) return;
     if (!marker.available) return;
     this.markers.forEach((m) => (m.selected = false));
     marker.selected = true;
-    this.postazioneSelected.emit(Number(marker.id));
+    this.workspaceSelected.emit(Number(marker.id));
   }
 
   getTooltipLine1(tooltip: string): string { return tooltip.split("\n")[0]; }

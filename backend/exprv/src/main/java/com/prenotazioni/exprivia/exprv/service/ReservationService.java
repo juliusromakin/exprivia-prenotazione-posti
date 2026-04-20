@@ -52,23 +52,23 @@ public class ReservationService {
 
     public void validateReservationDTO(ReservationDTO reservationDTO) {
         if (reservationDTO.getWorkspaceId() == null) {
-            throw new AppException("Il Workspace è obbligatorio", HttpStatus.BAD_REQUEST);
+            throw new AppException("Workspace is required", HttpStatus.BAD_REQUEST);
         }
         if (reservationDTO.getUserId() == null) {
-            throw new AppException("L'utente è obbligatorio", HttpStatus.BAD_REQUEST);
+            throw new AppException("User is required", HttpStatus.BAD_REQUEST);
         }
         if (reservationDTO.getStartDate() == null || reservationDTO.getEndDate() == null) {
-            throw new AppException("Le date di inizio e fine sono obbligatorie", HttpStatus.BAD_REQUEST);
+            throw new AppException("Start and end dates are required", HttpStatus.BAD_REQUEST);
         }
         if (reservationDTO.getEndDate().isBefore(reservationDTO.getStartDate())) {
-            throw new AppException("La data di fine deve essere successiva a quella di inizio", HttpStatus.BAD_REQUEST);
+            throw new AppException("End date must be after start date", HttpStatus.BAD_REQUEST);
         }
         if (reservationDTO.getStartDate().isBefore(java.time.LocalDateTime.now())) {
-            throw new AppException("Non puoi effettuare una prenotazione nel passato", HttpStatus.BAD_REQUEST);
+            throw new AppException("Reservations in the past are not allowed", HttpStatus.BAD_REQUEST);
         }
         java.time.DayOfWeek day = reservationDTO.getStartDate().getDayOfWeek();
         if (day == java.time.DayOfWeek.SATURDAY || day == java.time.DayOfWeek.SUNDAY) {
-            throw new AppException("Le prenotazioni sono permesse solo nei giorni lavorativi", HttpStatus.BAD_REQUEST);
+            throw new AppException("Reservations are only allowed on business days", HttpStatus.BAD_REQUEST);
         }
         List<Reservation> overlapping = reservationRepository
                 .findOverlappingBookings(
@@ -77,7 +77,7 @@ public class ReservationService {
                         reservationDTO.getWorkspaceId());
 
         if (!overlapping.isEmpty()) {
-            throw new AppException("Il workspace è già occupato in questo orario", HttpStatus.CONFLICT);
+            throw new AppException("The workspace is already occupied at this time", HttpStatus.CONFLICT);
         }
     }
 
@@ -88,7 +88,7 @@ public class ReservationService {
     public ReservationDTO findReservationById(Integer id) {
         return reservationMapper.toDto(reservationRepository.findById(id)
                 .orElseThrow(
-                        () -> new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND)));
+                        () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND)));
     }
 
     public List<ReservationDTO> findReservationsByUserEmail(String email) {
@@ -107,19 +107,19 @@ public class ReservationService {
         validateReservationDTO(reservationDTO);
 
         User user = userRepository.findById(reservationDTO.getUserId())
-                .orElseThrow(() -> new AppException("Utente non trovato", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         Workspace workspace = workspaceRepository.findById(reservationDTO.getWorkspaceId())
-                .orElseThrow(() -> new AppException("Postazione non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
 
         ReservationDuration duration = durationRepository.findByName(reservationDTO.getDurationName())
-                .orElseThrow(() -> new AppException("Durata non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Duration not found", HttpStatus.NOT_FOUND));
 
         Reservation reservation = reservationMapper.toEntity(reservationDTO);
         reservation.setUser(user);
         reservation.setWorkspace(workspace);
         reservation.setReservationDuration(duration);
-        reservation.setStatusReservation(ReservationStatus.CONFIRMED); // Default status
+        reservation.setStatus(ReservationStatus.CONFIRMED); // Default status
 
         Reservation savedReservation = reservationRepository.save(reservation);
         
@@ -132,33 +132,33 @@ public class ReservationService {
     public ReservationDTO updateReservation(Integer id, ReservationDTO reservationDTO) {
         Reservation existingReservation = reservationRepository.findById(id)
                 .orElseThrow(
-                        () -> new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+                        () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
 
         reservationMapper.updateReservationFromDto(reservationDTO, existingReservation);
 
         if (reservationDTO.getUserId() != null) {
             User user = userRepository.findById(reservationDTO.getUserId())
-                    .orElseThrow(() -> new AppException("Utente non trovato", HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
             existingReservation.setUser(user);
         }
         if (reservationDTO.getWorkspaceId() != null) {
             Workspace workspace = workspaceRepository.findById(reservationDTO.getWorkspaceId())
-                    .orElseThrow(() -> new AppException("Postazione non trovata", HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
             existingReservation.setWorkspace(workspace);
         }
         if (reservationDTO.getDurationName() != null) {
             ReservationDuration duration = durationRepository.findByName(reservationDTO.getDurationName())
-                    .orElseThrow(() -> new AppException("Durata non trovata", HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new AppException("Duration not found", HttpStatus.NOT_FOUND));
             existingReservation.setReservationDuration(duration);
         }
 
         validateReservationDTO(reservationDTO);
 
-        ReservationStatus oldStatus = existingReservation.getStatusReservation();
+        ReservationStatus oldStatus = existingReservation.getStatus();
         Reservation savedReservation = reservationRepository.save(existingReservation);
         
         // Se lo stato è cambiato in DENIED, invia email
-        if (oldStatus != ReservationStatus.DENIED && savedReservation.getStatusReservation() == ReservationStatus.DENIED) {
+        if (oldStatus != ReservationStatus.DENIED && savedReservation.getStatus() == ReservationStatus.DENIED) {
             sendStatusEmail(savedReservation, true); // Admin action
         }
 
@@ -167,7 +167,7 @@ public class ReservationService {
 
     public void deleteReservation(Integer id) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new AppException("Prenotazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
         
         // Notifica cancellazione via email prima di eliminare
         sendStatusEmail(reservation, true); // Considerata azione admin se fatta da questo service generico
@@ -208,9 +208,9 @@ public class ReservationService {
         String roomName = reservation.getWorkspace().getRoom().getName();
         String workspaceName = reservation.getWorkspace().getName();
 
-        if (reservation.getStatusReservation() == ReservationStatus.CONFIRMED && isAdminAction == null) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED && isAdminAction == null) {
             emailService.sendBookingConfirmationEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
-        } else if (reservation.getStatusReservation() == ReservationStatus.DENIED) {
+        } else if (reservation.getStatus() == ReservationStatus.DENIED) {
             emailService.sendBookingCancelledByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
         } else if (isAdminAction != null && isAdminAction) {
             emailService.sendBookingDeletedByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
@@ -243,13 +243,13 @@ public class ReservationService {
             int rowIdx = 1;
             for (Reservation r : reservations) {
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(r.getId_reservation());
+                row.createCell(0).setCellValue(r.getId());
                 row.createCell(1).setCellValue(r.getUser().getEmail());
                 row.createCell(2).setCellValue(r.getWorkspace().getRoom().getName());
                 row.createCell(3).setCellValue(r.getWorkspace().getName());
                 row.createCell(4).setCellValue(r.getStartDate().format(dtf));
                 row.createCell(5).setCellValue(r.getEndDate().format(dtf));
-                row.createCell(6).setCellValue(r.getStatusReservation().toString());
+                row.createCell(6).setCellValue(r.getStatus().toString());
             }
 
             for (int i = 0; i < columns.length; i++) {
@@ -260,7 +260,7 @@ public class ReservationService {
             workbook.write(out);
             return out.toByteArray();
         } catch (Exception e) {
-            throw new AppException("Errore durante la generazione del file Excel: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new AppException("Error while generating Excel file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

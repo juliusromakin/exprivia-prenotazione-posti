@@ -3,32 +3,32 @@ package com.prenotazioni.exprivia.exprv.dto;
 import com.prenotazioni.exprivia.exprv.enumerati.WorkspaceStatus;
 
 public class WorkspaceDTO {
-    private Integer id_workspace;
+    private Integer id;
     private String name;
     private Integer capacity;
     private WorkspaceStatus workspaceStatus;
     private Integer roomId;
-    private Boolean is_active;
+    private Boolean enabled;
 
     public WorkspaceDTO() {
     }
 
-    public WorkspaceDTO(Integer id_workspace, String name, Integer capacity, WorkspaceStatus workspaceStatus,
-            Integer roomId, Boolean is_active) {
-        this.id_workspace = id_workspace;
+    public WorkspaceDTO(Integer id, String name, Integer capacity, WorkspaceStatus workspaceStatus,
+            Integer roomId, Boolean enabled) {
+        this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.workspaceStatus = workspaceStatus;
         this.roomId = roomId;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
-    public Integer getId_workspace() {
-        return id_workspace;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_workspace(Integer id_workspace) {
-        this.id_workspace = id_workspace;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -63,12 +63,12 @@ public class WorkspaceDTO {
         this.roomId = roomId;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

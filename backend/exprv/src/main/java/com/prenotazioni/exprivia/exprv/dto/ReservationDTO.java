@@ -5,37 +5,37 @@ import java.time.LocalDateTime;
 import com.prenotazioni.exprivia.exprv.enumerati.ReservationStatus;
 
 public class ReservationDTO {
-    private Integer id_reservation;
+    private Integer id;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private ReservationStatus statusReservation;
+    private ReservationStatus status;
 
     private Integer workspaceId;
     private Integer userId;
     private String durationName;
-    private UserSummaryDTO userSummary; // Dettagli utente in inglese
+    private UserSummaryDTO userSummary; // English user details
 
     public ReservationDTO() {
     }
 
-    public ReservationDTO(Integer id_reservation, LocalDateTime startDate, LocalDateTime endDate,
-            ReservationStatus statusReservation, Integer workspaceId, Integer userId, String durationName, UserSummaryDTO userSummary) {
-        this.id_reservation = id_reservation;
+    public ReservationDTO(Integer id, LocalDateTime startDate, LocalDateTime endDate,
+            ReservationStatus status, Integer workspaceId, Integer userId, String durationName, UserSummaryDTO userSummary) {
+        this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.statusReservation = statusReservation;
+        this.status = status;
         this.workspaceId = workspaceId;
         this.userId = userId;
         this.durationName = durationName;
         this.userSummary = userSummary;
     }
 
-    public Integer getId_reservation() {
-        return id_reservation;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_reservation(Integer id_reservation) {
-        this.id_reservation = id_reservation;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public LocalDateTime getStartDate() {
@@ -54,12 +54,12 @@ public class ReservationDTO {
         this.endDate = endDate;
     }
 
-    public ReservationStatus getStatusReservation() {
-        return statusReservation;
+    public ReservationStatus getStatus() {
+        return status;
     }
 
-    public void setStatusReservation(ReservationStatus statusReservation) {
-        this.statusReservation = statusReservation;
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 
     public Integer getWorkspaceId() {

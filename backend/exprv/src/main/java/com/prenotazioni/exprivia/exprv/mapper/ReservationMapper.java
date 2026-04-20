@@ -19,8 +19,10 @@ public interface ReservationMapper {
 
     List<ReservationDTO> toDtoList(List<Reservation> reservationList);
 
-    @Mapping(source = "workspace.id_workspace", target = "workspaceId")
-    @Mapping(source = "user.id_user", target = "userId")
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "workspace.id", target = "workspaceId")
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "reservationDuration.name", target = "durationName")
     @Mapping(source = "user", target = "userSummary")
     ReservationDTO toDto(Reservation reservation);
@@ -30,19 +32,23 @@ public interface ReservationMapper {
             return null;
         }
         return new UserSummaryDTO(
-                user.getId_user(),
+                user.getId(),
                 user.getName(),
                 user.getLastName(),
                 user.getEmail());
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
     @Mapping(target = "workspace", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "reservationDuration", ignore = true)
     Reservation toEntity(ReservationDTO reservationDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
     @Mapping(target = "workspace", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "reservationDuration", ignore = true)

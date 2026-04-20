@@ -3,16 +3,15 @@ import { CommonModule, DatePipe } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { AuthService } from "@core/auth/auth.service";
 import { CalendarComponent } from "@shared/components/calendar/calendar.component";
-import { BookingState } from "./prenotazione-posizione.model";
+import { BookingState, WorkspaceWithAvailability } from "./prenotazione-posizione.model";
 import { Subject, takeUntil, firstValueFrom, forkJoin, of } from "rxjs";
-import { Prenotazione, StatoPrenotazione } from "@core/models/prenotazione.model";
-import { CosaDurata } from "@core/models/cosa-durata.model";
+import { Reservation, ReservationStatus, TimeSlot } from "@core/models/reservation.model";
 import { PrenotazionePosizioneService } from "./prenotazione-posizione.service";
-import { Postazione } from "@/app/core/models/postazione.model";
-import { Stanza, StanzaWithPostazioni } from "@core/models/stanza.model";
+import { Workspace } from "@core/models/workspace.model";
+import { Room } from "@core/models/room.model";
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../../shared/services/toast.service';
-import { User } from '@core/models';
+import { User } from '@core/models/user.model';
 import { AdminService } from '@core/services/admin.service';
 import { map, catchError } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -37,22 +36,21 @@ import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-in
 export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   bookingForm: FormGroup;
   state: BookingState = {
-    stanze: [],
-    postazioniDisponibili: [],
+    rooms: [],
+    availableWorkspaces: [],
     selectedDates: [],
     availableTimeSlots: [],
     isLoading: false,
     errorMessage: ""
   };
 
-  tipiStanza: string[] = [];
-  prenotazioni: Prenotazione[] = [];
-  sortedPrenotazioni: Prenotazione[] = [];
-  coseDurata: CosaDurata[] = [];
+  roomTypes: string[] = [];
+  reservations: Reservation[] = [];
+  sortedReservations: Reservation[] = [];
   private destroy$ = new Subject<void>();
 
   // Sorting properties
-  sortColumn: string = 'data_inizio'; // Default sort by date
+  sortColumn: string = 'startDate'; // Default sort by date
   sortDirection: 'asc' | 'desc' = 'desc'; // Default to descending (latest first)
 
   // Filter properties
@@ -67,7 +65,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   selectedUser: User | null = null;
 
   // Bulk selection properties
-  selectedPrenotazioni: Set<number> = new Set();
+  selectedReservations: Set<number> = new Set();
   isSelectAllChecked: boolean = false;
 
   // Map duration label to minutes
@@ -76,28 +74,17 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     '4 ore': 240,
     '2 ore': 120,
     '1 ora': 60,
-    '30 minuti': 30,
-    // Supporto nomi backup
-    'Postazione - Giornata intera': 540,
-    'Sala Riunione - Giornata intera': 540,
-    'Sala Riunione - 30 min': 30,
-    'Sala Riunione - 60 min': 60,
-    'Sala Riunione - 120 min': 120,
-    'Sala Riunione - 4 ore': 240
+    '30 minuti': 30
   };
 
   // Add new properties for confirmation modal
   showBulkCancelConfirmation = false;
-  prenotazioniToCancel: Prenotazione[] = [];
-
-  // Add new properties for single cancellation modal
-  showCancelConfirmation = false;
-  prenotazioneToCancel: Prenotazione | null = null;
+  reservationsToCancel: Reservation[] = [];
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private prenotazionePosizioneService: PrenotazionePosizioneService,
+    private presentationService: PrenotazionePosizioneService,
     private toastService: ToastService,
     private adminService: AdminService,
     private datePipe: DatePipe,
@@ -105,11 +92,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   ) {
     this.bookingForm = this.fb.group({
       selectedDate: [null, Validators.required],
-      tipo_stanza: ["", Validators.required],
-      id_stanza: [null, Validators.required],
+      roomType: ["", Validators.required],
+      roomId: [null, Validators.required],
       slotDuration: ["", Validators.required],
       timeSlot: ["", Validators.required],
-      id_postazione: ["", Validators.required],
+      workspaceId: ["", Validators.required],
       userId: [null]
     });
   }
@@ -118,7 +105,6 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (!durationName) return 0;
     const name = String(durationName).trim().toLowerCase();
     
-    // Regex molto inclusive per evitare problemi di encoding o caratteri speciali
     if (/intera/i.test(name) || /giorn/i.test(name)) return 540;
     if (/4.*ore/i.test(name) || /4h/i.test(name)) return 240;
     if (/2.*ore/i.test(name) || /2h/i.test(name) || /120.*min/i.test(name)) return 120;
@@ -131,12 +117,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   isFullDay(duration: string | null | undefined): boolean {
     if (!duration) return false;
     const name = String(duration).trim().toLowerCase();
-    // Match super-permissivo per Giornata Intera
     return /intera/i.test(name) || /giorn/i.test(name);
   }
 
   isMeetingRoom(): boolean {
-    return this.bookingForm.get('tipo_stanza')?.value === 'MeetingRoom';
+    return this.bookingForm.get('roomType')?.value === 'MeetingRoom';
   }
 
   get availableDurations(): string[] {
@@ -151,69 +136,39 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
     const checkAndAddDuration = (name: string, mins: number) => {
       if (isToday) {
-        // Se è oggi, calcola se c'è abbastanza tempo rimasto per questa durata
         const latestStartHour = 18 - (mins / 60);
         const latestStartInMinutes = latestStartHour * 60;
         if (latestStartInMinutes > (currentTimeInMinutes + 30)) {
           durations.add(name);
         }
       } else {
-        // Se è un giorno futuro, aggiungi sempre
         durations.add(name);
       }
     };
 
-    // Unifichiamo e normalizziamo i nomi delle durate (da DB e da Hardcoded)
-    const allPossibleNames = new Set([
-      ...Object.keys(this.durationMap),
-      ...this.coseDurata.map(cd => cd.nome)
-    ]);
-
-    allPossibleNames.forEach(name => {
-      if (!name) return;
-      const trimmedName = name.trim();
-      const mins = this.getDurationInMinutes(trimmedName);
-      
-      if (mins > 0) {
-        // NORMALIZZAZIONE: Mappiamo i nomi complessi o sporchi a nomi standard "puliti"
-        let normalizedName = trimmedName;
-        if (this.isFullDay(trimmedName)) normalizedName = 'Giornata Intera';
-        else if (mins === 240) normalizedName = '4 ore';
-        else if (mins === 120) normalizedName = '2 ore';
-        else if (mins === 60) normalizedName = '1 ora';
-        else if (mins === 30) normalizedName = '30 minuti';
-
-        if (normalizedName === 'Giornata Intera') {
-          // Logica specifica per giornata intera (solo se si può iniziare entro le 08:30)
-          if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) {
-            durations.add(normalizedName);
-          }
-        } else {
-          checkAndAddDuration(normalizedName, mins);
+    Object.keys(this.durationMap).forEach(name => {
+      const mins = this.durationMap[name];
+      if (name === 'Giornata Intera') {
+        if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) {
+          durations.add(name);
         }
+      } else {
+        checkAndAddDuration(name, mins);
       }
     });
-
-    // Fallback di sicurezza se non è stato trovato nulla
-    if (durations.size === 0 && !isToday) {
-      durations.add('Giornata Intera');
-      durations.add('4 ore');
-      durations.add('1 ora');
-    }
 
     return Array.from(durations).sort((a, b) => {
       const minsA = this.getDurationInMinutes(a);
       const minsB = this.getDurationInMinutes(b);
-      return minsB - minsA; // Ordina per durata decrescente
+      return minsB - minsA;
     });
   }
 
-
   ngOnInit(): void {
     this.checkUserRole();
-    this.loadPrenotazioneInfo();
+    this.loadBookingInfo();
     this.setupFormSubscriptions();
-    this.loadMiePrenotazioni(); // Carica tutte le prenotazioni all'avvio
+    this.loadMyReservations();
   }
 
   ngOnDestroy(): void {
@@ -221,707 +176,240 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadPrenotazioneInfo(): void {
+  private loadBookingInfo(): void {
     this.state.isLoading = true;
-    this.prenotazionePosizioneService.getPrenotazioneInfo()
+    this.presentationService.getRoomsWithWorkspaces()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.state.stanze = response.stanze;
-          this.coseDurata = response.coseDurata;
-          this.tipiStanza = [...new Set(response.stanze.map((s: StanzaWithPostazioni) => s.tipo_stanza))].filter(Boolean) as string[];
+          this.state.rooms = response.rooms;
+          this.roomTypes = [...new Set(response.rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
           this.state.isLoading = false;
         },
-        error: (err: Error) => {
-          console.error('Errore nel caricamento delle informazioni:', err);
-          this.state.errorMessage = "Errore nel caricamento delle informazioni";
-          this.showErrorToast(
-            'Errore di Caricamento', 
-            'Impossibile caricare le informazioni delle stanze o dell\'orario. Ricarica la pagina per riprovare.'
-          );
+        error: (err: any) => {
+          console.error('Error loading information:', err);
+          this.state.errorMessage = "Error loading information";
+          this.toastService.showError('Loading Error', 'Unable to load room information.');
           this.state.isLoading = false;
         }
       });
   }
 
   private setupFormSubscriptions(): void {
-    // Log iniziale del form
-    console.log('Stato iniziale del form:', {
-      formValues: this.bookingForm.value,
-      formValid: this.bookingForm.valid,
-      formTouched: this.bookingForm.touched,
-      formDirty: this.bookingForm.dirty
-    });
-
-    // Sottoscrizione a tutti i cambiamenti del form
-    this.bookingForm.valueChanges
+    this.bookingForm.get("roomType")?.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(values => {
-        console.log('Form aggiornato:', {
-          values,
-          valid: this.bookingForm.valid,
-          touched: this.bookingForm.touched,
-          dirty: this.bookingForm.dirty,
-          errors: this.bookingForm.errors,
-          controls: {
-            tipo_stanza: {
-              value: this.bookingForm.get('tipo_stanza')?.value,
-              valid: this.bookingForm.get('tipo_stanza')?.valid,
-              errors: this.bookingForm.get('tipo_stanza')?.errors
-            },
-            slotDuration: {
-              value: this.bookingForm.get('slotDuration')?.value,
-              valid: this.bookingForm.get('slotDuration')?.valid,
-              errors: this.bookingForm.get('slotDuration')?.errors
-            },
-            timeSlot: {
-              value: this.bookingForm.get('timeSlot')?.value,
-              valid: this.bookingForm.get('timeSlot')?.valid,
-              errors: this.bookingForm.get('timeSlot')?.errors
-            },
-            id_postazione: {
-              value: this.bookingForm.get('id_postazione')?.value,
-              valid: this.bookingForm.get('id_postazione')?.valid,
-              errors: this.bookingForm.get('id_postazione')?.errors
-            }
-          }
-        });
-      });
-
-    this.bookingForm.get("tipo_stanza")?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(tipo => {
-        console.log('Tipo stanza cambiato:', tipo);
+      .subscribe(type => {
         this.bookingForm.patchValue({
-          id_stanza: null,
-          id_postazione: "",
+          roomId: null,
+          workspaceId: "",
           slotDuration: "",
           timeSlot: ""
         });
 
-        if (tipo) {
-          console.log('Stanze disponibili:', this.state.stanze);
-          const stanzeFiltrate = this.state.stanze.filter(s => s.tipo_stanza === tipo);
-          console.log('Stanze filtrate per tipo:', stanzeFiltrate);
-
-          // Generate base list of postazioni for this room type
-          const allPostazioni = stanzeFiltrate
-            .flatMap(stanza => {
-              console.log('Elaborazione stanza:', stanza);
-              return stanza.postazioni
-                .filter(p => p.id_postazione !== undefined && p.nomePostazione !== undefined)
-                .map((p: Postazione) => ({
-                  id_postazione: p.id_postazione!,
-                  nomePostazione: p.nomePostazione!,
-                  stanza_id: stanza.id_stanza,
-                  stanza_nome: stanza.nome,
-                  tipo_stanza: stanza.tipo_stanza
-                }));
-            });
+        if (type) {
+          const filteredRooms = this.state.rooms.filter(s => s.roomType === type);
+          const allWorkspaces: WorkspaceWithAvailability[] = filteredRooms
+            .flatMap(room => (room.workspaces || []).map(w => ({
+              ...w,
+              roomId: room.id!,
+              roomName: room.name!,
+              roomType: room.roomType!
+            })));
 
           if (this.isMeetingRoom()) {
-            // Per le MeetingRoom, mostriamo solo una voce per stanza
-            const uniqueStanze = new Map<number, any>();
-            allPostazioni.forEach(p => {
-              if (!uniqueStanze.has(p.stanza_id)) {
-                uniqueStanze.set(p.stanza_id, {
-                  ...p,
-                  nomePostazione: p.stanza_nome // Usiamo il nome della stanza come nome visualizzato
-                });
+            const uniqueRooms = new Map<number, any>();
+            allWorkspaces.forEach(w => {
+              if (!uniqueRooms.has(w.roomId)) {
+                uniqueRooms.set(w.roomId, { ...w, name: w.roomName });
               }
             });
-            this.state.postazioniDisponibili = Array.from(uniqueStanze.values());
+            this.state.availableWorkspaces = Array.from(uniqueRooms.values());
           } else {
-            this.state.postazioniDisponibili = allPostazioni;
+            this.state.availableWorkspaces = allWorkspaces;
           }
-          
-          console.log('Postazioni disponibili aggiornate:', this.state.postazioniDisponibili);
         } else {
-          this.state.postazioniDisponibili = [];
+          this.state.availableWorkspaces = [];
         }
       });
 
     this.bookingForm.get("slotDuration")?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(duration => {
-        console.log('Durata slot cambiata:', duration);
-        this.bookingForm.patchValue({
-          timeSlot: "",
-          id_postazione: ""
-        });
-        
-          // Generate available time slots when duration is selected
-        if (duration && this.state.selectedDates.length > 0) {
-          this.loadAvailableTimeSlotsForDuration(duration);
-          
-          // L'utente dovrà selezionare esplicitamente lo slot (08:00-17:00 oppure 09:00-18:00) anche per la Giornata Intera
-          this.cdr.detectChanges();
+        this.bookingForm.patchValue({ timeSlot: "", workspaceId: "" });
+        if (duration && (this.bookingForm.get('selectedDate')?.value || this.state.selectedDates.length > 0)) {
+          this.generateTimeSlotsForDuration(duration, this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0]);
         } else {
           this.state.availableTimeSlots = [];
-          this.cdr.detectChanges();
         }
       });
 
     this.bookingForm.get("timeSlot")?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(timeSlot => {
-        console.log('Time slot cambiato:', timeSlot);
-        this.bookingForm.patchValue({
-          id_postazione: ""
-        });
-        
-        // When time slot is selected, update postazioni availability
-        if (timeSlot && this.state.selectedDates.length > 0) {
-          this.updatePostazioniAvailability();
-        }
+        this.bookingForm.patchValue({ workspaceId: "" });
+        if (timeSlot) this.updateWorkspacesAvailability();
       });
 
-    this.bookingForm.get("id_postazione")?.valueChanges
+    this.bookingForm.get("workspaceId")?.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(postazioneId => {
-        if (postazioneId) {
-          // Find the selected postazione to get its stanza_id
-          const selectedPostazione = this.state.postazioniDisponibili.find(p => p.id_postazione === Number(postazioneId));
-          if (selectedPostazione) {
-            // Set the associated stanza
-            this.bookingForm.patchValue({
-              id_stanza: selectedPostazione.stanza_id
-            });
-          }
+      .subscribe(workspaceId => {
+        if (workspaceId) {
+          const selectedWorkspace = this.state.availableWorkspaces.find(p => p.id === Number(workspaceId));
+          if (selectedWorkspace) this.bookingForm.patchValue({ roomId: selectedWorkspace.roomId });
         } else {
-          // When postazione is deselected, reset related fields
-          this.bookingForm.patchValue({
-            id_stanza: null
-          }, { emitEvent: false });
+          this.bookingForm.patchValue({ roomId: null }, { emitEvent: false });
         }
       });
-  }
-
-  private loadAvailableTimeSlotsForDuration(duration: string): void {
-    if (!this.state.selectedDates.length) {
-      console.warn('Nessuna data selezionata');
-      return;
-    }
-
-    const selectedDate = this.state.selectedDates[0];
-    
-    // Generate time slots based on duration without postazione dependency
-    this.generateTimeSlotsForDuration(duration, selectedDate);
   }
 
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
     const slots: { startTime: string; endTime: string }[] = [];
     const startHour = 8;
     const endHour = 18;
-    
-    // Map duration to minutes
     const durationMinutes = this.getDurationInMinutes(duration);
-    if (!durationMinutes) {
-      this.state.availableTimeSlots = [];
-      return;
-    }
+    if (!durationMinutes) { this.state.availableTimeSlots = []; return; }
 
-    // Check if today to filter past times
     const today = new Date();
     const isToday = this.isSameDay(date, today);
-    const currentHour = today.getHours();
-    const currentMinute = today.getMinutes();
-    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+    const currentTimeInMinutes = today.getHours() * 60 + today.getMinutes();
 
     if (this.isFullDay(duration)) {
-      // Aggiungi i turni standard da 9 ore per la giornata intera
-      if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) {
-        slots.push({ startTime: '08:00', endTime: '17:00' });
-      }
-      if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) {
-        slots.push({ startTime: '09:00', endTime: '18:00' });
-      }
+      if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '08:00', endTime: '17:00' });
+      if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '09:00', endTime: '18:00' });
     } else {
-      // Generate slots based on duration
-      const step = durationMinutes >= 60 ? 60 : 30; // Step by 1 hour or 30 minutes
-      
+      const step = durationMinutes >= 60 ? 60 : 30;
       for (let hour = startHour; hour < endHour; hour += step / 60) {
         const start = hour;
         const end = hour + durationMinutes / 60;
-        
         if (end > endHour) continue;
-
-        // Check if slot is in the future (for today)
-        if (isToday) {
-          const slotStartInMinutes = start * 60;
-          if (slotStartInMinutes <= (currentTimeInMinutes + 30)) {
-            continue;
-          }
-        }
+        if (isToday && (start * 60) <= (currentTimeInMinutes + 30)) continue;
 
         const startTime = `${Math.floor(start).toString().padStart(2, '0')}:${(start % 1 === 0.5 ? '30' : '00')}`;
         const endTime = `${Math.floor(end).toString().padStart(2, '0')}:${(end % 1 === 0.5 ? '30' : '00')}`;
-        
         slots.push({ startTime, endTime });
       }
     }
-
     this.state.availableTimeSlots = [...slots];
     this.cdr.detectChanges();
-    console.log('Generated time slots for duration:', { duration, slots });
   }
 
-  private updatePostazioniAvailability(): void {
+  private updateWorkspacesAvailability(): void {
     const selectedTimeSlot = this.bookingForm.get('timeSlot')?.value;
-    const selectedDate = this.state.selectedDates[0];
-    const tipoStanza = this.bookingForm.get('tipo_stanza')?.value;
-    
-    if (!selectedTimeSlot || !selectedDate || !tipoStanza) {
-      return;
-    }
+    const selectedDate = this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0];
+    if (!selectedTimeSlot || !selectedDate) return;
 
-    console.log('Updating postazioni availability for:', { selectedTimeSlot, selectedDate, tipoStanza });
-
-    // Parse time slot to get start and end times
     const [startTime, endTime] = selectedTimeSlot.split(' - ');
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
-
-    // Create start and end datetime objects
-    const startDateTime = new Date(selectedDate);
-    startDateTime.setHours(startHour, startMinute, 0, 0);
-    
-    const endDateTime = new Date(selectedDate);
-    endDateTime.setHours(endHour, endMinute, 0, 0);
-
-    // Check availability for each postazione
-    const availabilityChecks = this.state.postazioniDisponibili.map(postazione => 
-      this.prenotazionePosizioneService.getAvailableTimeSlots(selectedDate, postazione.id_postazione)
+    const availabilityChecks = this.state.availableWorkspaces.map(workspace => 
+      this.presentationService.getAvailableTimeSlots(selectedDate, workspace.id!)
         .pipe(
-          map(availableSlots => {
-            // Check if the selected time slot is available for this postazione
-            const isAvailable = availableSlots.some(slot => 
-              slot.startTime === startTime && slot.endTime === endTime
-            );
-            
-            return {
-              ...postazione,
-              isAvailable
-            };
-          }),
-          catchError(error => {
-            console.error(`Error checking availability for postazione ${postazione.id_postazione}:`, error);
-            return of({
-              ...postazione,
-              isAvailable: false
-            });
-          })
+          map(availableSlots => ({
+            ...workspace,
+            isAvailable: availableSlots.some(slot => slot.startTime === startTime && slot.endTime === endTime)
+          })),
+          catchError(() => of({ ...workspace, isAvailable: false }))
         )
     );
 
-    // Execute all availability checks in parallel
     forkJoin(availabilityChecks)
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (postazioniWithAvailability) => {
-          // Sort: available first, then unavailable
-          this.state.postazioniDisponibili = postazioniWithAvailability.sort((a, b) => {
-            if (a.isAvailable && !b.isAvailable) return -1;
-            if (!a.isAvailable && b.isAvailable) return 1;
-            return a.nomePostazione.localeCompare(b.nomePostazione);
-          });
-          
-          console.log('Updated postazioni with availability:', this.state.postazioniDisponibili);
-        },
-        error: (error) => {
-          console.error('Error updating postazioni availability:', error);
-          this.showErrorToast('Errore', 'Errore nel controllo della disponibilità delle postazioni');
-        }
+      .subscribe(workspaces => {
+        this.state.availableWorkspaces = workspaces.sort((a, b) => {
+          if (a.isAvailable && !b.isAvailable) return -1;
+          if (!a.isAvailable && b.isAvailable) return 1;
+          return (a.name || '').localeCompare(b.name || '');
+        });
       });
   }
 
   onDateSelectionChange(dates: Date[]): void {
-    console.log('Date selezionate:', dates);
-    // Only allow one date
     const selected = dates && dates.length > 0 ? [dates[0]] : [];
-    
-    // Update the selected dates immediately for visual feedback
     this.state.selectedDates = [...selected];
-    
-    // Update the selectedDate form control immediately and reset dependent fields
-    this.bookingForm.patchValue({
-      selectedDate: selected.length > 0 ? selected[0] : null,
-      slotDuration: "",
-      timeSlot: "",
-      id_postazione: ""
-    });
-    this.state.availableTimeSlots = [];
-    
-    // Clear postazioni availability when date changes
-    this.state.postazioniDisponibili = this.state.postazioniDisponibili.map(p => ({
-      ...p,
-      isAvailable: undefined
-    }));
+    this.bookingForm.patchValue({ selectedDate: selected[0] });
+    this.state.availableWorkspaces = this.state.availableWorkspaces.map(p => ({ ...p, isAvailable: undefined }));
   }
 
-  onPostazioneSelectedFromPlanimetria(postazioneId: number): void {
-    // Trova la postazione selezionata
-    const selectedPostazione = this.state.postazioniDisponibili.find(p => p.id_postazione === postazioneId);
-    if (!selectedPostazione) return;
-
-    // Aggiorna il form con postazione e stanza
-    this.bookingForm.patchValue({
-      id_postazione: String(postazioneId),
-      id_stanza: selectedPostazione.stanza_id
-    });
-
+  onWorkspaceSelectedFromPlanimetria(workspaceId: number): void {
+    const selectedWorkspace = this.state.availableWorkspaces.find(p => p.id === workspaceId);
+    if (!selectedWorkspace) return;
+    this.bookingForm.patchValue({ workspaceId: String(workspaceId), roomId: selectedWorkspace.roomId });
     this.cdr.detectChanges();
   }
 
-
-  getPostazioneNome(idPostazione: string | null): string {
-    if (!idPostazione) return '';
-    const p = this.state.postazioniDisponibili.find(p => p.id_postazione === Number(idPostazione));
-    return p ? `${p.nomePostazione} - ${p.stanza_nome}` : `Postazione ${idPostazione}`;
+  getWorkspaceName(workspaceId: any): string {
+    if (!workspaceId) return '';
+    const w = this.state.availableWorkspaces.find(p => p.id === Number(workspaceId));
+    return w ? `${w.name} - ${w.roomName}` : `Workspace ${workspaceId}`;
   }
 
-  getSelectedPostazioneId(): number | null {
-    const val = this.bookingForm.get('id_postazione')?.value;
+  getSelectedWorkspaceId(): number | null {
+    const val = this.bookingForm.get('workspaceId')?.value;
     return val ? Number(val) : null;
   }
 
   onSubmit() {
     if (this.bookingForm.valid) {
       const formData = this.bookingForm.value;
-      const selectedDate = formData.selectedDate;
-      const selectedTimeSlot = formData.timeSlot;
-
-
-      if (!selectedTimeSlot) {
-        this.showErrorToast('Selezione Incompleta', 'Seleziona un orario per completare la prenotazione');
-        return;
-      }
-
       this.state.isLoading = true;
       
-      // Show info toast while processing
-      this.showInfoToast('Elaborazione in corso', 'Stiamo creando la tua prenotazione...');
+      const startDateTime = new Date(formData.selectedDate);
+      const endDateTime = new Date(formData.selectedDate);
+      const [start, end] = formData.timeSlot.split(' - ');
+      const [startH, startM] = start.split(':');
+      const [endH, endM] = end.split(':');
 
-      try {
-        // Create start and end dates
-        const startDateTime = new Date(selectedDate);
-        const endDateTime = new Date(selectedDate);
+      startDateTime.setHours(parseInt(startH), parseInt(startM), 0, 0);
+      endDateTime.setHours(parseInt(endH), parseInt(endM), 0, 0);
 
-        // Leggi l'orario effettivo selezionato
-        let startHour, startMinute, endHour, endMinute;
-        const normalizedSlot = selectedTimeSlot.trim();
-        
-        [startHour, startMinute] = normalizedSlot.split(' - ')[0].split(':');
-        [endHour, endMinute] = normalizedSlot.split(' - ')[1].split(':');
+      const reservation = {
+        workspaceId: parseInt(formData.workspaceId),
+        roomId: parseInt(formData.roomId),
+        startDate: this.datePipe.transform(startDateTime, 'yyyy-MM-dd HH:mm:ss')!,
+        endDate: this.datePipe.transform(endDateTime, 'yyyy-MM-dd HH:mm:ss')!,
+        durationName: formData.slotDuration,
+        userId: formData.userId ? parseInt(formData.userId) : undefined
+      };
 
-        startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
-        endDateTime.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
-
-        // Format dates with seconds in local timezone
-        const formatDate = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          const seconds = String(date.getSeconds()).padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        };
-
-        // Log the form data and selected values
-        console.log('Form Data:', {
-          raw: formData,
-          selectedDate,
-          selectedTimeSlot,
-          startDateTime,
-          endDateTime,
-          formattedStart: formatDate(startDateTime),
-          formattedEnd: formatDate(endDateTime)
-        });
-
-        const prenotazione = {
-          id_postazione: parseInt(formData.id_postazione),
-          id_stanza: parseInt(formData.id_stanza),
-          data_inizio: formatDate(startDateTime),
-          data_fine: formatDate(endDateTime)
-        };
-
-        // Validate the prenotazione object
-        if (!prenotazione.id_postazione || !prenotazione.id_stanza) {
-          throw new Error('ID postazione o ID stanza non validi');
+      this.presentationService.createReservation(reservation).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Confirmed', 'Reservation created successfully');
+          this.resetForm();
+          this.loadMyReservations();
+          this.state.isLoading = false;
+        },
+        error: (err) => {
+          this.toastService.showError('Error', err.message || 'Failed to create reservation');
+          this.state.isLoading = false;
         }
-
-        if (!this.isValidDate(startDateTime) || !this.isValidDate(endDateTime)) {
-          throw new Error('Date non valide');
-        }
-
-        console.log('Sending reservation request:', prenotazione);
-
-        // Determine which service method to use based on admin status and user selection
-        const userId = this.bookingForm.get('userId')?.value;
-        const serviceCall = this.isAdmin && userId 
-          ? this.prenotazionePosizioneService.createPrenotazioneAdmin({ ...prenotazione, id_user: parseInt(userId) })
-          : this.prenotazionePosizioneService.createPrenotazione(prenotazione);
-
-        serviceCall.subscribe({
-            next: (response) => {
-              console.log('Prenotazione creata:', response);
-              this.clearAllToasts(); // Clear any existing toasts
-              this.showSuccessToast(
-                'Prenotazione Confermata!', 
-                `La postazione è stata prenotata per ${this.formatDate(selectedDate, 'dd/MM/yyyy')} dalle ${this.isFullDay(selectedTimeSlot) || selectedTimeSlot === '09:00 - 18:00' ? 'Giornata Intera' : selectedTimeSlot}`
-              );
-              
-              // Reset form and reload data
-              this.resetForm();
-              this.loadMiePrenotazioni();
-              
-              // Force reload of available time slots for the current date and postazione
-              const currentPostazioneId = this.bookingForm.get('id_postazione')?.value;
-              if (currentPostazioneId && this.state.selectedDates.length > 0) {
-                console.log('DEBUG: Reloading time slots after booking');
-                // After booking, we need to refresh the postazioni availability
-                this.updatePostazioniAvailability();
-              }
-              
-              this.state.isLoading = false;
-            },
-            error: (error) => {
-              console.error('Errore completo nella creazione della prenotazione:', error);
-              this.clearAllToasts();
-              this.showErrorToast(
-                'Errore di Validazione', 
-                error instanceof Error ? error.message : 'I dati inseriti non sono validi. Controlla i campi e riprova.'
-              );
-              this.state.isLoading = false;
-            }
-          });
-      } catch (error) {
-        console.error('Errore nella preparazione della prenotazione:', error);
-        this.clearAllToasts();
-        this.showErrorToast(
-          'Errore di Validazione', 
-          error instanceof Error ? error.message : 'I dati inseriti non sono validi. Controlla i campi e riprova.'
-        );
-        this.state.isLoading = false;
-      }
-    } else {
-      const errors = [];
-      if (!this.bookingForm.valid) errors.push('Compila tutti i campi richiesti');
-      if (this.state.selectedDates.length === 0) errors.push('Seleziona una data');
-      if (!this.bookingForm.get('timeSlot')?.value) errors.push('Seleziona un orario');
-
-      this.showWarningToast('Campi Mancanti', errors.join(', '));
+      });
     }
   }
-  
 
   private resetForm(): void {
-    this.bookingForm.reset();
+    this.bookingForm.reset({ roomType: "" });
     this.state.selectedDates = [];
     this.state.availableTimeSlots = [];
-    this.state.errorMessage = "";
-    
-    // Ensure tipo_stanza shows the default option instead of being null
-    this.bookingForm.patchValue({
-      tipo_stanza: ""
-    });
-    
-    // Reset user selection for admin
-    if (this.isAdmin) {
-      this.clearUserSearch();
-    }
-  }
-
-  getStanzaName(stanzaId: number | undefined): string {
-    if (!stanzaId) return '';
-    const stanza = this.state.stanze.find(s => s.id_stanza === stanzaId);
-    return stanza ? stanza.nome : '';
+    if (this.isAdmin) this.clearUserSearch();
   }
 
   isFormValid(): boolean {
-    const formControls = this.bookingForm.controls;
-    
-    // Check individual required fields
-    const hasTipoStanza = !!formControls['tipo_stanza'].value;
-    const hasIdStanza = !!formControls['id_stanza'].value;
-    const hasIdPostazione = !!formControls['id_postazione'].value;
-    const hasSelectedDate = !!formControls['selectedDate'].value || this.state.selectedDates.length > 0;
-    const hasTimeSlot = !!formControls['timeSlot'].value;
-
-    // Debug logging
-    /*console.log('Form Validation State:', {
-      hasTipoStanza,
-      hasIdStanza,
-      hasIdPostazione,
-      hasSelectedDate,
-      hasTimeSlot,
-      formValid: this.bookingForm.valid,
-      formValues: this.bookingForm.value,
-      formErrors: this.bookingForm.errors,
-      timeSlotValue: formControls['timeSlot'].value,
-      selectedDateValue: formControls['selectedDate'].value,
-      selectedDates: this.state.selectedDates
-    });*/
-
-    // Check if all required form controls have values
-    const hasRequiredFields = 
-      hasTipoStanza &&
-      hasIdStanza &&
-      hasIdPostazione &&
-      hasSelectedDate &&
-      hasTimeSlot;
-
-    // Check if the form is valid (this includes required field validation)
-    const formValid = this.bookingForm.valid;
-
-    return hasRequiredFields && formValid;
+    return this.bookingForm.valid;
   }
 
-  private loadAllPrenotazioni(): void {
+  private loadMyReservations(): void {
     this.state.isLoading = true;
-    this.prenotazionePosizioneService.getUserPrenotazioni()
+    this.presentationService.getUserReservations()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (prenotazioni: Prenotazione[]) => {
-          console.log('=== DETTAGLIO PRENOTAZIONI ===');
-          console.log('Numero totale prenotazioni:', prenotazioni.length);
-          
-          // Log dettagliato di ogni prenotazione
-          prenotazioni.forEach((p, index) => {
-            console.group(`Prenotazione #${index + 1}`);
-            console.log('ID:', p.id_prenotazioni);
-            console.log('Data Inizio (raw):', p.data_inizio);
-            console.log('Data Fine (raw):', p.data_fine);
-            console.log('Stato:', p.stato_prenotazione);
-            console.log('Utente:', {
-              id: p.users?.id_user,
-              email: p.users?.email,
-              nome: p.users?.nome,
-              cognome: p.users?.cognome
-            });
-            console.log('Stanza:', {
-              id: p.stanze?.id_stanza,
-              nome: p.stanze?.nome
-            });
-            console.log('Postazione:', {
-              id: p.postazione?.id_postazione,
-              nome: p.postazione?.nomePostazione
-            });
-            console.groupEnd();
-          });
-
-          // Parse e formatta le date
-          this.prenotazioni = prenotazioni.map(p => ({
-            ...p,
-            data_inizio: this.parseDate(p.data_inizio),
-            data_fine: this.parseDate(p.data_fine),
-            stato_prenotazione: p.stato_prenotazione || StatoPrenotazione.Confermata
-          }));
-
-          this.state.isLoading = false;
-          console.log('=== PRENOTAZIONI DOPO PARSING ===');
-          console.log(JSON.stringify(this.prenotazioni, null, 2));
-        },
-        error: (error: Error) => {
-          console.error('Errore nel caricamento delle prenotazioni:', error);
-          this.showErrorToast('Errore', 'Errore nel caricamento delle prenotazioni');
-          this.state.isLoading = false;
-        }
-      });
-  }
-
-  private loadMiePrenotazioni(): void {
-    this.state.isLoading = true;
-    this.prenotazionePosizioneService.getUserPrenotazioni()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (prenotazioni: Prenotazione[]) => {
-          console.group('Prenotazioni Utente');
-          console.log('Raw prenotazioni data:', prenotazioni);
-          
-          // Process the prenotazioni with the new simplified structure
-          this.prenotazioni = prenotazioni.map(p => ({
-            ...p,
-            data_inizio: this.parseDate(p.data_inizio),
-            data_fine: this.parseDate(p.data_fine),
-            stato_prenotazione: p.stato_prenotazione || StatoPrenotazione.Confermata,
-            users: {
-              id_user: p.users?.id_user || 0,
-              nome: p.users?.nome || 'N/A',
-              cognome: p.users?.cognome || 'N/A',
-              email: p.users?.email || 'N/A',
-              enabled: p.users?.enabled || false
-            },
-            postazione: {
-              id_postazione: p.postazione?.id_postazione || 0,
-              nomePostazione: p.postazione?.nomePostazione || 'N/A'
-            },
-            stanze: {
-              id_stanza: p.stanze?.id_stanza || 0,
-              nome: p.stanze?.nome || 'N/A',
-              tipo_stanza: p.stanze?.tipo_stanza || 'N/A'
-            }
-          }));
-
-          console.log('Processed prenotazioni:', this.prenotazioni);
-          console.groupEnd();
-          
-          // Apply sorting after loading data
+        next: (reservations) => {
+          this.reservations = reservations;
           this.applySorting();
           this.state.isLoading = false;
         },
-        error: (error: Error) => {
-          console.error('Errore nel caricamento delle prenotazioni:', error);
-          this.showErrorToast('Errore', 'Errore nel caricamento delle prenotazioni');
+        error: () => {
+          this.toastService.showError('Error', 'Unable to load reservations');
           this.state.isLoading = false;
         }
       });
-  }
-
-  private parseDate(dateValue: any): Date {
-    if (dateValue instanceof Date) {
-      console.log('Value is already a Date');
-      return dateValue;
-    }
-    
-    if (Array.isArray(dateValue)) {
-      try {
-        // Array format: [year, month, day, hours, minutes, seconds, nanoseconds]
-        const [year, month, day, hours, minutes] = dateValue;
-        const date = new Date(year, month - 1, day, hours, minutes);
-        return date;
-      } catch (error) {
-        console.error('Error parsing array date:', error);
-        return new Date();
-      }
-    }
-    
-    if (typeof dateValue === 'string') {
-      // Se è una stringa che contiene virgole, è un array di numeri
-      if (dateValue.includes(',')) {
-        try {
-          const [year, month, day, hours, minutes] = dateValue.split(',').map(Number);
-          const date = new Date(year, month - 1, day, hours, minutes);
-          return date;
-        } catch (error) {
-          console.error('Error parsing comma-separated date:', error);
-          return new Date();
-        }
-      }
-      
-      // Prova a parsare la stringa ISO
-      try {
-        const date = new Date(dateValue);
-        return date;
-      } catch (error) {
-        console.error('Error parsing ISO date:', error);
-        return new Date();
-      }
-    }
-    
-    console.error('Unknown date format:', dateValue);
-    return new Date();
   }
 
   isValidDate(date: any): boolean {
@@ -929,166 +417,33 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   formatDate(date: any, format: string): string {
-    if (!this.isValidDate(date)) {
-      return 'Data non valida';
-    }
-    return this.datePipe.transform(date, format, '', 'it-IT') || 'Data non valida';
+    const d = new Date(date);
+    return this.isValidDate(d) ? this.datePipe.transform(d, format)! : 'Invalid Date';
   }
 
-  getFormattedTimeRange(dataInizio: any, dataFine: any): string {
-    if (!this.isValidDate(dataInizio) || !this.isValidDate(dataFine)) {
-      return 'Orario non valido';
-    }
-    const inizio = this.formatDate(dataInizio, 'HH:mm');
-    const fine = this.formatDate(dataFine, 'HH:mm');
-    return `${inizio} - ${fine}`;
+  getFormattedTimeRange(start: any, end: any): string {
+    return `${this.formatDate(start, 'HH:mm')} - ${this.formatDate(end, 'HH:mm')}`;
   }
 
-  isValidTimeSlot(): boolean {
-    const selectedTimeSlot = this.bookingForm.get('timeSlot')?.value;
-    return !!(selectedTimeSlot && selectedTimeSlot.start && selectedTimeSlot.end);
-  }
-
-  deletePrenotazione(prenotazione: Prenotazione): void {
-    if (!prenotazione.id_prenotazioni) {
-      this.showErrorToast('Errore di Sistema', 'Impossibile identificare la prenotazione da eliminare');
-      return;
-    }
-
-    // Conferma eliminazione
-    const dataFormatted = this.formatDate(prenotazione.data_inizio, 'dd/MM/yyyy');
-    const orarioFormatted = this.getFormattedTimeRange(prenotazione.data_inizio, prenotazione.data_fine);
-    const postazioneNome = prenotazione.postazione?.nomePostazione || 'N/A';
-    
-    const conferma = confirm(
-      `Sei sicuro di voler eliminare la prenotazione?\n\n` +
-      `📅 Data: ${dataFormatted}\n` +
-      `⏰ Orario: ${orarioFormatted}\n` +
-      `💺 Postazione: ${postazioneNome}\n\n` +
-      `Questa azione non può essere annullata.`
-    );
-
-    if (!conferma) {
-      return;
-    }
-
-    this.state.isLoading = true;
-    
-    // Show info toast while processing
-    this.showInfoToast('Eliminazione in corso', 'Stiamo cancellando la tua prenotazione...');
-
-    this.prenotazionePosizioneService.deletePrenotazione(prenotazione.id_prenotazioni)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.clearAllToasts(); // Clear any existing toasts
-          this.showSuccessToast(
-            'Prenotazione Cancellata', 
-            `La prenotazione del ${dataFormatted} è stata eliminata con successo`
-          );
-          
-          // Rimuovi la prenotazione dalla lista locale
-          this.prenotazioni = this.prenotazioni.filter(p => p.id_prenotazioni !== prenotazione.id_prenotazioni);
-          // Update sorted array as well
-          this.applySorting();
-          this.state.isLoading = false;
-        },
-        error: (error: Error) => {
-          console.error('Errore nell\'eliminazione della prenotazione:', error);
-          this.clearAllToasts();
-          
-          let errorMessage = 'Si è verificato un errore durante l\'eliminazione della prenotazione';
-          if (error.message?.includes('non trovata')) {
-            errorMessage = 'La prenotazione non è più disponibile o è già stata eliminata';
-          } else if (error.message?.includes('non autorizzato')) {
-            errorMessage = 'Non hai i permessi per eliminare questa prenotazione';
-          }
-          
-          this.showErrorToast('Errore nell\'Eliminazione', errorMessage);
-          this.state.isLoading = false;
-        }
-      });
-  }
-
-  // Toast utility methods for consistent styling and messaging
-  private showSuccessToast(summary: string, detail: string): void {
-    this.toastService.showSuccess(summary, detail);
-  }
-
-  private showErrorToast(summary: string, detail: string): void {
-    this.toastService.showError(summary, detail);
-  }
-
-  private showInfoToast(summary: string, detail: string): void {
-    this.toastService.showInfo(summary, detail);
-  }
-
-  private showWarningToast(summary: string, detail: string): void {
-    this.toastService.showWarning(summary, detail);
-  }
-
-  // Clear all existing toasts
-  private clearAllToasts(): void {
-    this.toastService.clear();
-  }
-
-  // Sorting methods
   sortTable(column: string): void {
-    if (this.sortColumn === column) {
-      // Toggle direction if same column
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      // New column, default to ascending
-      this.sortColumn = column;
-      this.sortDirection = 'asc';
-    }
+    if (this.sortColumn === column) this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    else { this.sortColumn = column; this.sortDirection = 'asc'; }
     this.applySorting();
   }
 
   private applySorting(): void {
-    this.sortedPrenotazioni = this.filteredPrenotazioni.sort((a, b) => {
-      let valueA: any;
-      let valueB: any;
-
-      switch (this.sortColumn) {
-        case 'data_inizio':
-          valueA = new Date(a.data_inizio);
-          valueB = new Date(b.data_inizio);
-          break;
-        case 'utente':
-          valueA = `${a.users?.nome || ''} ${a.users?.cognome || ''}`.trim().toLowerCase();
-          valueB = `${b.users?.nome || ''} ${b.users?.cognome || ''}`.trim().toLowerCase();
-          break;
-        case 'stanza':
-          valueA = (a.stanze?.nome || '').toLowerCase();
-          valueB = (b.stanze?.nome || '').toLowerCase();
-          break;
-        case 'postazione':
-          valueA = (a.postazione?.nomePostazione || '').toLowerCase();
-          valueB = (b.postazione?.nomePostazione || '').toLowerCase();
-          break;
-        case 'stato':
-          valueA = a.stato_prenotazione?.toLowerCase() || '';
-          valueB = b.stato_prenotazione?.toLowerCase() || '';
-          break;
-        default:
-          return 0;
-      }
-
-      if (valueA < valueB) {
-        return this.sortDirection === 'asc' ? -1 : 1;
-      }
-      if (valueA > valueB) {
-        return this.sortDirection === 'asc' ? 1 : -1;
-      }
+    this.sortedReservations = this.filteredReservations.sort((a, b) => {
+      let vA: any, vB: any;
+      if (this.sortColumn === 'startDate') { vA = new Date(a.startDate); vB = new Date(b.startDate); }
+      else { vA = (a as any)[this.sortColumn]; vB = (b as any)[this.sortColumn]; }
+      if (vA < vB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (vA > vB) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }
 
   getSortIcon(column: string): string {
-    if (this.sortColumn !== column) {
-      return 'fas fa-sort text-gray-400';
-    }
+    if (this.sortColumn !== column) return 'fas fa-sort text-gray-400';
     return this.sortDirection === 'asc' ? 'fas fa-sort-up text-blue-600' : 'fas fa-sort-down text-blue-600';
   }
 
@@ -1096,334 +451,133 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     return this.sortColumn === column;
   }
 
-  setStatusFilter(status: 'tutti' | 'attive' | 'scadute' | 'annullate'): void {
+  setStatusFilter(status: any): void {
     this.statusFilter = status;
     this.applySorting();
   }
 
-  getStatusFilterCount(status: 'tutti' | 'attive' | 'scadute' | 'annullate'): number {
-    if (status === 'tutti') {
-      return this.prenotazioni.length;
-    }
-    
+  getStatusFilterCount(status: string): number {
     const now = new Date();
-    return this.prenotazioni.filter(prenotazione => {
-      switch (status) {
-        case 'attive':
-          return prenotazione.stato_prenotazione === 'Confermata' && 
-                 prenotazione.data_fine > now;
-        case 'scadute':
-          return prenotazione.data_fine <= now;
-        case 'annullate':
-          return prenotazione.stato_prenotazione === 'Annullata';
-        default:
-          return true;
-      }
+    if (status === 'tutti') return this.reservations.length;
+    return this.reservations.filter(r => {
+      const isPast = new Date(r.endDate) <= now;
+      if (status === 'attive') return r.status === ReservationStatus.CONFIRMED && !isPast;
+      if (status === 'scadute') return isPast;
+      if (status === 'annullate') return r.status === ReservationStatus.DENIED;
+      return true;
     }).length;
   }
 
-  get filteredPrenotazioni(): Prenotazione[] {
-    if (this.statusFilter === 'tutti') {
-      return this.prenotazioni;
-    }
-    
+  get filteredReservations(): Reservation[] {
     const now = new Date();
-    return this.prenotazioni.filter(prenotazione => {
-      switch (this.statusFilter) {
-        case 'attive':
-          return prenotazione.stato_prenotazione === 'Confermata' && 
-                 prenotazione.data_fine > now;
-        case 'scadute':
-          return prenotazione.data_fine <= now;
-        case 'annullate':
-          return prenotazione.stato_prenotazione === 'Annullata';
-        default:
-          return true;
-      }
+    if (this.statusFilter === 'tutti') return this.reservations;
+    return this.reservations.filter(r => {
+      const isPast = new Date(r.endDate) <= now;
+      if (this.statusFilter === 'attive') return r.status === ReservationStatus.CONFIRMED && !isPast;
+      if (this.statusFilter === 'scadute') return isPast;
+      if (this.statusFilter === 'annullate') return r.status === ReservationStatus.DENIED;
+      return true;
     });
   }
 
-  // Add this new method to handle month changes
-  onMonthChange(date: Date): void {
-    console.log('Month changed to:', date);
-    // No need to check availability anymore since we removed that functionality
+  onMonthChange(date: Date): void { console.log('Month changed:', date); }
+
+  private isSameDay(d1: Date, d2: Date): boolean {
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
   }
 
-  private isSameDay(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() === date2.getFullYear() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
-  }
-
-  isTodaySelected(): boolean {
-    if (this.state.selectedDates.length === 0) return false;
-    const selectedDate = this.state.selectedDates[0];
-    const today = new Date();
-    return this.isSameDay(selectedDate, today);
-  }
-
-  // Admin and user management methods
   private checkUserRole(): void {
-    this.authService.getIdentity()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
-        
-        if (this.isAdmin) {
-          this.loadUsers();
-          // For admin, userId is optional (if empty, defaults to themselves)
-          this.bookingForm.get('userId')?.clearValidators();
-        } else {
-          // For regular users, userId is not needed and should be hidden
-          this.bookingForm.get('userId')?.clearValidators();
-        }
-        this.bookingForm.get('userId')?.updateValueAndValidity();
-      });
+    this.authService.getIdentity().pipe(takeUntil(this.destroy$)).subscribe(user => {
+      this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+      if (this.isAdmin) this.loadUsers();
+    });
   }
 
   private loadUsers(): void {
-    if (!this.isAdmin) return;
-    
-    this.adminService.getAllUsers()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (users: User[]) => {
-          this.users = users;
-          this.filteredUsers = users;
-        },
-        error: (error: Error) => {
-          console.error('Errore nel caricamento degli utenti:', error);
-          this.showErrorToast('Errore', 'Impossibile caricare la lista degli utenti');
-        }
-      });
+    this.adminService.getAllUsers().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (users) => { this.users = users; this.filteredUsers = users; },
+      error: () => this.toastService.showError('Error', 'Unable to load users')
+    });
   }
 
   filterUsers(): void {
-    if (!this.userSearchTerm) {
-      this.filteredUsers = this.users;
-      // Clear selected user when search is empty
-      this.selectedUser = null;
-      this.bookingForm.patchValue({ userId: '' });
-      return;
-    }
-
-    const searchTerm = this.userSearchTerm.toLowerCase();
-    this.filteredUsers = this.users.filter(user =>
-      user.nome?.toLowerCase().includes(searchTerm) ||
-      user.cognome?.toLowerCase().includes(searchTerm) ||
-      user.email?.toLowerCase().includes(searchTerm) ||
-      `${user.nome} ${user.cognome}`.toLowerCase().includes(searchTerm)
-    );
+    if (!this.userSearchTerm) { this.filteredUsers = this.users; this.selectedUser = null; this.bookingForm.patchValue({ userId: null }); return; }
+    const term = this.userSearchTerm.toLowerCase();
+    this.filteredUsers = this.users.filter(u => `${u.name} ${u.lastName} ${u.email}`.toLowerCase().includes(term));
   }
 
   selectUser(user: User): void {
     this.selectedUser = user;
-    this.userSearchTerm = `${user.nome} ${user.cognome}`;
-    this.bookingForm.patchValue({ userId: user.id_user });
+    this.userSearchTerm = `${user.name} ${user.lastName}`;
+    this.bookingForm.patchValue({ userId: user.id });
     this.showUserDropdown = false;
   }
 
   clearUserSearch(): void {
     this.userSearchTerm = '';
     this.selectedUser = null;
-    this.bookingForm.patchValue({ userId: '' });
+    this.bookingForm.patchValue({ userId: null });
     this.filteredUsers = this.users;
     this.showUserDropdown = false;
   }
 
-  onUserInputBlur(): void {
-    // Delay hiding dropdown to allow click events
-    setTimeout(() => {
-      this.showUserDropdown = false;
-    }, 200);
+  onUserInputBlur(): void { setTimeout(() => this.showUserDropdown = false, 200); }
+
+  trackByUser(index: number, user: User): any { return user.id; }
+
+  canCancelPrenotazione(r: Reservation): boolean {
+    return r.status !== ReservationStatus.DENIED && new Date(r.endDate) > new Date();
   }
 
-  trackByUser(index: number, user: User): any {
-    return user.id_user;
-  }
-
-  // Helper methods for cancel functionality
-  canCancelPrenotazione(prenotazione: Prenotazione): boolean {
-    // Cannot cancel if already canceled
-    if (prenotazione.stato_prenotazione === StatoPrenotazione.Annullata) {
-      return false;
-    }
-    
-    // Cannot cancel if the booking has already passed
-    const now = new Date();
-    const bookingDate = new Date(prenotazione.data_fine);
-    if (bookingDate <= now) {
-      return false;
-    }
-    
-    return true;
-  }
-
-  cancelPrenotazione(prenotazione: Prenotazione): void {
-    if (!prenotazione.id_prenotazioni) {
-      this.showErrorToast('Errore di Sistema', 'Impossibile identificare la prenotazione da annullare');
-      return;
-    }
-
-    if (!this.canCancelPrenotazione(prenotazione)) {
-      this.showWarningToast('Azione non consentita', 'Questa prenotazione non può essere annullata');
-      return;
-    }
-
-    this.prenotazioniToCancel = [prenotazione];
+  cancelPrenotazione(r: Reservation): void {
+    this.reservationsToCancel = [r];
     this.showBulkCancelConfirmation = true;
-    document.body.classList.add('overflow-hidden');
   }
 
   bulkCancelPrenotazioni(): void {
-    if (this.selectedPrenotazioni.size === 0) {
-      this.showWarningToast('Nessuna Selezione', 'Seleziona almeno una prenotazione da annullare');
-      return;
-    }
-
-    const selectedIds = Array.from(this.selectedPrenotazioni);
-    this.prenotazioniToCancel = this.prenotazioni.filter(p => 
-      p.id_prenotazioni && selectedIds.includes(p.id_prenotazioni)
-    );
-
+    this.reservationsToCancel = this.reservations.filter(r => this.selectedReservations.has(r.id!));
     this.showBulkCancelConfirmation = true;
-    document.body.classList.add('overflow-hidden');
   }
 
   confirmBulkCancel(): void {
-    const count = this.prenotazioniToCancel.length;
+    const requests = this.reservationsToCancel.map(r => this.presentationService.deleteReservation(r.id!));
     this.state.isLoading = true;
-    this.showInfoToast('Annullamento in corso', `Annullando ${count} ${count > 1 ? 'prenotazioni' : 'prenotazione'}...`);
-
-    // Cancel all selected bookings in parallel
-    const cancelRequests = this.prenotazioniToCancel.map(prenotazione =>
-      this.prenotazionePosizioneService.updatePrenotazione(prenotazione.id_prenotazioni!, { 
-        stato_prenotazione: StatoPrenotazione.Annullata 
-      })
-    );
-
-    forkJoin(cancelRequests)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.clearAllToasts();
-          this.showSuccessToast(
-            'Prenotazioni Annullate', 
-            `${count} ${count > 1 ? 'prenotazioni annullate' : 'prenotazione annullata'} con successo`
-          );
-          
-          // Update local bookings list
-          this.prenotazioniToCancel.forEach(prenotazione => {
-            const index = this.prenotazioni.findIndex(p => p.id_prenotazioni === prenotazione.id_prenotazioni);
-            if (index !== -1) {
-              this.prenotazioni[index] = {
-                ...this.prenotazioni[index],
-                stato_prenotazione: StatoPrenotazione.Annullata
-              };
-            }
-          });
-          
-          // Clear selection and update sorted array
-          this.selectedPrenotazioni.clear();
-          this.isSelectAllChecked = false;
-          this.applySorting();
-          this.state.isLoading = false;
-          this.closeBulkCancelConfirmation();
-        },
-        error: (error: Error) => {
-          console.error('Errore nell\'annullamento delle prenotazioni:', error);
-          this.clearAllToasts();
-          this.showErrorToast('Errore nell\'Annullamento', 'Si è verificato un errore durante l\'annullamento delle prenotazioni selezionate');
-          this.state.isLoading = false;
-          this.closeBulkCancelConfirmation();
-        }
-      });
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Success', 'Reservations cancelled');
+        this.loadMyReservations();
+        this.selectedReservations.clear();
+        this.isSelectAllChecked = false;
+        this.closeBulkCancelConfirmation();
+      },
+      error: () => {
+        this.toastService.showError('Error', 'Failed to cancel reservations');
+        this.state.isLoading = false;
+      }
+    });
   }
 
-  closeBulkCancelConfirmation(): void {
-    this.showBulkCancelConfirmation = false;
-    this.prenotazioniToCancel = [];
-    document.body.classList.remove('overflow-hidden');
-  }
+  closeBulkCancelConfirmation(): void { this.showBulkCancelConfirmation = false; this.reservationsToCancel = []; }
 
-  getBulkCancelConfirmationMessage(): string {
-    if (this.prenotazioniToCancel.length === 0) {
-      return 'Nessuna prenotazione selezionata';
-    }
-
-    const count = this.prenotazioniToCancel.length;
-    const message = [
-      `Sei sicuro di voler annullare ${count} ${count > 1 ? 'prenotazioni' : 'prenotazione'}?`,
-      '',
-      'Le seguenti prenotazioni verranno annullate:',
-      ...this.prenotazioniToCancel.map(p => 
-        `• ${this.formatDate(p.data_inizio, 'dd/MM/yyyy')} ` +
-        `${this.getFormattedTimeRange(p.data_inizio, p.data_fine)} - ` +
-        `${p.postazione.nomePostazione || 'N/A'}`
-      ),
-      '',
-      'Questa azione non può essere annullata.'
-    ];
-
-    return message.join('<br>');
-  }
-
-  // Helper methods for template
-  hasAvailablePostazioni(): boolean {
-    return this.state.postazioniDisponibili.some(p => p.isAvailable === true);
-  }
-
-  hasUnavailablePostazioni(): boolean {
-    return this.state.postazioniDisponibili.some(p => p.isAvailable === false);
-  }
-
-  getAvailablePostazioni(): any[] {
-    return this.state.postazioniDisponibili.filter(p => p.isAvailable === true);
-  }
-
-  getUnavailablePostazioni(): any[] {
-    return this.state.postazioniDisponibili.filter(p => p.isAvailable === false);
-  }
-
-  // Bulk selection methods
   toggleSelectAll(): void {
-    if (this.isSelectAllChecked) {
-      this.selectedPrenotazioni.clear();
-    } else {
-      this.prenotazioni
-        .filter(p => this.canCancelPrenotazione(p))
-        .forEach(p => p.id_prenotazioni && this.selectedPrenotazioni.add(p.id_prenotazioni));
-    }
+    if (this.isSelectAllChecked) this.selectedReservations.clear();
+    else this.reservations.filter(r => this.canCancelPrenotazione(r)).forEach(r => this.selectedReservations.add(r.id!));
     this.isSelectAllChecked = !this.isSelectAllChecked;
   }
 
   toggleSelectPrenotazione(id: number): void {
-    if (this.selectedPrenotazioni.has(id)) {
-      this.selectedPrenotazioni.delete(id);
-      this.isSelectAllChecked = false;
-    } else {
-      this.selectedPrenotazioni.add(id);
-      this.isSelectAllChecked = this.selectedPrenotazioni.size === this.prenotazioni.filter(p => this.canCancelPrenotazione(p)).length;
-    }
+    if (this.selectedReservations.has(id)) { this.selectedReservations.delete(id); this.isSelectAllChecked = false; }
+    else { this.selectedReservations.add(id); this.isSelectAllChecked = this.selectedReservations.size === this.reservations.filter(r => this.canCancelPrenotazione(r)).length; }
   }
 
-  isPrenotazioneSelected(prenotazioneId: number): boolean {
-    return this.selectedPrenotazioni.has(prenotazioneId);
-  }
+  isPrenotazioneSelected(id: number): boolean { return this.selectedReservations.has(id); }
 
-  getActivePrenotazioni(): Prenotazione[] {
+  getActivePrenotazioni(): Reservation[] {
     const now = new Date();
-    return this.filteredPrenotazioni.filter(prenotazione => 
-      prenotazione.stato_prenotazione === 'Confermata' && 
-      prenotazione.data_fine > now
-    );
+    return this.reservations.filter(r => r.status === ReservationStatus.CONFIRMED && new Date(r.endDate) > now);
   }
 
-  canShowCheckbox(prenotazione: Prenotazione): boolean {
-    return this.canCancelPrenotazione(prenotazione);
-  }
+  canShowCheckbox(r: Reservation): boolean { return this.canCancelPrenotazione(r); }
 
-  getSelectedCount(): number {
-    return this.selectedPrenotazioni.size;
-  }
+  getSelectedCount(): number { return this.selectedReservations.size; }
 }

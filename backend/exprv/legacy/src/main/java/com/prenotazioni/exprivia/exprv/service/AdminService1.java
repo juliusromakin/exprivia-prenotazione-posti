@@ -68,11 +68,11 @@ public class AdminService1 {
         user.setPassword(passwordEncoder.encode(adminCreateUserDTO.getPassword()));
         user.setCreatedDate(LocalDateTime.now());
         
-        // Se is_active è fornito dall'admin usalo, altrimenti default a true
-        if (adminCreateUserDTO.getIs_active() != null) {
-            user.setIs_active(adminCreateUserDTO.getIs_active());
+        // Se enabled è fornito dall'admin usalo, altrimenti default a true
+        if (adminCreateUserDTO.getEnabled() != null) {
+            user.setEnabled(adminCreateUserDTO.getEnabled());
         } else {
-            user.setIs_active(true);
+            user.setEnabled(true);
         }
 
         user = userRepository.save(user);
@@ -95,7 +95,7 @@ public class AdminService1 {
 
         if (adminUpdateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(adminUpdateDTO.getEmail());
-            if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
+            if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
                 throw new IllegalArgumentException("Email già in uso");
             }
         }

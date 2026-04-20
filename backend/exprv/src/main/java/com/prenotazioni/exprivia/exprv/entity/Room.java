@@ -26,14 +26,15 @@ public class Room {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Integer id_room;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "name")
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "room_type")
-    private RoomType room_type;
+    private RoomType roomType;
 
     @Column(name = "capacity")
     private Integer capacity;
@@ -46,8 +47,8 @@ public class Room {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    @Column(name = "is_active")
-    private Boolean is_active = true;
+    @Column(name = "enabled")
+    private Boolean enabled = true;
 
     @OneToMany(mappedBy = "room")
     @JsonIgnore
@@ -56,20 +57,20 @@ public class Room {
     public Room() {
     }
 
-    public Room(Integer id_room, String name, RoomType room_type, Integer capacity, Boolean is_active) {
-        this.id_room = id_room;
+    public Room(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled) {
+        this.id = id;
         this.name = name;
-        this.room_type = room_type;
+        this.roomType = roomType;
         this.capacity = capacity;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
-    public Integer getId_room() {
-        return id_room;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_room(Integer id_room) {
-        this.id_room = id_room;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -80,12 +81,12 @@ public class Room {
         this.name = name;
     }
 
-    public RoomType getRoom_type() {
-        return room_type;
+    public RoomType getRoomType() {
+        return roomType;
     }
 
-    public void setRoom_type(RoomType room_type) {
-        this.room_type = room_type;
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
 
     public Integer getCapacity() {
@@ -112,12 +113,12 @@ public class Room {
         this.updatedDate = updatedDate;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

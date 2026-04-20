@@ -8,34 +8,35 @@ import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class AdminDTO {
-    private Integer id_user;
+    private Integer id;
     private String name;
     private String lastName;
     private String email;
     private Boolean enabled;
     private Set<String> authorities;
-    private LocalDateTime creatoIl;
-    private LocalDateTime aggiornatoIl;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
     public AdminDTO(User user) {
-        this.id_user = user.getId_user();
+        this.id = user.getId();
         this.name = user.getName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.creatoIl = user.getCreatedDate();
-        this.aggiornatoIl = user.getUpdatedDate();
+        this.enabled = user.getEnabled();
+        this.createdDate = user.getCreatedDate();
+        this.updatedDate = user.getUpdatedDate();
         this.authorities = user.getAuthorities()
                 .stream()
                 .map(Authority::getName)
                 .collect(Collectors.toSet());
     }
 
-    public Integer getId_user() {
-        return id_user;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_user(Integer id_user) {
-        this.id_user = id_user;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -78,19 +79,19 @@ public class AdminDTO {
         this.authorities = authorities;
     }
 
-    public LocalDateTime getCreatoIl() {
-        return creatoIl;
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreatoIl(LocalDateTime creatoIl) {
-        this.creatoIl = creatoIl;
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public LocalDateTime getAggiornatoIl() {
-        return aggiornatoIl;
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
     }
 
-    public void setAggiornatoIl(LocalDateTime aggiornatoIl) {
-        this.aggiornatoIl = aggiornatoIl;
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

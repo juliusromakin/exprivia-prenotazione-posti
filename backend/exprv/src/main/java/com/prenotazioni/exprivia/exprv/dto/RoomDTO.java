@@ -3,29 +3,29 @@ package com.prenotazioni.exprivia.exprv.dto;
 import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 
 public class RoomDTO {
-    private Integer id_room;
+    private Integer id;
     private String name;
-    private RoomType room_type;
+    private RoomType roomType;
     private Integer capacity;
-    private Boolean is_active;
+    private Boolean enabled;
 
     public RoomDTO() {
     }
 
-    public RoomDTO(Integer id_room, String name, RoomType room_type, Integer capacity, Boolean is_active) {
-        this.id_room = id_room;
+    public RoomDTO(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled) {
+        this.id = id;
         this.name = name;
-        this.room_type = room_type;
+        this.roomType = roomType;
         this.capacity = capacity;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
-    public Integer getId_room() {
-        return id_room;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_room(Integer id_room) {
-        this.id_room = id_room;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -36,12 +36,12 @@ public class RoomDTO {
         this.name = name;
     }
 
-    public RoomType getRoom_type() {
-        return room_type;
+    public RoomType getRoomType() {
+        return roomType;
     }
 
-    public void setRoom_type(RoomType room_type) {
-        this.room_type = room_type;
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
 
     public Integer getCapacity() {
@@ -52,12 +52,12 @@ public class RoomDTO {
         this.capacity = capacity;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

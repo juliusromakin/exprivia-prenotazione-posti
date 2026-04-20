@@ -1,12 +1,12 @@
-import { Postazione, User } from '@core/models';
+import { Workspace, User } from '@core/models';
 
 export interface BookingDetail {
   id?: number;
   user: User;
-  postazione: Postazione;
-  data_inizio: string;
-  data_fine: string;
-  stato_prenotazione: string;
+  workspace: Workspace;
+  startDate: string;
+  endDate: string;
+  reservationStatus: string;
 }
 
 export interface TimeSlotBooking {
@@ -20,8 +20,8 @@ export interface UserBooking {
   date: Date;
   startTime: string;
   endTime: string;
-  postazione: string;
-  stato: string;
+  workspace: string;
+  status: string;
 }
 
 export interface DateAvailability {
@@ -31,16 +31,16 @@ export interface DateAvailability {
 }
 
 export interface AvailabilityStatus {
-  level: 'nessuna' | 'bassa' | 'media' | 'alta';
+  level: 'none' | 'low' | 'medium' | 'high';
   text: string;
   description: string;
   dotClass: string;
 }
 
 export interface BookingFormData {
-  tipo_stanza: string;
-  piano: string;
-  id_postazione: string;
-  ora_inizio: string;
-  dipendenti: string[];
+  roomType: string;
+  floor: string;
+  workspaceId: string;
+  startTime: string;
+  employees: string[];
 } 

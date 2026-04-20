@@ -3,8 +3,8 @@ import { AuthService } from "@core/auth/auth.service";
 import { Observable, from } from "rxjs";
 
 export interface RegisterUserData {
-  nome: string;
-  cognome: string;
+  name: string;
+  lastName: string;
   email: string;
   password: string;
 }

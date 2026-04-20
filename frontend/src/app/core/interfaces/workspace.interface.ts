@@ -14,7 +14,7 @@ export interface FloorPlanMarker {
   type: string;
 }
 
-export interface PostazioneSelezionataEvent {
+export interface WorkspaceSelectedEvent {
   id: string;
   status: string;
 }

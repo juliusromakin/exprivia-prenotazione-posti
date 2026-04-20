@@ -7,7 +7,7 @@ import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class UserDTO {
-    private Integer id_user;
+    private Integer id;
     private String name;
     private String lastName;
     private String email;
@@ -17,8 +17,8 @@ public class UserDTO {
 
     }
 
-    public UserDTO(Integer id_user, String name, String lastName, String email, Set<String> authorities) {
-        this.id_user = id_user;
+    public UserDTO(Integer id, String name, String lastName, String email, Set<String> authorities) {
+        this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.email = email;
@@ -26,7 +26,7 @@ public class UserDTO {
     }
 
     public UserDTO(User user) {
-        this.id_user = user.getId_user();
+        this.id = user.getId();
         this.name = user.getName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
@@ -35,12 +35,12 @@ public class UserDTO {
                 .collect(Collectors.toSet());
     }
 
-    public Integer getId_user() {
-        return id_user;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_user(Integer id_user) {
-        this.id_user = id_user;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {

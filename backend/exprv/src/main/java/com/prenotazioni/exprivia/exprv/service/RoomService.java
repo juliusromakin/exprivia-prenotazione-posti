@@ -29,37 +29,37 @@ public class RoomService {
 
     public List<SelectOptionDTO> getRoomOptions() {
         return roomRepository.findAll().stream()
-                .map(room -> new SelectOptionDTO(room.getId_room(), room.getName()))
+                .map(room -> new SelectOptionDTO(room.getId(), room.getName()))
                 .toList();
     }
 
     public RoomDTO findRoomById(Integer id) {
-        return roomMapper.toDTO(roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND)));
+        return roomMapper.toDto(roomRepository.findById(id)
+                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND)));
     }
 
     public RoomDTO createRoom(RoomDTO roomDTO) {
-        return roomMapper.toDTO(roomRepository.save(roomMapper.toEntity(roomDTO)));
+        return roomMapper.toDto(roomRepository.save(roomMapper.toEntity(roomDTO)));
     }
 
     public RoomDTO updateRoom(Integer id, RoomDTO roomDTO) {
         Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND));
         roomMapper.updateRoomFromDto(roomDTO, existingRoom);
         roomRepository.save(existingRoom);
-        return roomMapper.toDTO(existingRoom);
+        return roomMapper.toDto(existingRoom);
     }
 
     public void softDeleteRoom(Integer id) {
         Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
-        existingRoom.setIs_active(false);
+                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND));
+        existingRoom.setEnabled(false);
         roomRepository.save(existingRoom);
     }
 
     public void hardDeleteRoom(Integer id) {
         if (!roomRepository.existsById(id)) {
-            throw new AppException("Stanza con ID " + id + " non trovata", HttpStatus.NOT_FOUND);
+            throw new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
         roomRepository.deleteById(id);
     }

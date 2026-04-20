@@ -28,7 +28,8 @@ public class Workspace {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Integer id_workspace;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "name")
     private String name;
@@ -45,11 +46,11 @@ public class Workspace {
     private LocalDateTime updatedDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "workspace_status")
-    private WorkspaceStatus workspaceStatus;
+    @Column(name = "status")
+    private WorkspaceStatus status;
 
-    @Column(name = "is_active")
-    private Boolean is_active = true;
+    @Column(name = "enabled")
+    private Boolean enabled = true;
 
     @ManyToOne
     @JoinColumn(name = "id_room")
@@ -62,21 +63,21 @@ public class Workspace {
     public Workspace() {
     }
 
-    public Workspace(Integer id_workspace, String name, Integer capacity, WorkspaceStatus workspaceStatus, Room room, Boolean is_active) {
-        this.id_workspace = id_workspace;
+    public Workspace(Integer id, String name, Integer capacity, WorkspaceStatus status, Room room, Boolean enabled) {
+        this.id = id;
         this.name = name;
         this.capacity = capacity;
-        this.workspaceStatus = workspaceStatus;
+        this.status = status;
         this.room = room;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
-    public Integer getId_workspace() {
-        return id_workspace;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_workspace(Integer id_workspace) {
-        this.id_workspace = id_workspace;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -111,12 +112,12 @@ public class Workspace {
         this.updatedDate = updatedDate;
     }
 
-    public WorkspaceStatus getWorkspaceStatus() {
-        return workspaceStatus;
+    public WorkspaceStatus getStatus() {
+        return status;
     }
 
-    public void setWorkspaceStatus(WorkspaceStatus workspaceStatus) {
-        this.workspaceStatus = workspaceStatus;
+    public void setStatus(WorkspaceStatus status) {
+        this.status = status;
     }
 
     public Room getRoom() {
@@ -127,12 +128,12 @@ public class Workspace {
         this.room = room;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

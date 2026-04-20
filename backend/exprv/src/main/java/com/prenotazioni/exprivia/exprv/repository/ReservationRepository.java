@@ -31,13 +31,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.workspace w " +
            "JOIN w.room ro " +
-           "WHERE r.statusReservation != 'DENIED' " +
+           "WHERE r.status != 'DENIED' " +
            "AND (r.startDate < :endTime AND r.endDate > :startTime) " +
            "AND (" +
-           "  w.id_workspace = :workspaceId " +
+           "  w.id = :workspaceId " +
            "  OR " +
-           "  (ro.room_type = 'MEETING_ROOM' " +
-           "   AND ro.id_room = (SELECT w2.room.id_room FROM Workspace w2 WHERE w2.id_workspace = :workspaceId))" +
+           "  (ro.roomType = 'MEETING_ROOM' " +
+           "   AND ro.id = (SELECT w2.room.id FROM Workspace w2 WHERE w2.id = :workspaceId))" +
            ")")
     List<Reservation> findOverlappingBookings(
             @Param("startTime") LocalDateTime startTime,
@@ -47,13 +47,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.workspace w " +
            "JOIN w.room ro " +
-           "WHERE r.statusReservation != 'DENIED' " +
+           "WHERE r.status != 'DENIED' " +
            "AND r.startDate >= :startDate AND r.startDate < :endDate " +
            "AND (" +
-           "  w.id_workspace = :workspaceId " +
+           "  w.id = :workspaceId " +
            "  OR " +
-           "  (ro.room_type = 'MEETING_ROOM' " +
-           "   AND ro.id_room = (SELECT w2.room.id_room FROM Workspace w2 WHERE w2.id_workspace = :workspaceId))" +
+           "  (ro.roomType = 'MEETING_ROOM' " +
+           "   AND ro.id = (SELECT w2.room.id FROM Workspace w2 WHERE w2.id = :workspaceId))" +
            ")")
     List<Reservation> findByWorkspaceAndDateRange(
             @Param("workspaceId") Integer workspaceId,
@@ -66,13 +66,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.workspace w " +
            "JOIN w.room ro " +
-           "WHERE r.statusReservation != 'DENIED' " +
+           "WHERE r.status != 'DENIED' " +
            "AND DATE(r.startDate) = DATE(:giorno) " +
            "AND (" +
-           "  w.id_workspace = :workspaceId " +
+           "  w.id = :workspaceId " +
            "  OR " +
-           "  (ro.room_type = 'MEETING_ROOM' " +
-           "   AND ro.id_room = (SELECT w2.room.id_room FROM Workspace w2 WHERE w2.id_workspace = :workspaceId))" +
+           "  (ro.roomType = 'MEETING_ROOM' " +
+           "   AND ro.id = (SELECT w2.room.id FROM Workspace w2 WHERE w2.id = :workspaceId))" +
            ")")
     List<Reservation> findByStartDateOnDayAndWorkspace(@Param("giorno") LocalDate giorno, @Param("workspaceId") Integer workspaceId);
 }

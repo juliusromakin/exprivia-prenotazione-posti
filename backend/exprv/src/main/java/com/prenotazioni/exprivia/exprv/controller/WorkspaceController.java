@@ -20,7 +20,7 @@ import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.service.WorkspaceService;
 
 @RestController
-@RequestMapping("/api/workspace")
+@RequestMapping("/api/workspaces")
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
@@ -29,9 +29,8 @@ public class WorkspaceController {
         this.workspaceService = workspaceService;
     }
 
-    // Ottieni tutte le postazioni
-    @GetMapping()
-    public List<WorkspaceDTO> getWorkspaces() {
+    @GetMapping
+    public List<WorkspaceDTO> getAllWorkspaces() {
         return workspaceService.findAllWorkspaces();
     }
 
@@ -52,10 +51,10 @@ public class WorkspaceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostazioneByID(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> getWorkspaceById(@PathVariable("id") Integer id) {
         try {
-            WorkspaceDTO newWorkspaceDTO = workspaceService.findWorkspaceById(id);
-            return ResponseEntity.ok(newWorkspaceDTO);
+            WorkspaceDTO workspaceDTO = workspaceService.findWorkspaceById(id);
+            return ResponseEntity.ok(workspaceDTO);
         } catch (AppException e) {
             return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
         } catch (Exception e) {
@@ -63,8 +62,7 @@ public class WorkspaceController {
         }
     }
 
-    // CREA POSTAZIONE
-    @PostMapping("/createWorkspace")
+    @PostMapping
     public ResponseEntity<?> createWorkspace(@RequestBody WorkspaceDTO workspaceDTO) {
         try {
             WorkspaceDTO newWorkspaceDTO = workspaceService.createWorkspace(workspaceDTO);
@@ -76,8 +74,7 @@ public class WorkspaceController {
         }
     }
 
-    // UPDATE POSTAZIONE
-    @PutMapping("/updateWorkspace/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateWorkspace(
             @PathVariable("id") Integer id,
             @RequestBody WorkspaceDTO workspaceDTO) {
@@ -89,9 +86,8 @@ public class WorkspaceController {
         }
     }
 
-    // SOFT Delete
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> softDeleteWorkspace(@PathVariable("id") Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteWorkspace(@PathVariable("id") Integer id) {
         try {
             workspaceService.softDeleteWorkspace(id);
             return ResponseEntity.noContent().build();
@@ -102,8 +98,7 @@ public class WorkspaceController {
         }
     }
 
-    // HARD Delete (Eliminazione definitiva)
-    @DeleteMapping("/hard-delete/{id}")
+    @DeleteMapping("/{id}/hard")
     public ResponseEntity<String> hardDeleteWorkspace(@PathVariable("id") Integer id) {
         try {
             workspaceService.hardDeleteWorkspace(id);

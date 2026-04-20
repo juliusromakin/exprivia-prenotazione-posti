@@ -7,17 +7,17 @@ public class AdminUpdateUserDTO {
     private String lastName;
     private String email;
     private Set<String> authorities;
-    private Boolean is_active;
+    private Boolean enabled;
 
     public AdminUpdateUserDTO() {
     }
 
-    public AdminUpdateUserDTO(String name, String lastName, String email, Set<String> authorities, Boolean is_active) {
+    public AdminUpdateUserDTO(String name, String lastName, String email, Set<String> authorities, Boolean enabled) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.authorities = authorities;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
     public String getName() {
@@ -52,11 +52,11 @@ public class AdminUpdateUserDTO {
         this.authorities = authorities;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

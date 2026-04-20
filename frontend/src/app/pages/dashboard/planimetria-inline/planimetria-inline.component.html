@@ -1,24 +1,24 @@
 <div class="planimetria-inline-wrapper">
 
-  <!-- Header: legenda + controlli zoom -->
+  <!-- Header: legend + zoom controls -->
   <div class="planimetria-toolbar">
-    <!-- Legenda -->
+    <!-- Legend -->
     <div class="planimetria-legend">
       <div class="legend-item">
         <div class="legend-dot available"></div>
-        <span>Disponibile</span>
+        <span>Available</span>
       </div>
       <div class="legend-item">
         <div class="legend-dot unavailable"></div>
-        <span>Non disponibile</span>
+        <span>Unavailable</span>
       </div>
       <div class="legend-item">
         <div class="legend-dot selected"></div>
-        <span>Selezionata</span>
+        <span>Selected</span>
       </div>
     </div>
 
-    <!-- Controlli zoom -->
+    <!-- Zoom controls -->
     <div class="zoom-controls">
       <button type="button" class="zoom-btn" (click)="zoomIn()" title="Zoom in">
         <i class="fas fa-search-plus"></i>
@@ -27,19 +27,19 @@
       <button type="button" class="zoom-btn" (click)="zoomOut()" [disabled]="scale <= 1" title="Zoom out">
         <i class="fas fa-search-minus"></i>
       </button>
-      <button type="button" class="zoom-btn reset" (click)="resetZoom()" *ngIf="isZoomed" title="Reimposta">
+      <button type="button" class="zoom-btn reset" (click)="resetZoom()" *ngIf="isZoomed" title="Reset Zoom">
         <i class="fas fa-compress-arrows-alt"></i>
       </button>
     </div>
   </div>
 
-  <!-- Messaggio se non ci sono postazioni da mostrare -->
+  <!-- Message if no workspaces to show -->
   <div *ngIf="markers.length === 0" class="no-markers-msg">
     <i class="fas fa-info-circle mr-2"></i>
-    Seleziona tipo di stanza, data e orario per vedere le postazioni disponibili sulla planimetria.
+    Select room type, date and time to see available workspaces on the map.
   </div>
 
-  <!-- Viewport con overflow hidden, riceve la rotella -->
+  <!-- Viewport -->
   <div #mapViewport
        class="planimetria-viewport"
        [class.dragging]="isDragging"
@@ -50,12 +50,12 @@
        (touchmove)="onTouchMove($event)"
        (touchend)="onTouchEnd()">
 
-    <!-- Layer trasformabile -->
+    <!-- Transformable Layer -->
     <div class="planimetria-transform-layer" [style.transform]="transformStyle">
 
-      <!-- Planimetria con marker -->
+      <!-- Planimetria with markers -->
       <div class="planimetria-container">
-        <img src="Planimetria.png" alt="Planimetria ufficio" class="planimetria-img" draggable="false">
+        <img src="Planimetria.png" alt="Office Plan" class="planimetria-img" draggable="false">
 
         <div *ngFor="let marker of markers"
              class="floor-plan-marker"
@@ -65,7 +65,7 @@
              [style.left.%]="marker.x"
              [style.top.%]="marker.y"
              [style.transform]="'scale(' + (1 / scale) + ')'"
-             (click)="selezionaMarker(marker, $event)">
+             (click)="selectMarker(marker, $event)">
           <span class="marker-label">{{ marker.label }}</span>
           <div class="marker-tooltip">
             <span class="tooltip-name">{{ getTooltipLine1(marker.tooltip) }}</span>
@@ -73,7 +73,7 @@
             <span class="tooltip-status"
                   [class.available]="marker.available"
                   [class.unavailable]="!marker.available">
-              {{ marker.available ? 'Disponibile — clicca per selezionare' : 'Non disponibile' }}
+              {{ marker.available ? 'Available — click to select' : 'Unavailable' }}
             </span>
           </div>
         </div>
@@ -82,9 +82,9 @@
     </div>
   </div>
 
-  <!-- Hint pan quando zoomato -->
+  <!-- Hint pan when zoomed -->
   <div *ngIf="isZoomed" class="pan-hint">
-    <i class="fas fa-hand-paper mr-1"></i> Trascina per spostarti
+    <i class="fas fa-hand-paper mr-1"></i> Drag to move
   </div>
 
 </div>

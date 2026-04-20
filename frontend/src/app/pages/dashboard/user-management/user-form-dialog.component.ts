@@ -27,8 +27,8 @@ export interface DialogData {
           <!-- Header -->
           <div class="px-6 py-4 bg-blue-50 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900 flex items-center">
-              <i class="fas fa-user-plus text-blue-600 mr-2" *ngIf="!data.user.id_user"></i>
-              <i class="fas fa-user-edit text-blue-600 mr-2" *ngIf="data.user.id_user"></i>
+              <i class="fas fa-user-plus text-blue-600 mr-2" *ngIf="!data.user.id"></i>
+              <i class="fas fa-user-edit text-blue-600 mr-2" *ngIf="data.user.id"></i>
               {{ data.title }}
             </h3>
           </div>
@@ -37,29 +37,29 @@ export interface DialogData {
           <div class="px-6 py-4 max-h-96 overflow-y-auto">
             <div class="space-y-4">
               
-              <!-- Nome -->
+              <!-- Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                 <input type="text" 
-                       formControlName="nome" 
-                       placeholder="Inserisci il nome"
+                       formControlName="name" 
+                       placeholder="Enter first name"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <div *ngIf="userForm.get('nome')?.invalid && userForm.get('nome')?.touched" 
+                <div *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  Il nome è obbligatorio
+                  First name is required
                 </div>
               </div>
 
-              <!-- Cognome -->
+              <!-- Last Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cognome</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                 <input type="text" 
-                       formControlName="cognome" 
-                       placeholder="Inserisci il cognome"
+                       formControlName="lastName" 
+                       placeholder="Enter last name"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <div *ngIf="userForm.get('cognome')?.invalid && userForm.get('cognome')?.touched" 
+                <div *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  Il cognome è obbligatorio
+                  Last name is required
                 </div>
               </div>
 
@@ -68,41 +68,41 @@ export interface DialogData {
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" 
                        formControlName="email" 
-                       placeholder="Inserisci l'email"
+                       placeholder="Enter email address"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  <span *ngIf="userForm.get('email')?.errors?.['required']">L'email è obbligatoria</span>
-                  <span *ngIf="userForm.get('email')?.errors?.['email']">Inserisci un indirizzo email valido</span>
+                  <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required</span>
+                  <span *ngIf="userForm.get('email')?.errors?.['email']">Enter a valid email address</span>
                 </div>
               </div>
 
-              <!-- Password (solo per nuovi utenti) -->
-              <div *ngIf="!data.user.id_user">
+              <!-- Password (new users only) -->
+              <div *ngIf="!data.user.id">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input type="password" 
                        formControlName="password" 
-                       placeholder="Inserisci la password"
+                       placeholder="Enter password"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  <span *ngIf="userForm.get('password')?.errors?.['required']">La password è obbligatoria</span>
-                  <span *ngIf="userForm.get('password')?.errors?.['minlength']">La password deve essere di almeno 6 caratteri</span>
+                  <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required</span>
+                  <span *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
                 </div>
               </div>
 
-              <!-- Ruolo -->
+              <!-- Role -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Ruolo</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select formControlName="authorities" 
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="">Seleziona ruolo</option>
-                  <option value="ROLE_USER">Dipendente</option>
-                  <option value="ROLE_ADMIN">Amministratore</option>
+                  <option value="">Select role</option>
+                  <option value="ROLE_USER">Employee</option>
+                  <option value="ROLE_ADMIN">Administrator</option>
                 </select>
                 <div *ngIf="userForm.get('authorities')?.invalid && userForm.get('authorities')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  Il ruolo è obbligatorio
+                  Role is required
                 </div>
               </div>
 
@@ -120,7 +120,7 @@ export interface DialogData {
                     (click)="onCancel()"
                     [disabled]="isLoading"
                     class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
-              Annulla
+              Cancel
             </button>
             <button type="submit" 
                     [disabled]="isLoading || userForm.invalid"
@@ -128,13 +128,26 @@ export interface DialogData {
               <span *ngIf="isLoading" class="mr-2">
                 <i class="fas fa-spinner fa-spin"></i>
               </span>
-              {{ isLoading ? (data.user.id_user ? 'Salvataggio...' : 'Creazione...') : (data.user.id_user ? 'Salva' : 'Crea') }}
+              {{ isLoading ? (data.user.id ? 'Saving...' : 'Creating...') : (data.user.id ? 'Save' : 'Create') }}
             </button>
           </div>
         </form>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+    }
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+    }
+  `]
 })
 export class UserFormDialogComponent implements OnInit {
   @Input() data: DialogData = { title: '', user: {} };
@@ -147,8 +160,8 @@ export class UserFormDialogComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required],
+      name: ['', Validators.required],
+      lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
       authorities: ['ROLE_USER', Validators.required]
@@ -158,15 +171,15 @@ export class UserFormDialogComponent implements OnInit {
   ngOnInit(): void {
     if (this.data && this.data.user) {
       this.userForm.patchValue({
-        nome: this.data.user.nome || '',
-        cognome: this.data.user.cognome || '',
+        name: this.data.user.name || '',
+        lastName: this.data.user.lastName || '',
         email: this.data.user.email || '',
         authorities: this.data.user.authorities?.[0] || 'ROLE_USER'
       });
 
       // Set password validation based on whether it's a new user or edit
       const passwordControl = this.userForm.get('password');
-      if (!this.data.user.id_user) {
+      if (!this.data.user.id) {
         passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
       } else {
         passwordControl?.clearValidators();
@@ -199,7 +212,7 @@ export class UserFormDialogComponent implements OnInit {
 
       this.submitted.emit(userData);
     } else {
-      this.errorMessage = 'Compila tutti i campi richiesti';
+      this.errorMessage = 'Please fill all required fields';
       Object.keys(this.userForm.controls).forEach(key => {
         this.userForm.get(key)?.markAsTouched();
       });
@@ -209,4 +222,4 @@ export class UserFormDialogComponent implements OnInit {
   onCancel(): void {
     this.cancelled.emit();
   }
-} 
+}

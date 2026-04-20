@@ -10,14 +10,12 @@ import {
 } from "@angular/forms"
 import { Router, RouterModule } from "@angular/router"
 import { Subject } from "rxjs"
-import { takeUntil, catchError, finalize, timeout } from "rxjs/operators"
+import { takeUntil, catchError, finalize } from "rxjs/operators"
 import { throwError } from "rxjs"
 import { authAnimations } from "../../shared/animations/auth.animations"
 import { AuthService } from "../../core/auth/auth.service"
 import { UserService } from "../../core/services/user.service"
 import type { User } from "../../core/models"
-import { FooterComponent } from "../../layout/footer/footer.component";
-import { DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-update-user",
@@ -57,8 +55,8 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
     private router: Router,
   ) {
     this.userForm = this.fb.group({
-      nome: ["", [Validators.required, Validators.minLength(2)]],
-      cognome: ["", [Validators.required, Validators.minLength(2)]],
+      name: ["", [Validators.required, Validators.minLength(2)]],
+      lastName: ["", [Validators.required, Validators.minLength(2)]],
       email: ["", [Validators.required, Validators.email]],
       currentPassword: [""],
       newPassword: [
@@ -104,19 +102,19 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
           if (user) {
             this.currentUser = user
             this.userForm.patchValue({
-              nome: user.nome,
-              cognome: user.cognome,
+              name: user.name,
+              lastName: user.lastName,
               email: user.email,
             })
-            console.log('Utente caricato correttamente:', user.nome, user.cognome)
+            console.log('User loaded successfully:', user.name, user.lastName)
           } else {
-            this.errorMessage = 'Errore nel caricamento dei dati utente'
-            console.warn('Utente non trovato')
+            this.errorMessage = 'Error loading user data'
+            console.warn('User not found')
           }
         },
         error: (error) => {
-          console.error('Errore nel caricamento dei dati utente:', error)
-          this.errorMessage = 'Errore nel caricamento dei dati utente'
+          console.error('Error loading user data:', error)
+          this.errorMessage = 'Error loading user data'
           this.isLoading = false // Backup safety
         }
       })
@@ -140,10 +138,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   get passwordStrengthText(): string {
     const strength = this.passwordStrength
     if (strength === 0) return ''
-    if (strength === 1) return 'Molto debole'
-    if (strength === 2) return 'Debole'
-    if (strength === 3) return 'Buona'
-    return 'Forte'
+    if (strength === 1) return 'Very weak'
+    if (strength === 2) return 'Weak'
+    if (strength === 3) return 'Good'
+    return 'Strong'
   }
 
   // Get password strength color
@@ -190,13 +188,13 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   }
 
   // Getters for field validation
-  get nomeInvalid() {
-    const control = this.userForm.get("nome")
+  get nameInvalid() {
+    const control = this.userForm.get("name")
     return control && control.invalid && (control.dirty || control.touched)
   }
 
-  get cognomeInvalid() {
-    const control = this.userForm.get("cognome")
+  get lastNameInvalid() {
+    const control = this.userForm.get("lastName")
     return control && control.invalid && (control.dirty || control.touched)
   }
 
@@ -221,24 +219,24 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   }
 
   // Error message getters
-  getNomeErrorMessage(): string {
-    const control = this.userForm.get("nome")
+  getNameErrorMessage(): string {
+    const control = this.userForm.get("name")
     if (control?.hasError("required")) {
-      return "Il nome è obbligatorio"
+      return "First name is required"
     }
     if (control?.hasError("minlength")) {
-      return "Il nome deve contenere almeno 2 caratteri"
+      return "First name must contain at least 2 characters"
     }
     return ""
   }
 
-  getCognomeErrorMessage(): string {
-    const control = this.userForm.get("cognome")
+  getLastNameErrorMessage(): string {
+    const control = this.userForm.get("lastName")
     if (control?.hasError("required")) {
-      return "Il cognome è obbligatorio"
+      return "Last name is required"
     }
     if (control?.hasError("minlength")) {
-      return "Il cognome deve contenere almeno 2 caratteri"
+      return "Last name must contain at least 2 characters"
     }
     return ""
   }
@@ -246,10 +244,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getEmailErrorMessage(): string {
     const control = this.userForm.get("email")
     if (control?.hasError("required")) {
-      return "L'email è obbligatoria"
+      return "Email is required"
     }
     if (control?.hasError("email")) {
-      return "Inserisci un indirizzo email valido"
+      return "Enter a valid email address"
     }
     return ""
   }
@@ -257,7 +255,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getCurrentPasswordErrorMessage(): string {
     const control = this.userForm.get("currentPassword")
     if (control?.hasError("required")) {
-      return "La password attuale è richiesta per modificare la password"
+      return "Current password is required to change password"
     }
     return ""
   }
@@ -265,13 +263,13 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getNewPasswordErrorMessage(): string {
     const control = this.userForm.get("newPassword")
     if (control?.hasError("required")) {
-      return "La nuova password è obbligatoria"
+      return "New password is required"
     }
     if (control?.hasError("minlength")) {
-      return "La password deve contenere almeno 6 caratteri"
+      return "Password must contain at least 6 characters"
     }
     if (control?.hasError("pattern")) {
-      return "La password deve contenere almeno una maiuscola, una minuscola e un numero"
+      return "Password must contain at least one uppercase, one lowercase and one number"
     }
     return ""
   }
@@ -279,10 +277,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getConfirmPasswordErrorMessage(): string {
     const control = this.userForm.get("confirmPassword")
     if (control?.hasError("required")) {
-      return "Conferma la nuova password"
+      return "Confirm your new password"
     }
     if (control?.hasError("passwordMismatch")) {
-      return "Le password non corrispondono"
+      return "Passwords do not match"
     }
     return ""
   }
@@ -298,8 +296,8 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
 
     const formValue = this.userForm.value
     const updateData: any = {
-      nome: formValue.nome,
-      cognome: formValue.cognome,
+      name: formValue.name,
+      lastName: formValue.lastName,
       email: formValue.email,
     }
 
@@ -310,28 +308,26 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
     }
 
     // Use current user ID for the update
-    if (!this.currentUser?.id_user) {
-      this.errorMessage = "Errore: dati utente non disponibili"
+    if (!this.currentUser?.id) {
+      this.errorMessage = "Error: user data not available"
       this.isLoading = false
       return
     }
 
-    console.log(updateData);
-
     this.userService
-      .updateUser(this.currentUser.id_user, updateData)
+      .updateUser(this.currentUser.id, updateData)
       .pipe(
         takeUntil(this.destroy$),
         catchError((error) => {
           console.error("Update error:", error)
           if (error.status === 400) {
-            this.errorMessage = "Dati non validi. Controlla i campi inseriti."
+            this.errorMessage = "Invalid data. Please check the entered fields."
           } else if (error.status === 401) {
-            this.errorMessage = "Password attuale non corretta."
+            this.errorMessage = "Current password is incorrect."
           } else if (error.status === 409) {
-            this.errorMessage = "L'email inserita è già in uso."
+            this.errorMessage = "The entered email is already in use."
           } else {
-            this.errorMessage = "Errore durante l'aggiornamento del profilo. Riprova più tardi."
+            this.errorMessage = "Error during profile update. Please try again later."
           }
           return throwError(() => error)
         }),
@@ -343,78 +339,46 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
         next: (updatedUser: any) => {
           this.updateSuccess = true
           this.currentUser = updatedUser
-          
-          // Clear password fields after successful update
           this.userForm.patchValue({
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
           })
-          
-          // Update the auth service with new user data
           this.authService.authenticate(updatedUser)
-          
-          // Auto-hide success message after 5 seconds
           setTimeout(() => {
             this.updateSuccess = false
           }, 5000)
-        },
-        error: () => {
-          // Error already handled in catchError
-        },
+        }
       })
   }
 
-  // Force reset all states (for debugging)
-  forceReset(): void {
-    console.log('Force reset called - before:', { isLoading: this.isLoading, currentUser: !!this.currentUser })
-    this.isLoading = false
-    this.updateSuccess = false
-    this.errorMessage = null
-    console.log('Force reset called - after:', { isLoading: this.isLoading, currentUser: !!this.currentUser })
-  }
-
   resetForm(): void {
-    console.log('Reset form called - before:', { isLoading: this.isLoading, currentUser: !!this.currentUser })
-    
     if (this.currentUser) {
       this.userForm.patchValue({
-        nome: this.currentUser.nome,
-        cognome: this.currentUser.cognome,
+        name: this.currentUser.name,
+        lastName: this.currentUser.lastName,
         email: this.currentUser.email,
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       })
     }
-    
-    // Reset password requirements
     this.passwordRequirements = {
       minLength: false,
       hasUppercase: false,
       hasLowercase: false,
       hasNumber: false
     }
-    
-    // Reset component state
     this.errorMessage = null
     this.updateSuccess = false
     this.isLoading = false
-    
-    // Reset form validation state
     this.userForm.markAsUntouched()
     this.userForm.markAsPristine()
-    
-    // Reset specific field errors
     Object.keys(this.userForm.controls).forEach(key => {
-      const control = this.userForm.get(key)
-      control?.setErrors(null)
+      this.userForm.get(key)?.setErrors(null)
     })
-    
-    console.log('Reset form called - after:', { isLoading: this.isLoading, currentUser: !!this.currentUser })
   }
 
-  // Delete account methods
   openDeleteConfirmation(): void {
     this.showDeleteConfirmation = true;
     document.body.classList.add('overflow-hidden');
@@ -442,25 +406,21 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          // Clear all auth data before navigation
           localStorage.removeItem('jwt_token');
           sessionStorage.clear();
           this.authService.logout();
-          
-          // Navigate after a small delay to ensure cleanup is complete
           setTimeout(() => {
             this.router.navigate(['/accedi']);
           }, 100);
         },
         error: (error: unknown) => {
-          console.error('Errore durante l\'eliminazione dell\'account:', error);
-          this.errorMessage = 'Si è verificato un errore durante l\'eliminazione dell\'account. Riprova più tardi.';
+          console.error('Error during account deletion:', error);
+          this.errorMessage = 'An error occurred during account deletion. Please try again later.';
         }
       });
   }
 
   ngOnDestroy(): void {
-    // Make sure to remove the overflow-hidden class when component is destroyed
     document.body.classList.remove('overflow-hidden');
     this.destroy$.next();
     this.destroy$.complete();

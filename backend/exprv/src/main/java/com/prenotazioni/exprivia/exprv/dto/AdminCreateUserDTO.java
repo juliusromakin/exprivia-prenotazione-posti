@@ -9,19 +9,19 @@ public class AdminCreateUserDTO {
     private String email;
     private String password;
     private Set<String> authorities;
-    private Boolean is_active;
+    private Boolean enabled;
 
     public AdminCreateUserDTO() {
     }
 
     public AdminCreateUserDTO(String name, String lastName, String email, String password, Set<String> authorities,
-            Boolean is_active) {
+            Boolean enabled) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
-        this.is_active = is_active;
+        this.enabled = enabled;
     }
 
     public String getName() {
@@ -64,11 +64,11 @@ public class AdminCreateUserDTO {
         this.authorities = authorities;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

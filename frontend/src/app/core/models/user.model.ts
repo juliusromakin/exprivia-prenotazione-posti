@@ -1,11 +1,19 @@
 export interface User {
-    id_user: number;
-    nome: string;
-    cognome: string;
+    id?: number;
+    username?: string;
+    name: string;
+    lastName: string;
     email: string;
     password?: string;
     enabled: boolean;
     authorities: string[];
-    creatoIl?: string;
-    aggiornatoIl?: string;
-} 
+    createdDate?: string | Date;
+    updatedDate?: string | Date;
+}
+
+export interface UserRegistration {
+    name: string;
+    lastName: string;
+    email: string;
+    password?: string;
+}

@@ -12,6 +12,6 @@ import com.prenotazioni.exprivia.exprv.entity.Workspace;
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Integer> {
 
-    @Query("SELECT w FROM Workspace w WHERE w.room.id_room = :roomId")
+    @Query("SELECT w FROM Workspace w WHERE w.room.id = :roomId")
     List<Workspace> findByRoomId(@Param("roomId") Integer roomId);
 }

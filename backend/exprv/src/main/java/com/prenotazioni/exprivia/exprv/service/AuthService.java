@@ -150,7 +150,7 @@ public class AuthService {
 
         // Impostiamo noi i dati sensibili in sicurezza!
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-        user.setIs_active(false); // L'utente non è attivo finché non verifica l'email!
+        user.setEnabled(false); // L'utente non è attivo finché non verifica l'email!
 
         Authority userAuthority = authorityRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new AppException("Ruolo ROLE_USER non trovato nel sistema",
@@ -192,7 +192,7 @@ public class AuthService {
         }
         
         User user = token.getUser();
-        user.setIs_active(true);
+        user.setEnabled(true);
         userRepository.save(user);
         
         verificationTokenRepository.delete(token);

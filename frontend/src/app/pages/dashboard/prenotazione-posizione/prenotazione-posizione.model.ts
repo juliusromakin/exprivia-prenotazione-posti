@@ -1,42 +1,37 @@
-import { User, Postazione, Stanza, StatoPrenotazione, Prenotazione } from '@core/models';
-import { StanzaWithPostazioni } from '@core/models/stanza.model';
-import { PostazioneWithStanza } from '@core/models/postazione.model';
-import { CosaDurata } from '@core/models/cosa-durata.model';
-import { TimeSlot } from '@core/models/prenotazione.model';
+import { User, Workspace, Room, ReservationStatus, Reservation } from '@core/models';
 
-export interface PrenotazionePosizione extends Omit<Prenotazione, 'users'> {
-    users: Required<User>;
-    postazione: Required<Postazione>;
-    stanze: Required<Stanza>;
-    stato_prenotazione: StatoPrenotazione;
-    data_inizio: string;
-    data_fine: string;
+export interface ReservationWithDetails extends Omit<Reservation, 'userSummary'> {
+    user: Required<User>;
+    workspace: Required<Workspace>;
+    room: Required<Room>;
+    status: ReservationStatus;
+    startDate: string;
+    endDate: string;
 }
 
 export interface BookingFormData {
-    tipo_stanza: string;
-    id_stanza: number;
-    id_postazione: number;
+    roomType: string;
+    roomId: number;
+    workspaceId: number;
     timeSlot: string;
     selectedDate: Date;
-    note?: string;
+    slotDuration: string;
+    userId?: number;
 }
 
 export interface BookingState {
-    stanze: StanzaWithPostazioni[];
-    postazioniDisponibili: PostazioneDisponibile[];
+    rooms: Room[];
+    availableWorkspaces: WorkspaceWithAvailability[];
     selectedDates: Date[];
-    availableTimeSlots: TimeSlot[];
+    availableTimeSlots: any[];
     isLoading: boolean;
     errorMessage: string;
 }
 
-export interface PostazioneDisponibile {
-    id_postazione: number;
-    nomePostazione: string;
-    stanza_id: number;
-    stanza_nome: string;
-    tipo_stanza: string;
+export interface WorkspaceWithAvailability extends Workspace {
+    roomId: number;
+    roomName: string;
+    roomType: string;
     isAvailable?: boolean;
 }
 
@@ -45,10 +40,11 @@ export interface BookingValidationError {
     message: string;
 }
 
-export interface PrenotazioneRequest {
-    id_stanza: number;
-    id_postazione: number;
-    data_inizio: string;
-    data_fine: string;
-    cosa_durata?: string | null;
+export interface ReservationRequest {
+    roomId: number;
+    workspaceId: number;
+    startDate: string;
+    endDate: string;
+    durationName?: string | null;
+    userId?: number;
 }

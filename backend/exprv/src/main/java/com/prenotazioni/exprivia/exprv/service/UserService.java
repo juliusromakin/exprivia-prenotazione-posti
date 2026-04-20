@@ -99,7 +99,7 @@ public class UserService {
         // Check for duplicate email
         if (updateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(updateDTO.getEmail());
-            if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId_user().equals(id)) {
+            if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
                 throw new AppException("Email already in use", HttpStatus.BAD_REQUEST);
             }
         }

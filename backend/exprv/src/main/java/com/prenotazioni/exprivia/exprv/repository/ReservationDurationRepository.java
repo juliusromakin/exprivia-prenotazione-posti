@@ -15,12 +15,12 @@ public interface ReservationDurationRepository extends JpaRepository<Reservation
     Optional<ReservationDuration> findByName(String name);
     boolean existsByName(String name);
 
-    @Query("SELECT rd FROM ReservationDuration rd JOIN rd.reservations r WHERE r.id_reservation = :reservationId")
+    @Query("SELECT rd FROM ReservationDuration rd JOIN rd.reservations r WHERE r.id = :reservationId")
     List<ReservationDuration> findByReservationId(@Param("reservationId") Integer reservationId);
 
     @Query("SELECT rd FROM ReservationDuration rd WHERE rd.name LIKE %:searchTerm%")
     List<ReservationDuration> searchByName(@Param("searchTerm") String searchTerm);
 
-    @Query("SELECT COUNT(rd) FROM ReservationDuration rd JOIN rd.reservations r WHERE r.id_reservation = :reservationId")
+    @Query("SELECT COUNT(rd) FROM ReservationDuration rd JOIN rd.reservations r WHERE r.id = :reservationId")
     long countByReservationId(@Param("reservationId") Integer reservationId);
 }

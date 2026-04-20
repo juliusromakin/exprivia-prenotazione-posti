@@ -1,20 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { AxiosService } from './axios.service';
-
-export interface User {
-  id_user: number;
-  nome: string;
-  cognome: string;
-  email: string;
-  role?: string;
-}
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private baseUrl = '/api/utenti';
+  private baseUrl = '/api/user';
 
   constructor(private axiosService: AxiosService) {}
 
@@ -23,14 +16,14 @@ export class UserService {
   }
 
   updateUser(id: number, updates: Partial<User>): Observable<User> {
-    return from(this.axiosService.put<User>(`${this.baseUrl}/aggiorna/${id}`, updates));
+    return from(this.axiosService.put<User>(`${this.baseUrl}/${id}`, updates));
   }
 
   deleteUser(id: number): Observable<void> {
-    return from(this.axiosService.delete<void>(`${this.baseUrl}/elimina/${id}`));
+    return from(this.axiosService.delete<void>(`/api/admin/users/${id}`));
   }
 
   deleteOwnAccount(): Observable<void> {
-    return from(this.axiosService.delete<void>(`${this.baseUrl}/elimina-account`));
+    return from(this.axiosService.delete<void>(`${this.baseUrl}/personal`));
   }
 }

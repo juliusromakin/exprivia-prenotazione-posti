@@ -1,198 +1,84 @@
 import { Injectable } from '@angular/core';
-import { Observable, from, forkJoin, throwError } from 'rxjs';
+import { Observable, from, forkJoin, throwError, of } from 'rxjs';
 import { map, switchMap, tap, catchError } from 'rxjs/operators';
 import { AxiosService } from '@core/services/axios.service';
-import { PrenotazioneRequest, Prenotazione, TimeSlot } from '@core/models/prenotazione.model';
-import { StanzaWithPostazioni } from '@core/models/stanza.model';
-import { StanzaService } from '@core/services/stanza.service';
-import { PostazioneService } from '@core/services/postazione.service';
-import { CosaDurataService } from '@core/services/cosa-durata.service';
-import { PrenotazioneService } from '@core/services/prenotazione.service';
-import { PostazioneWithStanza } from '@/app/core/models';
-import { CosaDurata } from '@core/models/cosa-durata.model';
+import { Reservation, ReservationStatus, TimeSlot, Room, Workspace, RoomWithWorkspaces } from '@core/models';
+import { RoomService } from '@core/services/room.service';
+import { WorkspaceService } from '@core/services/workspace.service';
+import { ReservationService } from '@core/services/reservation.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrenotazionePosizioneService {
-    private readonly ORARI_LAVORATIVI = {
-        INIZIO: 8,
-        FINE: 18
+    private readonly WORKING_HOURS = {
+        START: 8,
+        END: 18
     };
 
-
   constructor(
-    private axiosService: AxiosService,
-    private stanzaService: StanzaService,
-    private postazioneService: PostazioneService,
-    private cosaDurataService: CosaDurataService,
-    private prenotazioneService: PrenotazioneService
+    private roomService: RoomService,
+    private workspaceService: WorkspaceService,
+    private reservationService: ReservationService
   ) {}
 
   /**
-   * Recupera tutte le stanze con le relative postazioni
+   * Retrieves all rooms with their workspaces
    */
-  getStanzeWithPostazioni(): Observable<{stanze: StanzaWithPostazioni[]}> {
-    return this.stanzaService.getStanzeWithPostazioni().pipe(
-      map(stanze => ({ stanze }))
+  getRoomsWithWorkspaces(): Observable<{rooms: RoomWithWorkspaces[]}> {
+    return this.roomService.getAllRooms().pipe(
+      map(rooms => ({ rooms: rooms as RoomWithWorkspaces[] }))
     );
   }
 
-    getUserPrenotazioni(): Observable<Prenotazione[]> {
-        return this.prenotazioneService.getMiePrenotazioni();
+    getUserReservations(): Observable<Reservation[]> {
+        return this.reservationService.getReservations();
     }
 
-    getPostazioniByStanza(stanzaId: number, stanze: StanzaWithPostazioni[]): PostazioneWithStanza[] {
-        const stanza = stanze.find(s => s.id_stanza === stanzaId);
-        if (!stanza) return [];
+    getWorkspacesByRoom(roomId: number, rooms: RoomWithWorkspaces[]): any[] {
+        const room = rooms.find(r => r.id === roomId);
+        if (!room) return [];
 
-        return stanza.postazioni
-            .filter(p => p.id_postazione && p.nomePostazione)
-            .map(p => ({
-                id_postazione: p.id_postazione!,
-                nomePostazione: p.nomePostazione!,
-                stanza_id: stanzaId,
-                stanza_nome: stanza.nome,
-                tipo_stanza: stanza.tipo_stanza
+        return (room.workspaces || [])
+            .filter(w => w.id && w.name)
+            .map(w => ({
+                id: w.id!,
+                name: w.name!,
+                roomId: roomId,
+                roomName: room.name,
+                roomType: room.roomType
             }));
     }
 
-    getAvailableTimeSlots(date: Date, postazioneId: number): Observable<TimeSlot[]> {
-        // Format date in local timezone
+    getAvailableTimeSlots(date: Date, workspaceId: number): Observable<TimeSlot[]> {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
 
-        console.log('DEBUG: Request parameters:', {
-            formattedDate,
-            postazioneId,
-            originalDate: date,
-            dateISOString: date.toISOString(),
-            dateLocaleString: date.toLocaleString(),
-            year,
-            month,
-            day
-        });
-
-        return this.prenotazioneService.getPrenotazioniByDayAndPostazione(formattedDate, postazioneId).pipe(
-            map((prenotazioni: Prenotazione[]) => {
-                console.log('Raw prenotazioni from backend:', JSON.stringify(prenotazioni, null, 2));
-                
-                if (!prenotazioni || prenotazioni.length === 0) {
-                    console.log('No prenotazioni found, returning all available slots');
+        return this.reservationService.getReservationsByDayAndWorkspace(formattedDate, workspaceId).pipe(
+            map((reservations: Reservation[]) => {
+                if (!reservations || reservations.length === 0) {
                     return this.generateTimeSlots([]);
                 }
 
-                // Filtra le prenotazioni escludendo quelle annullate
-                const activePrenotazioni = prenotazioni.filter((p: Prenotazione) => 
-                    p.stato_prenotazione !== 'Annullata'
+                // Filter out cancelled reservations
+                const activeReservations = reservations.filter((r: Reservation) => 
+                    r.status !== ReservationStatus.DENIED
                 );
                 
-                console.log('Active prenotazioni (excluding cancelled):', {
-                    total: prenotazioni.length,
-                    active: activePrenotazioni.length,
-                    cancelled: prenotazioni.length - activePrenotazioni.length
-                });
-
-                if (activePrenotazioni.length === 0) {
-                    console.log('No active prenotazioni found, returning all available slots');
+                if (activeReservations.length === 0) {
                     return this.generateTimeSlots([]);
                 }
 
-                const occupiedSlots = activePrenotazioni.map((p: Prenotazione) => {
-                    console.log('Processing prenotazione:', {
-                        id: p.id_prenotazioni,
-                        raw_data_inizio: p.data_inizio,
-                        raw_data_fine: p.data_fine
-                    });
-
-                    // Parse start date
-                    let startDate;
-                    if (typeof p.data_inizio === 'string') {
-                        // Try different date formats
-                        const dateStr = p.data_inizio.replace(' ', 'T');
-                        startDate = new Date(dateStr);
-                        
-                        // If invalid, try parsing as array
-                        if (isNaN(startDate.getTime())) {
-                            const parts = dateStr.split(/[-T:]/);
-                            if (parts.length >= 5) {
-                                startDate = new Date(
-                                    parseInt(parts[0]), // year
-                                    parseInt(parts[1]) - 1, // month (0-based)
-                                    parseInt(parts[2]), // day
-                                    parseInt(parts[3]), // hours
-                                    parseInt(parts[4]) // minutes
-                                );
-                            }
-                        }
-                    } else if (Array.isArray(p.data_inizio)) {
-                        // Handle array format [year, month, day, hours, minutes]
-                        startDate = new Date(
-                            p.data_inizio[0],
-                            p.data_inizio[1] - 1,
-                            p.data_inizio[2],
-                            p.data_inizio[3] || 0,
-                            p.data_inizio[4] || 0
-                        );
-                    } else {
-                        startDate = new Date(p.data_inizio);
-                    }
-
-                    // Parse end date
-                    let endDate;
-                    if (typeof p.data_fine === 'string') {
-                        // Try different date formats
-                        const dateStr = p.data_fine.replace(' ', 'T');
-                        endDate = new Date(dateStr);
-                        
-                        // If invalid, try parsing as array
-                        if (isNaN(endDate.getTime())) {
-                            const parts = dateStr.split(/[-T:]/);
-                            if (parts.length >= 5) {
-                                endDate = new Date(
-                                    parseInt(parts[0]), // year
-                                    parseInt(parts[1]) - 1, // month (0-based)
-                                    parseInt(parts[2]), // day
-                                    parseInt(parts[3]), // hours
-                                    parseInt(parts[4]) // minutes
-                                );
-                            }
-                        }
-                    } else if (Array.isArray(p.data_fine)) {
-                        // Handle array format [year, month, day, hours, minutes]
-                        endDate = new Date(
-                            p.data_fine[0],
-                            p.data_fine[1] - 1,
-                            p.data_fine[2],
-                            p.data_fine[3] || 0,
-                            p.data_fine[4] || 0
-                        );
-                    } else {
-                        endDate = new Date(p.data_fine);
-                    }
-
-                    console.log('Parsed dates:', {
-                        startDate,
-                        endDate,
-                        startDateValid: !isNaN(startDate.getTime()),
-                        endDateValid: !isNaN(endDate.getTime())
-                    });
+                const occupiedSlots = activeReservations.map((r: Reservation) => {
+                    let startDate = new Date(r.startDate as string);
+                    let endDate = new Date(r.endDate as string);
 
                     const startHour = startDate.getHours();
                     const endHour = endDate.getHours();
 
-                    console.log('Extracted hours:', {
-                        startHour,
-                        endHour,
-                        isValidStart: !isNaN(startHour),
-                        isValidEnd: !isNaN(endHour)
-                    });
-
-                    // Validate hours before returning
                     if (isNaN(startHour) || isNaN(endHour)) {
-                        console.warn('Invalid hours detected, skipping slot');
                         return null;
                     }
 
@@ -200,50 +86,33 @@ export class PrenotazionePosizioneService {
                         start: startHour,
                         end: endHour
                     };
-                }).filter(slot => slot !== null); // Remove any null slots
+                }).filter(slot => slot !== null) as { start: number; end: number }[];
 
-                console.log('Processed occupied slots:', occupiedSlots);
                 return this.generateTimeSlots(occupiedSlots);
             })
         );
     }
 
-
-    getFileByPrenotazioni(date:Date): Observable<Blob> {
-        return this.prenotazioneService.exportPrenotazioniDaily(date);
-    }
-
-
-
-    createPrenotazione(request: PrenotazioneRequest): Observable<void> {
-        return this.prenotazioneService.createPrenotazione(request).pipe(
-            map(() => void 0)
-        );
-    }
-
-    createPrenotazioneAdmin(request: PrenotazioneRequest & { id_user: number }): Observable<void> {
-        return this.prenotazioneService.createPrenotazioneAdmin(request).pipe(
+    createReservation(reservation: any): Observable<void> {
+        return this.reservationService.createReservation(reservation).pipe(
             map(() => void 0)
         );
     }
 
     private generateTimeSlots(occupiedSlots: { start: number; end: number }[]): TimeSlot[] {
         const slots: TimeSlot[] = [];
-        const startHour = this.ORARI_LAVORATIVI.INIZIO;
-        const endHour = this.ORARI_LAVORATIVI.FINE;
-        const slotDurations = [600, 240, 120, 60, 30]; // minutes: 600=10h (full day), 240=4h, 120=2h, 60=1h, 30=30min
+        const startHour = this.WORKING_HOURS.START;
+        const endHour = this.WORKING_HOURS.END;
+        const slotDurations = [600, 240, 120, 60, 30]; // minutes
 
-        // Helper to check overlap
         function overlaps(startA: number, endA: number, startB: number, endB: number) {
             return startA < endB && endA > startB;
         }
 
-        // Helper to convert hours to minutes for easier comparison
         function toMinutes(hour: number): number {
             return Math.floor(hour) * 60 + (hour % 1 === 0.5 ? 30 : 0);
         }
 
-        // Helper to check if a slot is available
         function isSlotAvailable(slotStart: number, slotEnd: number): boolean {
             const slotStartMinutes = toMinutes(slotStart);
             const slotEndMinutes = toMinutes(slotEnd);
@@ -255,20 +124,17 @@ export class PrenotazionePosizioneService {
             });
         }
 
-        // Generate all possible slots
         for (const duration of slotDurations) {
-            const step = duration >= 60 ? 60 : 30; // step by 1h or 30min
+            const step = duration >= 60 ? 60 : 30;
             for (let hour = startHour; hour < endHour; hour += step / 60) {
                 const start = hour;
                 const end = hour + duration / 60;
                 if (end > endHour) continue;
 
-                // Check if this slot is available
                 if (isSlotAvailable(start, end)) {
                     const startTime = `${Math.floor(start).toString().padStart(2, '0')}:${(start % 1 === 0.5 ? '30' : '00')}`;
                     const endTime = `${Math.floor(end).toString().padStart(2, '0')}:${(end % 1 === 0.5 ? '30' : '00')}`;
                     
-                    // Only add if not already present
                     if (!slots.some(s => s.startTime === startTime && s.endTime === endTime)) {
                         slots.push({ startTime, endTime });
                     }
@@ -276,23 +142,20 @@ export class PrenotazionePosizioneService {
             }
         }
 
-        // Special handling for full day slots (9 ore)
-        const fullDay8Available = isSlotAvailable(8, 17);
-        if (fullDay8Available) {
+        // Standard full day handling
+        if (isSlotAvailable(8, 17)) {
             const slot = { startTime: '08:00', endTime: '17:00' };
             if (!slots.some(s => s.startTime === slot.startTime && s.endTime === slot.endTime)) {
                 slots.push(slot);
             }
         }
-        const fullDay9Available = isSlotAvailable(9, 18);
-        if (fullDay9Available) {
+        if (isSlotAvailable(9, 18)) {
             const fullDaySlot = { startTime: '09:00', endTime: '18:00' };
             if (!slots.some(s => s.startTime === fullDaySlot.startTime && s.endTime === fullDaySlot.endTime)) {
                 slots.push(fullDaySlot);
             }
         }
 
-        // Sort slots by duration (longest first) and then by start time
         slots.sort((a, b) => {
             const durA = toMinutes(parseInt(b.endTime.split(':')[0]) + parseInt(b.endTime.split(':')[1]) / 60) - 
                         toMinutes(parseInt(a.startTime.split(':')[0]) + parseInt(a.startTime.split(':')[1]) / 60);
@@ -302,45 +165,17 @@ export class PrenotazionePosizioneService {
             return a.startTime.localeCompare(b.startTime);
         });
 
-        console.log('Generated slots:', {
-            total: slots.length,
-            slots,
-            occupiedSlots
-        });
-
         return slots;
     }
 
-    isValidTimeSlot(time: string): boolean {
-        const hour = parseInt(time.split(':')[0]);
-        return hour >= this.ORARI_LAVORATIVI.INIZIO && hour < this.ORARI_LAVORATIVI.FINE;
-    }
-
-    isWorkingDay(date: Date): boolean {
-        const day = date.getDay();
-        return day !== 0 && day !== 6; // 0 = Domenica, 6 = Sabato
-    }
-
-    getPrenotazioneInfo(): Observable<{stanze: StanzaWithPostazioni[], coseDurata: CosaDurata[]}> {
+    getReservationInfo(): Observable<{rooms: RoomWithWorkspaces[], durations: any[]}> {
         return forkJoin({
-            stanze: this.stanzaService.getStanzeWithPostazioni(),
-            coseDurata: this.cosaDurataService.getAllCoseDurata()
+            rooms: this.roomService.getAllRooms().pipe(map(r => r as RoomWithWorkspaces[])),
+            durations: of([]) // Placeholder for duration info
         });
     }
 
-    getPrenotazioni(): Observable<Prenotazione[]> {
-        return this.prenotazioneService.getPrenotazioni();
-    }
-
-    getMiePrenotazioni(): Observable<Prenotazione[]> {
-        return this.prenotazioneService.getMiePrenotazioni();
-    }
-
-    deletePrenotazione(id: number): Observable<void> {
-        return this.prenotazioneService.deletePrenotazione(id);
-    }
-
-    updatePrenotazione(id: number, updates: Partial<Prenotazione>): Observable<Prenotazione> {
-        return this.prenotazioneService.updatePrenotazione(id, updates);
+    deleteReservation(id: number): Observable<void> {
+        return this.reservationService.deleteReservation(id);
     }
 } 

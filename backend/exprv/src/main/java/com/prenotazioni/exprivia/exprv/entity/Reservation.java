@@ -23,8 +23,8 @@ public class Reservation {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id_reservation")
-    private Integer id_reservation;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
@@ -33,8 +33,8 @@ public class Reservation {
     private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status_reservation")
-    private ReservationStatus statusReservation;
+    @Column(name = "status")
+    private ReservationStatus status;
 
     @CreationTimestamp
     @Column(name = "created_date")
@@ -57,24 +57,24 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(Integer id_reservation, LocalDateTime startDate, LocalDateTime endDate,
-            ReservationStatus statusReservation, Workspace workspace, User user,
+    public Reservation(Integer id, LocalDateTime startDate, LocalDateTime endDate,
+            ReservationStatus status, Workspace workspace, User user,
             ReservationDuration reservationDuration) {
-        this.id_reservation = id_reservation;
+        this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.statusReservation = statusReservation;
+        this.status = status;
         this.workspace = workspace;
         this.user = user;
         this.reservationDuration = reservationDuration;
     }
 
-    public Integer getId_reservation() {
-        return id_reservation;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_reservation(Integer id_reservation) {
-        this.id_reservation = id_reservation;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public LocalDateTime getStartDate() {
@@ -93,12 +93,12 @@ public class Reservation {
         this.endDate = endDate;
     }
 
-    public ReservationStatus getStatusReservation() {
-        return statusReservation;
+    public ReservationStatus getStatus() {
+        return status;
     }
 
-    public void setStatusReservation(ReservationStatus statusReservation) {
-        this.statusReservation = statusReservation;
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedDate() {

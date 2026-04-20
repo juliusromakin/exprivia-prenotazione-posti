@@ -38,7 +38,7 @@ public class WorkspaceService {
 
     public WorkspaceDTO findWorkspaceById(Integer id) {
         return workspaceMapper.toDto(workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Postazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND)));
     }
 
     public List<WorkspaceDTO> findWorkspacesByRoomId(Integer roomId) {
@@ -47,7 +47,7 @@ public class WorkspaceService {
 
     public List<SelectOptionDTO> getWorkspaceOptionsByRoom(Integer roomId) {
         return workspaceRepository.findByRoomId(roomId).stream()
-                .map(w -> new SelectOptionDTO(w.getId_workspace(), w.getName()))
+                .map(w -> new SelectOptionDTO(w.getId(), w.getName()))
                 .toList();
     }
 
@@ -59,14 +59,14 @@ public class WorkspaceService {
 
         for (Room room : rooms) {
             Map<String, Object> roomMap = new HashMap<>();
-            roomMap.put("id", room.getId_room());
+            roomMap.put("id", room.getId());
             roomMap.put("name", room.getName());
 
-            List<Map<String, Object>> workspacesList = workspaceRepository.findByRoomId(room.getId_room())
+            List<Map<String, Object>> workspacesList = workspaceRepository.findByRoomId(room.getId())
                     .stream()
                     .map(w -> {
                         Map<String, Object> workspaceMap = new HashMap<>();
-                        workspaceMap.put("id", w.getId_workspace());
+                        workspaceMap.put("id", w.getId());
                         workspaceMap.put("name", w.getName());
                         return workspaceMap;
                     })
@@ -85,7 +85,7 @@ public class WorkspaceService {
 
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
-                    .orElseThrow(() -> new AppException("Stanza con ID " + workspaceDTO.getRoomId() + " non trovata",
+                    .orElseThrow(() -> new AppException("Room with ID " + workspaceDTO.getRoomId() + " not found",
                             HttpStatus.NOT_FOUND));
             workspace.setRoom(room);
         }
@@ -96,13 +96,13 @@ public class WorkspaceService {
 
     public WorkspaceDTO updateWorkspace(Integer id, WorkspaceDTO workspaceDTO) {
         Workspace existingWorkspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Postazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND));
 
         workspaceMapper.updateWorkspaceFromDto(workspaceDTO, existingWorkspace);
 
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
-                    .orElseThrow(() -> new AppException("Stanza con ID " + workspaceDTO.getRoomId() + " non trovata",
+                    .orElseThrow(() -> new AppException("Room with ID " + workspaceDTO.getRoomId() + " not found",
                             HttpStatus.NOT_FOUND));
             existingWorkspace.setRoom(room);
         }
@@ -113,14 +113,14 @@ public class WorkspaceService {
 
     public void softDeleteWorkspace(Integer id) {
         Workspace existingWorkspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Postazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND));
-        existingWorkspace.setIs_active(false);
+                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND));
+        existingWorkspace.setEnabled(false);
         workspaceRepository.save(existingWorkspace);
     }
 
     public void hardDeleteWorkspace(Integer id) {
         if (!workspaceRepository.existsById(id)) {
-            throw new AppException("Postazione con ID " + id + " non trovata", HttpStatus.NOT_FOUND);
+            throw new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
         workspaceRepository.deleteById(id);
     }

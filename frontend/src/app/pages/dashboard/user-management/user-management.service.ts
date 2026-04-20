@@ -22,8 +22,8 @@ export class UserManagementService {
       }
       const searchLower = searchTerm.toLowerCase();
       return users.filter(user => 
-        user.nome.toLowerCase().includes(searchLower) ||
-        user.cognome.toLowerCase().includes(searchLower) ||
+        user.name.toLowerCase().includes(searchLower) ||
+        user.lastName.toLowerCase().includes(searchLower) ||
         user.email.toLowerCase().includes(searchLower)
       );
     })

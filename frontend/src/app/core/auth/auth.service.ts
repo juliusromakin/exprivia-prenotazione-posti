@@ -11,8 +11,8 @@ interface AuthResponse {
 }
 
 interface UserRegistration {
-  nome: string;
-  cognome: string;
+  name: string;
+  lastName: string;
   email: string;
   password: string;
 }
@@ -26,9 +26,6 @@ interface ResetPasswordRequest {
   providedIn: "root",
 })
 export class AuthService {
-  updateUserIdentity(arg0: { nome: any; cognome: any; email: any; id_user?: number; password?: string; enabled?: boolean | undefined; authorities?: string[] | undefined; creatoIl?: string; aggiornatoIl?: string; }) {
-    throw new Error("Method not implemented.");
-  }
   private userIdentity = new BehaviorSubject<User | null>(null);
   private authenticationState = new BehaviorSubject<boolean>(false);
   private accountCacheKey = "account-cache";
@@ -42,7 +39,7 @@ export class AuthService {
   private axiosService = inject(AxiosService);
   private tokenService = inject(TokenService);
   private router = inject(Router);
-  private accountUrl = "/api/utenti/current";
+  private accountUrl = "/api/user/current";
 
   constructor() {
     this.initializeAuth();
@@ -123,8 +120,7 @@ export class AuthService {
   private isValidUser(user: any): user is User {
     return (
       user &&
-      typeof user.nome === "string" &&
-      typeof user.cognome === "string" &&
+      typeof user.lastName === "string" &&
       typeof user.email === "string" &&
       Array.isArray(user.authorities)
     );

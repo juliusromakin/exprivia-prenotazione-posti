@@ -38,30 +38,17 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/updateUser/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDTO updateDTO) {
-        try {
-            UserDTO updatedUser = userService.updateUser(id, updateDTO);
-            return ResponseEntity.ok(updatedUser);
-        } catch (AppException e) {
-            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDTO updateDTO) {
+        UserDTO updatedUser = userService.updateUser(id, updateDTO);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    @DeleteMapping("/deleteUser")
-    public ResponseEntity<?> deleteOwnAccount() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
-            userService.deletePersonalAccount(email);
-            return ResponseEntity.ok().build();
-        } catch (AppException e) {
-            return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore durante l'eliminazione dell'account");
-        }
+    @DeleteMapping("/personal")
+    public ResponseEntity<Void> deleteOwnAccount() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        userService.deletePersonalAccount(email);
+        return ResponseEntity.noContent().build();
     }
 }

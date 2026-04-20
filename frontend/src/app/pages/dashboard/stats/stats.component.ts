@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
-import { PrenotazioneService } from '@core/services/prenotazione.service';
+import { ReservationService } from '@core/services/reservation.service';
 import { AuthService } from '@core/auth/auth.service';
 import { AdminService } from '@core/services/admin.service';
-import { Prenotazione } from '@core/models/prenotazione.model';
+import { Reservation } from '@core/models/reservation.model';
 
 interface StatsData {
   totalBookings: number;
@@ -53,7 +53,7 @@ export class StatsComponent implements OnInit, OnDestroy {
   isAdmin = false;
 
   constructor(
-    private prenotazioneService: PrenotazioneService,
+    private reservationService: ReservationService,
     private authService: AuthService,
     private adminService: AdminService
   ) {}
@@ -85,13 +85,13 @@ export class StatsComponent implements OnInit, OnDestroy {
     
     // Fetch both bookings and users data (admin-only page)
     forkJoin({
-      prenotazioni: this.prenotazioneService.getPrenotazioni(),
+      reservations: this.reservationService.getReservations(),
       users: this.adminService.getAllUsers()
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: ({ prenotazioni, users }) => {
-        this.calculateStats(prenotazioni, users.length);
+      next: ({ reservations, users }) => {
+        this.calculateStats(reservations, users.length);
         if (isRefresh) {
           this.isRefreshing = false;
         } else {
@@ -109,29 +109,29 @@ export class StatsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private calculateStats(prenotazioni: Prenotazione[], totalUsersCount: number): void {
+  private calculateStats(reservations: Reservation[], totalUsersCount: number): void {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     // Parse dates properly
-    const parsedPrenotazioni = prenotazioni.map(p => ({
+    const parsedReservations = reservations.map(p => ({
       ...p,
-      data_inizio: this.parseDate(p.data_inizio),
-      data_fine: this.parseDate(p.data_fine)
+      startDate: this.parseDate(p.startDate),
+      endDate: this.parseDate(p.endDate)
     }));
 
     // Basic counts
-    this.stats.totalBookings = parsedPrenotazioni.length;
-    this.stats.todayBookings = parsedPrenotazioni.filter(p => 
-      p.data_inizio >= today && p.data_inizio < new Date(today.getTime() + 24 * 60 * 60 * 1000)
+    this.stats.totalBookings = parsedReservations.length;
+    this.stats.todayBookings = parsedReservations.filter(p => 
+      p.startDate >= today && p.startDate < new Date(today.getTime() + 24 * 60 * 60 * 1000)
     ).length;
-    this.stats.weekBookings = parsedPrenotazioni.filter(p => p.data_inizio >= weekAgo).length;
-    this.stats.monthBookings = parsedPrenotazioni.filter(p => p.data_inizio >= monthAgo).length;
+    this.stats.weekBookings = parsedReservations.filter(p => p.startDate >= weekAgo).length;
+    this.stats.monthBookings = parsedReservations.filter(p => p.startDate >= monthAgo).length;
 
     // Users with bookings count
-    const uniqueUsers = new Set(parsedPrenotazioni.map(p => p.users?.id_user));
+    const uniqueUsers = new Set(parsedReservations.map(p => p.userSummary?.id));
     this.stats.usersWithBookings = uniqueUsers.size;
     
     // Total users count
@@ -139,26 +139,26 @@ export class StatsComponent implements OnInit, OnDestroy {
 
     // Most popular room
     const roomCounts = new Map<string, number>();
-    parsedPrenotazioni.forEach(p => {
-      const roomName = p.stanze?.nome || 'N/A';
+    parsedReservations.forEach(p => {
+      const roomName = p.roomSummary?.name || 'N/A';
       roomCounts.set(roomName, (roomCounts.get(roomName) || 0) + 1);
     });
     this.stats.mostPopularRoom = this.getMostPopular(roomCounts);
 
     // Most popular time slot
     const timeSlotCounts = new Map<string, number>();
-    parsedPrenotazioni.forEach(p => {
-      const timeSlot = this.getTimeSlot(p.data_inizio);
+    parsedReservations.forEach(p => {
+      const timeSlot = this.getTimeSlot(p.startDate);
       timeSlotCounts.set(timeSlot, (timeSlotCounts.get(timeSlot) || 0) + 1);
     });
     this.stats.mostPopularTimeSlot = this.getMostPopular(timeSlotCounts);
 
     // Average booking duration (in hours)
-    const totalDuration = parsedPrenotazioni.reduce((sum, p) => {
-      const duration = (p.data_fine.getTime() - p.data_inizio.getTime()) / (1000 * 60 * 60);
+    const totalDuration = parsedReservations.reduce((sum, p) => {
+      const duration = (p.endDate.getTime() - p.startDate.getTime()) / (1000 * 60 * 60);
       return sum + duration;
     }, 0);
-    this.stats.avgBookingDuration = totalDuration / parsedPrenotazioni.length || 0;
+    this.stats.avgBookingDuration = totalDuration / parsedReservations.length || 0;
 
     // Room utilization (top 5)
     this.stats.roomUtilization = Array.from(roomCounts.entries())
@@ -175,10 +175,10 @@ export class StatsComponent implements OnInit, OnDestroy {
       .sort((a, b) => b.count - a.count);
 
     // Weekly trend (last 7 days)
-    this.stats.weeklyTrend = this.calculateWeeklyTrend(parsedPrenotazioni);
+    this.stats.weeklyTrend = this.calculateWeeklyTrend(parsedReservations);
 
     // Monthly trend (last 6 months)
-    this.stats.monthlyTrend = this.calculateMonthlyTrend(parsedPrenotazioni);
+    this.stats.monthlyTrend = this.calculateMonthlyTrend(parsedReservations);
   }
 
   private parseDate(dateValue: any): Date {
@@ -223,8 +223,8 @@ export class StatsComponent implements OnInit, OnDestroy {
     return mostPopular;
   }
 
-  private calculateWeeklyTrend(prenotazioni: Prenotazione[]): { day: string; count: number }[] {
-    const days = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+  private calculateWeeklyTrend(reservations: Reservation[]): { day: string; count: number }[] {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const trend = days.map(day => ({ day, count: 0 }));
     
     const today = new Date();
@@ -234,8 +234,8 @@ export class StatsComponent implements OnInit, OnDestroy {
       const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
       
-      const count = prenotazioni.filter(p => 
-        p.data_inizio >= dayStart && p.data_inizio < dayEnd
+      const count = reservations.filter(p => 
+        p.startDate >= dayStart && p.startDate < dayEnd
       ).length;
       
       trend[dayIndex].count = count;
@@ -250,8 +250,8 @@ export class StatsComponent implements OnInit, OnDestroy {
     return reorderedTrend;
   }
 
-  private calculateMonthlyTrend(prenotazioni: Prenotazione[]): { month: string; count: number }[] {
-    const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+  private calculateMonthlyTrend(reservations: Reservation[]): { month: string; count: number }[] {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const trend = [];
     
     const today = new Date();
@@ -260,8 +260,8 @@ export class StatsComponent implements OnInit, OnDestroy {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59); // End of the month
       
-      const count = prenotazioni.filter(p => {
-        const bookingDate = this.parseDate(p.data_inizio);
+      const count = reservations.filter(p => {
+        const bookingDate = this.parseDate(p.startDate);
         return bookingDate >= monthStart && bookingDate <= monthEnd;
       }).length;
       
@@ -285,7 +285,6 @@ export class StatsComponent implements OnInit, OnDestroy {
     if (maxCount === 0) return 0;
     if (count === 0) return 0;
     const perc = Math.max((count / maxCount) * 100, 20);
-    console.log('[DEBUG] Weekly bar height for count', count, 'is', perc);
     return perc;
   }
 
@@ -295,7 +294,6 @@ export class StatsComponent implements OnInit, OnDestroy {
     if (maxCount === 0) return 0;
     if (count === 0) return 0;
     const perc = Math.max((count / maxCount) * 100, 20);
-    console.log('[DEBUG] Monthly bar height for count', count, 'is', perc);
     return perc;
   }
 

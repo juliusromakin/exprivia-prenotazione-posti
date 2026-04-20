@@ -7,8 +7,8 @@ import { TokenService } from "./token.service";
 interface AuthResponse {
   token: string;
   email: string;
-  nome: string;
-  cognome: string;
+  name: string;
+  lastName: string;
   authorities: string[];
 }
 

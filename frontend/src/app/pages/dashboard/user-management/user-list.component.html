@@ -4,8 +4,8 @@
   <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Gestione Utenti</h1>
-        <p class="text-gray-600">Gestisci gli utenti del sistema e i loro ruoli</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">User Management</h1>
+        <p class="text-gray-600">Manage system users and their roles</p>
       </div>
       
       <!-- Refresh Button -->
@@ -16,7 +16,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
         <div *ngIf="loading$ | async" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-        {{ (loading$ | async) ? 'Aggiornamento...' : 'Aggiorna' }}
+        {{ (loading$ | async) ? 'Refreshing...' : 'Refresh' }}
       </button>
     </div>
   </div>
@@ -27,7 +27,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Utenti Totali</p>
+          <p class="text-sm font-medium text-gray-600">Total Users</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getTotalUsers() }}</h3>
         </div>
         <div class="p-3 bg-blue-50 rounded-lg">
@@ -40,7 +40,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Amministratori</p>
+          <p class="text-sm font-medium text-gray-600">Administrators</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getAdminCount() }}</h3>
         </div>
         <div class="p-3 bg-purple-50 rounded-lg">
@@ -53,7 +53,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Dipendenti</p>
+          <p class="text-sm font-medium text-gray-600">Employees</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getUserCount() }}</h3>
         </div>
         <div class="p-3 bg-green-50 rounded-lg">
@@ -76,7 +76,7 @@
               type="text" 
               [(ngModel)]="searchTerm" 
               (keyup)="applyFilter($event)"
-              placeholder="Cerca per nome, email..." 
+              placeholder="Search by name, email..." 
               class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
             <lucide-icon name="search" class="w-5 h-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2"></lucide-icon>
           </div>
@@ -86,17 +86,17 @@
             <button [class.bg-blue-50]="currentFilter === 'all'" (click)="filterByRole('all')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="users" class="w-4 h-4"></lucide-icon>
-              Tutti
+              All
             </button>
             <button [class.bg-purple-50]="currentFilter === 'admin'" (click)="filterByRole('admin')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="shield" class="w-4 h-4"></lucide-icon>
-              Amministratori
+              Administrators
             </button>
             <button [class.bg-green-50]="currentFilter === 'user'" (click)="filterByRole('user')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="user" class="w-4 h-4"></lucide-icon>
-              Dipendenti
+              Employees
             </button>
           </div>
         </div>
@@ -105,7 +105,7 @@
         <button (click)="createUser()"
           class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer">
           <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
-          Nuovo Utente
+          New User
         </button>
       </div>
     </div>
@@ -117,28 +117,28 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cognome</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
               <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruolo</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr *ngFor="let user of paginatedUsers" class="hover:bg-gray-50 transition-colors duration-150">
               <!-- ID -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ user.id_user }}
+                {{ user.id }}
               </td>
               
-              <!-- Nome -->
+              <!-- First Name -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ user.nome }}
+                {{ user.name }}
               </td>
 
-              <!-- Cognome -->
+              <!-- Last Name -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ user.cognome }}
+                {{ user.lastName }}
               </td>
 
               <!-- Email -->
@@ -146,7 +146,7 @@
                 {{ user.email }}
               </td>
 
-              <!-- Ruolo -->
+              <!-- Role -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <span [class]="
                     user.authorities.includes('ROLE_ADMIN')
@@ -155,8 +155,8 @@
                   " class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{
                   user.authorities.includes('ROLE_ADMIN')
-                  ? 'Amministratore'
-                  : 'Dipendente'
+                  ? 'Administrator'
+                  : 'Employee'
                   }}
                 </span>
               </td>
@@ -166,27 +166,27 @@
                 <div class="relative">
                   <button 
                     type="button"
-                    (click)="toggleDropdown(user.id_user!)"
+                    (click)="toggleDropdown(user.id!)"
                     class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-colors duration-200"
                     title="Azioni"
-                    [disabled]="!user.id_user"
-                    [attr.data-user-id]="user.id_user">
+                    [disabled]="!user.id"
+                    [attr.data-user-id]="user.id">
                     <i class="fas fa-ellipsis-v text-sm"></i>
                   </button>
                   
                   <!-- Dropdown Menu -->
                   <div 
-                    *ngIf="openDropdownId === user.id_user && user.id_user"
+                    *ngIf="openDropdownId === user.id && user.id"
                     class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10"
                     style="top: 100%; transform: translateY(0); max-height: calc(100vh - 100%); overflow: visible;"
-                    [style.transform]="'translateY(' + (shouldOpenUpward(user.id_user) ? '-100%' : '0') + ')'">
+                    [style.transform]="'translateY(' + (shouldOpenUpward(user.id) ? '-100%' : '0') + ')'">
                     <div class="py-1">
                       <button
                         type="button"
                         (click)="editUser(user)"
                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                         <i class="fas fa-edit mr-2"></i>
-                        Modifica
+                        Edit
                       </button>
                       <button
                         type="button"
@@ -194,7 +194,7 @@
                         [disabled]="loading$ | async"
                         class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="fas fa-trash mr-2"></i>
-                        Elimina
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -207,7 +207,7 @@
               <td colspan="6" class="px-4 sm:px-6 py-8 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center justify-center space-y-2">
                   <lucide-icon name="users" class="w-8 h-8 text-gray-400"></lucide-icon>
-                  <p>Nessun utente trovato</p>
+                  <p>No users found</p>
                 </div>
               </td>
             </tr>
@@ -226,19 +226,19 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <!-- Items per page selector -->
         <div class="flex items-center gap-2">
-          <label class="text-sm font-medium text-gray-700">Mostra:</label>
+          <label class="text-sm font-medium text-gray-700">Show:</label>
           <select 
             [(ngModel)]="itemsPerPage" 
             (ngModelChange)="onItemsPerPageChange($event)"
             class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
           </select>
-          <span class="text-sm text-gray-500">elementi per pagina</span>
+          <span class="text-sm text-gray-500">items per page</span>
         </div>
 
         <!-- Page info -->
         <div class="text-sm text-gray-700">
-          Visualizzati {{ getStartIndex() }}-{{ getEndIndex() }} di {{ totalItems }} risultati
+          Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ totalItems }} results
         </div>
 
         <!-- Page navigation -->
@@ -317,10 +317,10 @@
   [type]="'danger'"
   [icon]="'trash'"
   [data]="{
-    title: 'Conferma Eliminazione Utente',
+    title: 'Confirm User Deletion',
     message: getUserDeleteConfirmationMessage(),
-    confirmButtonText: 'Elimina',
-    cancelButtonText: 'Annulla'
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel'
   }"
   (confirm)="confirmDelete()"
   (cancel)="closeDeleteConfirmation()">

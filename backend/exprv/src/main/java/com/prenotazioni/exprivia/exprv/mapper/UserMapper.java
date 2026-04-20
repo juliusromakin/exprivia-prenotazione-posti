@@ -54,7 +54,7 @@ public interface UserMapper {
     /**
      * Converte un AdminCreateUserDTO in entità User (per creazioni tramite Admin).
      */
-    @Mapping(target = "id_user", ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
@@ -65,23 +65,23 @@ public interface UserMapper {
      * Converte un UserSignupDTO in entità User (per registrazioni pubbliche
      * standard).
      */
-    @Mapping(target = "id_user", ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
     @Mapping(target = "authorities", ignore = true) // Niente ruoli per sicurezza!
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    @Mapping(target = "is_active", ignore = true) // Gestito di default nel DB
+    @Mapping(target = "enabled", ignore = true) // Gestito di default nel DB
     User toEntity(UserSignupDTO userSignupDTO);
 
     /**
      * Aggiorna profilo utente da parte dell'utente stesso
      */
-    @Mapping(target = "id_user", ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true) // Gestita separatamente
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    @Mapping(target = "is_active", ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     void updateEntityFromUserUpdateDto(UserUpdateDTO updateDTO, @MappingTarget User user);
 
     @Mapping(target = "password", ignore = true)
