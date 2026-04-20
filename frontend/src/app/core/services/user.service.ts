@@ -9,7 +9,7 @@ import { User } from '../models/user.model';
 export class UserService {
   private baseUrl = '/api/user';
 
-  constructor(private axiosService: AxiosService) {}
+  constructor(private axiosService: AxiosService) { }
 
   getCurrentUser(): Observable<User> {
     return from(this.axiosService.get<User>(`${this.baseUrl}/current`));
@@ -17,10 +17,6 @@ export class UserService {
 
   updateUser(id: number, updates: Partial<User>): Observable<User> {
     return from(this.axiosService.put<User>(`${this.baseUrl}/${id}`, updates));
-  }
-
-  deleteUser(id: number): Observable<void> {
-    return from(this.axiosService.delete<void>(`/api/admin/users/${id}`));
   }
 
   deleteOwnAccount(): Observable<void> {

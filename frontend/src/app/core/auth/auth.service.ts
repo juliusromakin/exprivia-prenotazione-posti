@@ -2,19 +2,12 @@ import { inject, Injectable } from "@angular/core";
 import { AuthJwtService } from "./auth-jwt.service";
 import { AxiosService } from "../../core/services/axios.service";
 import { BehaviorSubject, Observable, tap, catchError, of, from, throwError, switchMap } from "rxjs";
-import { User } from "../models";
+import { User, UserRegistration } from "../models";
 import { TokenService } from "./token.service";
 import { Router } from "@angular/router";
 
 interface AuthResponse {
   token: string;
-}
-
-interface UserRegistration {
-  name: string;
-  lastName: string;
-  email: string;
-  password: string;
 }
 
 interface ResetPasswordRequest {
@@ -47,7 +40,7 @@ export class AuthService {
 
   private async initializeAuth(): Promise<void> {
     if (this.initialized) return;
-    
+
     const token = this.tokenService.getToken();
     if (token && this.tokenService.isTokenValid()) {
       try {
@@ -55,7 +48,7 @@ export class AuthService {
         if (cachedUser) {
           this.authenticate(cachedUser);
         }
-        
+
         const user = await this.fetchUserIdentity();
         if (user) {
           this.authenticate(user);

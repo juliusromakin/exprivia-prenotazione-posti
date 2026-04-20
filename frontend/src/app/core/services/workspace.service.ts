@@ -10,10 +10,14 @@ import { Workspace } from '@core/models';
 export class WorkspaceService {
   private readonly BASE_URL = '/api/workspaces';
 
-  constructor(private axiosService: AxiosService) {}
+  constructor(private axiosService: AxiosService) { }
 
   getWorkspaces(): Observable<Workspace[]> {
     return from(this.axiosService.get<Workspace[]>(`${this.BASE_URL}`));
+  }
+
+  getWorkspaceOptions(roomId: number): Observable<any> {
+    return from(this.axiosService.get<any>(`${this.BASE_URL}/options/${roomId}`));
   }
 
   getWorkspaceById(id: number): Observable<Workspace> {

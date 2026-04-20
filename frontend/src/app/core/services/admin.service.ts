@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
 import { AxiosService } from "./axios.service";
-import { User } from "../models";
+import { User, AdminCreateUserRequest } from "../models";
 
 @Injectable({
     providedIn: "root",
@@ -23,9 +23,8 @@ export class AdminService {
     getUserByEmail(email: string): Observable<User> {
         return from(this.axiosService.get<User>(`${this.baseUrl}/email/${email}`));
     }
-    
 
-    createUser(user: Partial<User>): Observable<User> {
+    createUser(user: AdminCreateUserRequest): Observable<User> {
         return from(this.axiosService.post<User>(this.baseUrl, user));
     }
 
@@ -38,10 +37,4 @@ export class AdminService {
             map(() => void 0)
         );
     }
-
-    createAdminUser(user: Partial<User>): Observable<User> {
-        return from(this.axiosService.post<User>(this.baseUrl, user));
-    }
-
-    
 }
