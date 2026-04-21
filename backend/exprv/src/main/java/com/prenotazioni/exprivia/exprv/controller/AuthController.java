@@ -14,6 +14,8 @@ import com.prenotazioni.exprivia.exprv.dto.EmailDTO;
 import com.prenotazioni.exprivia.exprv.dto.ResetPasswordRequest;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
+import com.prenotazioni.exprivia.exprv.dtos.ErrorDto;
+import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.service.AuthService;
 
 @RestController
@@ -35,17 +37,11 @@ public class AuthController {
         try {
             UserDTO newUser = authService.creaUtente(registrationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/verify")
-    public ResponseEntity<String> verify(@org.springframework.web.bind.annotation.RequestParam String code) {
-        try {
-            return authService.verifyAccount(code);
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getHttpStatus()).body(new ErrorDto(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDto("Errore interno del server: " + e.getMessage()));
         }
     }
 

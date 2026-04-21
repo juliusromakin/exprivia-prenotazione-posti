@@ -27,27 +27,41 @@ ON CONFLICT (duration_name) DO NOTHING;
 
 -- Inserimento Room (English Table)
 -- Nota: La colonna per abilitazione è "enabled" in queste tabelle
+-- Aggiunto ON CONFLICT (name) per evitare crash al riavvio
 INSERT INTO room (name, room_type, capacity, enabled, created_date, updated_date) 
-VALUES ('Executive Suite', 'OFFICE', 2, true, NOW(), NOW()) ON CONFLICT DO NOTHING;
+VALUES ('Executive Suite', 'OFFICE', 2, true, NOW(), NOW()) ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO room (name, room_type, capacity, enabled, created_date, updated_date) 
-VALUES ('Main Open Space', 'OPEN_SPACE', 50, true, NOW(), NOW()) ON CONFLICT DO NOTHING;
+VALUES ('Main Open Space', 'OPEN_SPACE', 50, true, NOW(), NOW()) ON CONFLICT (name) DO NOTHING;
 
 -- Inserimento Workspace (English Table)
+-- Aggiunto ON CONFLICT (name) per evitare crash al riavvio
 INSERT INTO workspace (name, capacity, status, enabled, id_room, created_date, updated_date)
-SELECT 'Desk-A1', 1, 'AVAILABLE', true, id, NOW(), NOW() FROM room WHERE name = 'Main Open Space' LIMIT 1;
+SELECT 'Desk-A1', 1, 'AVAILABLE', true, id, NOW(), NOW() FROM room WHERE name = 'Main Open Space' 
+ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO workspace (name, capacity, status, enabled, id_room, created_date, updated_date)
-SELECT 'Desk-A2', 1, 'AVAILABLE', true, id, NOW(), NOW() FROM room WHERE name = 'Main Open Space' LIMIT 1;
+SELECT 'Desk-A2', 1, 'AVAILABLE', true, id, NOW(), NOW() FROM room WHERE name = 'Main Open Space' 
+ON CONFLICT (name) DO NOTHING;
 
 -- Inserimento Reservation (English Table)
+-- Usiamo una query che inserisce solo se non esiste già una prenotazione per lo stesso utente e workspace nello stesso orario
 INSERT INTO reservation (id_user, id_workspace, duration_name, start_date, end_date, status, created_date)
 SELECT 
-    (SELECT id FROM users WHERE email = 'user@example.com'),
-    (SELECT id FROM workspace WHERE name = 'Desk-A1'),
+    u.id,
+    w.id,
     '4 hours',
     NOW() + interval '1 day',
     NOW() + interval '1 day' + interval '4 hours',
     'CONFIRMED',
     NOW()
+FROM users u, workspace w
+WHERE u.email = 'user@example.com' 
+  AND w.name = 'Desk-A1'
+  AND NOT EXISTS (
+      SELECT 1 FROM reservation r 
+      WHERE r.id_user = u.id 
+        AND r.id_workspace = w.id 
+        AND r.start_date > NOW() -- Evita duplicati per prenotazioni future
+  )
 LIMIT 1;

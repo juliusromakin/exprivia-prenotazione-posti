@@ -23,13 +23,12 @@ import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
-import com.prenotazioni.exprivia.exprv.entity.VerificationToken;
-import com.prenotazioni.exprivia.exprv.exceptions.AppException;
-import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
-import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
-import com.prenotazioni.exprivia.exprv.repository.VerificationTokenRepository;
+import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
+import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.security.jwt.JwtTokenProvider;
+import com.prenotazioni.exprivia.exprv.service.EmailService;
+import com.prenotazioni.exprivia.exprv.service.PasswordResetService;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -50,8 +49,6 @@ public class AuthServiceTest {
     private PasswordResetService passwordResetService;
     @Mock
     private EmailService emailService;
-    @Mock
-    private VerificationTokenRepository verificationTokenRepository;
 
     @InjectMocks
     private AuthService authService;
@@ -63,8 +60,8 @@ public class AuthServiceTest {
     void setUp() {
         user = new User();
         user.setEmail("test@example.com");
-        user.setId_user(1);
-        user.setIs_active(false);
+        user.setId(1);
+        user.setEnabled(false);
 
         registrationDTO = new UserSignupDTO();
         registrationDTO.setEmail("test@example.com");
@@ -88,45 +85,11 @@ public class AuthServiceTest {
         when(userMapper.toDto(any(User.class))).thenReturn(new UserDTO());
 
         // Act
-        authService.creaUtente(registrationDTO);
+        UserDTO result = authService.creaUtente(registrationDTO);
 
         // Assert
-        assertFalse(user.getIs_active(), "L'utente dovrebbe essere inattivo alla creazione");
-        verify(verificationTokenRepository, times(1)).save(any(VerificationToken.class));
-        verify(emailService, times(1)).sendVerificationEmail(eq("test@example.com"), anyString());
-    }
-
-    @Test
-    void testVerifyAccount_Success() {
-        // Arrange
-        String code = "123456";
-        VerificationToken token = new VerificationToken(code, user, LocalDateTime.now().plusHours(1));
-        when(verificationTokenRepository.findByToken(code)).thenReturn(Optional.of(token));
-
-        // Act
-        ResponseEntity<String> response = authService.verifyAccount(code);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(user.getIs_active(), "L'utente dovrebbe essere attivo dopo la verifica");
-        verify(verificationTokenRepository, times(1)).delete(token);
-        verify(userRepository, times(1)).save(user);
-    }
-
-    @Test
-    void testVerifyAccount_ExpiredToken() {
-        // Arrange
-        String code = "123456";
-        VerificationToken token = new VerificationToken(code, user, LocalDateTime.now().minusHours(1));
-        when(verificationTokenRepository.findByToken(code)).thenReturn(Optional.of(token));
-
-        // Act
-        ResponseEntity<String> response = authService.verifyAccount(code);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().contains("scaduto"));
-        assertFalse(user.getIs_active());
-        verify(verificationTokenRepository, times(1)).delete(token);
+        assertNotNull(result);
+        assertFalse(user.getEnabled(), "L'utente dovrebbe essere inattivo alla creazione");
+        verify(userRepository, times(1)).save(any(User.class));
     }
 }

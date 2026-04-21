@@ -537,16 +537,16 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   trackByUser(index: number, user: User): any { return user.id; }
 
-  canCancelPrenotazione(r: Reservation): boolean {
+  canCancelReservation(r: Reservation): boolean {
     return r.status !== ReservationStatus.DENIED && new Date(r.endDate) > new Date();
   }
 
-  cancelPrenotazione(r: Reservation): void {
+  cancelReservation(r: Reservation): void {
     this.reservationsToCancel = [r];
     this.showBulkCancelConfirmation = true;
   }
 
-  bulkCancelPrenotazioni(): void {
+  bulkCancelReservations(): void {
     this.reservationsToCancel = this.reservations.filter(r => this.selectedReservations.has(r.id!));
     this.showBulkCancelConfirmation = true;
   }
@@ -573,23 +573,23 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   toggleSelectAll(): void {
     if (this.isSelectAllChecked) this.selectedReservations.clear();
-    else this.reservations.filter(r => this.canCancelPrenotazione(r)).forEach(r => this.selectedReservations.add(r.id!));
+    else this.reservations.filter(r => this.canCancelReservation(r)).forEach(r => this.selectedReservations.add(r.id!));
     this.isSelectAllChecked = !this.isSelectAllChecked;
   }
 
-  toggleSelectPrenotazione(id: number): void {
+  toggleSelectReservation(id: number): void {
     if (this.selectedReservations.has(id)) { this.selectedReservations.delete(id); this.isSelectAllChecked = false; }
-    else { this.selectedReservations.add(id); this.isSelectAllChecked = this.selectedReservations.size === this.reservations.filter(r => this.canCancelPrenotazione(r)).length; }
+    else { this.selectedReservations.add(id); this.isSelectAllChecked = this.selectedReservations.size === this.reservations.filter(r => this.canCancelReservation(r)).length; }
   }
 
-  isPrenotazioneSelected(id: number): boolean { return this.selectedReservations.has(id); }
+  isReservationSelected(id: number): boolean { return this.selectedReservations.has(id); }
 
-  getActivePrenotazioni(): Reservation[] {
+  getActiveReservations(): Reservation[] {
     const now = new Date();
     return this.reservations.filter(r => r.status === ReservationStatus.CONFIRMED && new Date(r.endDate) > now);
   }
 
-  canShowCheckbox(r: Reservation): boolean { return this.canCancelPrenotazione(r); }
+  canShowCheckbox(r: Reservation): boolean { return this.canCancelReservation(r); }
 
   getSelectedCount(): number { return this.selectedReservations.size; }
 }

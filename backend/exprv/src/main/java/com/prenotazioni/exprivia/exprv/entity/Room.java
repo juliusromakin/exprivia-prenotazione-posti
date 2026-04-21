@@ -29,7 +29,7 @@ public class Room {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)

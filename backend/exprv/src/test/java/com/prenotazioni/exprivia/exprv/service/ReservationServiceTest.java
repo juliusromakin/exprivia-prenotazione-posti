@@ -57,7 +57,7 @@ public class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         user = new User();
-        user.setId_user(1);
+        user.setId(1);
         user.setEmail("user@example.com");
         user.setName("Mario");
         user.setLastName("Rossi");
@@ -66,7 +66,7 @@ public class ReservationServiceTest {
         room.setName("Sala A");
 
         workspace = new Workspace();
-        workspace.setId_workspace(1);
+        workspace.setId(1);
         workspace.setName("Postazione 1");
         workspace.setRoom(room);
 

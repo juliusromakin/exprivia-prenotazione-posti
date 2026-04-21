@@ -25,12 +25,10 @@ import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
-import com.prenotazioni.exprivia.exprv.entity.VerificationToken;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
-import com.prenotazioni.exprivia.exprv.repository.VerificationTokenRepository;
 import com.prenotazioni.exprivia.exprv.security.jwt.JwtTokenProvider;
 
 @Service
@@ -44,12 +42,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
     private final EmailService emailService;
-    private final VerificationTokenRepository verificationTokenRepository;
 
     public AuthService(UserRepository userRepository, AuthorityRepository authorityRepository,
             PasswordEncoder passwordEncoder, UserMapper userMapper, JwtTokenProvider jwtTokenProvider,
             AuthenticationManager authenticationManager, PasswordResetService passwordResetService,
-            EmailService emailService, VerificationTokenRepository verificationTokenRepository) {
+            EmailService emailService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
@@ -58,7 +55,6 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
         this.passwordResetService = passwordResetService;
         this.emailService = emailService;
-        this.verificationTokenRepository = verificationTokenRepository;
     }
 
     public AuthResponseDTO login(CredentialsDto credentialsDto) {
@@ -138,9 +134,11 @@ public class AuthService {
 
     @Transactional
     public UserDTO creaUtente(UserSignupDTO registrationDTO) {
+        System.out.println("DEBUG - Avvio registrazione per email: " + registrationDTO.getEmail());
         validateRegistrationData(registrationDTO);
 
         if (userRepository.findByEmail(registrationDTO.getEmail()).isPresent()) {
+            System.out.println("DEBUG - Email già esistente: " + registrationDTO.getEmail());
             throw new AppException("Esiste già un utente con questa email!", HttpStatus.BAD_REQUEST);
         }
 
@@ -160,44 +158,11 @@ public class AuthService {
         authorities.add(userAuthority);
         user.setAuthorities(authorities);
 
+        System.out.println("DEBUG - Salvataggio nuovo utente (In attesa di approvazione Admin)...");
         User savedUser = userRepository.save(user);
         
-        // Generazione del codice di verifica (6 cifre)
-        String verificationCode = String.format("%06d", new java.util.Random().nextInt(999999));
-        VerificationToken verificationToken = new VerificationToken(
-            verificationCode, 
-            savedUser, 
-            LocalDateTime.now().plusHours(24) // Scade tra 24 ore
-        );
-        verificationTokenRepository.save(verificationToken);
-        
-        // Invio email di verifica
-        emailService.sendVerificationEmail(savedUser.getEmail(), verificationCode);
-
+        System.out.println("DEBUG - Registrazione completata con successo per: " + savedUser.getEmail());
         return userMapper.toDto(savedUser);
-    }
-
-    @Transactional
-    public ResponseEntity<String> verifyAccount(String code) {
-        Optional<VerificationToken> tokenOpt = verificationTokenRepository.findByToken(code);
-        
-        if (tokenOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Codice di verifica non valido");
-        }
-        
-        VerificationToken token = tokenOpt.get();
-        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            verificationTokenRepository.delete(token);
-            return ResponseEntity.badRequest().body("Codice di verifica scaduto");
-        }
-        
-        User user = token.getUser();
-        user.setEnabled(true);
-        userRepository.save(user);
-        
-        verificationTokenRepository.delete(token);
-        
-        return ResponseEntity.ok("Account verificato con successo! Ora puoi effettuare il login.");
     }
 
     private void validateRegistrationData(UserSignupDTO registrationDTO) {

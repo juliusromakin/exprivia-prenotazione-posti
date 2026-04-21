@@ -9,7 +9,7 @@ import { authAnimations } from '../../shared/animations/auth.animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { ToastModule } from 'primeng/toast';
@@ -189,19 +189,20 @@ export class RegisterComponent {
           catchError(error => {
             console.error('Registration error:', error);
 
-            // This is a registration error
-            let errorMessage = 'Errore durante la registrazione. Riprova più tardi.';
+            // Access the message from the ErrorDto JSON if available
+            const backendError = error.response?.data?.message || 
+                                error.response?.data || 
+                                'Errore durante la registrazione. Riprova più tardi.';
+            
+            let errorMessage = (typeof backendError === 'string') ? backendError : 'Errore durante la registrazione.';
 
-            // Check for specific error cases
-            if (error.response?.status === 400 &&
-              (error.response?.data === 'Esiste già un utente con questa email!' ||
-                error.response?.data?.toLowerCase().includes('email già esistente') ||
-                error.response?.data?.toLowerCase().includes('email already exists'))) {
-              errorMessage = 'Questa email è già registrata. Per favore, utilizza un\'altra email o accedi al tuo account esistente.';
+            // Check for specific error cases (matching the strings from AuthService.java)
+            if (error.response?.status === 400 && 
+               (errorMessage === 'Esiste già un utente con questa email!' || 
+                errorMessage.toLowerCase().includes('email già esistente') ||
+                errorMessage.toLowerCase().includes('email already exists'))) {
               this.registerForm.get('email')?.setErrors({ emailExists: true });
-            } else if (error.response?.data) {
-              // Use the error message from the backend if available
-              errorMessage = error.response.data;
+              errorMessage = 'Questa email è già registrata. Per favore, utilizza un\'altra email o accedi.';
             }
 
             this.showErrorToast('Errore Registrazione', errorMessage);
@@ -209,14 +210,18 @@ export class RegisterComponent {
           }),
           finalize(() => {
             this.isLoading = false;
+          }),
+          tap(() => {
+            console.log('Registration success, showing success toast...');
+            this.showSuccessToast(
+              'Registrazione Completata',
+              'Il tuo account è stato creato con successo! Ora è in attesa di approvazione da parte dell\'amministratore. Riceverai l\'abilitazione a breve.'
+            );
+            console.log('Navigating to login...');
+            this.router.navigate(['/login']);
           })
         )
-        .subscribe({
-          next: () => {
-            this.showSuccessToast('Registrazione Completata', 'Account creato con successo. Ora puoi effettuare il login.');
-            this.router.navigate(['/login']);
-          }
-        });
+        .subscribe();
     }
   }
 
