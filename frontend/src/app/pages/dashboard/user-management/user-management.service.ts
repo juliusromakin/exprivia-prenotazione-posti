@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, map, firstValueFrom } from 'rxjs';
-import { User } from '@core/models';
+import { User, AdminCreateUserRequest, AdminUpdateUserRequest } from '@core/models';
 import { AdminService } from '@core/services';
 
 @Injectable({
@@ -68,7 +68,7 @@ export class UserManagementService {
   }
 
   // Crea un nuovo utente
-  async createUser(userData: Partial<User>): Promise<User> {
+  async createUser(userData: AdminCreateUserRequest): Promise<User> {
     try {
       this.loadingSubject.next(true);
       const newUser = await firstValueFrom(this.adminService.createUser(userData));
@@ -83,7 +83,7 @@ export class UserManagementService {
   }
 
   // Aggiorna un utente esistente
-  async updateUser(userId: number, userData: Partial<User>): Promise<User> {
+  async updateUser(userId: number, userData: AdminUpdateUserRequest): Promise<User> {
     try {
       this.loadingSubject.next(true);
       const updatedUser = await firstValueFrom(this.adminService.updateUser(userId, userData));

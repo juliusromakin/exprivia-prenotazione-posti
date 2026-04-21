@@ -54,6 +54,6 @@ WORKDIR /backend
 #Copia il JAR dalla build precedente
 COPY --from=builder /app/target/exprv-0.0.1-SNAPSHOT.jar /backend/
 
-EXPOSE 8080
+EXPOSE 10010
 
 CMD ["java", "-jar", "exprv-0.0.1-SNAPSHOT.jar"]

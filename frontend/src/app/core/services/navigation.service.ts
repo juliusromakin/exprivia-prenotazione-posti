@@ -28,36 +28,34 @@ export class NavigationService {
       authorities: [UserRole.ADMIN],
     },
     {
-      label: "Utenti",
+      label: "Users",
       icon: "users",
       route: "/dashboard/user-management",
       adminOnly: true,
       authorities: [UserRole.ADMIN],
     },
     {
-      label: "Prenotazioni",
+      label: "Bookings",
       icon: "calendar",
       route: "/dashboard/bookings",
       // CORREZIONE LOGICA: Anche gli utenti devono poter vedere le loro prenotazioni!
       authorities: [UserRole.ADMIN, UserRole.USER],
     },
     {
-      label: "Prenota",
+      label: "Book Workspace",
       icon: "layout-dashboard",
-      // TODO: Quando tradurrai i nomi dei componenti/pagine della UI, ricordati di cambiare questa rotta (es. /dashboard/book-workspace)
-      route: "/dashboard/prenotazione-posizione",
+      route: "/dashboard/workspace-booking",
       authorities: [UserRole.USER, UserRole.ADMIN],
     },
     {
-      label: "Statistiche",
+      label: "Statistics",
       icon: "ChartBar",
-      // TODO: Anche qui, valuta se tradurre in /dashboard/statistics in futuro
-      route: "/dashboard/statistiche",
+      route: "/dashboard/statistics",
       adminOnly: true,
       authorities: [UserRole.ADMIN],
     },
     {
-      label: "Aggiorna Profilo",
+      label: "Update Profile",
       icon: "user",
       route: "/dashboard/update-user",
       authorities: [UserRole.USER, UserRole.ADMIN],
@@ -84,9 +82,8 @@ export class NavigationService {
       "/dashboard": () => currentRoute === "/dashboard",
       "/dashboard/user-management": () => currentRoute === "/dashboard/user-management",
       "/dashboard/bookings": () => currentRoute === "/dashboard/bookings",
-      // Mantenute in italiano per ora per non rompere il routing attuale
-      "/dashboard/prenotazione-posizione": () => currentRoute === "/dashboard/prenotazione-posizione",
-      "/dashboard/statistiche": () => currentRoute === "/dashboard/statistiche",
+      "/dashboard/workspace-booking": () => currentRoute === "/dashboard/workspace-booking",
+      "/dashboard/statistics": () => currentRoute === "/dashboard/statistics",
       "/dashboard/management": () => currentRoute.startsWith("/dashboard/management"),
     };
 

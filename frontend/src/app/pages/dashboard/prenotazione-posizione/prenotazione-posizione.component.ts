@@ -1,19 +1,17 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { Subject, of, forkJoin } from "rxjs";
 import { CommonModule, DatePipe } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { AuthService } from "@core/auth/auth.service";
 import { CalendarComponent } from "@shared/components/calendar/calendar.component";
-import { BookingState, WorkspaceWithAvailability } from "./prenotazione-posizione.model";
-import { Subject, takeUntil, firstValueFrom, forkJoin, of } from "rxjs";
-import { Reservation, ReservationStatus, TimeSlot } from "@core/models/reservation.model";
-import { PrenotazionePosizioneService } from "./prenotazione-posizione.service";
-import { Workspace } from "@core/models/workspace.model";
-import { Room } from "@core/models/room.model";
+import { RoomService } from "@core/services/room.service";
+import { ReservationService } from "@core/services/reservation.service";
+import { Room, Workspace, Reservation, ReservationRequest, ReservationStatus, RoomType } from "@core/models";
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../../shared/services/toast.service';
 import { User } from '@core/models/user.model';
 import { AdminService } from '@core/services/admin.service';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-inline.component';
 
@@ -35,11 +33,11 @@ import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-in
 })
 export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   bookingForm: FormGroup;
-  state: BookingState = {
-    rooms: [],
-    availableWorkspaces: [],
-    selectedDates: [],
-    availableTimeSlots: [],
+  state = {
+    rooms: [] as Room[],
+    availableWorkspaces: [] as any[],
+    selectedDates: [] as Date[],
+    availableTimeSlots: [] as { startTime: string; endTime: string }[],
     isLoading: false,
     errorMessage: ""
   };
@@ -84,7 +82,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private presentationService: PrenotazionePosizioneService,
+    private roomService: RoomService,
+    private reservationService: ReservationService,
     private toastService: ToastService,
     private adminService: AdminService,
     private datePipe: DatePipe,
@@ -121,7 +120,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   isMeetingRoom(): boolean {
-    return this.bookingForm.get('roomType')?.value === 'MeetingRoom';
+    const type = this.bookingForm.get('roomType')?.value;
+    return type === RoomType.MEETING_ROOM || type === 'MeetingRoom' || type === 'MEETINGROOM';
   }
 
   get availableDurations(): string[] {
@@ -178,12 +178,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private loadBookingInfo(): void {
     this.state.isLoading = true;
-    this.presentationService.getRoomsWithWorkspaces()
+    this.roomService.getAllRooms()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.state.rooms = response.rooms;
-          this.roomTypes = [...new Set(response.rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
+        next: (rooms) => {
+          this.state.rooms = rooms;
+          this.roomTypes = [...new Set(rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
           this.state.isLoading = false;
         },
         error: (err: any) => {
@@ -207,8 +207,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         });
 
         if (type) {
-          const filteredRooms = this.state.rooms.filter(s => s.roomType === type);
-          const allWorkspaces: WorkspaceWithAvailability[] = filteredRooms
+          const filteredRooms = this.state.rooms.filter(s => s.roomType === type || (typeof s.roomType === 'string' && s.roomType.toUpperCase() === String(type).toUpperCase()));
+          const allWorkspaces: any[] = filteredRooms
             .flatMap(room => (room.workspaces || []).map(w => ({
               ...w,
               roomId: room.id!,
@@ -299,12 +299,14 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (!selectedTimeSlot || !selectedDate) return;
 
     const [startTime, endTime] = selectedTimeSlot.split(' - ');
+    const slotString = `${startTime} - ${endTime}`;
+    
     const availabilityChecks = this.state.availableWorkspaces.map(workspace => 
-      this.presentationService.getAvailableTimeSlots(selectedDate, workspace.id!)
+      this.reservationService.getAvailableTimeSlots(selectedDate, workspace.id!)
         .pipe(
           map(availableSlots => ({
             ...workspace,
-            isAvailable: availableSlots.some(slot => slot.startTime === startTime && slot.endTime === endTime)
+            isAvailable: availableSlots.includes(slotString)
           })),
           catchError(() => of({ ...workspace, isAvailable: false }))
         )
@@ -360,16 +362,22 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       startDateTime.setHours(parseInt(startH), parseInt(startM), 0, 0);
       endDateTime.setHours(parseInt(endH), parseInt(endM), 0, 0);
 
-      const reservation = {
-        workspaceId: parseInt(formData.workspaceId),
-        roomId: parseInt(formData.roomId),
-        startDate: this.datePipe.transform(startDateTime, 'yyyy-MM-dd HH:mm:ss')!,
-        endDate: this.datePipe.transform(endDateTime, 'yyyy-MM-dd HH:mm:ss')!,
-        durationName: formData.slotDuration,
-        userId: formData.userId ? parseInt(formData.userId) : undefined
-      };
+      this.authService.getIdentity().pipe(
+        takeUntil(this.destroy$),
+        switchMap(user => {
+          const userId = formData.userId ? parseInt(formData.userId) : (user?.id || 0);
+          
+          const reservation: ReservationRequest = {
+            workspaceId: parseInt(formData.workspaceId),
+            userId: userId,
+            startDate: startDateTime,
+            endDate: endDateTime,
+            durationName: formData.slotDuration
+          };
 
-      this.presentationService.createReservation(reservation).subscribe({
+          return this.reservationService.createReservation(reservation);
+        })
+      ).subscribe({
         next: () => {
           this.toastService.showSuccess('Confirmed', 'Reservation created successfully');
           this.resetForm();
@@ -397,19 +405,23 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private loadMyReservations(): void {
     this.state.isLoading = true;
-    this.presentationService.getUserReservations()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (reservations) => {
-          this.reservations = reservations;
-          this.applySorting();
-          this.state.isLoading = false;
-        },
-        error: () => {
-          this.toastService.showError('Error', 'Unable to load reservations');
-          this.state.isLoading = false;
-        }
-      });
+    this.authService.getIdentity().pipe(
+      takeUntil(this.destroy$),
+      switchMap(user => {
+        if (!user || !user.email) return of([]);
+        return this.reservationService.getReservationsByEmail(user.email);
+      })
+    ).subscribe({
+      next: (reservations) => {
+        this.reservations = reservations;
+        this.applySorting();
+        this.state.isLoading = false;
+      },
+      error: () => {
+        this.toastService.showError('Error', 'Unable to load reservations');
+        this.state.isLoading = false;
+      }
+    });
   }
 
   isValidDate(date: any): boolean {
@@ -540,7 +552,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   confirmBulkCancel(): void {
-    const requests = this.reservationsToCancel.map(r => this.presentationService.deleteReservation(r.id!));
+    const requests = this.reservationsToCancel.map(r => this.reservationService.deleteReservation(r.id!));
     this.state.isLoading = true;
     forkJoin(requests).subscribe({
       next: () => {

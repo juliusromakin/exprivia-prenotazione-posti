@@ -54,10 +54,10 @@
 
         <!-- Navigation for non-authenticated users -->
         <div *ngIf="!isAuthenticated" class="flex items-center gap-3">
-            <a [routerLink]="['/accedi']" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-expriviaOrange)] rounded-[var(--radius-lg)] hover:bg-[var(--color-expriviaOrange400)] transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
+            <a [routerLink]="['/login']" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-expriviaOrange)] rounded-[var(--radius-lg)] hover:bg-[var(--color-expriviaOrange400)] transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
                 Login
             </a>
-            <a [routerLink]="['/registrazione']" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
+            <a [routerLink]="['/register']" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
                 Signup
             </a>
         </div>

@@ -214,7 +214,7 @@ export class RegisterComponent {
         .subscribe({
           next: () => {
             this.showSuccessToast('Registrazione Completata', 'Account creato con successo. Ora puoi effettuare il login.');
-            this.router.navigate(['/accedi']);
+            this.router.navigate(['/login']);
           }
         });
     }

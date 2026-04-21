@@ -11,8 +11,8 @@ import { Router } from "@angular/router";
 import { RegisterComponent } from "./account/register/register.component";
 import { UpdateUserComponent } from "./account/update-user/update-user.component";
 
-// Guard to redirect authenticated users to prenotazione-posizione
-const redirectAuthenticatedToPrenotazione = () => {
+// Guard to redirect authenticated users to workspace-booking
+const redirectAuthenticatedToWorkspaceBooking = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -28,7 +28,7 @@ const redirectAuthenticatedToPrenotazione = () => {
     }
     
     // Altrimenti reindirizza alla dashboard
-    return router.createUrlTree(["/dashboard/prenotazione-posizione"]);
+    return router.createUrlTree(["/dashboard/workspace-booking"]);
   }
   return true;
 };
@@ -40,19 +40,19 @@ export const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: "registrazione",
+    path: "register",
     component: RegisterComponent,
-    canActivate: [() => redirectAuthenticatedToPrenotazione()],
+    canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
   {
-    path: "accedi",
+    path: "login",
     component: LoginComponent,
-    canActivate: [() => redirectAuthenticatedToPrenotazione()],
+    canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
   {
     path: "update-user",
     component: UpdateUserComponent,
-    canActivate: [() => redirectAuthenticatedToPrenotazione()],
+    canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
 
   {
@@ -66,12 +66,12 @@ export const routes: Routes = [
   {
     path: "forgot-password",
     component: ForgotpwdComponent,
-    canActivate: [() => redirectAuthenticatedToPrenotazione()],
+    canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
   {
     path: "reset-password",
     component: ResetpwdComponent,
-    canActivate: [() => redirectAuthenticatedToPrenotazione()],
+    canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
   { path: "forbidden", component: ForbiddenComponent },
   { path: "**", redirectTo: "" },

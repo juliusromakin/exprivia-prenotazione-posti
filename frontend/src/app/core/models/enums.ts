@@ -5,8 +5,8 @@ export enum WorkspaceStatus {
 }
 
 export enum RoomType {
-  MEETINGROOM = "MEETINGROOM",
-  OPENSPACE = "OPENSPACE",
+  MEETING_ROOM = "MEETING_ROOM",
+  OPEN_SPACE = "OPEN_SPACE",
   OFFICE = "OFFICE",
 }
 
@@ -16,8 +16,7 @@ export enum UserRole {
 }
 
 export enum ReservationStatus {
-  PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  CANCELLED = "CANCELLED",
-  COMPLETED = "COMPLETED"
+  NOT_CONFIRMED = "NOT_CONFIRMED",
+  DENIED = "DENIED",
 }

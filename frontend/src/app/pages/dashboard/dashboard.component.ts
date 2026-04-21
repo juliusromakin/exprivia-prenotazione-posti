@@ -169,12 +169,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       );
     }
 
-    if (checkRoute === "/accedi") {
-      return currentRoute === "/accedi";
+    if (checkRoute === "/login") {
+      return currentRoute === "/login";
     }
 
-    if (checkRoute === "/registrazione") {
-      return currentRoute === "/registrazione";
+    if (checkRoute === "/register") {
+      return currentRoute === "/register";
     }
 
     if (checkRoute === "/dashboard/user-management") {
@@ -191,6 +191,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return (
       this.router.url === "/dashboard" || this.router.url === "/dashboard/"
     );
+  }
+
+  openNewBookingModal(): void {
+    this.router.navigate(['/dashboard/workspace-booking']);
   }
 
 }

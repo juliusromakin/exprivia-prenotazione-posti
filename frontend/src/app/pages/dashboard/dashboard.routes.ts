@@ -17,7 +17,7 @@ export const DASHBOARD_ROUTES: Routes = [
         canActivate: [UserRouteAccessService],
       },
       {
-        path: "prenotazione-posizione",
+        path: "workspace-booking",
         loadComponent: () =>
           import(
             "./prenotazione-posizione/prenotazione-posizione.component"
@@ -44,7 +44,7 @@ export const DASHBOARD_ROUTES: Routes = [
         canActivate: [UserRouteAccessService],
       },
       {
-        path: "statistiche",
+        path: "statistics",
         loadComponent: () =>
           import("./stats/stats.component").then(
             (m) => m.StatsComponent

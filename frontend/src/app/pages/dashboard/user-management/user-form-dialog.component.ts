@@ -106,6 +106,20 @@ export interface DialogData {
                 </div>
               </div>
 
+              <!-- Enabled Status -->
+              <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div class="flex items-center h-5">
+                  <input id="enabled" 
+                         type="checkbox" 
+                         formControlName="enabled"
+                         class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                </div>
+                <div class="text-sm">
+                  <label for="enabled" class="font-medium text-gray-700">Account Active</label>
+                  <p class="text-gray-500">Enable or disable user access to the system</p>
+                </div>
+              </div>
+
             </div>
 
             <!-- Error message -->
@@ -164,7 +178,8 @@ export class UserFormDialogComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
-      authorities: ['ROLE_USER', Validators.required]
+      authorities: ['ROLE_USER', Validators.required],
+      enabled: [true]
     });
   }
 
@@ -174,7 +189,8 @@ export class UserFormDialogComponent implements OnInit {
         name: this.data.user.name || '',
         lastName: this.data.user.lastName || '',
         email: this.data.user.email || '',
-        authorities: this.data.user.authorities?.[0] || 'ROLE_USER'
+        authorities: this.data.user.authorities?.[0] || 'ROLE_USER',
+        enabled: this.data.user.enabled !== false // Default to true if not specified
       });
 
       // Set password validation based on whether it's a new user or edit

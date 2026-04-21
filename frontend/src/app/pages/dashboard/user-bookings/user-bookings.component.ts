@@ -5,14 +5,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } 
 import { Subject, takeUntil } from 'rxjs';
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../../shared/services/toast.service';
-import { Reservation, ReservationStatus, UserSummary } from '@core/models/reservation.model';
+import { Reservation, ReservationStatus } from '@core/models';
 import { ReservationService, RoomService, AdminService } from '@core/services';
 import { AuthService } from '@core/auth/auth.service';
 import * as XLSX from 'xlsx';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
-import { User } from '@core/models/user.model';
-import { Room } from '@core/models/room.model';
-import { Workspace } from '@core/models/workspace.model';
+import { User, Room, Workspace } from '@core/models';
+import { switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-user-bookings',
@@ -66,6 +65,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     { value: 'month', label: 'Last Month', description: 'Export reservations from the last 30 days' },
     { value: '6months', label: 'Last 6 Months', description: 'Export reservations from the last 6 months' }
   ];
+  selectedExportType: 'period' | 'daily' = 'period';
+  exportDate: string = new Date().toISOString().split('T')[0];
 
   constructor(
     private reservationService: ReservationService,
@@ -95,25 +96,35 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
 
   loadReservations(): void {
     this.isLoading = true;
-    this.reservationService.getReservations()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (reservations) => {
-          this.reservations = reservations.map(r => ({
-            ...r,
-            startDate: new Date(r.startDate),
-            endDate: new Date(r.endDate),
-            status: r.status || ReservationStatus.NOT_CONFIRMED
-          }));
-          this.applySorting();
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error loading reservations:', error);
-          this.toastService.showError('Error', 'Unable to load reservations');
-          this.isLoading = false;
+    this.authService.getIdentity().pipe(
+      takeUntil(this.destroy$),
+      switchMap(user => {
+        this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+        if (this.isAdmin) {
+          return this.reservationService.getReservations();
+        } else if (user?.email) {
+          return this.reservationService.getReservationsByEmail(user.email);
+        } else {
+          return of([]);
         }
-      });
+      })
+    ).subscribe({
+      next: (reservations) => {
+        this.reservations = reservations.map(r => ({
+          ...r,
+          startDate: new Date(r.startDate),
+          endDate: new Date(r.endDate),
+          status: r.status || ReservationStatus.NOT_CONFIRMED
+        }));
+        this.applySorting();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading reservations:', error);
+        this.toastService.showError('Error', 'Unable to load reservations');
+        this.isLoading = false;
+      }
+    });
   }
 
   deleteReservation(reservation: Reservation): void {
@@ -157,7 +168,7 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
   }
 
   openNewBookingModal(): void {
-    this.router.navigate(['/dashboard/prenota-posizione']);
+    this.router.navigate(['/dashboard/workspace-booking']);
   }
 
   setStatusFilter(status: any): void {
@@ -171,8 +182,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     const now = new Date();
     return this.reservations.filter(r => {
       const isPast = new Date(r.endDate) <= now;
-      if (status === 'active') return r.status === ReservationStatus.CONFIRMED && !isPast;
-      if (status === 'expired') return isPast;
+      if (status === 'active') return (r.status === ReservationStatus.CONFIRMED || r.status === ReservationStatus.NOT_CONFIRMED) && !isPast;
+      if (status === 'expired') return isPast && r.status !== ReservationStatus.DENIED;
       if (status === 'cancelled') return r.status === ReservationStatus.DENIED;
       return true;
     }).length;
@@ -200,8 +211,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     if (this.statusFilter !== 'all') {
       filtered = filtered.filter(r => {
         const isPast = new Date(r.endDate) <= now;
-        if (this.statusFilter === 'active') return r.status === ReservationStatus.CONFIRMED && !isPast;
-        if (this.statusFilter === 'expired') return isPast;
+        if (this.statusFilter === 'active') return (r.status === ReservationStatus.CONFIRMED || r.status === ReservationStatus.NOT_CONFIRMED) && !isPast;
+        if (this.statusFilter === 'expired') return isPast && r.status !== ReservationStatus.DENIED;
         if (this.statusFilter === 'cancelled') return r.status === ReservationStatus.DENIED;
         return true;
       });
@@ -266,11 +277,57 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
 
   isSortedColumn(column: string): boolean { return this.sortColumn === column; }
 
-  openExportModal(): void { this.showExportModal = true; this.selectedExportPeriod = null; }
+  openExportModal(): void { 
+    this.showExportModal = true; 
+    this.selectedExportPeriod = null; 
+    this.selectedExportType = 'period';
+  }
   closeExportModal(): void { this.showExportModal = false; }
-  selectExportPeriod(period: any): void { this.selectedExportPeriod = period; }
+  selectExportPeriod(period: any): void { 
+    this.selectedExportPeriod = period; 
+    this.selectedExportType = 'period';
+  }
+  selectDailyExport(): void {
+    this.selectedExportType = 'daily';
+    this.selectedExportPeriod = null;
+  }
 
   confirmExport(): void {
+    if (this.selectedExportType === 'daily') {
+      this.confirmDailyExport();
+    } else {
+      this.confirmPeriodExport();
+    }
+  }
+
+  confirmDailyExport(): void {
+    if (!this.exportDate) return;
+    this.isExporting = true;
+    const dateObj = new Date(this.exportDate);
+    
+    this.reservationService.exportReservationsDaily(dateObj)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `reservations_report_${this.exportDate}.xlsx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          this.toastService.showSuccess('Export', 'Daily report exported successfully');
+          this.isExporting = false;
+          this.closeExportModal();
+        },
+        error: (error) => {
+          console.error('Export error:', error);
+          this.toastService.showError('Export', 'Failed to export daily report');
+          this.isExporting = false;
+        }
+      });
+  }
+
+  confirmPeriodExport(): void {
     if (!this.selectedExportPeriod) return;
     const now = new Date();
     const start = new Date();
