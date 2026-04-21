@@ -17,6 +17,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -54,15 +56,39 @@ public class Room {
     @JsonIgnore
     private List<Workspace> workspaces = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "id_floor")
+    private Floor floor;
+
+    @Column(name = "map_x")
+    private Double mapX;
+
+    @Column(name = "map_y")
+    private Double mapY;
+
+    @Column(name = "map_width")
+    private Double mapWidth;
+
+    @Column(name = "map_height")
+    private Double mapHeight;
+
     public Room() {
     }
 
-    public Room(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled) {
+    public Room(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled,
+            List<Workspace> workspaces, Floor floor, Double mapX,
+            Double mapY, Double mapWidth, Double mapHeight) {
         this.id = id;
         this.name = name;
         this.roomType = roomType;
         this.capacity = capacity;
         this.enabled = enabled;
+        this.workspaces = workspaces;
+        this.floor = floor;
+        this.mapX = mapX;
+        this.mapY = mapY;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
     }
 
     public Integer getId() {
@@ -119,6 +145,54 @@ public class Room {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public List<Workspace> getWorkspaces() {
+        return workspaces;
+    }
+
+    public void setWorkspaces(List<Workspace> workspaces) {
+        this.workspaces = workspaces;
+    }
+
+    public Floor getFloor() {
+        return floor;
+    }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
+
+    public Double getMapX() {
+        return mapX;
+    }
+
+    public void setMapX(Double mapX) {
+        this.mapX = mapX;
+    }
+
+    public Double getMapY() {
+        return mapY;
+    }
+
+    public void setMapY(Double mapY) {
+        this.mapY = mapY;
+    }
+
+    public Double getMapWidth() {
+        return mapWidth;
+    }
+
+    public void setMapWidth(Double mapWidth) {
+        this.mapWidth = mapWidth;
+    }
+
+    public Double getMapHeight() {
+        return mapHeight;
+    }
+
+    public void setMapHeight(Double mapHeight) {
+        this.mapHeight = mapHeight;
     }
 
 }

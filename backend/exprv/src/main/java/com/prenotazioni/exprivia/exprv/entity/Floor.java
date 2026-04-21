@@ -1,10 +1,20 @@
 package com.prenotazioni.exprivia.exprv.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
@@ -20,15 +30,35 @@ public class Floor {
     @Column(name = "name")
     private String name;
 
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
+    private LocalDateTime createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
     @Column(name = "image_path")
     private String imagePath;
-
-    @Column(name = "coordinates_json", columnDefinition = "TEXT")
-    private String coordinatesJson;
 
     @ManyToOne
     @JoinColumn(name = "id_building")
     private Building building;
+
+    @OneToMany(mappedBy = "floor")
+    @JsonIgnore
+    private List<Room> rooms = new ArrayList<>();
+
+    public Floor() {
+    }
+
+    public Floor(Integer id, String name, String imagePath, Building building, List<Room> rooms) {
+        this.id = id;
+        this.name = name;
+        this.imagePath = imagePath;
+        this.building = building;
+        this.rooms = rooms;
+    }
 
     public Integer getId() {
         return id;
@@ -54,19 +84,19 @@ public class Floor {
         this.imagePath = imagePath;
     }
 
-    public String getCoordinatesJson() {
-        return coordinatesJson;
-    }
-
-    public void setCoordinatesJson(String coordinatesJson) {
-        this.coordinatesJson = coordinatesJson;
-    }
-
     public Building getBuilding() {
         return building;
     }
 
     public void setBuilding(Building building) {
         this.building = building;
+    }
+
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
     }
 }
