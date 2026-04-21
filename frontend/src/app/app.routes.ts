@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { HomeComponent } from "./pages/home/home.component";
+import { AdminHomeComponent } from "./pages/admin-home/admin-home.component";
 import { LoginComponent } from "./login/login.component";
 import { ForgotpwdComponent } from "./account/password/forgot-password/forgotpwd.component";
 import { ResetpwdComponent } from "./account/password/reset-password/resetpwd.component";
@@ -21,12 +22,12 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
     // o se è un caricamento iniziale dell'app
     const navigation = router.getCurrentNavigation();
     const isInitialNavigation = !navigation?.previousNavigation;
-    
+
     // Se è la navigazione iniziale, permetti di vedere la home
     if (isInitialNavigation) {
       return true;
     }
-    
+
     // Altrimenti reindirizza alla dashboard
     return router.createUrlTree(["/dashboard/workspace-booking"]);
   }
@@ -55,6 +56,11 @@ export const routes: Routes = [
     canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
   },
 
+  {
+    path: "admin/homepage",
+    component: AdminHomeComponent,
+    canActivate: [AuthGuard],
+  },
   {
     path: "dashboard",
     loadChildren: () =>
