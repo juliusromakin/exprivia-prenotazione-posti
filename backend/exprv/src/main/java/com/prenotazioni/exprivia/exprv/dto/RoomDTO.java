@@ -1,13 +1,26 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 
 public class RoomDTO {
     private Integer id;
+    
+    @NotBlank(message = "Il nome della stanza è obbligatorio")
     private String name;
+    
+    @NotNull(message = "Il tipo di stanza è obbligatorio")
     private RoomType roomType;
+    
+    @NotNull(message = "La capacità è obbligatoria")
+    @Min(value = 1, message = "La capacità deve essere almeno di 1 persona")
     private Integer capacity;
+    
     private Boolean enabled;
+    
+    @NotNull(message = "Il piano di appartenenza è obbligatorio")
     private Integer floorId;
     private Double mapX;
     private Double mapY;

@@ -1,13 +1,21 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
 import com.prenotazioni.exprivia.exprv.enumerati.WorkspaceStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class WorkspaceDTO {
     private Integer id;
+    
+    @NotBlank(message = "Il nome della postazione è obbligatorio")
     private String name;
+    
     private Integer capacity;
     private WorkspaceStatus workspaceStatus;
+    
+    @NotNull(message = "La stanza di appartenenza è obbligatoria")
     private Integer roomId;
+    
     private Boolean enabled;
     private Double mapX;
     private Double mapY;

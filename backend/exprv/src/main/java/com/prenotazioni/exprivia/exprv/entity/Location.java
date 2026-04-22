@@ -35,6 +35,9 @@ public class Location {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
+    @Column(name = "enabled")
+    private Boolean enabled = true;
+
     @OneToMany(mappedBy = "location")
     @JsonIgnore
     private List<Building> buildings = new ArrayList<>();
@@ -62,6 +65,14 @@ public class Location {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public List<Building> getBuildings() {

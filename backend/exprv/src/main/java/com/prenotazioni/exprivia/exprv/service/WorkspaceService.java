@@ -1,10 +1,6 @@
 package com.prenotazioni.exprivia.exprv.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,7 +28,10 @@ public class WorkspaceService {
         this.roomRepository = roomRepository;
     }
 
-    public List<WorkspaceDTO> findAllWorkspaces() {
+    public List<WorkspaceDTO> findAllWorkspaces(boolean enabledOnly) {
+        if (enabledOnly) {
+            return workspaceMapper.toDtoList(workspaceRepository.findAllByEnabledTrue());
+        }
         return workspaceMapper.toDtoList(workspaceRepository.findAll());
     }
 
@@ -41,47 +40,31 @@ public class WorkspaceService {
                 .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND)));
     }
 
-    public List<WorkspaceDTO> findWorkspacesByRoomId(Integer roomId) {
+    public List<WorkspaceDTO> findWorkspacesByRoomId(Integer roomId, boolean enabledOnly) {
+        if (enabledOnly) {
+            return workspaceMapper.toDtoList(workspaceRepository.findByRoomIdAndEnabledTrue(roomId));
+        }
         return workspaceMapper.toDtoList(workspaceRepository.findByRoomId(roomId));
     }
 
-    public List<SelectOptionDTO> getWorkspaceOptionsByRoom(Integer roomId) {
-        return workspaceRepository.findByRoomId(roomId).stream()
-                .map(w -> new SelectOptionDTO(w.getId(), w.getName()))
-                .toList();
+    public List<WorkspaceDTO> findWorkspacesByFloorId(Integer floorId, boolean enabledOnly) {
+        if (enabledOnly) {
+            return workspaceMapper.toDtoList(workspaceRepository.findByRoomFloorIdAndEnabledTrue(floorId));
+        }
+        return workspaceMapper.toDtoList(workspaceRepository.findByRoomFloorId(floorId));
     }
 
-    public Map<String, List<Map<String, Object>>> getRoomsWithWorkspaces() {
-        List<Room> rooms = roomRepository.findAll();
+    public List<SelectOptionDTO> getWorkspaceOptionsByRoom(Integer roomId) {
+        return workspaceMapper.toSelectOptionDTOList(workspaceRepository.findByRoomIdAndEnabledTrue(roomId));
+    }
 
-        Map<String, List<Map<String, Object>>> result = new HashMap<>();
-        List<Map<String, Object>> roomsList = new ArrayList<>();
-
-        for (Room room : rooms) {
-            Map<String, Object> roomMap = new HashMap<>();
-            roomMap.put("id", room.getId());
-            roomMap.put("name", room.getName());
-
-            List<Map<String, Object>> workspacesList = workspaceRepository.findByRoomId(room.getId())
-                    .stream()
-                    .map(w -> {
-                        Map<String, Object> workspaceMap = new HashMap<>();
-                        workspaceMap.put("id", w.getId());
-                        workspaceMap.put("name", w.getName());
-                        return workspaceMap;
-                    })
-                    .collect(Collectors.toList());
-
-            roomMap.put("workspaces", workspacesList);
-            roomsList.add(roomMap);
-        }
-
-        result.put("rooms", roomsList);
-        return result;
+    public List<SelectOptionDTO> getWorkspaceOptionsByFloor(Integer floorId) {
+        return workspaceMapper.toSelectOptionDTOList(workspaceRepository.findByRoomFloorIdAndEnabledTrue(floorId));
     }
 
     public WorkspaceDTO createWorkspace(WorkspaceDTO workspaceDTO) {
         Workspace workspace = workspaceMapper.toEntity(workspaceDTO);
+        workspace.setId(null);
 
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
@@ -124,5 +107,4 @@ public class WorkspaceService {
         }
         workspaceRepository.deleteById(id);
     }
-
 }

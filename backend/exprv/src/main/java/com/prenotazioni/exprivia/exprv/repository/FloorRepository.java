@@ -9,5 +9,9 @@ import java.util.List;
 public interface FloorRepository extends JpaRepository<Floor, Integer> {
 
     List<Floor> findByBuildingId(Integer buildingId);
+    
+    List<Floor> findByBuildingIdAndEnabledTrue(Integer buildingId);
+    
+    List<Floor> findAllByEnabledTrue();
 
 }

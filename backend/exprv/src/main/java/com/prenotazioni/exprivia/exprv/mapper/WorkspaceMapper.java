@@ -9,6 +9,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
+import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.dto.WorkspaceDTO;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
 
@@ -18,20 +19,31 @@ public interface WorkspaceMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "room.id", target = "roomId")
     @Mapping(source = "enabled", target = "enabled")
+    @Mapping(source = "mapX", target = "mapX")
+    @Mapping(source = "mapY", target = "mapY")
     WorkspaceDTO toDto(Workspace workspace);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(target = "room", ignore = true)
     @Mapping(source = "enabled", target = "enabled")
+    @Mapping(source = "mapX", target = "mapX")
+    @Mapping(source = "mapY", target = "mapY")
     Workspace toEntity(WorkspaceDTO workspaceDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(target = "room", ignore = true)
     @Mapping(source = "enabled", target = "enabled")
+    @Mapping(source = "mapX", target = "mapX")
+    @Mapping(source = "mapY", target = "mapY")
     void updateWorkspaceFromDto(WorkspaceDTO workspaceDTO, @MappingTarget Workspace workspace);
 
     List<WorkspaceDTO> toDtoList(List<Workspace> workspaceList);
+
+    @Mapping(source = "name", target = "label")
+    SelectOptionDTO toSelectOptionDTO(Workspace entity);
+
+    List<SelectOptionDTO> toSelectOptionDTOList(List<Workspace> entities);
 
 }

@@ -45,6 +45,9 @@ public class Floor {
     @JoinColumn(name = "id_building")
     private Building building;
 
+    @Column(name = "enabled")
+    private Boolean enabled = true;
+
     @OneToMany(mappedBy = "floor")
     @JsonIgnore
     private List<Room> rooms = new ArrayList<>();
@@ -90,6 +93,14 @@ public class Floor {
 
     public void setBuilding(Building building) {
         this.building = building;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public List<Room> getRooms() {

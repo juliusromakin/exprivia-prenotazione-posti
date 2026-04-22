@@ -1,10 +1,17 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class LocationDTO {
 
     private Integer id;
 
+    @NotBlank(message = "Il nome della sede è obbligatorio")
     private String name;
+
+    @NotNull(message = "Lo stato della sede è obbligatorio")
+    private Boolean enabled;
 
     public LocationDTO() {
     }
@@ -28,6 +35,14 @@ public class LocationDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

@@ -112,6 +112,10 @@ public class ReservationService {
         Workspace workspace = workspaceRepository.findById(reservationDTO.getWorkspaceId())
                 .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
 
+        if (!Boolean.TRUE.equals(workspace.getEnabled())) {
+            throw new AppException("This workspace is currently unavailable for bookings", HttpStatus.FORBIDDEN);
+        }
+
         ReservationDuration duration = durationRepository.findByName(reservationDTO.getDurationName())
                 .orElseThrow(() -> new AppException("Duration not found", HttpStatus.NOT_FOUND));
 
@@ -176,6 +180,13 @@ public class ReservationService {
     }
 
     public List<String> getAvailableTimes(Integer workspaceId, LocalDate data) {
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
+        
+        if (!Boolean.TRUE.equals(workspace.getEnabled())) {
+            return List.of(); // Nessun orario disponibile se disabilitato
+        }
+
         List<String> tuttiOrari = List.of(
                 "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
                 "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
