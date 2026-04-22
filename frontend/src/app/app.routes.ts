@@ -11,6 +11,7 @@ import { AuthService } from "./core/auth/auth.service";
 import { Router } from "@angular/router";
 import { RegisterComponent } from "./account/register/register.component";
 import { UpdateUserComponent } from "./account/update-user/update-user.component";
+import { AmministrazionePlanimetrieComponent } from "./pages/amministrazione-planimetrie/amministrazione-planimetrie.component";
 
 // Guard to redirect authenticated users to workspace-booking
 const redirectAuthenticatedToWorkspaceBooking = () => {
@@ -59,6 +60,11 @@ export const routes: Routes = [
   {
     path: "admin/homepage",
     component: AdminHomeComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: "amministrazione-planimetrie",
+    component: AmministrazionePlanimetrieComponent,
     canActivate: [AuthGuard],
   },
   {
