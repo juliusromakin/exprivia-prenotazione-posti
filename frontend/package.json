@@ -24,6 +24,7 @@
     "axios": "^1.8.1",
     "date-fns": "^4.1.0",
     "exprivia": "file:",
+    "fabric": "^6.9.1",
     "flowbite": "^3.1.2",
     "jwt-decode": "^4.0.0",
     "lucide-angular": "^0.479.0",
