@@ -1,25 +1,31 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.prenotazioni.exprivia.exprv.enumerati.ReservationStatus;
 
 public class ReservationDTO {
     private Integer id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime endDate;
     private ReservationStatus status;
 
     private Integer workspaceId;
     private Integer userId;
     private String durationName;
-    private UserSummaryDTO userSummary; // English user details
+
+    private UserSummaryDTO userSummary;
+    private WorkspaceDTO workspaceSummary;
+    private RoomDTO roomSummary;
 
     public ReservationDTO() {
     }
 
     public ReservationDTO(Integer id, LocalDateTime startDate, LocalDateTime endDate,
-            ReservationStatus status, Integer workspaceId, Integer userId, String durationName, UserSummaryDTO userSummary) {
+            ReservationStatus status, Integer workspaceId, Integer userId, String durationName,
+            UserSummaryDTO userSummary, WorkspaceDTO workspaceSummary, RoomDTO roomSummary) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -28,6 +34,8 @@ public class ReservationDTO {
         this.userId = userId;
         this.durationName = durationName;
         this.userSummary = userSummary;
+        this.workspaceSummary = workspaceSummary;
+        this.roomSummary = roomSummary;
     }
 
     public Integer getId() {
@@ -94,4 +102,19 @@ public class ReservationDTO {
         this.userSummary = userSummary;
     }
 
+    public WorkspaceDTO getWorkspaceSummary() {
+        return workspaceSummary;
+    }
+
+    public void setWorkspaceSummary(WorkspaceDTO workspaceSummary) {
+        this.workspaceSummary = workspaceSummary;
+    }
+
+    public RoomDTO getRoomSummary() {
+        return roomSummary;
+    }
+
+    public void setRoomSummary(RoomDTO roomSummary) {
+        this.roomSummary = roomSummary;
+    }
 }
