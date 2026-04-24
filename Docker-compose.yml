@@ -33,6 +33,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - prenotazioni-net
 
@@ -44,6 +46,15 @@ services:
       - "10000:80"
     depends_on:
       - backend
+    networks:
+      - prenotazioni-net
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: PrenotazioniMailHog
+    ports:
+      - "1025:1025"
+      - "10030:8025"
     networks:
       - prenotazioni-net
 

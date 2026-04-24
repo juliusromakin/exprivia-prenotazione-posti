@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.prenotazioni.exprivia.exprv.entity.User;
@@ -22,6 +23,7 @@ public class PasswordResetService {
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
 
+    @Transactional
     public String createResetToken(String email) {
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email.trim());
         if (userOpt.isEmpty()) {
@@ -30,7 +32,12 @@ public class PasswordResetService {
 
         User user = userOpt.get();
         String token = UUID.randomUUID().toString();
-        PasswordResetToken resetToken = new PasswordResetToken();
+        
+        // Cerca se esiste già un token per l'utente e lo aggiorna, 
+        // oppure ne crea uno nuovo se non esiste.
+        PasswordResetToken resetToken = tokenRepository.findByUser(user)
+                .orElseGet(PasswordResetToken::new);
+        
         resetToken.setToken(token);
         resetToken.setUser(user);
         resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));

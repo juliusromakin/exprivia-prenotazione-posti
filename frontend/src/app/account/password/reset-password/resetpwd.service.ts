@@ -11,7 +11,7 @@ interface ResetPasswordRequest {
     providedIn: 'root'
 })
 export class ResetPasswordService {
-    private readonly baseUrl = '/auth';
+    private readonly baseUrl = '/api/auth';
 
     constructor(private axiosService: AxiosService) {}
 

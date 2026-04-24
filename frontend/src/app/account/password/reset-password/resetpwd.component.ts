@@ -39,7 +39,7 @@ export class ResetpwdComponent implements OnInit {
     password: new FormControl('', [
       Validators.required,
       Validators.minLength(6),
-      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/)
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)
     ]),
     confirmPassword: new FormControl('', [Validators.required])
   }, { validators: passwordMatchValidator });
@@ -62,7 +62,7 @@ export class ResetpwdComponent implements OnInit {
       this.token = params['token'];
       if (!this.token) {
         this.showError('Token mancante. Richiedi un nuovo link di reset.');
-        this.router.navigate(['/account/password/forgot']);
+        this.router.navigate(['/forgot-password']);
       }
     });
   }
@@ -92,7 +92,7 @@ export class ResetpwdComponent implements OnInit {
         await this.resetPwdService.resetPassword(this.token, password);
         
         this.showSuccess('Password cambiata con successo!');
-        await this.router.navigate(['/accedi']);
+        await this.router.navigate(['/login']);
       } catch (error) {
         this.errorMessage = error instanceof Error ? error.message : 'Errore durante il cambio password';
         this.showError(this.errorMessage);

@@ -37,7 +37,13 @@
           }}</mat-icon>
         </button>
         <mat-error *ngIf="resetPwdForm.get('password')?.hasError('required')">
-          <strong>Password richiesta</strong>
+          Password richiesta
+        </mat-error>
+        <mat-error *ngIf="resetPwdForm.get('password')?.hasError('minlength')">
+          La password deve essere di almeno 6 caratteri
+        </mat-error>
+        <mat-error *ngIf="resetPwdForm.get('password')?.hasError('pattern')">
+          La password deve contenere una maiuscola, una minuscola e un numero
         </mat-error>
       </mat-form-field>
 

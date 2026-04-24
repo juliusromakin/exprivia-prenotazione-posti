@@ -8,8 +8,8 @@ RUN npm install
 
 COPY . .
 
-# Aggiungi questa variabile per aumentare la memoria
-ENV NODE_OPTIONS=--max-old-space-size=16384
+# Limite di memoria più ragionevole per evitare crash del builder
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 RUN npm run build --configuration=production --project=exprivia
 

@@ -10,7 +10,7 @@ interface ForgotPasswordRequest {
     providedIn: 'root'
 })
 export class ForgotPasswordService {
-    private readonly baseUrl = '/auth';
+    private readonly baseUrl = '/api/auth';
 
     constructor(private axiosService: AxiosService) {}
 

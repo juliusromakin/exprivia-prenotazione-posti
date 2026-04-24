@@ -89,38 +89,38 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<String> forgotPassword(EmailDTO emailDTO) {
+    public ResponseEntity<?> forgotPassword(EmailDTO emailDTO) {
         if (emailDTO.email() == null || emailDTO.email().isBlank()) {
-            return ResponseEntity.badRequest().body("L'email è obbligatoria");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "L'email è obbligatoria"));
         }
 
         String email = emailDTO.email().trim();
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email non trovata nel sistema");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("message", "Email non trovata nel sistema"));
         }
 
         try {
             String token = passwordResetService.createResetToken(email);
             emailService.sendPasswordResetEmail(email, token);
-            return ResponseEntity.ok("Email inviata, controlla la tua posta elettronica");
+            return ResponseEntity.ok(java.util.Map.of("message", "Email inviata, controlla la tua posta elettronica"));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Errore durante l'invio dell'email");
+            return ResponseEntity.internalServerError().body(java.util.Map.of("message", "Errore durante l'invio dell'email"));
         }
     }
 
     @Transactional
-    public ResponseEntity<String> resetPassword(ResetPasswordRequest resetRequest) {
+    public ResponseEntity<?> resetPassword(ResetPasswordRequest resetRequest) {
         if (resetRequest.token() == null || resetRequest.newPassword() == null
                 || resetRequest.newPassword().isBlank()) {
-            return ResponseEntity.badRequest().body("Dati mancanti per il reset");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Dati mancanti per il reset"));
         }
 
         Optional<User> userOpt = passwordResetService.validateToken(resetRequest.token());
 
         if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Token non valido o scaduto");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Token non valido o scaduto"));
         }
 
         User user = userOpt.get();
@@ -129,7 +129,7 @@ public class AuthService {
 
         passwordResetService.invalidateToken(resetRequest.token());
 
-        return ResponseEntity.ok("Password aggiornata con successo");
+        return ResponseEntity.ok(java.util.Map.of("message", "Password aggiornata con successo"));
     }
 
     @Transactional

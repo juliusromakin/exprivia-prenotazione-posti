@@ -14,7 +14,7 @@ public class EmailService {
 
     public void sendPasswordResetEmail(String toEmail, String token) {
         try {
-            String resetUrl = "http://localhost:4200/reset-password?token=" + token; // ← URL frontend
+            String resetUrl = "http://localhost:10000/reset-password?token=" + token; // ← URL frontend (Porta Docker 10000)
 
             System.out.println("DEBUG - Token di reset password per " + toEmail + ": " + token);
             System.out.println("DEBUG - Link di reset: " + resetUrl);

@@ -11,4 +11,6 @@ import com.prenotazioni.exprivia.exprv.entity.PasswordResetToken;
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Integer> {
 
     Optional<PasswordResetToken> findByToken(String token);
+    Optional<PasswordResetToken> findByUser(com.prenotazioni.exprivia.exprv.entity.User user);
+    void deleteByUser(com.prenotazioni.exprivia.exprv.entity.User user);
 }

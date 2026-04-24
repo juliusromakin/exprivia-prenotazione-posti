@@ -46,25 +46,14 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody EmailDTO emailDTO) {
-        try {
-            authService.forgotPassword(emailDTO);
-            return ResponseEntity.ok("Email inviata se l'indirizzo esiste nel sistema.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+    public ResponseEntity<?> forgotPassword(@RequestBody EmailDTO emailDTO) {
+        return authService.forgotPassword(emailDTO);
     }
 
     // Endpoint per il reset password
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
-        try {
-            authService.resetPassword(resetPasswordRequest);
-            return ResponseEntity.ok("Password Aggiornata Con Successo");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return authService.resetPassword(resetPasswordRequest);
     }
 
 }
