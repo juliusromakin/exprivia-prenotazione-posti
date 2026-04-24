@@ -5,11 +5,12 @@ import com.prenotazioni.exprivia.exprv.dto.WorkspaceDTO;
 import com.prenotazioni.exprivia.exprv.service.WorkspaceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/workspaces")
+@RequestMapping("/api/workspaces")
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
@@ -19,7 +20,8 @@ public class WorkspaceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WorkspaceDTO>> getAllWorkspaces(@RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
+    public ResponseEntity<List<WorkspaceDTO>> getAllWorkspaces(
+            @RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
         return ResponseEntity.ok(workspaceService.findAllWorkspaces(enabledOnly));
     }
 
@@ -53,22 +55,28 @@ public class WorkspaceController {
     }
 
     @PostMapping
-    public ResponseEntity<WorkspaceDTO> createWorkspace(@jakarta.validation.Valid @RequestBody WorkspaceDTO workspaceDTO) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<WorkspaceDTO> createWorkspace(
+            @jakarta.validation.Valid @RequestBody WorkspaceDTO workspaceDTO) {
         return ResponseEntity.ok(workspaceService.createWorkspace(workspaceDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkspaceDTO> updateWorkspace(@PathVariable Integer id, @jakarta.validation.Valid @RequestBody WorkspaceDTO workspaceDTO) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<WorkspaceDTO> updateWorkspace(@PathVariable Integer id,
+            @jakarta.validation.Valid @RequestBody WorkspaceDTO workspaceDTO) {
         return ResponseEntity.ok(workspaceService.updateWorkspace(id, workspaceDTO));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> softDeleteWorkspace(@PathVariable Integer id) {
         workspaceService.softDeleteWorkspace(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/hard")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> hardDeleteWorkspace(@PathVariable Integer id) {
         workspaceService.hardDeleteWorkspace(id);
         return ResponseEntity.noContent().build();

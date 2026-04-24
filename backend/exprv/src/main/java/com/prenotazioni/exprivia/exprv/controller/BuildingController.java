@@ -19,7 +19,8 @@ public class BuildingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BuildingDTO>> getAllBuildings(@RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
+    public ResponseEntity<List<BuildingDTO>> getAllBuildings(
+            @RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
         return ResponseEntity.ok(buildingService.findAllBuildings(enabledOnly));
     }
 
@@ -46,7 +47,8 @@ public class BuildingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BuildingDTO> updateBuilding(@PathVariable Integer id, @jakarta.validation.Valid @RequestBody BuildingDTO buildingDTO) {
+    public ResponseEntity<BuildingDTO> updateBuilding(@PathVariable Integer id,
+            @jakarta.validation.Valid @RequestBody BuildingDTO buildingDTO) {
         return ResponseEntity.ok(buildingService.updateBuilding(id, buildingDTO));
     }
 

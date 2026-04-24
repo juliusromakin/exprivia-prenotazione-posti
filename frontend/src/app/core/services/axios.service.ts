@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { TokenService } from '../auth/token.service';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,7 +13,7 @@ export class AxiosService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: '',
+      baseURL: environment.apiUrl || '',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -38,8 +40,9 @@ export class AxiosService {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          this.tokenService.clearToken();
-          window.location.href = '/login';
+          console.error("401 Unauthorized received:", error.response);
+          // this.tokenService.clearToken();
+          // window.location.href = '/login'; // Disabilitato temporaneamente per debug
         }
         return Promise.reject(error);
       }

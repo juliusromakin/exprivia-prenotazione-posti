@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { Subject, takeUntil, forkJoin, of, catchError } from 'rxjs';
 import { ReservationService } from '@core/services/reservation.service';
 import { AuthService } from '@core/auth/auth.service';
 import { AdminService } from '@core/services/admin.service';
-import { Reservation } from '@core/models/reservation.model';
+import { StatisticsService } from '@core/services/statistics.service';
+import { Reservation, User, RoomStats, StatisticsCount } from '@core/models';
 
 interface StatsData {
   totalBookings: number;
@@ -54,6 +55,7 @@ export class StatsComponent implements OnInit, OnDestroy {
 
   constructor(
     private reservationService: ReservationService,
+    private statisticsService: StatisticsService,
     private authService: AuthService,
     private adminService: AdminService
   ) {}
@@ -83,15 +85,30 @@ export class StatsComponent implements OnInit, OnDestroy {
       this.isLoading = true;
     }
     
-    // Fetch both bookings and users data (admin-only page)
+    // Fetch bookings, users, and pre-calculated statistics
+    // Using of([]) as fallback to prevent the whole dashboard from failing if one call fails
     forkJoin({
-      reservations: this.reservationService.getReservations(),
-      users: this.adminService.getAllUsers()
+      reservations: this.reservationService.getReservations().pipe(catchError(() => {
+        console.error('Failed to load reservations');
+        return of([] as Reservation[]);
+      })),
+      users: this.adminService.getAllUsers().pipe(catchError(() => {
+        console.error('Failed to load users');
+        return of([] as User[]);
+      })),
+      dailyStats: this.statisticsService.getReservationsPerDay().pipe(catchError(() => {
+        console.error('Failed to load daily statistics');
+        return of([] as StatisticsCount[]);
+      })),
+      roomStats: this.statisticsService.getMostBookedRooms().pipe(catchError(() => {
+        console.error('Failed to load room statistics');
+        return of([] as RoomStats[]);
+      }))
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: ({ reservations, users }) => {
-        this.calculateStats(reservations, users.length);
+      next: ({ reservations, users, dailyStats, roomStats }) => {
+        this.calculateStats(reservations, users.length, dailyStats, roomStats);
         if (isRefresh) {
           this.isRefreshing = false;
         } else {
@@ -99,17 +116,19 @@ export class StatsComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        console.error('Error loading stats:', error);
-        if (isRefresh) {
-          this.isRefreshing = false;
-        } else {
-          this.isLoading = false;
-        }
+        console.error('Critical error loading stats:', error);
+        this.isLoading = false;
+        this.isRefreshing = false;
       }
     });
   }
 
-  private calculateStats(reservations: Reservation[], totalUsersCount: number): void {
+  private calculateStats(
+    reservations: Reservation[], 
+    totalUsersCount: number,
+    dailyStats: StatisticsCount[],
+    roomStats: RoomStats[]
+  ): void {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -137,15 +156,21 @@ export class StatsComponent implements OnInit, OnDestroy {
     // Total users count
     this.stats.totalUsers = totalUsersCount;
 
-    // Most popular room
-    const roomCounts = new Map<string, number>();
-    parsedReservations.forEach(p => {
-      const roomName = p.roomSummary?.name || 'N/A';
-      roomCounts.set(roomName, (roomCounts.get(roomName) || 0) + 1);
-    });
-    this.stats.mostPopularRoom = this.getMostPopular(roomCounts);
+    // Use backend Room Statistics
+    if (roomStats && roomStats.length > 0) {
+      this.stats.mostPopularRoom = roomStats[0].roomName;
+      this.stats.roomUtilization = roomStats.map(rs => ({
+        roomName: rs.roomName,
+        percentage: this.stats.totalBookings > 0 
+          ? Math.round((rs.reservationCount / this.stats.totalBookings) * 100) 
+          : 0
+      })).slice(0, 5);
+    } else {
+      this.stats.mostPopularRoom = 'N/A';
+      this.stats.roomUtilization = [];
+    }
 
-    // Most popular time slot
+    // Most popular time slot (still calculated manually for now)
     const timeSlotCounts = new Map<string, number>();
     parsedReservations.forEach(p => {
       const timeSlot = this.getTimeSlot(p.startDate);
@@ -160,22 +185,30 @@ export class StatsComponent implements OnInit, OnDestroy {
     }, 0);
     this.stats.avgBookingDuration = totalDuration / parsedReservations.length || 0;
 
-    // Room utilization (top 5)
-    this.stats.roomUtilization = Array.from(roomCounts.entries())
-      .map(([room, count]) => ({
-        roomName: room,
-        percentage: Math.round((count / this.stats.totalBookings) * 100)
-      }))
-      .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 5);
-
     // Time slot distribution
     this.stats.timeSlotDistribution = Array.from(timeSlotCounts.entries())
       .map(([timeSlot, count]) => ({ timeSlot, count }))
       .sort((a, b) => b.count - a.count);
 
-    // Weekly trend (last 7 days)
-    this.stats.weeklyTrend = this.calculateWeeklyTrend(parsedReservations);
+    // Use backend Daily Statistics for Weekly Trend
+    if (dailyStats && dailyStats.length > 0) {
+      // Map backend data to trend days
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const trend = days.map(day => ({ day, count: 0 }));
+      
+      dailyStats.forEach(ds => {
+        const date = this.parseDate(ds.startDate);
+        const dayIndex = date.getDay();
+        trend[dayIndex].count += ds.count;
+      });
+
+      this.stats.weeklyTrend = [
+        ...trend.slice(1), // Monday to Saturday
+        trend[0] // Sunday
+      ];
+    } else {
+      this.stats.weeklyTrend = this.calculateWeeklyTrend(parsedReservations);
+    }
 
     // Monthly trend (last 6 months)
     this.stats.monthlyTrend = this.calculateMonthlyTrend(parsedReservations);

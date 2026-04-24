@@ -5,3 +5,4 @@ export * from "./reservation.model";
 export * from "./auth.model";
 export * from "./reservation-duration.model";
 export * from "./enums";
+export * from "./statistics.model";

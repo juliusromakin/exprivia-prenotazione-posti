@@ -64,13 +64,15 @@ public class SecurityConfig {
 
                         // Endpoint per utenti Autenticati (Mappatura Italiano + Inglese)
                         .requestMatchers("/api/user/**", "/api/utenti/**").authenticated()
-                        .requestMatchers("/api/room/**", "/api/stanze/**").authenticated()
-                        .requestMatchers("/api/workspace/**", "/api/postazioni/**").authenticated()
-                        .requestMatchers("/api/reservation/**", "/api/prenotazioni/**").authenticated()
+                        .requestMatchers("/api/room/**", "/api/rooms/**", "/api/stanze/**").authenticated()
+                        .requestMatchers("/api/workspace/**", "/api/workspaces/**", "/api/postazioni/**")
+                        .authenticated()
+                        .requestMatchers("/api/reservation/**", "/api/reservations/**", "/api/prenotazioni/**")
+                        .authenticated()
 
                         // Altri endpoint specifici
                         .requestMatchers("/api/cose-durata/**", "/api/reservation-duration/**").authenticated()
-                        .requestMatchers("/api/stats/**").authenticated()
+                        .requestMatchers("/api/stats/**", "/api/statistics/**").authenticated()
 
                         // Qualsiasi altra richiesta deve essere autenticata
                         .anyRequest().authenticated());

@@ -46,7 +46,8 @@ public class FloorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FloorDTO> updateFloor(@PathVariable Integer id, @jakarta.validation.Valid @RequestBody FloorDTO floorDTO) {
+    public ResponseEntity<FloorDTO> updateFloor(@PathVariable Integer id,
+            @jakarta.validation.Valid @RequestBody FloorDTO floorDTO) {
         return ResponseEntity.ok(floorService.updateFloor(id, floorDTO));
     }
 

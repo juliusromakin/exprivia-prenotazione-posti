@@ -75,4 +75,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
            "   AND ro.id = (SELECT w2.room.id FROM Workspace w2 WHERE w2.id = :workspaceId))" +
            ")")
     List<Reservation> findByStartDateOnDayAndWorkspace(@Param("giorno") LocalDate giorno, @Param("workspaceId") Integer workspaceId);
+
+    @Query(value = "SELECT CAST(start_date AS DATE) as start_date, COUNT(*) as count " +
+            "FROM reservation " +
+            "WHERE start_date >= :startDate " +
+            "GROUP BY CAST(start_date AS DATE) " +
+            "ORDER BY start_date ASC", nativeQuery = true)
+    List<Object[]> countReservationsPerDay(@Param("startDate") LocalDateTime startDate);
+
+    @Query(value = "SELECT r.name, COUNT(res.id) as reservation_count " +
+            "FROM reservation res " +
+            "JOIN workspace w ON res.id_workspace = w.id " +
+            "JOIN room r ON w.id_room = r.id " +
+            "GROUP BY r.name " +
+            "ORDER BY reservation_count DESC", nativeQuery = true)
+    List<Object[]> findMostBookedRooms();
 }

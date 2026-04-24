@@ -19,7 +19,8 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationDTO>> getAllLocations(@RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
+    public ResponseEntity<List<LocationDTO>> getAllLocations(
+            @RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
         return ResponseEntity.ok(locationService.findAllLocations(enabledOnly));
     }
 
@@ -39,7 +40,8 @@ public class LocationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LocationDTO> updateLocation(@PathVariable Integer id, @jakarta.validation.Valid @RequestBody LocationDTO locationDTO) {
+    public ResponseEntity<LocationDTO> updateLocation(@PathVariable Integer id,
+            @jakarta.validation.Valid @RequestBody LocationDTO locationDTO) {
         return ResponseEntity.ok(locationService.updateLocation(id, locationDTO));
     }
 
