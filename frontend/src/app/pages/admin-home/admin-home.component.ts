@@ -29,7 +29,7 @@ export class AdminHomeComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
     private destroy$ = new Subject<void>();
 
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) { }
 
     ngOnInit(): void {
         this.authService
@@ -58,7 +58,7 @@ export class AdminHomeComponent implements OnInit, OnDestroy {
         },
         {
             title: 'Gestione Planimetrie',
-            description: 'Configura e aggiorna le planimetrie degli uffici, gestendo postazioni e sale riunioni.',
+            description: 'Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.',
             icon: 'map',
             features: [
                 'Editor planimetria interattivo',
