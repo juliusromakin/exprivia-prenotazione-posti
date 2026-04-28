@@ -36,6 +36,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     private lastPosX = 0;
     private lastPosY = 0;
     private readonly GRID = 2;
+    private readonly ZOOM_THRESHOLD = 1.5;
 
     constructor(private cdr: ChangeDetectorRef) { }
 
@@ -120,6 +121,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             if (zoom < 0.1) zoom = 0.1;
 
             this.canvas!.zoomToPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY), zoom);
+            this.updateClusteringView(zoom);
             opt.e.preventDefault();
             opt.e.stopPropagation();
         });
@@ -285,6 +287,70 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             }
         });
         this.canvas?.renderAll();
+    }
+
+    /**
+     * Mostra/nasconde le postazioni in base al livello di zoom.
+     * Zoom Out (zoom < ZOOM_THRESHOLD): le postazioni scompaiono e le stanze
+     * mostrano un contatore verde con il numero di postazioni al loro interno.
+     * Zoom In  (zoom >= ZOOM_THRESHOLD): le postazioni tornano visibili e il testo
+     * della stanza torna allo stato originale (nome, opacity 0).
+     */
+    updateClusteringView(zoom: number): void {
+        if (!this.canvas) return;
+
+        const allObjects = this.canvas.getObjects();
+
+        const stanze = allObjects.filter(
+            (obj: any) => obj.data?.tipo === 'stanza' && obj instanceof fabric.Group
+        ) as fabric.Group[];
+
+        const postazioni = allObjects.filter(
+            (obj: any) => obj.data?.tipo === 'postazione' && obj instanceof fabric.Group
+        ) as fabric.Group[];
+
+        const isZoomedOut = zoom < this.ZOOM_THRESHOLD;
+
+        // ── Aggiorna visibilità postazioni ───────────────────────────────────
+        postazioni.forEach((desk) => {
+            desk.set({ opacity: isZoomedOut ? 0 : 1, evented: !isZoomedOut });
+        });
+
+        // ── Aggiorna label di ogni stanza ────────────────────────────────────
+        stanze.forEach((room) => {
+            const children = room.getObjects();
+            const labelText = children[1] as fabric.Text | undefined;
+            if (!labelText) return;
+
+            if (isZoomedOut) {
+                // Conta le postazioni che appartengono a questa stanza
+                const count = postazioni.filter((desk) => {
+                    const center = desk.getCenterPoint();
+                    return room.containsPoint(center);
+                }).length;
+
+                labelText.set({
+                    text: String(count),
+                    fill: '#22c55e',          // verde Tailwind green-500
+                    fontSize: 24,
+                    fontWeight: 'bold',
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    opacity: 1
+                });
+            } else {
+                // Ripristina il nome originale della stanza, tenendolo nascosto
+                labelText.set({
+                    text: (room as any).data?.label ?? '',
+                    fill: '#ffffff',
+                    fontSize: 14,
+                    fontWeight: 'normal',
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    opacity: 0
+                });
+            }
+        });
+
+        this.canvas.renderAll();
     }
 
     salvaDati() {
