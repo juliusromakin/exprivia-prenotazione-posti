@@ -27,7 +27,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody CredentialsDto credentialsDto) {
-        // Utilizziamo il metodo login del service che ora gestisce sia UserDTO che AdminDTO
         AuthResponseDTO authResponse = authService.login(credentialsDto);
         return ResponseEntity.ok(authResponse);
     }
@@ -50,7 +49,6 @@ public class AuthController {
         return authService.forgotPassword(emailDTO);
     }
 
-    // Endpoint per il reset password
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         return authService.resetPassword(resetPasswordRequest);
