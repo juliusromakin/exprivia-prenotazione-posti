@@ -28,11 +28,6 @@ public class FloorController {
         this.floorService = floorService;
     }
 
-    @PostMapping(value = "/{id}/upload-plan", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FloorDTO> uploadPlan(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(floorService.uploadFloorPlan(id, file));
-    }
-
     @PostMapping("")
     public ResponseEntity<FloorDTO> createFloor(@jakarta.validation.Valid @RequestBody FloorDTO floorDTO) {
         return ResponseEntity.ok(floorService.createFloor(floorDTO));

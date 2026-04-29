@@ -8,7 +8,6 @@ public class FloorDTO {
     private Integer id;
     @NotBlank(message = "Il nome del piano è obbligatorio")
     private String name;
-    private String imagePath;
     @NotNull(message = "L'edificio di appartenenza è obbligatorio")
     private Integer buildingId;
     private Boolean enabled;
@@ -16,10 +15,9 @@ public class FloorDTO {
     public FloorDTO() {
     }
 
-    public FloorDTO(Integer id, String name, String imagePath, Integer buildingId) {
+    public FloorDTO(Integer id, String name, Integer buildingId) {
         this.id = id;
         this.name = name;
-        this.imagePath = imagePath;
         this.buildingId = buildingId;
     }
 
@@ -39,14 +37,6 @@ public class FloorDTO {
         this.name = name;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
     public Integer getBuildingId() {
         return buildingId;
     }
@@ -62,5 +52,4 @@ public class FloorDTO {
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
-
 }

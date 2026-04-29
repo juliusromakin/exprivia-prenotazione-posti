@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { User } from '@core/models';
+import { RoleSelectorComponent } from './components/role-selector/role-selector.component';
 
 export interface DialogData {
   title: string;
@@ -13,14 +14,15 @@ export interface DialogData {
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RoleSelectorComponent
   ],
   template: `
     <!-- Modal Overlay -->
     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 99999; display: flex; align-items: center; justify-content: center;"
          (click)="onCancel()">
       
-      <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-lg mx-4" 
+      <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-3xl mx-4" 
            (click)="$event.stopPropagation()">
         
         <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
@@ -34,7 +36,7 @@ export interface DialogData {
           </div>
           
           <!-- Body -->
-          <div class="px-6 py-4 max-h-96 overflow-y-auto">
+          <div class="px-6 py-4 max-h-[80vh] overflow-y-auto">
             <div class="space-y-4">
               
               <!-- Name -->
@@ -92,17 +94,18 @@ export interface DialogData {
               </div>
 
               <!-- Role -->
+              <!-- Roles Drag and Drop -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select formControlName="authorities" 
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="">Select role</option>
-                  <option value="ROLE_USER">Employee</option>
-                  <option value="ROLE_ADMIN">Administrator</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Assegnazione Ruoli e Permessi</label>
+                <app-role-selector 
+                  [assignedRoles]="userForm.get('authorities')?.value || []"
+                  (rolesChanged)="userForm.get('authorities')?.setValue($event); userForm.get('authorities')?.markAsTouched()">
+                </app-role-selector>
+                <!-- Messaggio di errore per ruoli mancanti -->
                 <div *ngIf="userForm.get('authorities')?.invalid && userForm.get('authorities')?.touched" 
-                     class="text-sm text-red-600 mt-1">
-                  Role is required
+                     class="text-sm text-red-600 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  Seleziona almeno un ruolo per poter procedere
                 </div>
               </div>
 
@@ -178,7 +181,7 @@ export class UserFormDialogComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
-      authorities: ['ROLE_USER', Validators.required],
+      authorities: [[], [Validators.required, Validators.minLength(1)]],
       enabled: [true]
     });
   }
@@ -189,7 +192,7 @@ export class UserFormDialogComponent implements OnInit {
         name: this.data.user.name || '',
         lastName: this.data.user.lastName || '',
         email: this.data.user.email || '',
-        authorities: this.data.user.authorities?.[0] || 'ROLE_USER',
+        authorities: this.data.user.authorities || ['ROLE_USER'],
         enabled: this.data.user.enabled !== false // Default to true if not specified
       });
 
@@ -210,11 +213,6 @@ export class UserFormDialogComponent implements OnInit {
       this.errorMessage = '';
       
       const userData = this.userForm.value;
-      
-      // Convert authorities string to array
-      if (userData.authorities) {
-        userData.authorities = [userData.authorities];
-      }
       
       // Remove password if empty (edit mode)
       if (!userData.password) {

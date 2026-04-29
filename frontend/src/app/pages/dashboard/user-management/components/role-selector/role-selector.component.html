@@ -1,0 +1,59 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6" cdkDropListGroup>
+  
+  <!-- Colonna 1: Ruoli Disponibili (Quelli da poter assegnare) -->
+  <div class="flex flex-col bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
+    <h4 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider flex items-center">
+      <i class="fas fa-layer-group mr-2"></i> Ruoli Disponibili
+    </h4>
+    
+    <div 
+      cdkDropList 
+      [cdkDropListData]="availableRoles" 
+      (cdkDropListDropped)="drop($event)"
+      class="max-h-[300px] min-h-[150px] overflow-y-auto pr-1 space-y-2">
+      
+      <div *ngIf="availableRoles.length === 0" class="text-xs text-gray-400 italic p-4 text-center border-2 border-dashed border-gray-200 rounded-lg">
+        Nessun altro ruolo disponibile
+      </div>
+
+      <div *ngFor="let role of availableRoles" cdkDrag
+           class="flex items-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm cursor-grab hover:shadow-md transition-shadow">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 {{ role.bg }} {{ role.color }}">
+          <i class="fas {{ role.icon }}"></i>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-800">{{ role.label }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonna 2: Ruoli Assegnati (I poteri attuali dell'utente) -->
+  <div class="flex flex-col bg-blue-50/50 border border-blue-200 rounded-xl p-4 shadow-sm">
+    <h4 class="text-sm font-bold text-blue-700 mb-4 uppercase tracking-wider flex items-center">
+      <i class="fas fa-check-circle mr-2"></i> Ruoli Assegnati
+    </h4>
+    
+    <div 
+      cdkDropList 
+      [cdkDropListData]="assignedRolesList" 
+      (cdkDropListDropped)="drop($event)"
+      class="flex-1 min-h-[150px] space-y-2">
+      
+      <div *ngIf="assignedRolesList.length === 0" class="text-xs text-blue-400 italic p-4 text-center border-2 border-dashed border-blue-200 rounded-lg">
+        Trascina qui i ruoli per assegnarli
+      </div>
+
+      <div *ngFor="let role of assignedRolesList" cdkDrag
+           class="flex items-center p-3 bg-white border border-blue-200 rounded-lg shadow-sm cursor-grab hover:shadow-md transition-shadow">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 {{ role.bg }} {{ role.color }}">
+          <i class="fas {{ role.icon }}"></i>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-800">{{ role.label }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

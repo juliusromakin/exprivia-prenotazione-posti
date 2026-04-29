@@ -119,15 +119,4 @@ public class FloorService {
         floorRepository.deleteById(id);
     }
 
-    @Transactional
-    public FloorDTO uploadFloorPlan(Integer floorId, MultipartFile file) {
-        Floor floor = floorRepository.findById(floorId)
-                .orElseThrow(() -> new AppException("Floor not found", HttpStatus.NOT_FOUND));
-
-        String fileName = fileStorageService.storeFile(file, "floor_" + floorId);
-        floor.setImagePath(fileName);
-        floorRepository.save(floor);
-
-        return floorMapper.toDto(floor);
-    }
 }

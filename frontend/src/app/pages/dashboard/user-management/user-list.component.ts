@@ -49,7 +49,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   loading$: Observable<boolean>;
   searchTerm = "";
   private destroy$ = new Subject<void>();
-  currentFilter: 'all' | 'admin' | 'user' = 'all';
+  currentFilter: 'all' | 'admin' | 'user' | 'inactive' = 'all';
   openDropdownId: number | null = null;
 
   // Pagination properties
@@ -117,6 +117,8 @@ export class UserListComponent implements OnInit, OnDestroy {
       filtered = filtered.filter(user => user.authorities?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'user') {
       filtered = filtered.filter(user => !user.authorities?.includes('ROLE_ADMIN'));
+    } else if (this.currentFilter === 'inactive') {
+      filtered = filtered.filter(user => !user.enabled);
     }
 
     // Apply search filter
@@ -224,8 +226,12 @@ export class UserListComponent implements OnInit, OnDestroy {
     ).length;
   }
 
+  getInactiveCount(): number {
+  return this.users.filter(user => !user.enabled).length;
+  }
+  
   // Role filtering
-  filterByRole(role: 'all' | 'admin' | 'user'): void {
+  filterByRole(role: 'all' | 'admin' | 'user' | 'inactive'): void {
     this.currentFilter = role;
     this.applyCurrentFilter();
   }
@@ -343,7 +349,6 @@ export class UserListComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  // Add new method to construct confirmation message
   getUserDeleteConfirmationMessage(): string {
     if (!this.userToDelete) {
       return '';
@@ -363,5 +368,24 @@ export class UserListComponent implements OnInit, OnDestroy {
     ];
 
     return message.join('<br>');
+  }
+
+  async activateUser(user: User): Promise<void> {
+    try {
+      await this.userManagementService.updateUser(user.id!, {
+        name: user.name,
+        lastName: user.lastName,
+        email: user.email,
+        authorities: user.authorities,
+        enabled: true
+      });
+      
+      this.toastService.showSuccess(
+        "Utente Attivato", 
+        `L'account di ${user.name} è ora attivo.`
+      );
+    } catch (error) {
+      this.toastService.showError("Errore", "Impossibile attivare l'utente.");
+    }
   }
 }

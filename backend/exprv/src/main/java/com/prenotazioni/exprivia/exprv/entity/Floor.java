@@ -38,9 +38,6 @@ public class Floor {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    @Column(name = "image_path")
-    private String imagePath;
-
     @ManyToOne
     @JoinColumn(name = "id_building")
     private Building building;
@@ -55,10 +52,9 @@ public class Floor {
     public Floor() {
     }
 
-    public Floor(Integer id, String name, String imagePath, Building building, List<Room> rooms) {
+    public Floor(Integer id, String name, Building building, List<Room> rooms) {
         this.id = id;
         this.name = name;
-        this.imagePath = imagePath;
         this.building = building;
         this.rooms = rooms;
     }
@@ -77,14 +73,6 @@ public class Floor {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
     public Building getBuilding() {
