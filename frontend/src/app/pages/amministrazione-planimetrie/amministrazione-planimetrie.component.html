@@ -1,10 +1,14 @@
 <app-header></app-header>
 
-<main class="flex-1 w-full min-h-screen bg-gradient-to-b from-[var(--color-expriviaBlue)] to-[var(--color-expriviaBlue)]/90" role="main">
+<main
+    class="flex-1 w-full min-h-screen bg-gradient-to-b from-[var(--color-expriviaBlue)] to-[var(--color-expriviaBlue)]/90"
+    role="main">
 
     <!-- Background Pattern -->
     <div class="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0cy00LTEuNzkxLTQtNCAxLjc5MS00IDQtNCA0IDEuNzkxIDQgNHoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+')]"></div>
+        <div
+            class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0cy00LTEuNzkxLTQtNCAxLjc5MS00IDQtNCA0IDEuNzkxIDQgNHoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+')]">
+        </div>
     </div>
 
     <section class="relative py-8 px-4 sm:px-6 lg:px-10" aria-labelledby="admin-planimetrie-title">
@@ -27,11 +31,7 @@
                 <!-- Filtro Sede + Conferma -->
                 <div class="flex items-center gap-3">
                     <div class="relative">
-                        <select
-                            id="sede-select"
-                            (change)="onSedeChange($event)"
-                            [disabled]="isConfirmed"
-                            class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl
+                        <select id="sede-select" (change)="onSedeChange($event)" [disabled]="isConfirmed" class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl
                                    px-4 py-2.5 pr-10 text-sm font-medium
                                    focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)]
                                    transition-colors cursor-pointer appearance-none
@@ -45,27 +45,14 @@
                     </div>
 
                     <!-- Conferma -->
-                    <app-button
-                        *ngIf="!isConfirmed"
-                        label="Conferma"
-                        type="primary"
-                        size="md"
-                        icon="fas fa-check"
-                        iconPosition="right"
-                        [disabled]="!selectedSede"
-                        (click)="onConfirm()"
+                    <app-button *ngIf="!isConfirmed" label="Conferma" type="primary" size="md" icon="fas fa-check"
+                        iconPosition="right" [disabled]="!selectedSede" (click)="onConfirm()"
                         aria-label="Conferma selezione sede">
                     </app-button>
 
                     <!-- Cambia Sede -->
-                    <app-button
-                        *ngIf="isConfirmed"
-                        label="Cambia Sede"
-                        type="ghost"
-                        size="md"
-                        icon="fas fa-exchange-alt"
-                        (click)="resetSede()"
-                        aria-label="Cambia sede">
+                    <app-button *ngIf="isConfirmed" label="Cambia Sede" type="ghost" size="md"
+                        icon="fas fa-exchange-alt" (click)="resetSede()" aria-label="Cambia sede">
                     </app-button>
                 </div>
             </div>
@@ -74,16 +61,15 @@
             <div *ngIf="isConfirmed" class="flex flex-col gap-4" @fadeIn>
 
                 <!-- Toolbar Editor -->
-                <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex flex-wrap items-center gap-2">
+                <div
+                    class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex flex-wrap items-center gap-2">
 
                     <!-- Label sezione modalità -->
                     <span class="text-white/50 text-xs font-semibold uppercase tracking-widest">Modalità</span>
                     <div class="h-5 w-px bg-white/20"></div>
 
                     <!-- Pulsante SELECT -->
-                    <button
-                        *ngIf="imageUrl"
-                        (click)="setMode('SELECT')"
+                    <button *ngIf="imageUrl" (click)="setMode('SELECT')"
                         [class]="currentMode === 'SELECT'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--color-expriviaOrange)] text-white shadow-md transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
@@ -93,9 +79,7 @@
                     </button>
 
                     <!-- Pulsante ROOM -->
-                    <button
-                        *ngIf="imageUrl"
-                        (click)="setMode('ROOM')"
+                    <button *ngIf="imageUrl" (click)="setMode('ROOM')"
                         [class]="currentMode === 'ROOM'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-400 text-white shadow-md ring-2 ring-orange-300/50 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
@@ -106,9 +90,7 @@
                     </button>
 
                     <!-- Pulsante DESK -->
-                    <button
-                        *ngIf="imageUrl"
-                        (click)="setMode('DESK')"
+                    <button *ngIf="imageUrl" (click)="setMode('DESK')"
                         [class]="currentMode === 'DESK'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-500 text-white shadow-md ring-2 ring-blue-400/50 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
@@ -123,10 +105,7 @@
                     <div class="h-5 w-px bg-white/20"></div>
 
                     <!-- Salva -->
-                    <button
-                        *ngIf="imageUrl"
-                        (click)="salvaDati()"
-                        [disabled]="isSaving"
+                    <button *ngIf="imageUrl" (click)="salvaDati()" [disabled]="isSaving"
                         [class]="isSaving
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 text-white/30 cursor-not-allowed border border-white/10 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
@@ -137,13 +116,8 @@
                     </button>
 
                     <!-- Carica File -->
-                    <app-button
-                        label="Carica Planimetria"
-                        type="ghost"
-                        size="sm"
-                        icon="fas fa-upload"
-                        (click)="fileInput.click()"
-                        aria-label="Carica file planimetria">
+                    <app-button label="Carica Planimetria" type="ghost" size="sm" icon="fas fa-upload"
+                        (click)="fileInput.click()" aria-label="Carica file planimetria">
                     </app-button>
 
                     <input type="file" #fileInput (change)="onFileSelected($event)" accept=".png" class="hidden" />
@@ -152,9 +126,12 @@
                     <div class="ml-auto flex items-center gap-4 text-white/40 text-xs">
                         <span><i class="fas fa-search-plus mr-1"></i>Scroll = Zoom</span>
                         <ng-container [ngSwitch]="currentMode">
-                            <span *ngSwitchCase="'SELECT'"><i class="fas fa-hand-paper mr-1"></i>Drag sfondo = Pan</span>
-                            <span *ngSwitchCase="'ROOM'"><i class="fas fa-expand-arrows-alt mr-1"></i>Trascina sul canvas</span>
-                            <span *ngSwitchCase="'DESK'"><i class="fas fa-mouse-pointer mr-1"></i>Click per piazzare</span>
+                            <span *ngSwitchCase="'SELECT'"><i class="fas fa-hand-paper mr-1"></i>Drag sfondo =
+                                Pan</span>
+                            <span *ngSwitchCase="'ROOM'"><i class="fas fa-expand-arrows-alt mr-1"></i>Trascina sul
+                                canvas</span>
+                            <span *ngSwitchCase="'DESK'"><i class="fas fa-mouse-pointer mr-1"></i>Click per
+                                piazzare</span>
                         </ng-container>
                         <span><i class="fas fa-trash mr-1"></i>Canc = Elimina</span>
                     </div>
@@ -164,15 +141,15 @@
                 <div *ngIf="imageUrl" class="flex items-center gap-2">
                     <div [ngSwitch]="currentMode">
                         <span *ngSwitchCase="'SELECT'"
-                              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/70 border border-white/10">
+                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/70 border border-white/10">
                             <i class="fas fa-mouse-pointer"></i> Modalità: Selezione & Pan
                         </span>
                         <span *ngSwitchCase="'ROOM'"
-                              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-400/20 text-orange-300 border border-orange-400/30">
+                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-400/20 text-orange-300 border border-orange-400/30">
                             <i class="fas fa-vector-square"></i> Modalità: Disegno Stanza — trascina per creare
                         </span>
                         <span *ngSwitchCase="'DESK'"
-                              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
                             <i class="fas fa-circle"></i> Modalità: Posiziona Postazione — clicca per inserire
                         </span>
                     </div>
@@ -184,8 +161,8 @@
 
                     <!-- Placeholder quando non c'è ancora immagine -->
                     <div *ngIf="!imageUrl"
-                         class="w-full aspect-video flex flex-col items-center justify-center gap-4 cursor-pointer group"
-                         (click)="fileInput.click()">
+                        class="w-full aspect-video flex flex-col items-center justify-center gap-4 cursor-pointer group"
+                        (click)="fileInput.click()">
                         <div class="w-20 h-20 rounded-full bg-[var(--color-expriviaOrange)]/20
                                     border border-[var(--color-expriviaOrange)]/50
                                     flex items-center justify-center
@@ -205,14 +182,48 @@
             </div>
 
             <!-- ── PLACEHOLDER iniziale ── -->
-            <div *ngIf="!isConfirmed"
-                 class="bg-white/5 border border-dashed border-white/20 rounded-xl
-                        flex flex-col items-center justify-center py-24 gap-4"
-                 @scaleIn>
+            <div *ngIf="!isConfirmed" class="bg-white/5 border border-dashed border-white/20 rounded-xl
+                        flex flex-col items-center justify-center py-24 gap-4" @scaleIn>
                 <i class="fas fa-map-marked-alt text-5xl text-white/20"></i>
                 <p class="text-white/40 text-base font-medium">Seleziona e conferma una sede per iniziare</p>
             </div>
 
         </div>
     </section>
+    <!-- ── MODAL CREAZIONE STANZA ── -->
+    <div *ngIf="showRoomModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelRoomCreation()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative bg-[#1a1a1a] border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl" @scaleIn>
+            <h3 class="text-xl font-bold text-white mb-4">Nuova Stanza</h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Nome Stanza</label>
+                    <input type="text" [(ngModel)]="newRoomName"
+                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                        placeholder="Es. Stanza A1">
+                </div>
+
+                <div>
+                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Tipo Stanza</label>
+                    <select [(ngModel)]="newRoomType"
+                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer">
+                        <option value="MEETING_ROOM">Sala Riunioni</option>
+                        <option value="OFFICE">Ufficio</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <app-button label="Annulla" type="ghost" size="md" class="flex-1" (click)="cancelRoomCreation()">
+                </app-button>
+                <app-button label="Crea" type="primary" size="md" class="flex-1" [disabled]="!newRoomName"
+                    (click)="confirmRoomCreation()">
+                </app-button>
+            </div>
+        </div>
+    </div>
 </main>

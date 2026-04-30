@@ -9,12 +9,14 @@ import { lastValueFrom } from 'rxjs';
 import { RoomService } from '../../core/services/room.service';
 import { WorkspaceService } from '../../core/services/workspace.service';
 
+import { FormsModule } from '@angular/forms';
+
 export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 
 @Component({
     selector: 'app-amministrazione-planimetrie',
     standalone: true,
-    imports: [CommonModule, RouterModule, HeaderComponent, ButtonComponent],
+    imports: [CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule],
     templateUrl: './amministrazione-planimetrie.component.html',
     animations: [
         authAnimations.fadeIn,
@@ -42,6 +44,11 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     private readonly ZOOM_THRESHOLD = 1.5;
 
     isSaving = false;
+
+    showRoomModal = false;
+    newRoomName = '';
+    newRoomType = 'MEETING_ROOM';
+    private pendingRoomRect: { left: number, top: number, width: number, height: number } | null = null;
 
     constructor(
         private cdr: ChangeDetectorRef,
@@ -254,20 +261,11 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 this.canvas!.remove(this.drawingRect);
 
                 if (width! > 5 && height! > 5) {
-                    const name = prompt("Nome Stanza:", "Stanza") || "Stanza";
-                    const rect = new fabric.Rect({
-                        width, height, fill: 'rgba(255, 165, 0, 0.35)',
-                        stroke: 'rgba(255, 140, 0, 0.9)', strokeWidth: 2,
-                        originX: 'center', originY: 'center'
-                    });
-                    const text = new fabric.Text(name, {
-                        fontSize: 14, fill: '#fff', backgroundColor: 'rgba(0,0,0,0.6)',
-                        originX: 'center', originY: 'center', opacity: 0
-                    });
-                    const tempId = Date.now();
-                    const group = new fabric.Group([rect, text], { left, top, selectable: true });
-                    (group as any).data = { tipo: 'stanza', label: name, tempId };
-                    this.canvas!.add(group);
+                    this.pendingRoomRect = { left: left!, top: top!, width: width!, height: height! };
+                    this.newRoomName = 'Stanza ' + (this.canvas!.getObjects().filter(o => (o as any).data?.tipo === 'stanza').length + 1);
+                    this.newRoomType = 'MEETING_ROOM';
+                    this.showRoomModal = true;
+                    this.cdr.detectChanges();
                 }
                 this.drawingRect = null;
             }
@@ -287,6 +285,39 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 }
             }
         });
+    }
+
+    confirmRoomCreation() {
+        if (!this.pendingRoomRect || !this.canvas) return;
+
+        const { left, top, width, height } = this.pendingRoomRect;
+        const name = this.newRoomName || "Stanza";
+        const type = this.newRoomType;
+
+        const rect = new fabric.Rect({
+            width, height, fill: 'rgba(255, 165, 0, 0.35)',
+            stroke: 'rgba(255, 140, 0, 0.9)', strokeWidth: 2,
+            originX: 'center', originY: 'center'
+        });
+        const text = new fabric.Text(name, {
+            fontSize: 14, fill: '#fff', backgroundColor: 'rgba(0,0,0,0.6)',
+            originX: 'center', originY: 'center', opacity: 0
+        });
+        const tempId = Date.now();
+        const group = new fabric.Group([rect, text], { left, top, selectable: true });
+        (group as any).data = { tipo: 'stanza', label: name, roomType: type, tempId };
+        this.canvas.add(group);
+
+        this.showRoomModal = false;
+        this.pendingRoomRect = null;
+        this.canvas.renderAll();
+        this.cdr.detectChanges();
+    }
+
+    cancelRoomCreation() {
+        this.showRoomModal = false;
+        this.pendingRoomRect = null;
+        this.cdr.detectChanges();
     }
 
     private handleRoomLabelVisibility(e: any, opacity: number) {
@@ -380,7 +411,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             for (const stanza of stanzeCanvas) {
                 const payload = {
                     name: stanza.data?.label ?? 'Stanza',
-                    roomType: 'MEETING_ROOM',
+                    roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
                     capacity: 10,
                     floorId: 1,
                     enabled: true,
