@@ -13,7 +13,7 @@
     "SUBTITLE2": "",
     "START_NOW": "Get started",
     "LOGIN": "Login",
-    "GO_DASHBOARD": "Go to Dashboard",
+    "GO_DASHBOARD": "Book now",
     "FEATURES_TITLE": "Key Features",
     "FEATURES_SUBTITLE": "Discover how our system can simplify your workspace management",
     "FEATURE_1": {
@@ -35,6 +35,5 @@
       "BULLET_2": "Shared spaces"
     }
   },
-  "DASHBOARD": {
-  }
+  "DASHBOARD": {}
 }
