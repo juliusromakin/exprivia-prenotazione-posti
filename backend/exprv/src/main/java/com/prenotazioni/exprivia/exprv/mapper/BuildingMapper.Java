@@ -19,11 +19,11 @@ public interface BuildingMapper {
     @Mapping(source = "location.id", target = "locationId")
     BuildingDTO toDto(Building entity);
 
-    @Mapping(source = "locationId", target = "location.id")
+    @Mapping(target = "location", ignore = true)
     Building toEntity(BuildingDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "locationId", target = "location.id")
+    @Mapping(target = "location", ignore = true)
     void updateBuildingFromDto(BuildingDTO dto, @MappingTarget Building entity);
 
     List<BuildingDTO> toDtoList(List<Building> reservationDurationList);

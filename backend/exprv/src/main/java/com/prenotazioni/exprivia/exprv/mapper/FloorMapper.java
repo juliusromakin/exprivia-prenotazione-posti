@@ -19,11 +19,11 @@ public interface FloorMapper {
     @Mapping(source = "building.id", target = "buildingId")
     FloorDTO toDto(Floor entity);
 
-    @Mapping(source = "buildingId", target = "building.id")
+    @Mapping(target = "building", ignore = true)
     Floor toEntity(FloorDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "buildingId", target = "building.id")
+    @Mapping(target = "building", ignore = true)
     void updateFloorFromDto(FloorDTO dto, @MappingTarget Floor entity);
 
     List<FloorDTO> toDtoList(List<Floor> reservationDurationList);

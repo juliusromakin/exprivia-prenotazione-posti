@@ -26,14 +26,14 @@ public interface RoomMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "roomType", target = "roomType")
     @Mapping(source = "enabled", target = "enabled")
-    @Mapping(source = "floorId", target = "floor.id")
+    @Mapping(target = "floor", ignore = true)
     Room toEntity(RoomDTO roomDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(source = "roomType", target = "roomType")
     @Mapping(source = "enabled", target = "enabled")
-    @Mapping(source = "floorId", target = "floor.id")
+    @Mapping(target = "floor", ignore = true)
     void updateRoomFromDto(RoomDTO roomDTO, @MappingTarget Room room);
 
     List<RoomDTO> toDtoList(List<Room> roomList);
