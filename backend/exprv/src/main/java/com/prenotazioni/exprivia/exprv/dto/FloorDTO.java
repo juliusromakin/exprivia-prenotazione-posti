@@ -14,7 +14,8 @@ public class FloorDTO {
     private String imagePath;
     private Double canvasWidth;
     private Double canvasHeight;
-    private List<FloorPlanObjectDTO> objects;
+    private List<RoomDTO> rooms;
+    private List<WorkspaceDTO> workspaces;
 
     public FloorDTO() {
     }
@@ -81,11 +82,19 @@ public class FloorDTO {
         this.canvasHeight = canvasHeight;
     }
 
-    public List<FloorPlanObjectDTO> getObjects() {
-        return objects;
+    public List<RoomDTO> getRooms() {
+        return rooms;
     }
 
-    public void setObjects(List<FloorPlanObjectDTO> objects) {
-        this.objects = objects;
+    public void setRooms(List<RoomDTO> rooms) {
+        this.rooms = rooms;
+    }
+
+    public List<WorkspaceDTO> getWorkspaces() {
+        return workspaces;
+    }
+
+    public void setWorkspaces(List<WorkspaceDTO> workspaces) {
+        this.workspaces = workspaces;
     }
 }

@@ -9,14 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.prenotazioni.exprivia.exprv.dto.FloorDTO;
-import com.prenotazioni.exprivia.exprv.dto.FloorPlanObjectDTO;
+import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
 import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
+import com.prenotazioni.exprivia.exprv.dto.WorkspaceDTO;
 import com.prenotazioni.exprivia.exprv.entity.Building;
 import com.prenotazioni.exprivia.exprv.entity.Floor;
 import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.FloorMapper;
+import com.prenotazioni.exprivia.exprv.mapper.RoomMapper;
+import com.prenotazioni.exprivia.exprv.mapper.WorkspaceMapper;
 import com.prenotazioni.exprivia.exprv.repository.BuildingRepository;
 import com.prenotazioni.exprivia.exprv.repository.FloorRepository;
 import com.prenotazioni.exprivia.exprv.repository.RoomRepository;
@@ -35,11 +38,14 @@ public class FloorService {
     private final RoomRepository roomRepository;
     private final RoomService roomService;
     private final WorkspaceRepository workspaceRepository;
+    private final RoomMapper roomMapper;
+    private final WorkspaceMapper workspaceMapper;
 
     public FloorService(FloorRepository floorRepository, FloorMapper floorMapper,
             BuildingRepository buildingRepository, FileStorageService fileStorageService,
             RoomRepository roomRepository, @Lazy RoomService roomService,
-            WorkspaceRepository workspaceRepository) {
+            WorkspaceRepository workspaceRepository, RoomMapper roomMapper,
+            WorkspaceMapper workspaceMapper) {
         this.floorRepository = floorRepository;
         this.floorMapper = floorMapper;
         this.buildingRepository = buildingRepository;
@@ -47,6 +53,8 @@ public class FloorService {
         this.roomRepository = roomRepository;
         this.roomService = roomService;
         this.workspaceRepository = workspaceRepository;
+        this.roomMapper = roomMapper;
+        this.workspaceMapper = workspaceMapper;
     }
 
     public List<FloorDTO> findAllFloors(boolean enabledOnly) {
@@ -142,36 +150,39 @@ public class FloorService {
 
         floorRepository.save(floor);
 
-        // Update positions of rooms and workspaces
-        if (floorDTO.getObjects() != null) {
-            for (FloorPlanObjectDTO obj : floorDTO.getObjects()) {
-                if ("room".equalsIgnoreCase(obj.getType()) || "stanza".equalsIgnoreCase(obj.getType())) {
-                    updateRoomPosition(obj);
-                } else if ("workspace".equalsIgnoreCase(obj.getType()) || "postazione".equalsIgnoreCase(obj.getType())) {
-                    updateWorkspacePosition(obj);
-                }
+        // Update positions of rooms
+        if (floorDTO.getRooms() != null) {
+            for (RoomDTO roomDto : floorDTO.getRooms()) {
+                updateRoomPosition(roomDto);
+            }
+        }
+
+        // Update positions of workspaces
+        if (floorDTO.getWorkspaces() != null) {
+            for (WorkspaceDTO workspaceDto : floorDTO.getWorkspaces()) {
+                updateWorkspacePosition(workspaceDto);
             }
         }
     }
 
-    private void updateRoomPosition(FloorPlanObjectDTO objDto) {
-        Optional<Room> roomOpt = roomRepository.findByName(objDto.getIdentifier());
+    private void updateRoomPosition(RoomDTO roomDto) {
+        Optional<Room> roomOpt = roomRepository.findById(roomDto.getId());
         if (roomOpt.isPresent()) {
             Room room = roomOpt.get();
-            room.setMapX(objDto.getX());
-            room.setMapY(objDto.getY());
-            room.setMapWidth(objDto.getWidth());
-            room.setMapHeight(objDto.getHeight());
+            room.setMapX(roomDto.getMapX());
+            room.setMapY(roomDto.getMapY());
+            room.setMapWidth(roomDto.getMapWidth());
+            room.setMapHeight(roomDto.getMapHeight());
             roomRepository.save(room);
         }
     }
 
-    private void updateWorkspacePosition(FloorPlanObjectDTO objDto) {
-        Optional<Workspace> workspaceOpt = workspaceRepository.findByName(objDto.getIdentifier());
+    private void updateWorkspacePosition(WorkspaceDTO workspaceDto) {
+        Optional<Workspace> workspaceOpt = workspaceRepository.findById(workspaceDto.getId());
         if (workspaceOpt.isPresent()) {
             Workspace workspace = workspaceOpt.get();
-            workspace.setMapX(objDto.getX());
-            workspace.setMapY(objDto.getY());
+            workspace.setMapX(workspaceDto.getMapX());
+            workspace.setMapY(workspaceDto.getMapY());
             workspaceRepository.save(workspace);
         }
     }
@@ -185,19 +196,9 @@ public class FloorService {
         List<Room> rooms = roomRepository.findByFloorId(floorId);
         List<Workspace> workspaces = workspaceRepository.findByRoomFloorId(floorId);
 
-        List<FloorPlanObjectDTO> objects = new ArrayList<>();
+        floorDTO.setRooms(roomMapper.toDtoList(rooms));
+        floorDTO.setWorkspaces(workspaceMapper.toDtoList(workspaces));
 
-        for (Room room : rooms) {
-            objects.add(new FloorPlanObjectDTO("room", room.getName(), room.getMapX(), room.getMapY(),
-                    room.getMapWidth(), room.getMapHeight()));
-        }
-
-        for (Workspace workspace : workspaces) {
-            objects.add(new FloorPlanObjectDTO("workspace", workspace.getName(), workspace.getMapX(),
-                    workspace.getMapY(), null, null));
-        }
-
-        floorDTO.setObjects(objects);
         return floorDTO;
     }
 
