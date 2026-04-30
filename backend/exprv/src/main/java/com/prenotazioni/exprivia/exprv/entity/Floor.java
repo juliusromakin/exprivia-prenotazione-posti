@@ -45,6 +45,15 @@ public class Floor {
     @Column(name = "enabled")
     private Boolean enabled = true;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "canvas_width")
+    private Double canvasWidth;
+
+    @Column(name = "canvas_height")
+    private Double canvasHeight;
+
     @OneToMany(mappedBy = "floor")
     @JsonIgnore
     private List<Room> rooms = new ArrayList<>();
@@ -89,6 +98,30 @@ public class Floor {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public Double getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public void setCanvasWidth(Double canvasWidth) {
+        this.canvasWidth = canvasWidth;
+    }
+
+    public Double getCanvasHeight() {
+        return canvasHeight;
+    }
+
+    public void setCanvasHeight(Double canvasHeight) {
+        this.canvasHeight = canvasHeight;
     }
 
     public List<Room> getRooms() {
