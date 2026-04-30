@@ -1,0 +1,38 @@
+{
+  "HEADER": {
+    "TITLE": "Prenotazione Posti",
+    "LOGIN": "Accedi",
+    "LOGOUT": "Esci",
+    "SIGNUP": "Registrati",
+    "PROFILE": "Profilo",
+    "WELCOME": "Benvenuto,"
+  },
+  "HOME": {
+    "WELCOME": "Semplifica la prenotazione del tuo spazio di lavoro",
+    "SUBTITLE1": "Prenota scrivanie e sale riunioni in pochi clic.",
+    "SUBTITLE2": "",
+    "START_NOW": "Inizia ora",
+    "LOGIN": "Accedi",
+    "GO_DASHBOARD": "Vai alla Dashboard",
+    "FEATURES_TITLE": "Funzionalità Principali",
+    "FEATURES_SUBTITLE": "Scopri come il nostro sistema può semplificare la gestione degli spazi di lavoro",
+    "FEATURE_1": {
+      "TITLE": "Prenotazioni Facili",
+      "DESC": "Prenota il tuo spazio di lavoro in pochi click, con un'interfaccia intuitiva e veloce.",
+      "BULLET_1": "Selezione rapida date e orari",
+      "BULLET_2": "Visualizzazione in tempo reale"
+    },
+    "FEATURE_2": {
+      "TITLE": "Gestione Flessibile",
+      "DESC": "Modifica o cancella le tue prenotazioni in qualsiasi momento, con notifiche in tempo reale.",
+      "BULLET_1": "Modifiche istantanee",
+      "BULLET_2": "Notifiche push"
+    },
+    "FEATURE_3": {
+      "TITLE": "Collaborazione",
+      "DESC": "Coordina facilmente le prenotazioni con il tuo team e gestisci gli spazi condivisi.",
+      "BULLET_1": "Gestione team",
+      "BULLET_2": "Spazi condivisi"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { HeaderComponent } from '../layout/header/header.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,8 @@ import { HeaderComponent } from '../layout/header/header.component';
     RouterLink,
     LucideAngularModule,
     MatIconModule,
-    HeaderComponent
+    HeaderComponent,
+    TranslateModule
   ],
   animations: [
     authAnimations.fadeIn,

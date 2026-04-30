@@ -7,12 +7,15 @@ import { filter } from "rxjs";
 import { UpdateUserComponent } from "./account/update-user/update-user.component";
 import { HeaderComponent } from "./layout/header/header.component";
 import { AuthService } from "./core/auth/auth.service";
+// 1. HO AGGIUNTO L'IMPORT QUI SOTTO:
+import { TranslateService } from "@ngx-translate/core";
 
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FooterComponent],
+  // HO AGGIUNTO HeaderComponent QUI SOTTO:
+  imports: [CommonModule, RouterOutlet, FooterComponent, HeaderComponent],
   templateUrl: "./app.component.html",
 })
 export class AppComponent implements OnInit {
@@ -20,17 +23,20 @@ export class AppComponent implements OnInit {
   showLayout: boolean = true;
 
   constructor(
+    // 2. HO INIETTATO IL SERVIZIO QUI:
+    private translate: TranslateService,
     private router: Router,
     private authService: AuthService
-  ) { }
+  ) { 
+    // 3. HO AGGIUNTO L'INIZIALIZZAZIONE DELLA LINGUA:
+    this.translate.setDefaultLang('it');
+    this.translate.use('it');
+  }
 
   ngOnInit(): void {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      // Mostra header e footer sempre, tranne che per:
-      // - Dashboard admin (gli admin hanno la loro sidebar)
-      // - Pagine di login/registrazione se necessario
       const isAdminDashboard = event.urlAfterRedirects.includes('/dashboard') && 
         this.authService.hasAnyAuthority(['ROLE_ADMIN']);
       
@@ -38,4 +44,3 @@ export class AppComponent implements OnInit {
     });
   }
 }
-
