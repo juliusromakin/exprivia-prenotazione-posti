@@ -11,6 +11,11 @@ export interface User {
     updatedDate?: string | Date;
 }
 
+export interface AuthorityDTO {
+    name: string;
+    is_active: boolean;
+}
+
 export interface UserSummary {
     id: number;
     name: string;

@@ -38,15 +38,21 @@ public class Floor {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    @Column(name = "image_path")
-    private String imagePath;
-
     @ManyToOne
     @JoinColumn(name = "id_building")
     private Building building;
 
     @Column(name = "enabled")
     private Boolean enabled = true;
+
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "canvas_width")
+    private Double canvasWidth;
+
+    @Column(name = "canvas_height")
+    private Double canvasHeight;
 
     @OneToMany(mappedBy = "floor")
     @JsonIgnore
@@ -55,10 +61,9 @@ public class Floor {
     public Floor() {
     }
 
-    public Floor(Integer id, String name, String imagePath, Building building, List<Room> rooms) {
+    public Floor(Integer id, String name, Building building, List<Room> rooms) {
         this.id = id;
         this.name = name;
-        this.imagePath = imagePath;
         this.building = building;
         this.rooms = rooms;
     }
@@ -79,14 +84,6 @@ public class Floor {
         this.name = name;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
     public Building getBuilding() {
         return building;
     }
@@ -101,6 +98,30 @@ public class Floor {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public Double getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public void setCanvasWidth(Double canvasWidth) {
+        this.canvasWidth = canvasWidth;
+    }
+
+    public Double getCanvasHeight() {
+        return canvasHeight;
+    }
+
+    public void setCanvasHeight(Double canvasHeight) {
+        this.canvasHeight = canvasHeight;
     }
 
     public List<Room> getRooms() {

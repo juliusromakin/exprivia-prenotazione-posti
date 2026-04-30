@@ -1,65 +1,61 @@
 <app-header></app-header>
 
 <main class="flex-1 w-full bg-gradient-to-b from-[var(--color-expriviaBlue)] to-[var(--color-expriviaBlue)]/90" role="main">
-    <!-- Hero Section -->
     <section class="relative py-6 sm:py-8 md:py-12 lg:py-16 overflow-hidden" aria-labelledby="hero-title">
-        <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-10" aria-hidden="true">
             <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0cy00LTEuNzkxLTQtNCAxLjc5MS00IDQtNCA0IDEuNzkxIDQgNHoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+')]"></div>
         </div>
 
         <div class="container px-4 sm:px-6 mx-auto relative">
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-8 items-center">
-                <!-- Text Content -->
                 <div class="flex flex-col justify-center space-y-4 sm:space-y-6" @fadeIn>
                     <div class="space-y-3 sm:space-y-4">
                         <h1 id="hero-title" class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight" @slideUp>
-                            Prenota il tuo spazio di lavoro
+                            {{ 'HOME.WELCOME' | translate }}
                         </h1>
                         <p class="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed max-w-[600px]" @slideUp>
-                            Semplifica la prenotazione di desk e sale riunioni con il nostro sistema intuitivo. 
-                            Gestisci le tue prenotazioni in modo efficiente e flessibile.
+                            {{ 'HOME.SUBTITLE1' | translate }}
+                            {{ 'HOME.SUBTITLE2' | translate }}
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4" @scaleIn>
                         <ng-container *ngIf="!isAuthenticated">
                             <app-button
-                                label="Inizia ora"
+                                [label]="'HOME.START_NOW' | translate"
                                 type="primary"
                                 size="lg"
                                 icon="fas fa-arrow-right"
                                 iconPosition="right"
                                 routerLink="/registrazione"
                                 class="w-full sm:w-auto"
-                                aria-label="Inizia la registrazione"
+                                [attr.aria-label]="'HOME.START_NOW' | translate"
                             ></app-button>
                             
                             <app-button
-                                label="Accedi"
+                                [label]="'HOME.LOGIN' | translate"
                                 type="ghost"
                                 size="lg"
                                 icon="fas fa-sign-in-alt"
                                 routerLink="/accedi"
                                 class="w-full sm:w-auto"
-                                aria-label="Accedi al tuo account"
+                                [attr.aria-label]="'HOME.LOGIN' | translate"
                             ></app-button>
                         </ng-container>
 
                         <app-button
                             *ngIf="isAuthenticated"
-                            label="Vai alla Dashboard"
+                            [label]="'HOME.GO_DASHBOARD' | translate"
                             type="primary"
                             size="lg"
                             icon="fas fa-tachometer-alt"
                             iconPosition="right"
                             routerLink="/dashboard"
                             class="w-full sm:w-auto"
-                            aria-label="Vai alla dashboard"
+                            [attr.aria-label]="'HOME.GO_DASHBOARD' | translate"
                         ></app-button>
                     </div>
                 </div>
 
-                <!-- Image Content -->
                 <div class="relative flex items-center justify-center mt-6 lg:mt-0" @fadeIn>
                     <div class="relative w-full max-w-2xl">
                         <div class="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-[var(--color-expriviaOrange)] to-[var(--color-expriviaOrange400)] rounded-[var(--radius-2xl)] blur-xl sm:blur-2xl opacity-20" aria-hidden="true"></div>
@@ -78,13 +74,15 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="py-8 sm:py-12 md:py-16 bg-[var(--color-expriviaBlue)]/50" aria-labelledby="features-title">
         <div class="container px-4 sm:px-6 mx-auto">
-            <!-- Section Header -->
             <div class="text-center mb-8 sm:mb-12" @fadeIn>
-                <h2 id="features-title" class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">Funzionalità Principali</h2>
-                <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">Scopri come il nostro sistema può semplificare la gestione degli spazi di lavoro</p>
+                <h2 id="features-title" class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
+                    {{ 'HOME.FEATURES_TITLE' | translate }}
+                </h2>
+                <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
+                    {{ 'HOME.FEATURES_SUBTITLE' | translate }}
+                </p>
             </div>
 
             <div class="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">

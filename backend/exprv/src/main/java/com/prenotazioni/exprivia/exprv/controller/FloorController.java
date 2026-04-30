@@ -2,6 +2,7 @@ package com.prenotazioni.exprivia.exprv.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +27,6 @@ public class FloorController {
 
     public FloorController(FloorService floorService) {
         this.floorService = floorService;
-    }
-
-    @PostMapping(value = "/{id}/upload-plan", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FloorDTO> uploadPlan(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(floorService.uploadFloorPlan(id, file));
     }
 
     @PostMapping("")
@@ -66,5 +62,21 @@ public class FloorController {
     @GetMapping("/building/{buildingId}/options")
     public ResponseEntity<List<SelectOptionDTO>> getFloorOptions(@PathVariable Integer buildingId) {
         return ResponseEntity.ok(floorService.getFloorOptionsByBuilding(buildingId));
+    }
+
+    @PostMapping("/planimetry/save")
+    public ResponseEntity<Void> savePlanimetry(@RequestBody FloorDTO floorDTO) {
+        floorService.savePlanimetry(floorDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/planimetry")
+    public ResponseEntity<FloorDTO> getFloorPlanimetry(@PathVariable Integer id) {
+        return ResponseEntity.ok(floorService.getFloorPlanimetry(id));
+    }
+
+    @PostMapping(value = "/{id}/upload-planimetry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadPlanimetry(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(floorService.uploadPlanimetryImage(id, file));
     }
 }

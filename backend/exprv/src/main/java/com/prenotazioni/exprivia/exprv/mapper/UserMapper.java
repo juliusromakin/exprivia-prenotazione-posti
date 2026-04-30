@@ -20,10 +20,16 @@ import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.entity.Authority;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
 /**
  * Mapper per la conversione tra l'entità User e i vari DTO.
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+    componentModel = "spring", 
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface UserMapper {
 
     /**

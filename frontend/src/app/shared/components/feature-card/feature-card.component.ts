@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { authAnimations } from '../../../shared/animations/auth.animations';
 
 export interface FeatureCardConfig {
@@ -27,6 +28,7 @@ export interface FeatureCardConfig {
         MatButtonModule,
         MatRippleModule,
         RouterModule,
+        TranslateModule,
     ],
     template: `
        <div
@@ -65,9 +67,9 @@ export interface FeatureCardConfig {
                     <h3
                         class="text-2xl font-semibold mb-3 text-gray-800 transition-[var(--transition-colors)] group-hover:text-expriviaOrange"
                     >
-                        {{ config.title }}
+                        {{ config.title | translate }}
                     </h3>
-                    <p class="text-gray-600 mb-6">{{ config.description }}</p>
+                    <p class="text-gray-600 mb-6">{{ config.description | translate }}</p>
 
                     <!-- Feature List -->
                     <ul *ngIf="config.features?.length" class="text-left space-y-2 mb-6">
@@ -78,7 +80,7 @@ export interface FeatureCardConfig {
                             <mat-icon class="text-expriviaOrange mr-2 drop-shadow-sm" aria-hidden="true">
                                 check_circle
                             </mat-icon>
-                            {{ feature }}
+                            {{ feature | translate }}
                         </li>
                     </ul>
 
@@ -89,7 +91,7 @@ export interface FeatureCardConfig {
                         class="inline-flex items-center text-expriviaOrange hover:text-expriviaOrange600 transition-[var(--transition-colors)] font-medium"
                        
                     >
-                        {{ config.linkText }}
+                        {{ config.linkText | translate }}
                         <mat-icon
                             class="ml-2 transform group-hover:translate-x-1 transition-[var(--transition-transform)]"
                             aria-hidden="true"

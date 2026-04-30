@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { authAnimations } from '../../shared/animations/auth.animations';
 import { FeatureCardComponent, FeatureCardConfig } from '../../shared/components/feature-card/feature-card.component';
@@ -14,9 +15,10 @@ import { Subject, takeUntil } from 'rxjs';
     imports: [
         CommonModule,
         RouterModule,
+        TranslateModule,
         HeaderComponent,
         FeatureCardComponent,
-        ButtonComponent
+        ButtonComponent,
     ],
     templateUrl: './home.component.html',
     animations: [
@@ -47,32 +49,32 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     featureCards: FeatureCardConfig[] = [
         {
-            title: 'Prenotazioni Facili',
-            description: 'Prenota il tuo spazio di lavoro in pochi click, con un\'interfaccia intuitiva e veloce.',
+            title: 'HOME.FEATURE_1.TITLE',
+            description: 'HOME.FEATURE_1.DESC',
             icon: 'calendar_today',
             features: [
-                'Selezione rapida date e orari',
-                'Visualizzazione in tempo reale'
+                'HOME.FEATURE_1.BULLET_1',
+                'HOME.FEATURE_1.BULLET_2'
             ],
             linkUrl: '/prenotazioni'
         },
         {
-            title: 'Gestione Flessibile',
-            description: 'Modifica o cancella le tue prenotazioni in qualsiasi momento, con notifiche in tempo reale.',
+            title: 'HOME.FEATURE_2.TITLE',
+            description: 'HOME.FEATURE_2.DESC',
             icon: 'schedule',
             features: [
-                'Modifiche istantanee',
-                'Notifiche push'
+                'HOME.FEATURE_2.BULLET_1',
+                'HOME.FEATURE_2.BULLET_2'
             ],
             linkUrl: '/gestione'
         },
         {
-            title: 'Collaborazione',
-            description: 'Coordina facilmente le prenotazioni con il tuo team e gestisci gli spazi condivisi.',
+            title: 'HOME.FEATURE_3.TITLE',
+            description: 'HOME.FEATURE_3.DESC',
             icon: 'group',
             features: [
-                'Gestione team',
-                'Spazi condivisi'
+                'HOME.FEATURE_3.BULLET_1',
+                'HOME.FEATURE_3.BULLET_2'
             ],
             linkUrl: '/team'
         }

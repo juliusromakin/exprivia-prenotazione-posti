@@ -83,6 +83,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             "ORDER BY start_date ASC", nativeQuery = true)
     List<Object[]> countReservationsPerDay(@Param("startDate") LocalDateTime startDate);
 
+    @Query("SELECT r FROM Reservation r " +
+           "JOIN r.workspace w " +
+           "JOIN w.room ro " +
+           "WHERE ro.id = :roomId " +
+           "AND r.status != 'DENIED' " +
+           "AND ((r.startDate >= :start AND r.startDate < :end) " +
+           "OR (r.endDate > :start AND r.endDate <= :end) " +
+           "OR (r.startDate <= :start AND r.endDate >= :end))")
+    List<Reservation> findByRoomIdAndDateRange(
+            @Param("roomId") Integer roomId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
     @Query(value = "SELECT r.name, COUNT(res.id) as reservation_count " +
             "FROM reservation res " +
             "JOIN workspace w ON res.id_workspace = w.id " +

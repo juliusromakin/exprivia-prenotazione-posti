@@ -10,6 +10,7 @@ import { AuthService } from "../../core/auth/auth.service";
 import { LoginService } from "../../login/login.service";
 import { User as UserModel } from "../../core/models";
 import { NavigationService, NavItem } from "@core/services/navigation.service";
+import { TranslateService, TranslateModule } from "@ngx-translate/core";
 
 @Component({
   selector: "app-header",
@@ -21,7 +22,8 @@ import { NavigationService, NavItem } from "@core/services/navigation.service";
     MatButtonModule,
     MatMenuModule,
     MatIconModule,
-    LucideAngularModule
+    LucideAngularModule,
+    TranslateModule
   ],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
@@ -34,7 +36,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private loginService: LoginService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    // 2. Iniettato il servizio di traduzione
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +95,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout(): void {
     this.isMenuOpen = false;
     this.loginService.logout();
+  }
+
+  // 3. Aggiunto il metodo per cambiare lingua richiamato dall'HTML
+  cambiaLingua(lingua: string): void {
+    this.translate.use(lingua);
   }
 
   isRouteActive(route: string): boolean {

@@ -53,6 +53,8 @@ import { AxiosService } from "./app/core/services/axios.service";
 import { UserService } from "./app/core/services/user.service";
 import { AuthService } from "./app/core/auth/auth.service";
 import { MessageService } from "primeng/api";
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 // Importa la configurazione delle rotte
 
@@ -64,6 +66,13 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes), // Usa la configurazione delle rotte
     provideAnimations(),
     provideHttpClient(),
+    provideTranslateService({
+      defaultLanguage: 'it',
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json'
+      })
+    }),
     importProvidersFrom(
       FormsModule,
       ReactiveFormsModule,

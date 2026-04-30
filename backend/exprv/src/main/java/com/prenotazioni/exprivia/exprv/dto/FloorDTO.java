@@ -2,24 +2,26 @@ package com.prenotazioni.exprivia.exprv.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public class FloorDTO {
-
     private Integer id;
     @NotBlank(message = "Il nome del piano è obbligatorio")
     private String name;
-    private String imagePath;
     @NotNull(message = "L'edificio di appartenenza è obbligatorio")
     private Integer buildingId;
     private Boolean enabled;
+    private String imagePath;
+    private Double canvasWidth;
+    private Double canvasHeight;
+    private List<FloorPlanObjectDTO> objects;
 
     public FloorDTO() {
     }
 
-    public FloorDTO(Integer id, String name, String imagePath, Integer buildingId) {
+    public FloorDTO(Integer id, String name, Integer buildingId) {
         this.id = id;
         this.name = name;
-        this.imagePath = imagePath;
         this.buildingId = buildingId;
     }
 
@@ -39,14 +41,6 @@ public class FloorDTO {
         this.name = name;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
     public Integer getBuildingId() {
         return buildingId;
     }
@@ -63,4 +57,35 @@ public class FloorDTO {
         this.enabled = enabled;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public Double getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public void setCanvasWidth(Double canvasWidth) {
+        this.canvasWidth = canvasWidth;
+    }
+
+    public Double getCanvasHeight() {
+        return canvasHeight;
+    }
+
+    public void setCanvasHeight(Double canvasHeight) {
+        this.canvasHeight = canvasHeight;
+    }
+
+    public List<FloorPlanObjectDTO> getObjects() {
+        return objects;
+    }
+
+    public void setObjects(List<FloorPlanObjectDTO> objects) {
+        this.objects = objects;
+    }
 }

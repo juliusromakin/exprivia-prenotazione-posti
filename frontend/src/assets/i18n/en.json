@@ -1,0 +1,40 @@
+{
+  "HEADER": {
+    "TITLE": "Workspace Reservation",
+    "LOGIN": "Login",
+    "LOGOUT": "Logout",
+    "SIGNUP": "Signup",
+    "PROFILE": "Profile",
+    "WELCOME": "Welcome,"
+  },
+  "HOME": {
+    "WELCOME": "Simplify your workspace booking",
+    "SUBTITLE1": "Book desks and meeting rooms in just a few clicks.",
+    "SUBTITLE2": "",
+    "START_NOW": "Get started",
+    "LOGIN": "Login",
+    "GO_DASHBOARD": "Go to Dashboard",
+    "FEATURES_TITLE": "Key Features",
+    "FEATURES_SUBTITLE": "Discover how our system can simplify your workspace management",
+    "FEATURE_1": {
+      "TITLE": "Easy Bookings",
+      "DESC": "Book your workspace in a few clicks, with an intuitive and fast interface.",
+      "BULLET_1": "Quick date and time selection",
+      "BULLET_2": "Real-time visualization"
+    },
+    "FEATURE_2": {
+      "TITLE": "Flexible Management",
+      "DESC": "Modify or cancel your bookings at any time, with real-time notifications.",
+      "BULLET_1": "Instant modifications",
+      "BULLET_2": "Push notifications"
+    },
+    "FEATURE_3": {
+      "TITLE": "Collaboration",
+      "DESC": "Easily coordinate bookings with your team and manage shared spaces.",
+      "BULLET_1": "Team management",
+      "BULLET_2": "Shared spaces"
+    }
+  },
+  "DASHBOARD": {
+  }
+}

@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
 import { AxiosService } from "./axios.service";
-import { User, AdminCreateUserRequest, AdminUpdateUserRequest } from "../models";
+import { User, AdminCreateUserRequest, AdminUpdateUserRequest, AuthorityDTO } from "../models";
 
 @Injectable({
     providedIn: "root",
@@ -37,5 +37,9 @@ export class AdminService {
         return from(this.axiosService.delete(`${this.baseUrl}/${id}`)).pipe(
             map(() => void 0)
         );
+    }
+
+    getAuthorities(): Observable<AuthorityDTO[]> {
+        return from(this.axiosService.get<AuthorityDTO[]>("/api/admin/authorities"));
     }
 }
