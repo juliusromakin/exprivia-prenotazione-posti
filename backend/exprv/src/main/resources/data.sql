@@ -11,6 +11,19 @@ INSERT INTO reservation_duration (duration_name, minutes, is_active) VALUES
 ('Full Day', 480, true) 
 ON CONFLICT (duration_name) DO NOTHING;
 
+-- Inserimento Sede, Edificio e Piano se non esistono
+INSERT INTO location (name, enabled, created_date, updated_date)
+SELECT 'Sede Principale', true, NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM location WHERE name = 'Sede Principale');
+
+INSERT INTO building (address, id_location, enabled, created_date, updated_date)
+SELECT 'Edificio A', (SELECT id FROM location WHERE name = 'Sede Principale' LIMIT 1), true, NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM building WHERE address = 'Edificio A');
+
+INSERT INTO floor (name, id_building, enabled, created_date, updated_date)
+SELECT 'Piano Terra', (SELECT id FROM building WHERE address = 'Edificio A' LIMIT 1), true, NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM floor WHERE name = 'Piano Terra');
+
 -- Inserimento Room (English Table)
 -- Nota: La colonna per abilitazione è "enabled" in queste tabelle
 -- Aggiunto ON CONFLICT (name) per evitare crash al riavvio
