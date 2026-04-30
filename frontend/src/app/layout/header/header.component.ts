@@ -102,6 +102,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.translate.use(lingua);
   }
 
+  get currentLang(): string {
+    return this.translate.currentLang || this.translate.defaultLang || 'it';
+  }
+
+  get currentFlag(): string {
+    return this.getFlag(this.currentLang);
+  }
+
+  getFlag(lang: string): string {
+    switch(lang) {
+      // Puoi sostituire questi URL con percorsi locali come 'assets/flags/it.png' quando avrai scaricato le immagini
+      case 'it': return 'https://flagcdn.com/w40/it.png';
+      case 'en': return 'https://flagcdn.com/w40/gb.png';
+      default: return 'https://flagcdn.com/w40/it.png';
+    }
+  }
+
   isRouteActive(route: string): boolean {
     const currentRoute = window.location.pathname;
     if (route === '/dashboard/update-user') {

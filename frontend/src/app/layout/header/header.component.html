@@ -30,9 +30,11 @@
                         </div>
 
                         <div class="flex items-center gap-1 border-r border-gray-200 pr-4">
-                            <button (click)="cambiaLingua('it')" class="px-2 py-1 text-sm font-semibold text-gray-600 hover:text-[var(--color-expriviaBlue)] transition-[var(--transition-colors)]">IT</button>
-                            <span class="text-gray-300 text-sm">|</span>
-                            <button (click)="cambiaLingua('en')" class="px-2 py-1 text-sm font-semibold text-gray-600 hover:text-[var(--color-expriviaBlue)] transition-[var(--transition-colors)]">EN</button>
+                            <button [matMenuTriggerFor]="langMenu" class="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)]">
+                                <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+                                <span>{{ currentLang | uppercase }}</span>
+                                <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+                            </button>
                         </div>
 
                         <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-lg)] text-red-600 hover:bg-red-50 transition-[var(--transition-all)] cursor-pointer">
@@ -52,9 +54,11 @@
 
         <div *ngIf="!isAuthenticated" class="flex items-center gap-3">
             <div class="flex items-center gap-1 border-r border-gray-200 pr-4 mr-2">
-                <button (click)="cambiaLingua('it')" class="px-2 py-1 text-sm font-semibold text-gray-600 hover:text-[var(--color-expriviaBlue)] transition-[var(--transition-colors)]">IT</button>
-                <span class="text-gray-300 text-sm">|</span>
-                <button (click)="cambiaLingua('en')" class="px-2 py-1 text-sm font-semibold text-gray-600 hover:text-[var(--color-expriviaBlue)] transition-[var(--transition-colors)]">EN</button>
+                <button [matMenuTriggerFor]="langMenu" class="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)]">
+                    <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+                    <span>{{ currentLang | uppercase }}</span>
+                    <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+                </button>
             </div>
             <a [routerLink]="['/login']" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-expriviaOrange)] rounded-[var(--radius-lg)] hover:bg-[var(--color-expriviaOrange400)] transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
                 {{ 'HEADER.LOGIN' | translate }}
@@ -101,10 +105,12 @@
                     </ng-container>
                 </ng-container>
 
-                <div class="flex items-center justify-center gap-4 py-3 border-t border-gray-100 mt-2">
-                    <button (click)="cambiaLingua('it')" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)]">IT</button>
-                    <span class="text-gray-300">|</span>
-                    <button (click)="cambiaLingua('en')" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)]">EN</button>
+                <div class="flex items-center justify-center py-3 border-t border-gray-100 mt-2 px-4">
+                    <button [matMenuTriggerFor]="langMenu" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)] w-full justify-center">
+                        <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+                        <span>{{ currentLang | uppercase }}</span>
+                        <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+                    </button>
                 </div>
 
                 <button (click)="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-[var(--radius-lg)] text-red-600 hover:bg-red-50 transition-[var(--transition-all)] cursor-pointer">
@@ -115,3 +121,14 @@
         </div>
     </div>
 </header>
+
+<mat-menu #langMenu="matMenu" class="rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] mt-1">
+    <button mat-menu-item (click)="cambiaLingua('it')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+        <img src="https://flagcdn.com/w40/it.png" alt="IT" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+        <span class="font-medium text-gray-700">IT</span>
+    </button>
+    <button mat-menu-item (click)="cambiaLingua('en')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+        <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+        <span class="font-medium text-gray-700">EN</span>
+    </button>
+</mat-menu>
