@@ -5,6 +5,9 @@ import { HeaderComponent } from '../../layout/header/header.component';
 import { authAnimations } from '../../shared/animations/auth.animations';
 import { ButtonComponent } from '../../shared/components/buttons/button.component';
 import * as fabric from 'fabric';
+import { lastValueFrom } from 'rxjs';
+import { RoomService } from '../../core/services/room.service';
+import { WorkspaceService } from '../../core/services/workspace.service';
 
 export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 
@@ -38,7 +41,13 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     private readonly GRID = 2;
     private readonly ZOOM_THRESHOLD = 1.5;
 
-    constructor(private cdr: ChangeDetectorRef) { }
+    isSaving = false;
+
+    constructor(
+        private cdr: ChangeDetectorRef,
+        private roomService: RoomService,
+        private workspaceService: WorkspaceService
+    ) { }
 
     ngOnInit(): void { }
 
@@ -203,7 +212,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     const circle = new fabric.Circle({ radius, fill: 'rgba(59, 130, 246, 0.75)', stroke: '#1d4ed8', strokeWidth: 2, originX: 'center', originY: 'center' });
                     const text = new fabric.Text(id, { fontSize: 7, fill: '#fff', fontWeight: 'bold', originX: 'center', originY: 'center' });
                     const group = new fabric.Group([circle, text], { left: x - radius, top: y - radius, selectable: true });
-                    (group as any).data = { tipo: 'postazione', label: id };
+                    (group as any).data = { tipo: 'postazione', label: id, tempRoomId: (stanza as any).data?.tempId };
                     this.canvas!.add(group);
 
                     // Reset dopo il prompt
@@ -255,8 +264,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                         fontSize: 14, fill: '#fff', backgroundColor: 'rgba(0,0,0,0.6)',
                         originX: 'center', originY: 'center', opacity: 0
                     });
+                    const tempId = Date.now();
                     const group = new fabric.Group([rect, text], { left, top, selectable: true });
-                    (group as any).data = { tipo: 'stanza', label: name };
+                    (group as any).data = { tipo: 'stanza', label: name, tempId };
                     this.canvas!.add(group);
                 }
                 this.drawingRect = null;
@@ -288,14 +298,6 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         });
         this.canvas?.renderAll();
     }
-
-    /**
-     * Mostra/nasconde le postazioni in base al livello di zoom.
-     * Zoom Out (zoom < ZOOM_THRESHOLD): le postazioni scompaiono e le stanze
-     * mostrano un contatore verde con il numero di postazioni al loro interno.
-     * Zoom In  (zoom >= ZOOM_THRESHOLD): le postazioni tornano visibili e il testo
-     * della stanza torna allo stato originale (nome, opacity 0).
-     */
     updateClusteringView(zoom: number): void {
         if (!this.canvas) return;
 
@@ -353,17 +355,83 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         this.canvas.renderAll();
     }
 
-    salvaDati() {
-        if (!this.canvas) return;
-        const data = this.canvas.getObjects().map((obj: any) => ({
-            tipo: obj.data?.tipo,
-            identificativo: obj.data?.label,
-            x: obj.left,
-            y: obj.top,
-            larghezza: obj.width ? obj.width * (obj.scaleX || 1) : 0,
-            altezza: obj.height ? obj.height * (obj.scaleY || 1) : 0
-        }));
-        console.log('Salvataggio:', data);
-        alert("Dati salvati correttamente. Controlla la console.");
+    async salvaDati(): Promise<void> {
+        if (!this.canvas || this.isSaving) return;
+
+        const allObjects = this.canvas.getObjects() as any[];
+
+        // ── Separa stanze e postazioni ─────────────────────────────────────
+        const stanzeCanvas = allObjects.filter(o => o.data?.tipo === 'stanza');
+        const postazioniCanvas = allObjects.filter(o => o.data?.tipo === 'postazione');
+
+        if (stanzeCanvas.length === 0 && postazioniCanvas.length === 0) {
+            alert('Nessun elemento da salvare sul canvas.');
+            return;
+        }
+
+        this.isSaving = true;
+        this.cdr.detectChanges();
+
+        try {
+            // ── FASE A: Salvataggio Stanze ─────────────────────────────────
+            // Mappa: tempId → real backend ID
+            const tempIdToRealId = new Map<number, number>();
+
+            for (const stanza of stanzeCanvas) {
+                const payload = {
+                    name: stanza.data?.label ?? 'Stanza',
+                    roomType: 'MEETING_ROOM',
+                    capacity: 10,
+                    floorId: 1,
+                    enabled: true,
+                    mapX: Math.round(stanza.left ?? 0),
+                    mapY: Math.round(stanza.top ?? 0),
+                    mapWidth: Math.round((stanza.width ?? 0) * (stanza.scaleX ?? 1)),
+                    mapHeight: Math.round((stanza.height ?? 0) * (stanza.scaleY ?? 1))
+                };
+
+                console.log('[FASE A] Salvataggio stanza:', payload);
+                const savedRoom = await lastValueFrom(this.roomService.createRoom(payload));
+                console.log('[FASE A] Stanza salvata con id:', savedRoom.id);
+
+                // Associa tempId → real id
+                if (stanza.data?.tempId !== undefined && savedRoom.id !== undefined) {
+                    tempIdToRealId.set(stanza.data.tempId, savedRoom.id);
+                }
+            }
+
+            // ── FASE B: Salvataggio Postazioni ────────────────────────────
+            for (const postazione of postazioniCanvas) {
+                const tempRoomId: number | undefined = postazione.data?.tempRoomId;
+                const realRoomId = tempRoomId !== undefined ? tempIdToRealId.get(tempRoomId) : undefined;
+
+                if (realRoomId === undefined) {
+                    console.warn('[FASE B] Postazione senza stanza associata, skip:', postazione.data);
+                    continue;
+                }
+
+                const payload = {
+                    name: postazione.data?.label ?? 'Postazione',
+                    roomId: realRoomId,
+                    capacity: 1,
+                    enabled: true,
+                    mapX: Math.round(postazione.left ?? 0),
+                    mapY: Math.round(postazione.top ?? 0)
+                };
+
+                console.log('[FASE B] Salvataggio postazione:', payload);
+                const savedWorkspace = await lastValueFrom(this.workspaceService.createWorkspace(payload as any));
+                console.log('[FASE B] Postazione salvata con id:', savedWorkspace.id);
+            }
+
+            alert(`✅ Salvataggio completato!\n• ${stanzeCanvas.length} stanza/e salvata/e\n• ${postazioniCanvas.length} postazione/i salvata/e`);
+
+        } catch (error: any) {
+            console.error('[SALVATAGGIO] Errore durante il salvataggio:', error);
+            alert(`❌ Errore durante il salvataggio:\n${error?.message ?? 'Errore sconosciuto. Controlla la console.'}`);
+        } finally {
+            this.isSaving = false;
+            this.cdr.detectChanges();
+        }
     }
 }

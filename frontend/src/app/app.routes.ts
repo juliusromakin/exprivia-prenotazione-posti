@@ -5,6 +5,7 @@ import { LoginComponent } from "./login/login.component";
 import { ForgotpwdComponent } from "./account/password/forgot-password/forgotpwd.component";
 import { ResetpwdComponent } from "./account/password/reset-password/resetpwd.component";
 import { AuthGuard } from "./core/auth/auth.guard";
+import { UserRouteAccessService } from "./core/auth/user-route-access.service";
 import { ForbiddenComponent } from "./pages/forbidden/forbidden.component";
 import { inject } from "@angular/core";
 import { AuthService } from "./core/auth/auth.service";
@@ -65,7 +66,8 @@ export const routes: Routes = [
   {
     path: "amministrazione-planimetrie",
     component: AmministrazionePlanimetrieComponent,
-    canActivate: [AuthGuard],
+    canActivate: [UserRouteAccessService],
+    data: { authorities: ["ROLE_ADMIN"] }
   },
   {
     path: "dashboard",
