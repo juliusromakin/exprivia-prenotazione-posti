@@ -30,6 +30,11 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
       return true;
     }
 
+    // Reindirizza in base al ruolo
+    if (authService.hasAnyAuthority(['ROLE_ADMIN'])) {
+      return router.createUrlTree(["/admin/homepage"]);
+    }
+
     // Altrimenti reindirizza alla dashboard
     return router.createUrlTree(["/dashboard/workspace-booking"]);
   }
