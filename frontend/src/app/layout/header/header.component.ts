@@ -116,6 +116,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.router.url === '/amministrazione-planimetrie';
   }
 
+  get isAdmin(): boolean {
+    return this.currentUser?.authorities?.includes('ROLE_ADMIN') ?? false;
+  }
+
   getFlag(lang: string): string {
     switch(lang) {
       // Puoi sostituire questi URL con percorsi locali come 'assets/flags/it.png' quando avrai scaricato le immagini

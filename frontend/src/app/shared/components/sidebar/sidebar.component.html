@@ -6,7 +6,7 @@
   <div class="py-4 px-4 border-b border-slate-200 flex items-center justify-center">
     <!-- Logo quando espanso -->
     <div *ngIf="!isCollapsed" class="flex items-center justify-between w-full">
-      <a [routerLink]="'/dashboard'">
+      <a [routerLink]="isAdmin ? '/admin/homepage' : '/'">
         <img src="LogoExprivia.svg" alt="Logo Exprivia" class="h-10 w-auto" />
       </a>
       <!-- Toggle Button per collassare -->
