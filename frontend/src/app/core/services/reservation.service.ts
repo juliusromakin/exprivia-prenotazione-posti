@@ -67,7 +67,10 @@ export class ReservationService {
      * Recupera gli slot orari disponibili per una postazione in una certa data
      */
     getAvailableTimeSlots(date: Date, workspaceId: number): Observable<string[]> {
-        const formattedDate = date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
         return from(this.axiosService.get<string[]>(
             `${this.BASE_URL}/available-times?workspaceId=${workspaceId}&date=${formattedDate}`
         )).pipe(
@@ -121,7 +124,10 @@ export class ReservationService {
      * Esporta le prenotazioni giornaliere in formato Excel
      */
     exportReservationsDaily(date: Date): Observable<Blob> {
-        const formattedDate = date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
 
         return from(this.axiosService.get<Blob>(
             `${this.BASE_URL}/export-excel?date=${formattedDate}`,

@@ -10,6 +10,7 @@ import {
   HostListener,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { Room, Workspace } from "@core/models";
 
 interface MarkerPosition {
   id: string;
@@ -37,6 +38,7 @@ export interface PlanimetriaWorkspace {
   styleUrls: ["./planimetria-inline.component.css"],
 })
 export class PlanimetriaInlineComponent implements OnChanges {
+  @Input() rooms: Room[] = [];
   @Input() availableWorkspaces: PlanimetriaWorkspace[] = [];
   @Input() selectedWorkspaceId: number | null = null;
   @Output() workspaceSelected = new EventEmitter<number>();
@@ -200,45 +202,9 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
   // ─── Markers ─────────────────────────────────────────────────────────────────
 
-  private workspaceCoordinates: { id: number; x: number; y: number; label: string }[] = [
-    { id: 1,  x: 33.1,  y: 26.2, label: "Gastone" },
-    { id: 2,  x: 14.25, y: 30.7, label: "Leonardo" },
-    { id: 3,  x: 43.8,  y: 24.6, label: "3" },
-    { id: 4,  x: 46.4,  y: 21.5, label: "4" },
-    { id: 5,  x: 46.4,  y: 28.5, label: "5" },
-    { id: 11, x: 40.2,  y: 62.6, label: "11" },
-    { id: 12, x: 40.3,  y: 58.4, label: "12" },
-    { id: 13, x: 42,    y: 58.7, label: "13" },
-    { id: 14, x: 41.8,  y: 62.5, label: "14" },
-    { id: 20, x: 31.3,  y: 65.8, label: "20" },
-    { id: 21, x: 31.3,  y: 59.8, label: "21" },
-    { id: 22, x: 34.7,  y: 60.4, label: "22" },
-    { id: 23, x: 34.3,  y: 64.0, label: "23" },
-    { id: 36, x: 2.25,  y: 56.3, label: "36" },
-    { id: 43, x: 2.25,  y: 29.6, label: "43" },
-    { id: 44, x: 2.25,  y: 32.9, label: "44" },
-    { id: 45, x: 5.25,  y: 34.7, label: "45" },
-    { id: 49, x: 2.25,  y: 12.5, label: "49" },
-    { id: 50, x: 2.25,  y: 15.5, label: "50" },
-    { id: 51, x: 5.25,  y: 13.0, label: "51" },
-    { id: 52, x: 2.25,  y: 4.6,  label: "52" },
-    { id: 53, x: 6.26,  y: 3.9,  label: "53" },
-    { id: 54, x: 6.25,  y: 7.4,  label: "54" },
-    { id: 55, x: 2.25,  y: 7.6,  label: "55" },
-    { id: 56, x: 11.3,  y: 5,    label: "56" },
-    { id: 57, x: 13.40, y: 5,    label: "57" },
-    { id: 58, x: 11.3,  y: 11,   label: "58" },
-    { id: 61, x: 19.9,  y: 80.9, label: "Keplero" },
-    { id: 66, x: 20.8,  y: 37.5, label: "66" },
-    { id: 67, x: 22.3,  y: 43.2, label: "67" },
-    { id: 68, x: 22.2,  y: 48.8, label: "68" },
-    { id: 24, x: 11.8,  y: 62.7, label: "24" },
-    { id: 25, x: 14.2,  y: 62.7, label: "25" },
-    { id: 26, x: 16.7,  y: 62.7, label: "26" },
-    { id: 27, x: 16.5,  y: 68.7, label: "27" },
-    { id: 28, x: 14.14, y: 68.7, label: "28" },
-    { id: 29, x: 11.6,  y: 68.7, label: "29" },
-  ];
+  // Canvas dimensions used in administration for coordinate reference
+  private readonly REF_WIDTH = 800;
+  private readonly REF_HEIGHT = 450;
 
   ngOnChanges(changes: SimpleChanges): void {
     this.buildMarkers();
@@ -246,23 +212,62 @@ export class PlanimetriaInlineComponent implements OnChanges {
 
   private buildMarkers(): void {
     this.markers = [];
-    const availableMap = new Map<any, any>();
-    for (const w of this.availableWorkspaces) {
-      availableMap.set(w.id, w);
+
+    const availableMap = new Map<number, PlanimetriaWorkspace>();
+    if (this.availableWorkspaces) {
+      for (const w of this.availableWorkspaces) {
+        if (w.id) availableMap.set(w.id, w);
+      }
     }
-    for (const coord of this.workspaceCoordinates) {
-      if (!availableMap.has(coord.id)) continue;
-      const w = availableMap.get(coord.id)!;
-      this.markers.push({
-        id: String(coord.id),
-        label: coord.label,
-        tooltip: `${w.name}\n${w.roomName}`,
-        x: coord.x,
-        y: coord.y,
-        available: w.isAvailable !== false,
-        selected: this.selectedWorkspaceId === coord.id,
-      });
+
+    const workspacesToRender: any[] = [];
+    if (this.rooms && this.rooms.length > 0) {
+      for (const room of this.rooms) {
+        if (room.workspaces) {
+          for (const ws of room.workspaces) {
+            workspacesToRender.push({
+              ...ws,
+              roomName: room.name
+            });
+          }
+        }
+      }
+    } else if (this.availableWorkspaces) {
+      workspacesToRender.push(...this.availableWorkspaces);
     }
+
+    for (const ws of workspacesToRender) {
+      if (ws.mapX !== undefined && ws.mapY !== undefined) {
+        const w = availableMap.get(ws.id!);
+        const isSelectable = !!w;
+
+        // Offset adjusted to +7 for better alignment on the planimetria image
+        const centerX = ws.mapX + 4;
+        const centerY = ws.mapY + 4;
+
+        this.markers.push({
+          id: String(ws.id),
+          label: ws.name,
+          tooltip: `${ws.name}\n${ws.roomName || ''}`,
+          x: (centerX / this.REF_WIDTH) * 100,
+          y: (centerY / this.REF_HEIGHT) * 100,
+          available: isSelectable ? (w.isAvailable !== false) : true,
+          selected: this.selectedWorkspaceId === ws.id,
+        });
+      }
+    }
+  }
+
+  getRoomStyle(room: Room): any {
+    if (room.mapX === undefined || room.mapY === undefined || room.mapWidth === undefined || room.mapHeight === undefined) {
+      return { display: 'none' };
+    }
+    return {
+      left: (room.mapX / this.REF_WIDTH * 100) + '%',
+      top: (room.mapY / this.REF_HEIGHT * 100) + '%',
+      width: (room.mapWidth / this.REF_WIDTH * 100) + '%',
+      height: (room.mapHeight / this.REF_HEIGHT * 100) + '%',
+    };
   }
 
   selectMarker(marker: MarkerPosition, event: MouseEvent): void {

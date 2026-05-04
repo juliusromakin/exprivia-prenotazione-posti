@@ -14,14 +14,15 @@ import { AdminService } from '@core/services/admin.service';
 import { map, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-inline.component';
+import { WorkspaceService } from "@core/services/workspace.service";
 
 @Component({
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    FormsModule, 
-    CalendarComponent, 
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    CalendarComponent,
     ToastModule,
     ConfirmationModalComponent,
     PlanimetriaInlineComponent
@@ -66,13 +67,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   selectedReservations: Set<number> = new Set();
   isSelectAllChecked: boolean = false;
 
-  // Map duration label to minutes
+  // Map duration label to minutes - synced with DB values from screenshot
   readonly durationMap: { [key: string]: number } = {
-    'Giornata Intera': 540,
-    '4 ore': 240,
-    '2 ore': 120,
-    '1 ora': 60,
-    '30 minuti': 30
+    'Full Day': 480,
+    '4 hours': 240,
+    '1 hour': 60
   };
 
   // Add new properties for confirmation modal
@@ -83,6 +82,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private roomService: RoomService,
+    private workspaceService: WorkspaceService,
     private reservationService: ReservationService,
     private toastService: ToastService,
     private adminService: AdminService,
@@ -102,21 +102,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private getDurationInMinutes(durationName: string | null | undefined): number {
     if (!durationName) return 0;
-    const name = String(durationName).trim().toLowerCase();
-    
-    if (/intera/i.test(name) || /giorn/i.test(name)) return 540;
-    if (/4.*ore/i.test(name) || /4h/i.test(name)) return 240;
-    if (/2.*ore/i.test(name) || /2h/i.test(name) || /120.*min/i.test(name)) return 120;
-    if (/1.*ora/i.test(name) || /1h/i.test(name) || /60.*min/i.test(name)) return 60;
-    if (/30.*min/i.test(name) || /30m/i.test(name)) return 30;
-    
+    const name = String(durationName).trim();
+
+    if (name === 'Full Day') return 480;
+    if (name === '4 hours') return 240;
+    if (name === '1 hour') return 60;
+
     return 0;
   }
 
   isFullDay(duration: string | null | undefined): boolean {
     if (!duration) return false;
-    const name = String(duration).trim().toLowerCase();
-    return /intera/i.test(name) || /giorn/i.test(name);
+    const name = String(duration).trim();
+    return name === 'Full Day';
   }
 
   isMeetingRoom(): boolean {
@@ -129,9 +127,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     const now = new Date();
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const selectedDate = this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0];
-    
+
     if (!selectedDate) return [];
-    
+
     const isToday = this.isSameDay(selectedDate, now);
 
     const checkAndAddDuration = (name: string, mins: number) => {
@@ -148,7 +146,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
     Object.keys(this.durationMap).forEach(name => {
       const mins = this.durationMap[name];
-      if (name === 'Giornata Intera') {
+      if (name === 'Full Day') {
         if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) {
           durations.add(name);
         }
@@ -178,18 +176,37 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private loadBookingInfo(): void {
     this.state.isLoading = true;
-    this.roomService.getAllRooms()
-      .pipe(takeUntil(this.destroy$))
+    this.state.errorMessage = "";
+
+    forkJoin({
+      rooms: this.roomService.getAllRooms().pipe(catchError(err => {
+        console.error('Error loading rooms:', err);
+        return of([]);
+      })),
+      workspaces: this.workspaceService.getWorkspaces().pipe(catchError(err => {
+        console.error('Error loading workspaces:', err);
+        return of([]);
+      }))
+    }).pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (rooms) => {
-          this.state.rooms = rooms;
-          this.roomTypes = [...new Set(rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
+        next: ({ rooms, workspaces }) => {
+          if (rooms.length === 0 && workspaces.length === 0) {
+            this.state.errorMessage = "No data found. Please check backend connection.";
+          }
+
+          // Merge workspaces into rooms
+          this.state.rooms = (rooms as Room[]).map(room => ({
+            ...room,
+            workspaces: (workspaces as Workspace[]).filter(w => w.roomId === room.id)
+          }));
+
+          this.roomTypes = [...new Set(this.state.rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
           this.state.isLoading = false;
         },
         error: (err: any) => {
-          console.error('Error loading information:', err);
-          this.state.errorMessage = "Error loading information";
-          this.toastService.showError('Loading Error', 'Unable to load room information.');
+          console.error('Critical error in loadBookingInfo:', err);
+          this.state.errorMessage = "Critical loading error";
+          this.toastService.showError('Loading Error', 'Unable to load information.');
           this.state.isLoading = false;
         }
       });
@@ -300,14 +317,24 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
     const [startTime, endTime] = selectedTimeSlot.split(' - ');
     const slotString = `${startTime} - ${endTime}`;
-    
-    const availabilityChecks = this.state.availableWorkspaces.map(workspace => 
+
+    const availabilityChecks = this.state.availableWorkspaces.map(workspace =>
       this.reservationService.getAvailableTimeSlots(selectedDate, workspace.id!)
         .pipe(
-          map(availableSlots => ({
-            ...workspace,
-            isAvailable: availableSlots.includes(slotString)
-          })),
+          map(availableSlots => {
+            // Restore precise check with normalization for robust matching
+            const normalize = (time: string) => (time || '').replace(/\s/g, '').replace(/^0/, '');
+            const target = normalize(startTime);
+
+            const isAvailable = availableSlots && availableSlots.some(s =>
+              normalize(s).includes(target)
+            );
+
+            return {
+              ...workspace,
+              isAvailable: isAvailable
+            };
+          }),
           catchError(() => of({ ...workspace, isAvailable: false }))
         )
     );
@@ -352,7 +379,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (this.bookingForm.valid) {
       const formData = this.bookingForm.value;
       this.state.isLoading = true;
-      
+
       const startDateTime = new Date(formData.selectedDate);
       const endDateTime = new Date(formData.selectedDate);
       const [start, end] = formData.timeSlot.split(' - ');
@@ -366,7 +393,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         switchMap(user => {
           const userId = formData.userId ? parseInt(formData.userId) : (user?.id || 0);
-          
+
           const reservation: ReservationRequest = {
             workspaceId: parseInt(formData.workspaceId),
             userId: userId,

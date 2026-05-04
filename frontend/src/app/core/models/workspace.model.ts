@@ -7,6 +7,8 @@ export interface Workspace {
     capacity?: number;
     status?: WorkspaceStatus;
     isActive?: boolean;
+    mapX?: number;
+    mapY?: number;
 }
 
 export interface WorkspaceWithRoom extends Workspace {
@@ -20,6 +22,10 @@ export interface WorkspaceWithRoom extends Workspace {
 export interface RoomWorkspace {
     id: number;
     name: string;
+    mapX?: number;
+    mapY?: number;
+    mapWidth?: number;
+    mapHeight?: number;
     workspaces: Workspace[];
 }
 

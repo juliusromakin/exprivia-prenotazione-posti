@@ -42,6 +42,7 @@
               Selected workspace: {{ getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
             </p>
             <app-planimetria-inline
+              [rooms]="state.rooms"
               [availableWorkspaces]="$any(state.availableWorkspaces)"
               [selectedWorkspaceId]="$any(getSelectedWorkspaceId())"
               (workspaceSelected)="onWorkspaceSelectedFromPlanimetria($event)">

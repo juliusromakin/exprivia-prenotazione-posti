@@ -7,6 +7,10 @@ export interface Room {
     roomType: RoomType | string;
     capacity: number;
     isActive: boolean;
+    mapX?: number;
+    mapY?: number;
+    mapWidth?: number;
+    mapHeight?: number;
     workspaces?: Workspace[];
 }
 

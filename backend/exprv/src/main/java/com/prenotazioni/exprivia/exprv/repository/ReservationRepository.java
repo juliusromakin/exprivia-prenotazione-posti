@@ -48,7 +48,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
            "JOIN r.workspace w " +
            "JOIN w.room ro " +
            "WHERE r.status != 'DENIED' " +
-           "AND r.startDate >= :startDate AND r.startDate < :endDate " +
+           "AND (r.startDate < :endDate AND r.endDate > :startDate) " +
            "AND (" +
            "  w.id = :workspaceId " +
            "  OR " +
