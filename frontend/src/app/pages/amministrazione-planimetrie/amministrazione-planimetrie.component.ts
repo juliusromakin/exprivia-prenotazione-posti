@@ -186,6 +186,40 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             }
         });
 
+        // --- VINCOLO SPOSTAMENTO POSTAZIONI ---
+        // Quando una postazione finisce il drag:
+        //  - se è dentro una stanza → aggiorna tempRoomId (supporta cambio stanza)
+        //  - se è fuori da tutte le stanze → ripristina la posizione precedente
+        this.canvas.on('object:modified', (opt: any) => {
+            const target = opt.target;
+            if (!target || (target as any).data?.tipo !== 'postazione') return;
+
+            const center = target.getCenterPoint();
+            const stanze = this.canvas!.getObjects().filter(
+                (o: any) => o.data?.tipo === 'stanza'
+            );
+
+            const stanzaContenitrice = stanze.find((s: any) =>
+                s.containsPoint(center)
+            ) as any;
+
+            if (stanzaContenitrice) {
+                // Postazione spostata in una stanza (stessa o diversa): aggiorna il riferimento
+                (target as any).data.tempRoomId = stanzaContenitrice.data?.tempId;
+                console.log('[MOVE] Postazione assegnata a stanza tempId:', stanzaContenitrice.data?.tempId);
+            } else {
+                // Postazione fuori da qualsiasi stanza: annulla lo spostamento
+                console.warn('[MOVE] Postazione fuori dalle stanze, ripristino posizione.');
+                target.set({
+                    left: (target as any)._lastLeft,
+                    top:  (target as any)._lastTop
+                });
+                target.setCoords();
+                this.canvas!.renderAll();
+            }
+        });
+
+
         // --- MOUSE EVENTS ---
         this.canvas.on('mouse:down', (opt: any) => {
             const pointer = this.canvas!.getPointer(opt.e);
@@ -279,7 +313,20 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             if ((e.key === 'Delete' || e.key === 'Backspace') && this.canvas) {
                 const active = this.canvas.getActiveObjects();
                 if (active.length) {
-                    active.forEach(obj => this.canvas?.remove(obj));
+                    active.forEach(obj => {
+                        this.canvas?.remove(obj);
+
+                        // Eliminazione a cascata: se l'oggetto è una stanza,
+                        // rimuovi anche tutte le postazioni che vi appartengono
+                        if ((obj as any).data?.tipo === 'stanza') {
+                            const tempId = (obj as any).data?.tempId;
+                            const postazioniDaRimuovere = this.canvas!.getObjects().filter(
+                                (o: any) => o.data?.tipo === 'postazione' && o.data?.tempRoomId === tempId
+                            );
+                            postazioniDaRimuovere.forEach(p => this.canvas?.remove(p));
+                            console.log(`[DELETE] Stanza tempId=${tempId}: rimosse ${postazioniDaRimuovere.length} postazioni.`);
+                        }
+                    });
                     this.canvas.discardActiveObject();
                     this.canvas.renderAll();
                 }
