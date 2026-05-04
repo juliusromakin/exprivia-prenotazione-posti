@@ -9,7 +9,7 @@
                 <lucide-icon name="arrow-left" class="w-5 h-5 text-[var(--color-expriviaBlue)] group-hover:scale-110 transition-transform"></lucide-icon>
             </div>
             
-            <div class="cursor-pointer hover:opacity-80 transition-[var(--transition-opacity)]" [routerLink]="isAuthenticated ? ['/dashboard/'] : ['/']" role="link" aria-label="Torna alla home">
+            <div class="cursor-pointer hover:opacity-80 transition-[var(--transition-opacity)]" [routerLink]="isAdmin ? ['/admin/homepage'] : ['/']" role="link" aria-label="Torna alla home">
                 <img class="h-6 sm:h-8 w-auto" src="LogoExprivia.svg" alt="Exprivia Logo" width="120" height="32">
             </div>
         </div>
