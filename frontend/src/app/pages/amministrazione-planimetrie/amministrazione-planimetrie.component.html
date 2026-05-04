@@ -193,26 +193,26 @@
     <!-- ── MODAL CREAZIONE STANZA ── -->
     <div *ngIf="showRoomModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelRoomCreation()"></div>
+        <div class="absolute inset-0 bg-black/60" (click)="cancelRoomCreation()"></div>
 
         <!-- Modal Content -->
-        <div class="relative bg-[#1a1a1a] border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl" @scaleIn>
+        <div class="relative bg-expriviaBlue border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl" @scaleIn>
             <h3 class="text-xl font-bold text-white mb-4">Nuova Stanza</h3>
 
             <div class="space-y-4">
                 <div>
                     <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Nome Stanza</label>
                     <input type="text" [(ngModel)]="newRoomName"
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                        class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all"
                         placeholder="Es. Stanza A1">
                 </div>
 
                 <div>
                     <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Tipo Stanza</label>
                     <select [(ngModel)]="newRoomType"
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer">
-                        <option value="MEETING_ROOM">Sala Riunioni</option>
-                        <option value="OFFICE">Ufficio</option>
+                        class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all cursor-pointer">
+                        <option value="MEETING_ROOM" class="bg-expriviaBlue">Sala Riunioni</option>
+                        <option value="OFFICE" class="bg-expriviaBlue">Ufficio</option>
                     </select>
                 </div>
             </div>
