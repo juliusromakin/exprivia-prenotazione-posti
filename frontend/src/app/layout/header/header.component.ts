@@ -11,6 +11,8 @@ import { LoginService } from "../../login/login.service";
 import { User as UserModel } from "../../core/models";
 import { NavigationService, NavItem } from "@core/services/navigation.service";
 import { TranslateService, TranslateModule } from "@ngx-translate/core";
+import { Router, NavigationEnd } from "@angular/router";
+import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-header",
@@ -37,8 +39,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private loginService: LoginService,
     private navigationService: NavigationService,
-    // 2. Iniettato il servizio di traduzione
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +110,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   get currentFlag(): string {
     return this.getFlag(this.currentLang);
+  }
+
+  get isPlanimetriePage(): boolean {
+    return this.router.url === '/amministrazione-planimetrie';
   }
 
   getFlag(lang: string): string {

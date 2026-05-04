@@ -1,7 +1,17 @@
 <header class="w-full bg-white fixed md:sticky top-0 z-[var(--z-50)] border-b border-gray-100 shadow-[var(--shadow-sm)]" role="banner">
     <div class="mx-auto container px-4 md:px-8 flex h-14 sm:h-16 items-center justify-between">
-        <div class="cursor-pointer hover:opacity-80 transition-[var(--transition-opacity)]" [routerLink]="isAuthenticated ? ['/dashboard/'] : ['/']" role="link" aria-label="Torna alla home">
-            <img class="h-6 sm:h-8 w-auto" src="LogoExprivia.svg" alt="Exprivia Logo" width="120" height="32">
+        <div class="flex items-center gap-2">
+            <!-- Back Arrow for Planimetrie Page -->
+            <div *ngIf="isPlanimetriePage" 
+                 [routerLink]="['/admin/homepage']" 
+                 class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 cursor-pointer transition-all mr-1 group"
+                 title="Torna alla Home Admin">
+                <lucide-icon name="arrow-left" class="w-5 h-5 text-[var(--color-expriviaBlue)] group-hover:scale-110 transition-transform"></lucide-icon>
+            </div>
+            
+            <div class="cursor-pointer hover:opacity-80 transition-[var(--transition-opacity)]" [routerLink]="isAuthenticated ? ['/dashboard/'] : ['/']" role="link" aria-label="Torna alla home">
+                <img class="h-6 sm:h-8 w-auto" src="LogoExprivia.svg" alt="Exprivia Logo" width="120" height="32">
+            </div>
         </div>
 
         <ng-container *ngIf="isAuthenticated">

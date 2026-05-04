@@ -101,7 +101,17 @@ export class LoginComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (user) => {
             if (user) {
-              const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
+              let returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'];
+              
+              if (!returnUrl) {
+                // Se è un admin, reindirizza alla home admin, altrimenti alla home base (che poi manderà alla dashboard)
+                if (user.authorities?.includes('ROLE_ADMIN')) {
+                  returnUrl = '/admin/homepage';
+                } else {
+                  returnUrl = '/';
+                }
+              }
+              
               this.router.navigateByUrl(returnUrl);
             }
           },
