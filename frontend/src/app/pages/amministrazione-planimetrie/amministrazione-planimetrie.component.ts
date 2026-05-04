@@ -400,6 +400,27 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             return;
         }
 
+        // ── Calcolo dinamico capacity per ogni stanza ──────────────────────
+        // Conta quante postazioni (pallini) sono contenute geometricamente in ogni stanza
+        const capacityMap = new Map<number, number>(); // tempId → count
+        for (const stanza of stanzeCanvas) {
+            const tempId: number = stanza.data?.tempId;
+            const count = postazioniCanvas.filter((postazione: any) => {
+                const center = postazione.getCenterPoint();
+                return stanza.containsPoint(center);
+            }).length;
+            capacityMap.set(tempId, count);
+        }
+
+        // ── FASE 0: Validazione pre-salvataggio ────────────────────────────
+        // Blocca se una o più stanze non hanno alcuna postazione
+        const stanzeVuote = stanzeCanvas.filter((s: any) => (capacityMap.get(s.data?.tempId) ?? 0) === 0);
+        if (stanzeVuote.length > 0) {
+            const nomi = stanzeVuote.map((s: any) => `"${s.data?.label ?? 'Senza nome'}"`).join(', ');
+            alert(`⚠️ Attenzione: le seguenti stanze non hanno postazioni:\n${nomi}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.`);
+            return;
+        }
+
         this.isSaving = true;
         this.cdr.detectChanges();
 
@@ -409,11 +430,14 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             const tempIdToRealId = new Map<number, number>();
 
             for (const stanza of stanzeCanvas) {
+                const tempId: number = stanza.data?.tempId;
+                const capacityCalcolata = capacityMap.get(tempId) ?? 1;
+
                 const payload = {
                     name: stanza.data?.label ?? 'Stanza',
                     roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
-                    capacity: 10,
-                    floorId: 1,
+                    capacity: capacityCalcolata,    // ← calcolata dinamicamente
+                    floorId: 1,                     // ← unico piano disponibile nel DB
                     enabled: true,
                     mapX: Math.round(stanza.left ?? 0),
                     mapY: Math.round(stanza.top ?? 0),
@@ -425,9 +449,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 const savedRoom = await lastValueFrom(this.roomService.createRoom(payload));
                 console.log('[FASE A] Stanza salvata con id:', savedRoom.id);
 
-                // Associa tempId → real id
-                if (stanza.data?.tempId !== undefined && savedRoom.id !== undefined) {
-                    tempIdToRealId.set(stanza.data.tempId, savedRoom.id);
+                // Associa tempId → real id: garantisce la sincronizzazione nella FASE B
+                if (tempId !== undefined && savedRoom.id !== undefined) {
+                    tempIdToRealId.set(tempId, savedRoom.id);
                 }
             }
 
