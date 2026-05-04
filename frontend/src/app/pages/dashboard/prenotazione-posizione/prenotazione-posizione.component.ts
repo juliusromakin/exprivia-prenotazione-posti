@@ -63,6 +63,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   showUserDropdown: boolean = false;
   selectedUser: User | null = null;
 
+  // Location selection properties
+  locations: string[] = ['Roma', 'Milano', 'Molfetta'];
+  selectedLocation: string = 'Roma';
+
   // Bulk selection properties
   selectedReservations: Set<number> = new Set();
   isSelectAllChecked: boolean = false;
@@ -200,7 +204,6 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
             workspaces: (workspaces as Workspace[]).filter(w => w.roomId === room.id)
           }));
 
-          this.roomTypes = [...new Set(this.state.rooms.map((r: Room) => r.roomType))].filter(Boolean) as string[];
           this.state.isLoading = false;
         },
         error: (err: any) => {
@@ -272,11 +275,75 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       .subscribe(workspaceId => {
         if (workspaceId) {
           const selectedWorkspace = this.state.availableWorkspaces.find(p => p.id === Number(workspaceId));
-          if (selectedWorkspace) this.bookingForm.patchValue({ roomId: selectedWorkspace.roomId });
+          if (selectedWorkspace) {
+            // Only patch roomId if it's different to avoid loops
+            if (this.bookingForm.get('roomId')?.value !== selectedWorkspace.roomId) {
+              this.bookingForm.patchValue({ roomId: selectedWorkspace.roomId }, { emitEvent: false });
+            }
+          }
         } else {
           this.bookingForm.patchValue({ roomId: null }, { emitEvent: false });
         }
       });
+
+    this.bookingForm.get("roomId")?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(roomId => {
+        if (roomId) {
+          const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
+          if (currentWorkspaceId) {
+            const workspace = this.state.availableWorkspaces.find(p => p.id === Number(currentWorkspaceId));
+            if (workspace && workspace.roomId !== Number(roomId)) {
+              this.bookingForm.patchValue({ workspaceId: "" });
+            }
+          }
+        } else {
+          this.bookingForm.patchValue({ workspaceId: "" });
+        }
+      });
+  }
+
+  get filteredRoomTypes(): string[] {
+    const types = Object.values(RoomType) as string[];
+    if (this.selectedLocation === 'Roma') {
+      return types.filter(t => t !== 'OPEN_SPACE' && t !== RoomType.OPEN_SPACE);
+    }
+    return types;
+  }
+
+  get roomsForSelectedType(): Room[] {
+    const type = this.bookingForm.get('roomType')?.value;
+    if (!type) return [];
+
+    let rooms = this.state.rooms.filter(r =>
+      r.roomType === type ||
+      (typeof r.roomType === 'string' && r.roomType.toUpperCase() === String(type).toUpperCase())
+    );
+
+    // Se è selezionato un orario, mostra solo le stanze con almeno una postazione disponibile
+    const timeSlot = this.bookingForm.get('timeSlot')?.value;
+    if (timeSlot) {
+      rooms = rooms.filter(room =>
+        this.state.availableWorkspaces.some(w => w.roomId === room.id && w.isAvailable === true)
+      );
+    }
+
+    return rooms;
+  }
+
+  get workstationsForSelectedRoom(): any[] {
+    const roomId = this.bookingForm.get('roomId')?.value;
+    if (!roomId) return [];
+
+    let workspaces = this.state.availableWorkspaces.filter(w => w.roomId === Number(roomId));
+
+    // Se è selezionato un orario, mostra solo le postazioni effettivamente disponibili
+    const timeSlot = this.bookingForm.get('timeSlot')?.value;
+    if (timeSlot) {
+      workspaces = workspaces.filter(w => w.isAvailable === true);
+    }
+
+    return workspaces;
   }
 
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
@@ -347,6 +414,16 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           if (!a.isAvailable && b.isAvailable) return 1;
           return (a.name || '').localeCompare(b.name || '');
         });
+
+        // Se la postazione selezionata non è più disponibile col nuovo orario, resetta la selezione
+        const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
+        if (currentWorkspaceId) {
+          const selected = workspaces.find(w => w.id === Number(currentWorkspaceId));
+          if (selected && !selected.isAvailable) {
+            this.bookingForm.patchValue({ workspaceId: "", roomId: null });
+            this.toastService.showInfo('Info', 'La postazione selezionata non è disponibile per questo orario.');
+          }
+        }
       });
   }
 
@@ -423,6 +500,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.bookingForm.reset({ roomType: "" });
     this.state.selectedDates = [];
     this.state.availableTimeSlots = [];
+    this.state.availableWorkspaces = [];
     if (this.isAdmin) this.clearUserSearch();
   }
 
@@ -520,6 +598,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   onMonthChange(date: Date): void { console.log('Month changed:', date); }
+
+  onLocationChange(): void {
+    this.resetForm();
+    this.toastService.showInfo('Sede Cambiata', `Hai selezionato la sede di ${this.selectedLocation}`);
+  }
 
   private isSameDay(d1: Date, d2: Date): boolean {
     return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
