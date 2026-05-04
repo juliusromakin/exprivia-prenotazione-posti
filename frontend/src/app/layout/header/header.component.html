@@ -3,9 +3,9 @@
         <div class="flex items-center gap-2">
             <!-- Back Arrow for Planimetrie Page -->
             <div *ngIf="isPlanimetriePage" 
-                 [routerLink]="['/admin/homepage']" 
+                 (click)="tornaIndietro()" 
                  class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 cursor-pointer transition-all mr-1 group"
-                 title="Torna alla Home Admin">
+                 title="Torna indietro">
                 <lucide-icon name="arrow-left" class="w-5 h-5 text-[var(--color-expriviaBlue)] group-hover:scale-110 transition-transform"></lucide-icon>
             </div>
             

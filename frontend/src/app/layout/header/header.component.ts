@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatIconModule } from "@angular/material/icon";
@@ -40,7 +40,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private navigationService: NavigationService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -114,6 +115,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   get isPlanimetriePage(): boolean {
     return this.router.url === '/amministrazione-planimetrie';
+  }
+
+  tornaIndietro(): void {
+    this.location.back();
   }
 
   get isAdmin(): boolean {
