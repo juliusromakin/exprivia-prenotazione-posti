@@ -55,6 +55,13 @@ export class NavigationService {
       authorities: [UserRole.ADMIN],
     },
     {
+      label: "Gestione Planimetrie",
+      icon: "map",
+      route: "/amministrazione-planimetrie",
+      adminOnly: true,
+      authorities: [UserRole.ADMIN],
+    },
+    {
       label: "Update Profile",
       icon: "user",
       route: "/dashboard/update-user",
