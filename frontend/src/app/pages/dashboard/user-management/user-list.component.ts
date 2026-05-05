@@ -15,6 +15,7 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
 import { User } from "@core/models";
 import { UserManagementService } from "./user-management.service";
 import { UserFormDialogComponent } from "./user-form-dialog.component";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 
 @Component({
   selector: "app-user-list",
@@ -37,7 +38,8 @@ import { UserFormDialogComponent } from "./user-form-dialog.component";
     FormsModule,
     UserFormDialogComponent,
     ToastModule,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    TranslateModule
   ],
   providers: [],
   styleUrls: ['../../../shared/styles/toast.styles.css']
@@ -73,7 +75,8 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   constructor(
     private userManagementService: UserManagementService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private translate: TranslateService
   ) {
     this.loading$ = this.userManagementService.loading$;
   }
@@ -98,7 +101,10 @@ export class UserListComponent implements OnInit, OnDestroy {
     try {
       await this.userManagementService.loadUsers();
     } catch (error) {
-      this.toastService.showError("Loading Error", "Error loading users");
+      this.toastService.showError(
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.LOADING_ERROR'),
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.LOADING_ERROR_DESC')
+      );
     }
   }
 
@@ -137,7 +143,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   createUser(): void {
-    this.modalData = { title: "New User", user: {} };
+    this.modalData = { title: this.translate.instant('USER_MANAGEMENT.NEW_USER'), user: {} };
     this.showModal = true;
   }
 
@@ -150,24 +156,33 @@ export class UserListComponent implements OnInit, OnDestroy {
     try {
       this.isModalLoading = true;
       if (this.modalData.user.id) {
-        // Edit mode
         await this.userManagementService.updateUser(this.modalData.user.id!, userData);
-        this.toastService.showSuccess("User Updated", "User updated successfully");
+        this.toastService.showSuccess(
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_UPDATED'),
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_UPDATED_DESC')
+        );
       } else {
-        // Create mode
         await this.userManagementService.createUser(userData);
-        this.toastService.showSuccess("User Created", "User created successfully");
+        this.toastService.showSuccess(
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_CREATED'),
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_CREATED_DESC')
+        );
       }
       this.closeModal();
     } catch (error) {
-      this.toastService.showError("Operation Error", this.modalData.user.id ? "Error updating user" : "Error creating user");
+      this.toastService.showError(
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.OPERATION_ERROR'),
+        this.modalData.user.id 
+          ? this.translate.instant('USER_MANAGEMENT.MESSAGES.UPDATE_ERROR') 
+          : this.translate.instant('USER_MANAGEMENT.MESSAGES.CREATE_ERROR')
+      );
     } finally {
       this.isModalLoading = false;
     }
   }
 
   editUser(user: User): void {
-    this.modalData = { title: "Edit User", user: { ...user } };
+    this.modalData = { title: this.translate.instant('USER_MANAGEMENT.TABLE.ACTION_EDIT'), user: { ...user } };
     this.showModal = true;
   }
 
@@ -190,10 +205,16 @@ export class UserListComponent implements OnInit, OnDestroy {
 
     try {
       await this.userManagementService.deleteUser(this.userToDelete.id);
-      this.toastService.showSuccess("User Deleted", "User deleted successfully");
+      this.toastService.showSuccess(
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_DELETED'),
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_DELETED_DESC')
+      );
       this.closeDeleteConfirmation();
     } catch (error) {
-      this.toastService.showError("Deletion Error", "Error deleting user");
+      this.toastService.showError(
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.DELETE_ERROR'),
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.DELETE_ERROR_DESC')
+      );
       this.closeDeleteConfirmation();
     }
   }
@@ -357,14 +378,16 @@ export class UserListComponent implements OnInit, OnDestroy {
     const user = this.userToDelete;
     const isAdmin = user.authorities && user.authorities.includes('ROLE_ADMIN');
     
+    const roleString = isAdmin ? this.translate.instant('USER_MANAGEMENT.TABLE.ROLE_ADMIN') : this.translate.instant('USER_MANAGEMENT.TABLE.ROLE_EMPLOYEE');
+
     const message = [
-      `Are you sure you want to delete the user ${user.name} ${user.lastName}?`,
+      this.translate.instant('USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_MSG1', { name: user.name, lastName: user.lastName }),
       '',
-      `Name: ${user.name} ${user.lastName}`,
-      `Email: ${user.email}`,
-      `Role: ${isAdmin ? 'Administrator' : 'Employee'}`,
+      this.translate.instant('USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_NAME', { name: user.name, lastName: user.lastName }),
+      this.translate.instant('USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_EMAIL', { email: user.email }),
+      this.translate.instant('USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_ROLE', { role: roleString }),
       '',
-      'This action cannot be undone.'
+      this.translate.instant('USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_UNDONE')
     ];
 
     return message.join('<br>');
@@ -381,11 +404,14 @@ export class UserListComponent implements OnInit, OnDestroy {
       });
       
       this.toastService.showSuccess(
-        "Utente Attivato", 
-        `L'account di ${user.name} è ora attivo.`
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_TITLE'),
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_DESC', { name: user.name })
       );
     } catch (error) {
-      this.toastService.showError("Errore", "Impossibile attivare l'utente.");
+      this.toastService.showError(
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_TITLE'),
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_DESC')
+      );
     }
   }
 }

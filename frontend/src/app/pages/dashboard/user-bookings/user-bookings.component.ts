@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { User, Room, Workspace } from '@core/models';
 import { switchMap, of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-bookings',
@@ -22,7 +23,8 @@ import { switchMap, of } from 'rxjs';
     ReactiveFormsModule, 
     FormsModule, 
     ToastModule,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    TranslateModule
   ],
   providers: [DatePipe],
   templateUrl: './user-bookings.component.html',
@@ -73,7 +75,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private toastService: ToastService,
     private datePipe: DatePipe,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -121,7 +124,10 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading reservations:', error);
-        this.toastService.showError('Error', 'Unable to load reservations');
+        this.toastService.showError(
+          this.translate.instant('RESERVATIONS.MESSAGES.ERROR'),
+          this.translate.instant('RESERVATIONS.MESSAGES.ERROR_LOADING')
+        );
         this.isLoading = false;
       }
     });
@@ -140,14 +146,20 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.toastService.showSuccess('Success', 'Reservation deleted successfully');
+          this.toastService.showSuccess(
+            this.translate.instant('RESERVATIONS.MESSAGES.SUCCESS'),
+            this.translate.instant('RESERVATIONS.MESSAGES.DELETE_SUCCESS')
+          );
           this.reservations = this.reservations.filter(r => r.id !== this.reservationToDelete?.id);
           this.applySorting();
           this.isLoading = false;
           this.closeDeleteConfirmation();
         },
         error: () => {
-          this.toastService.showError('Error', 'Failed to delete reservation');
+          this.toastService.showError(
+            this.translate.instant('RESERVATIONS.MESSAGES.ERROR'),
+            this.translate.instant('RESERVATIONS.MESSAGES.DELETE_ERROR')
+          );
           this.isLoading = false;
           this.closeDeleteConfirmation();
         }
@@ -315,13 +327,19 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
           link.download = `reservations_report_${this.exportDate}.xlsx`;
           link.click();
           window.URL.revokeObjectURL(url);
-          this.toastService.showSuccess('Export', 'Daily report exported successfully');
+          this.toastService.showSuccess(
+            this.translate.instant('RESERVATIONS.EXPORT'),
+            this.translate.instant('RESERVATIONS.MESSAGES.EXPORT_DAILY_SUCCESS')
+          );
           this.isExporting = false;
           this.closeExportModal();
         },
         error: (error) => {
           console.error('Export error:', error);
-          this.toastService.showError('Export', 'Failed to export daily report');
+          this.toastService.showError(
+            this.translate.instant('RESERVATIONS.EXPORT'),
+            this.translate.instant('RESERVATIONS.MESSAGES.EXPORT_DAILY_ERROR')
+          );
           this.isExporting = false;
         }
       });
@@ -350,12 +368,15 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Reservations');
     XLSX.writeFile(wb, `reservations_${this.selectedExportPeriod}.xlsx`);
-    this.toastService.showSuccess('Export', 'File exported successfully');
+    this.toastService.showSuccess(
+      this.translate.instant('RESERVATIONS.EXPORT'),
+      this.translate.instant('RESERVATIONS.MESSAGES.EXPORT_SUCCESS')
+    );
     this.closeExportModal();
   }
 
   getReservationDeleteConfirmationMessage(): string {
     if (!this.reservationToDelete) return '';
-    return `Are you sure you want to delete the reservation for ${this.formatDate(this.reservationToDelete.startDate, 'dd/MM/yyyy')}?`;
+    return this.translate.instant('RESERVATIONS.MESSAGES.CONFIRM_DELETE_MSG', { date: this.formatDate(this.reservationToDelete.startDate, 'dd/MM/yyyy') });
   }
 }

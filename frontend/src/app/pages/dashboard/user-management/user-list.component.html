@@ -4,8 +4,8 @@
   <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">User Management</h1>
-        <p class="text-gray-600">Manage system users and their roles</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ 'USER_MANAGEMENT.TITLE' | translate }}</h1>
+        <p class="text-gray-600">{{ 'USER_MANAGEMENT.DESC' | translate }}</p>
       </div>
       
       <!-- Refresh Button -->
@@ -16,7 +16,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
         <div *ngIf="loading$ | async" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-        {{ (loading$ | async) ? 'Refreshing...' : 'Refresh' }}
+        {{ (loading$ | async) ? ('USER_MANAGEMENT.REFRESHING' | translate) : ('USER_MANAGEMENT.REFRESH' | translate) }}
       </button>
     </div>
   </div>
@@ -27,7 +27,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Total Users</p>
+          <p class="text-sm font-medium text-gray-600">{{ 'USER_MANAGEMENT.TOTAL_USERS' | translate }}</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getTotalUsers() }}</h3>
         </div>
         <div class="p-3 bg-blue-50 rounded-lg">
@@ -40,7 +40,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Administrators</p>
+          <p class="text-sm font-medium text-gray-600">{{ 'USER_MANAGEMENT.ADMINISTRATORS' | translate }}</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getAdminCount() }}</h3>
         </div>
         <div class="p-3 bg-purple-50 rounded-lg">
@@ -53,7 +53,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Employees</p>
+          <p class="text-sm font-medium text-gray-600">{{ 'USER_MANAGEMENT.EMPLOYEES' | translate }}</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getUserCount() }}</h3>
         </div>
         <div class="p-3 bg-green-50 rounded-lg">
@@ -66,7 +66,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
       <div class="flex items-center justify-between relative z-10">
         <div>
-          <p class="text-sm font-medium text-gray-600">Pending Activation</p>
+          <p class="text-sm font-medium text-gray-600">{{ 'USER_MANAGEMENT.PENDING_ACTIVATION' | translate }}</p>
           <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ getInactiveCount() }}</h3>
         </div>
         <div class="p-3 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
@@ -89,7 +89,7 @@
               type="text" 
               [(ngModel)]="searchTerm" 
               (keyup)="applyFilter($event)"
-              placeholder="Search by name, email..." 
+              [placeholder]="'USER_MANAGEMENT.SEARCH_PLACEHOLDER' | translate" 
               class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
             <lucide-icon name="search" class="w-5 h-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2"></lucide-icon>
           </div>
@@ -99,22 +99,22 @@
             <button [class.bg-blue-50]="currentFilter === 'all'" (click)="filterByRole('all')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="users" class="w-4 h-4"></lucide-icon>
-              All
+              {{ 'USER_MANAGEMENT.FILTER_ALL' | translate }}
             </button>
             <button [class.bg-purple-50]="currentFilter === 'admin'" (click)="filterByRole('admin')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="shield" class="w-4 h-4"></lucide-icon>
-              Administrators
+              {{ 'USER_MANAGEMENT.ADMINISTRATORS' | translate }}
             </button>
             <button [class.bg-green-50]="currentFilter === 'user'" (click)="filterByRole('user')"
               class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <lucide-icon name="user" class="w-4 h-4"></lucide-icon>
-              Employees
+              {{ 'USER_MANAGEMENT.EMPLOYEES' | translate }}
             </button>
             <button [class.bg-red-50]="currentFilter === 'inactive'" (click)="filterByRole('inactive')"
               class="relative px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
               <i class="fas fa-user-clock text-red-600"></i>
-              Pending Activation
+              {{ 'USER_MANAGEMENT.PENDING_ACTIVATION' | translate }}
               <span *ngIf="getInactiveCount() > 0" 
                 class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-pulse">
                 {{ getInactiveCount() }}
@@ -127,7 +127,7 @@
         <button (click)="createUser()"
           class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer">
           <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
-          New User
+          {{ 'USER_MANAGEMENT.NEW_USER' | translate }}
         </button>
       </div>
     </div>
@@ -139,12 +139,12 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.FIRST_NAME' | translate }}</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.LAST_NAME' | translate }}</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.EMAIL' | translate }}</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.STATUS' | translate }}</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.ROLE' | translate }}</th>
+              <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'USER_MANAGEMENT.TABLE.ACTIONS' | translate }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -176,7 +176,7 @@
                       ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
                   " class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{ user.enabled ? 'Active' : 'Inactive' }}
+                  {{ user.enabled ? ('USER_MANAGEMENT.TABLE.STATUS_ACTIVE' | translate) : ('USER_MANAGEMENT.TABLE.STATUS_INACTIVE' | translate) }}
                 </span>
               </td>
 
@@ -189,8 +189,8 @@
                   " class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{
                   user.authorities.includes('ROLE_ADMIN')
-                  ? 'Administrator'
-                  : 'Employee'
+                  ? ('USER_MANAGEMENT.TABLE.ROLE_ADMIN' | translate)
+                  : ('USER_MANAGEMENT.TABLE.ROLE_EMPLOYEE' | translate)
                   }}
                 </span>
               </td>
@@ -203,7 +203,7 @@
                   <button *ngIf="currentFilter === 'inactive'"
                     (click)="activateUser(user)"
                     class="flex items-center justify-center w-8 h-8 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 border border-green-200 rounded shadow-sm transition-all cursor-pointer"
-                    title="Attiva Utente">
+                    [title]="'USER_MANAGEMENT.TABLE.ACTIVATE_USER_TITLE' | translate">
                     <i class="fas fa-check text-sm"></i>
                   </button>
                   <div class="relative">
@@ -211,7 +211,7 @@
                       type="button"
                       (click)="toggleDropdown(user.id!)"
                       class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-colors duration-200"
-                      title="Azioni"
+                      [title]="'USER_MANAGEMENT.TABLE.ACTIONS' | translate"
                       [disabled]="!user.id"
                       [attr.data-user-id]="user.id">
                       <i class="fas fa-ellipsis-v text-sm"></i>
@@ -229,7 +229,7 @@
                           (click)="editUser(user)"
                           class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                           <i class="fas fa-edit mr-2"></i>
-                          Edit
+                          {{ 'USER_MANAGEMENT.TABLE.ACTION_EDIT' | translate }}
                         </button>
                         <button
                           type="button"
@@ -237,7 +237,7 @@
                           [disabled]="loading$ | async"
                           class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                           <i class="fas fa-trash mr-2"></i>
-                          Delete
+                          {{ 'USER_MANAGEMENT.TABLE.ACTION_DELETE' | translate }}
                         </button>
                       </div>
                     </div>
@@ -251,7 +251,7 @@
               <td colspan="7" class="px-4 sm:px-6 py-8 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center justify-center space-y-2">
                   <lucide-icon name="users" class="w-8 h-8 text-gray-400"></lucide-icon>
-                  <p>No users found</p>
+                  <p>{{ 'USER_MANAGEMENT.TABLE.NO_USERS_FOUND' | translate }}</p>
                 </div>
               </td>
             </tr>
@@ -270,19 +270,19 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <!-- Items per page selector -->
         <div class="flex items-center gap-2">
-          <label class="text-sm font-medium text-gray-700">Show:</label>
+          <label class="text-sm font-medium text-gray-700">{{ 'USER_MANAGEMENT.PAGINATION.SHOW' | translate }}</label>
           <select 
             [(ngModel)]="itemsPerPage" 
             (ngModelChange)="onItemsPerPageChange($event)"
             class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
           </select>
-          <span class="text-sm text-gray-500">items per page</span>
+          <span class="text-sm text-gray-500">{{ 'USER_MANAGEMENT.PAGINATION.ITEMS_PER_PAGE' | translate }}</span>
         </div>
 
         <!-- Page info -->
         <div class="text-sm text-gray-700">
-          Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ totalItems }} results
+          {{ 'USER_MANAGEMENT.PAGINATION.SHOWING_START' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'USER_MANAGEMENT.PAGINATION.SHOWING_OF' | translate }} {{ totalItems }} {{ 'USER_MANAGEMENT.PAGINATION.SHOWING_RESULTS' | translate }}
         </div>
 
         <!-- Page navigation -->
@@ -361,10 +361,10 @@
   [type]="'danger'"
   [icon]="'trash'"
   [data]="{
-    title: 'Confirm User Deletion',
+    title: 'USER_MANAGEMENT.MESSAGES.CONFIRM_DELETE_TITLE' | translate,
     message: getUserDeleteConfirmationMessage(),
-    confirmButtonText: 'Delete',
-    cancelButtonText: 'Cancel'
+    confirmButtonText: 'USER_MANAGEMENT.MESSAGES.CONFIRM' | translate,
+    cancelButtonText: 'USER_MANAGEMENT.MESSAGES.CANCEL' | translate
   }"
   (confirm)="confirmDelete()"
   (cancel)="closeDeleteConfirmation()">

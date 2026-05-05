@@ -32,13 +32,12 @@
   <div class="calendar-container w-full max-w-4xl mx-auto">
     <!-- Calendar Header (Days of Week) -->
     <div class="grid grid-cols-7 mb-2 text-center text-xs sm:text-sm font-medium" role="row">
-      <div class="py-2" role="columnheader">Lun</div>
-      <div class="py-2" role="columnheader">Mar</div>
-      <div class="py-2" role="columnheader">Mer</div>
-      <div class="py-2" role="columnheader">Gio</div>
-      <div class="py-2" role="columnheader">Ven</div>
-      <div class="py-2 text-red-500" role="columnheader">Sab</div>
-      <div class="py-2 text-red-500" role="columnheader">Dom</div>
+      <div *ngFor="let day of weekDays; let i = index" 
+        class="py-2" 
+        [class.text-red-500]="i >= 5"
+        role="columnheader">
+        {{ day }}
+      </div>
     </div>
 
     <!-- Calendar Grid -->

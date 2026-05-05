@@ -6,10 +6,10 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-900 flex items-center">
           <i class="fas fa-user-edit text-blue-600 mr-3"></i>
-          Update Profile
+          {{ 'ACCOUNT.TITLE' | translate }}
         </h1>
         <p class="text-gray-600 mt-1">
-          Manage your personal information and account settings
+          {{ 'ACCOUNT.DESC' | translate }}
         </p>
       </div>
       <div class="flex items-center space-x-4">
@@ -20,7 +20,7 @@
           routerLink="/dashboard"
           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           <i class="fas fa-arrow-left mr-2"></i>
-          Back to dashboard
+          {{ 'ACCOUNT.BACK_TO_DASHBOARD' | translate }}
         </button>
         <button 
           type="button" 
@@ -28,7 +28,7 @@
           [disabled]="isLoading"
           class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
           <i class="fas fa-undo mr-2"></i>
-          Reset
+          {{ 'ACCOUNT.RESET' | translate }}
         </button>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <div *ngIf="isLoading && !currentUser" class="flex justify-center items-center py-12">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p class="text-gray-500">Loading profile data...</p>
+        <p class="text-gray-500">{{ 'ACCOUNT.LOADING' | translate }}</p>
       </div>
     </div>
 
@@ -55,8 +55,8 @@
               <i class="fas fa-user text-blue-600"></i>
             </div>
             <div>
-              <h3 class="text-lg font-medium text-gray-900">Personal Information</h3>
-              <p class="text-sm text-gray-500">Update your personal details</p>
+              <h3 class="text-lg font-medium text-gray-900">{{ 'ACCOUNT.PERSONAL_INFO.TITLE' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'ACCOUNT.PERSONAL_INFO.DESC' | translate }}</p>
             </div>
           </div>
           
@@ -64,13 +64,13 @@
             <!-- Name -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2" for="name">
-                First Name <span class="text-red-500">*</span>
+                {{ 'ACCOUNT.PERSONAL_INFO.FIRST_NAME' | translate }} <span class="text-red-500">*</span>
               </label>
               <input 
                 id="name" 
                 formControlName="name" 
                 type="text"
-                placeholder="Enter your first name"
+                [placeholder]="'ACCOUNT.PERSONAL_INFO.FIRST_NAME_HINT' | translate"
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                 [class.border-red-500]="nameInvalid"
                 [class.focus:ring-red-200]="nameInvalid"
@@ -85,13 +85,13 @@
             <!-- Last Name -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2" for="lastName">
-                Last Name <span class="text-red-500">*</span>
+                {{ 'ACCOUNT.PERSONAL_INFO.LAST_NAME' | translate }} <span class="text-red-500">*</span>
               </label>
               <input 
                 id="lastName" 
                 formControlName="lastName" 
                 type="text"
-                placeholder="Enter your last name"
+                [placeholder]="'ACCOUNT.PERSONAL_INFO.LAST_NAME_HINT' | translate"
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                 [class.border-red-500]="lastNameInvalid"
                 [class.focus:ring-red-200]="lastNameInvalid"
@@ -107,14 +107,14 @@
           <!-- Email -->
           <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700 mb-2" for="email">
-              Email <span class="text-red-500">*</span>
+              {{ 'ACCOUNT.PERSONAL_INFO.EMAIL' | translate }} <span class="text-red-500">*</span>
             </label>
             <div class="relative">
               <input 
                 id="email" 
                 formControlName="email" 
                 type="email"
-                placeholder="email@example.com"
+                [placeholder]="'ACCOUNT.PERSONAL_INFO.EMAIL_HINT' | translate"
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                 [class.border-red-500]="emailInvalid"
                 [class.focus:ring-red-200]="emailInvalid"
@@ -136,22 +136,22 @@
               <i class="fas fa-lock text-orange-600"></i>
             </div>
             <div>
-              <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
-              <p class="text-sm text-gray-500">Leave these fields empty if you don't wish to change your password</p>
+              <h3 class="text-lg font-medium text-gray-900">{{ 'ACCOUNT.PASSWORD.TITLE' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'ACCOUNT.PASSWORD.DESC' | translate }}</p>
             </div>
           </div>
 
           <!-- Password Attuale -->
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2" for="currentPassword">
-              Current Password
+              {{ 'ACCOUNT.PASSWORD.CURRENT' | translate }}
             </label>
             <div class="relative">
               <input 
                 id="currentPassword" 
                 [type]="hideCurrentPwd ? 'password' : 'text'"
                 formControlName="currentPassword"
-                placeholder="Enter current password"
+                [placeholder]="'ACCOUNT.PASSWORD.CURRENT_HINT' | translate"
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 pr-12 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                 [class.border-red-500]="currentPasswordInvalid"
                 [class.focus:ring-red-200]="currentPasswordInvalid"
@@ -177,7 +177,7 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <label class="block text-sm font-medium text-gray-700" for="newPassword">
-                  New Password
+                  {{ 'ACCOUNT.PASSWORD.NEW' | translate }}
                 </label>
                 <div class="flex items-center" *ngIf="userForm.get('newPassword')?.value && passwordStrengthText">
                   <div class="flex space-x-1 mr-2">
@@ -190,7 +190,7 @@
                     <div class="w-1.5 h-1.5 rounded-full" 
                          [class]="passwordStrength >= 4 ? 'bg-green-400' : 'bg-gray-200'"></div>
                   </div>
-                  <span class="text-xs font-medium" [class]="passwordStrengthColor">{{ passwordStrengthText }}</span>
+                  <span class="text-xs font-medium" [class]="passwordStrengthColor">{{ getStrengthText() }}</span>
                 </div>
               </div>
               <div class="relative">
@@ -198,7 +198,7 @@
                   id="newPassword" 
                   [type]="hideNewPwd ? 'password' : 'text'"
                   formControlName="newPassword"
-                  placeholder="Enter new password"
+                  [placeholder]="'ACCOUNT.PASSWORD.NEW_HINT' | translate"
                   class="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 pr-12 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   [class.border-red-500]="newPasswordInvalid"
                   [class.focus:ring-red-200]="newPasswordInvalid"
@@ -229,14 +229,14 @@
             <!-- Confirm Password -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2" for="confirmPassword">
-                Confirm Password
+                {{ 'ACCOUNT.PASSWORD.CONFIRM' | translate }}
               </label>
               <div class="relative">
                 <input 
                   id="confirmPassword" 
                   [type]="hideConfirmPwd ? 'password' : 'text'"
                   formControlName="confirmPassword"
-                  placeholder="Confirm new password"
+                  [placeholder]="'ACCOUNT.PASSWORD.CONFIRM_HINT' | translate"
                   class="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 pr-12 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   [class.border-red-500]="confirmPasswordInvalid"
                   [class.focus:ring-red-200]="confirmPasswordInvalid"
@@ -261,10 +261,10 @@
           <!-- Password Requirements -->
           <div class="mt-4 p-4 bg-gray-50 rounded-lg" *ngIf="userForm.get('newPassword')?.value">
             <div class="flex items-center justify-between mb-3">
-              <h4 class="text-sm font-medium text-gray-700">Password Requirements:</h4>
+              <h4 class="text-sm font-medium text-gray-700">{{ 'ACCOUNT.PASSWORD.REQUIREMENTS' | translate }}</h4>
               <div class="flex items-center" *ngIf="passwordStrengthText">
-                <span class="text-xs font-medium mr-2">Strength:</span>
-                <span class="text-xs font-semibold" [class]="passwordStrengthColor">{{ passwordStrengthText }}</span>
+                <span class="text-xs font-medium mr-2">{{ 'ACCOUNT.PASSWORD.STRENGTH' | translate }}:</span>
+                <span class="text-xs font-semibold" [class]="passwordStrengthColor">{{ getStrengthText() }}</span>
               </div>
             </div>
             
@@ -287,28 +287,28 @@
                 <i class="fas mr-2 w-3" 
                    [class]="passwordRequirements.minLength ? 'fa-check-circle text-green-500' : 'fa-circle text-gray-300'"></i>
                 <span [class]="passwordRequirements.minLength ? 'text-green-700' : 'text-gray-500'">
-                  At least 6 characters
+                  {{ 'ACCOUNT.PASSWORD.REQ_MIN_LENGTH' | translate }}
                 </span>
               </li>
               <li class="flex items-center transition-colors duration-200">
                 <i class="fas mr-2 w-3" 
                    [class]="passwordRequirements.hasUppercase ? 'fa-check-circle text-green-500' : 'fa-circle text-gray-300'"></i>
                 <span [class]="passwordRequirements.hasUppercase ? 'text-green-700' : 'text-gray-500'">
-                  At least one uppercase letter
+                  {{ 'ACCOUNT.PASSWORD.REQ_UPPERCASE' | translate }}
                 </span>
               </li>
               <li class="flex items-center transition-colors duration-200">
                 <i class="fas mr-2 w-3" 
                    [class]="passwordRequirements.hasLowercase ? 'fa-check-circle text-green-500' : 'fa-circle text-gray-300'"></i>
                 <span [class]="passwordRequirements.hasLowercase ? 'text-green-700' : 'text-gray-500'">
-                  At least one lowercase letter
+                  {{ 'ACCOUNT.PASSWORD.REQ_LOWERCASE' | translate }}
                 </span>
               </li>
               <li class="flex items-center transition-colors duration-200">
                 <i class="fas mr-2 w-3" 
                    [class]="passwordRequirements.hasNumber ? 'fa-check-circle text-green-500' : 'fa-circle text-gray-300'"></i>
                 <span [class]="passwordRequirements.hasNumber ? 'text-green-700' : 'text-gray-500'">
-                  At least one number
+                  {{ 'ACCOUNT.PASSWORD.REQ_NUMBER' | translate }}
                 </span>
               </li>
             </ul>
@@ -323,7 +323,7 @@
                [@shake]>
             <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
             <div class="flex-1">
-              <p class="text-sm font-medium text-red-800">Update Error</p>
+              <p class="text-sm font-medium text-red-800">{{ 'ACCOUNT.MESSAGES.ERROR_TITLE' | translate }}</p>
               <p class="text-sm text-red-600">{{ errorMessage }}</p>
             </div>
             <button type="button" (click)="errorMessage = null" class="text-red-400 hover:text-red-600">
@@ -337,8 +337,8 @@
                [@scaleIn]>
             <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
             <div class="flex-1">
-              <p class="text-sm font-medium text-green-800">Update Completed</p>
-              <p class="text-sm text-green-600">Changes were saved successfully</p>
+              <p class="text-sm font-medium text-green-800">{{ 'ACCOUNT.MESSAGES.SUCCESS_TITLE' | translate }}</p>
+              <p class="text-sm text-green-600">{{ 'ACCOUNT.MESSAGES.SUCCESS_DESC' | translate }}</p>
             </div>
             <button type="button" (click)="updateSuccess = false" class="text-green-400 hover:text-green-600">
               <i class="fas fa-times"></i>
@@ -355,7 +355,7 @@
             [disabled]="isLoading"
             class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
             <i class="fas fa-trash-alt mr-2"></i>
-            Delete Account
+            {{ 'ACCOUNT.ACTIONS.DELETE_ACCOUNT' | translate }}
           </button>
 
           <!-- Save Changes Button -->
@@ -364,7 +364,7 @@
             [disabled]="userForm.invalid || isLoading"
             class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
             <i class="fas fa-save mr-2"></i>
-            Save Changes
+            {{ 'ACCOUNT.ACTIONS.SAVE_CHANGES' | translate }}
             <div *ngIf="isLoading" class="ml-2">
               <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
@@ -386,9 +386,9 @@
       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
         <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Confirm Account Deletion</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'ACCOUNT.DELETE_MODAL.TITLE' | translate }}</h3>
       <p class="text-sm text-gray-500 mb-6">
-        Are you sure you want to delete your account? This action is irreversible and all your data will be permanently deleted.
+        {{ 'ACCOUNT.DELETE_MODAL.DESC' | translate }}
       </p>
       <div class="flex justify-center space-x-4">
         <button
@@ -396,7 +396,7 @@
           (click)="closeDeleteConfirmation()"
           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
           <i class="fas fa-times mr-2"></i>
-          Cancel
+          {{ 'ACCOUNT.DELETE_MODAL.CANCEL' | translate }}
         </button>
         <button
           type="button"
@@ -404,7 +404,7 @@
           [disabled]="isLoading"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
           <i class="fas fa-trash-alt mr-2"></i>
-          Delete Account
+          {{ 'ACCOUNT.DELETE_MODAL.CONFIRM' | translate }}
           <div *ngIf="isLoading" class="ml-2">
             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
           </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { User } from '@core/models';
 import { RoleSelectorComponent } from './components/role-selector/role-selector.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export interface DialogData {
   title: string;
@@ -15,7 +16,8 @@ export interface DialogData {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RoleSelectorComponent
+    RoleSelectorComponent,
+    TranslateModule
   ],
   template: `
     <!-- Modal Overlay -->
@@ -41,62 +43,62 @@ export interface DialogData {
               
               <!-- Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'USER_MANAGEMENT.FORM.FIRST_NAME' | translate }}</label>
                 <input type="text" 
                        formControlName="name" 
-                       placeholder="Enter first name"
+                       [placeholder]="'USER_MANAGEMENT.FORM.ENTER_FIRST_NAME' | translate"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  First name is required
+                  {{ 'USER_MANAGEMENT.FORM.FIRST_NAME_REQ' | translate }}
                 </div>
               </div>
 
               <!-- Last Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'USER_MANAGEMENT.FORM.LAST_NAME' | translate }}</label>
                 <input type="text" 
                        formControlName="lastName" 
-                       placeholder="Enter last name"
+                       [placeholder]="'USER_MANAGEMENT.FORM.ENTER_LAST_NAME' | translate"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  Last name is required
+                  {{ 'USER_MANAGEMENT.FORM.LAST_NAME_REQ' | translate }}
                 </div>
               </div>
 
               <!-- Email -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'USER_MANAGEMENT.FORM.EMAIL' | translate }}</label>
                 <input type="email" 
                        formControlName="email" 
-                       placeholder="Enter email address"
+                       [placeholder]="'USER_MANAGEMENT.FORM.ENTER_EMAIL' | translate"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required</span>
-                  <span *ngIf="userForm.get('email')?.errors?.['email']">Enter a valid email address</span>
+                  <span *ngIf="userForm.get('email')?.errors?.['required']">{{ 'USER_MANAGEMENT.FORM.EMAIL_REQ' | translate }}</span>
+                  <span *ngIf="userForm.get('email')?.errors?.['email']">{{ 'USER_MANAGEMENT.FORM.EMAIL_INVALID' | translate }}</span>
                 </div>
               </div>
 
               <!-- Password (new users only) -->
               <div *ngIf="!data.user.id">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'USER_MANAGEMENT.FORM.PASSWORD' | translate }}</label>
                 <input type="password" 
                        formControlName="password" 
-                       placeholder="Enter password"
+                       [placeholder]="'USER_MANAGEMENT.FORM.ENTER_PASSWORD' | translate"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" 
                      class="text-sm text-red-600 mt-1">
-                  <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required</span>
-                  <span *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="userForm.get('password')?.errors?.['required']">{{ 'USER_MANAGEMENT.FORM.PASSWORD_REQ' | translate }}</span>
+                  <span *ngIf="userForm.get('password')?.errors?.['minlength']">{{ 'USER_MANAGEMENT.FORM.PASSWORD_MIN' | translate }}</span>
                 </div>
               </div>
 
               <!-- Role -->
               <!-- Roles Drag and Drop -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">Assegnazione Ruoli e Permessi</label>
+                <label class="block text-sm font-medium text-gray-700 mb-3">{{ 'USER_MANAGEMENT.FORM.ROLE_ASSIGN' | translate }}</label>
                 <app-role-selector 
                   [assignedRoles]="userForm.get('authorities')?.value || []"
                   (rolesChanged)="userForm.get('authorities')?.setValue($event); userForm.get('authorities')?.markAsTouched()">
@@ -105,7 +107,7 @@ export interface DialogData {
                 <div *ngIf="userForm.get('authorities')?.invalid && userForm.get('authorities')?.touched" 
                      class="text-sm text-red-600 mt-2 flex items-center">
                   <i class="fas fa-exclamation-circle mr-1"></i>
-                  Seleziona almeno un ruolo per poter procedere
+                  {{ 'USER_MANAGEMENT.FORM.ROLE_REQ' | translate }}
                 </div>
               </div>
 
@@ -118,8 +120,8 @@ export interface DialogData {
                          class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                 </div>
                 <div class="text-sm">
-                  <label for="enabled" class="font-medium text-gray-700">Account Active</label>
-                  <p class="text-gray-500">Enable or disable user access to the system</p>
+                  <label for="enabled" class="font-medium text-gray-700">{{ 'USER_MANAGEMENT.FORM.ACCOUNT_ACTIVE' | translate }}</label>
+                  <p class="text-gray-500">{{ 'USER_MANAGEMENT.FORM.ACCOUNT_ACTIVE_DESC' | translate }}</p>
                 </div>
               </div>
 
@@ -137,7 +139,7 @@ export interface DialogData {
                     (click)="onCancel()"
                     [disabled]="isLoading"
                     class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
-              Cancel
+              {{ 'USER_MANAGEMENT.FORM.CANCEL' | translate }}
             </button>
             <button type="submit" 
                     [disabled]="isLoading || userForm.invalid"
@@ -145,7 +147,7 @@ export interface DialogData {
               <span *ngIf="isLoading" class="mr-2">
                 <i class="fas fa-spinner fa-spin"></i>
               </span>
-              {{ isLoading ? (data.user.id ? 'Saving...' : 'Creating...') : (data.user.id ? 'Save' : 'Create') }}
+              {{ isLoading ? (data.user.id ? ('USER_MANAGEMENT.FORM.SAVING' | translate) : ('USER_MANAGEMENT.FORM.CREATING' | translate)) : (data.user.id ? ('USER_MANAGEMENT.FORM.SAVE' | translate) : ('USER_MANAGEMENT.FORM.CREATE' | translate)) }}
             </button>
           </div>
         </form>
@@ -175,7 +177,7 @@ export class UserFormDialogComponent implements OnInit {
   errorMessage = '';
   isLoading = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private translate: TranslateService) {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -226,7 +228,7 @@ export class UserFormDialogComponent implements OnInit {
 
       this.submitted.emit(userData);
     } else {
-      this.errorMessage = 'Please fill all required fields';
+      this.errorMessage = this.translate.instant('USER_MANAGEMENT.FORM.FILL_REQUIRED');
       Object.keys(this.userForm.controls).forEach(key => {
         this.userForm.get(key)?.markAsTouched();
       });

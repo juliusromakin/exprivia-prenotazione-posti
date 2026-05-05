@@ -16,6 +16,7 @@ import { authAnimations } from "../../shared/animations/auth.animations"
 import { AuthService } from "../../core/auth/auth.service"
 import { UserService } from "../../core/services/user.service"
 import type { User } from "../../core/models"
+import { TranslateModule, TranslateService } from "@ngx-translate/core"
 
 @Component({
   selector: "app-update-user",
@@ -25,6 +26,7 @@ import type { User } from "../../core/models"
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    TranslateModule
   ],
   animations: [authAnimations.fadeIn, authAnimations.slideUp, authAnimations.shake, authAnimations.scaleIn],
 })
@@ -53,6 +55,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
+    private translate: TranslateService
   ) {
     this.userForm = this.fb.group({
       name: ["", [Validators.required, Validators.minLength(2)]],
@@ -136,12 +139,16 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
 
   // Get password strength text
   get passwordStrengthText(): string {
+    return this.getStrengthText();
+  }
+
+  getStrengthText(): string {
     const strength = this.passwordStrength
     if (strength === 0) return ''
-    if (strength === 1) return 'Very weak'
-    if (strength === 2) return 'Weak'
-    if (strength === 3) return 'Good'
-    return 'Strong'
+    if (strength === 1) return this.translate.instant('ACCOUNT.PASSWORD.STRENGTH_LEVELS.WEAK')
+    if (strength === 2) return this.translate.instant('ACCOUNT.PASSWORD.STRENGTH_LEVELS.FAIR')
+    if (strength === 3) return this.translate.instant('ACCOUNT.PASSWORD.STRENGTH_LEVELS.GOOD')
+    return this.translate.instant('ACCOUNT.PASSWORD.STRENGTH_LEVELS.STRONG')
   }
 
   // Get password strength color
@@ -222,10 +229,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getNameErrorMessage(): string {
     const control = this.userForm.get("name")
     if (control?.hasError("required")) {
-      return "First name is required"
+      return this.translate.instant('ACCOUNT.ERRORS.REQUIRED')
     }
     if (control?.hasError("minlength")) {
-      return "First name must contain at least 2 characters"
+      return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH')
     }
     return ""
   }
@@ -233,10 +240,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getLastNameErrorMessage(): string {
     const control = this.userForm.get("lastName")
     if (control?.hasError("required")) {
-      return "Last name is required"
+      return this.translate.instant('ACCOUNT.ERRORS.REQUIRED')
     }
     if (control?.hasError("minlength")) {
-      return "Last name must contain at least 2 characters"
+      return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH')
     }
     return ""
   }
@@ -244,10 +251,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getEmailErrorMessage(): string {
     const control = this.userForm.get("email")
     if (control?.hasError("required")) {
-      return "Email is required"
+      return this.translate.instant('ACCOUNT.ERRORS.REQUIRED')
     }
     if (control?.hasError("email")) {
-      return "Enter a valid email address"
+      return this.translate.instant('ACCOUNT.ERRORS.EMAIL_INVALID')
     }
     return ""
   }
@@ -255,7 +262,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getCurrentPasswordErrorMessage(): string {
     const control = this.userForm.get("currentPassword")
     if (control?.hasError("required")) {
-      return "Current password is required to change password"
+      return this.translate.instant('ACCOUNT.ERRORS.CURRENT_PWD_REQ')
     }
     return ""
   }
@@ -263,13 +270,13 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getNewPasswordErrorMessage(): string {
     const control = this.userForm.get("newPassword")
     if (control?.hasError("required")) {
-      return "New password is required"
+      return this.translate.instant('ACCOUNT.ERRORS.REQUIRED')
     }
     if (control?.hasError("minlength")) {
-      return "Password must contain at least 6 characters"
+      return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH')
     }
     if (control?.hasError("pattern")) {
-      return "Password must contain at least one uppercase, one lowercase and one number"
+      return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH') + " (1 upper, 1 lower, 1 number)"
     }
     return ""
   }
@@ -277,10 +284,10 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
   getConfirmPasswordErrorMessage(): string {
     const control = this.userForm.get("confirmPassword")
     if (control?.hasError("required")) {
-      return "Confirm your new password"
+      return this.translate.instant('ACCOUNT.ERRORS.REQUIRED')
     }
     if (control?.hasError("passwordMismatch")) {
-      return "Passwords do not match"
+      return this.translate.instant('ACCOUNT.ERRORS.PWD_MISMATCH')
     }
     return ""
   }

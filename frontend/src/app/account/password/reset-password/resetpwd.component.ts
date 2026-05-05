@@ -10,6 +10,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { ResetPasswordService } from "./resetpwd.service";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 
 // Validator corretto
 export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -30,7 +31,8 @@ export function passwordMatchValidator(control: AbstractControl): ValidationErro
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslateModule
   ],
   templateUrl: './resetpwd.component.html'
 })
@@ -54,14 +56,15 @@ export class ResetpwdComponent implements OnInit {
     private resetPwdService: ResetPasswordService,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.token = params['token'];
       if (!this.token) {
-        this.showError('Token mancante. Richiedi un nuovo link di reset.');
+        this.showError(this.translate.instant('AUTH.RESET_PASSWORD.ERRORS.TOKEN_MISSING'));
         this.router.navigate(['/forgot-password']);
       }
     });
@@ -86,16 +89,17 @@ export class ResetpwdComponent implements OnInit {
       try {
         const password = this.resetPwdForm.get('password')?.value;
         if (!password) {
-          throw new Error('Password non valida');
+          throw new Error(this.translate.instant('AUTH.RESET_PASSWORD.ERRORS.INVALID_PASSWORD'));
         }
 
         await this.resetPwdService.resetPassword(this.token, password);
         
-        this.showSuccess('Password cambiata con successo!');
+        this.showSuccess(this.translate.instant('AUTH.RESET_PASSWORD.SUCCESS_MSG'));
         await this.router.navigate(['/login']);
       } catch (error) {
-        this.errorMessage = error instanceof Error ? error.message : 'Errore durante il cambio password';
-        this.showError(this.errorMessage);
+        const msg = error instanceof Error ? error.message : this.translate.instant('AUTH.RESET_PASSWORD.ERRORS.GENERIC_ERROR');
+        this.errorMessage = msg;
+        this.showError(msg);
       } finally {
         this.isLoading = false;
       }
@@ -103,7 +107,7 @@ export class ResetpwdComponent implements OnInit {
   }
 
   private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Chiudi', {
+    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
@@ -112,7 +116,7 @@ export class ResetpwdComponent implements OnInit {
   }
 
   private showError(message: string): void {
-    this.snackBar.open(message, 'Chiudi', {
+    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
