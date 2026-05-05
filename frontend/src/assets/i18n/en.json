@@ -115,7 +115,11 @@
       "TYPE_MEETING": "Meeting Room",
       "TYPE_OFFICE": "Office",
       "CANCEL": "Cancel",
-      "CREATE": "Create"
+      "CREATE": "Create",
+      "EQUIPMENT": "Equipment",
+      "ADD_EQUIPMENT": "Add Equipment",
+      "CUSTOM_EQUIPMENT_NAME": "Custom equipment name",
+      "QUANTITY": "Quantity"
     },
     "ALERTS": {
       "DESK_ID_PROMPT": "Workstation ID:",

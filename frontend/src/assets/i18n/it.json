@@ -115,7 +115,11 @@
       "TYPE_MEETING": "Sala Riunioni",
       "TYPE_OFFICE": "Ufficio",
       "CANCEL": "Annulla",
-      "CREATE": "Crea"
+      "CREATE": "Crea",
+      "EQUIPMENT": "Attrezzatura",
+      "ADD_EQUIPMENT": "Aggiungi Attrezzatura",
+      "CUSTOM_EQUIPMENT_NAME": "Nome attrezzatura personalizzata",
+      "QUANTITY": "Quantità"
     },
     "ALERTS": {
       "DESK_ID_PROMPT": "ID Postazione:",

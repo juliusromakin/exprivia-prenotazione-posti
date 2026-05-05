@@ -222,13 +222,16 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           }));
 
           // Initialize availableWorkspaces with all workspaces enriched with room info
+          // Filter out workspaces without coordinates (cannot be shown on map)
           this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
-            (room.workspaces || []).map(w => ({
-              ...w,
-              roomId: room.id!,
-              roomName: room.name!,
-              roomType: room.roomType!
-            }))
+            (room.workspaces || [])
+              .filter(w => w.mapX != null && w.mapY != null)
+              .map(w => ({
+                ...w,
+                roomId: room.id!,
+                roomName: room.name!,
+                roomType: room.roomType!
+              }))
           );
 
           this.state.isLoading = false;

@@ -49,6 +49,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     showRoomModal = false;
     newRoomName = '';
     newRoomType = 'MEETING_ROOM';
+    equipmentOptions = ['Proiettore', 'Monitor', 'Mouse', 'Tastiera', 'Altro'];
+    newRoomEquipment: { type: string, quantity: number, customName?: string }[] = [];
     private pendingRoomRect: { left: number, top: number, width: number, height: number } | null = null;
 
     constructor(
@@ -301,6 +303,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     this.pendingRoomRect = { left: left!, top: top!, width: width!, height: height! };
                     this.newRoomName = 'Stanza ' + (this.canvas!.getObjects().filter(o => (o as any).data?.tipo === 'stanza').length + 1);
                     this.newRoomType = 'MEETING_ROOM';
+                    this.newRoomEquipment = []; // Reset equipment
                     this.showRoomModal = true;
                     this.cdr.detectChanges();
                 }
@@ -344,6 +347,14 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const name = this.newRoomName || "Stanza";
         const type = this.newRoomType;
 
+        // Mappa l'attrezzatura per il salvataggio
+        const equipment = this.newRoomType === 'MEETING_ROOM'
+            ? this.newRoomEquipment.map(eq => ({
+                name: eq.type === 'Altro' ? (eq.customName || 'Altro') : eq.type,
+                quantity: eq.quantity || 1
+            }))
+            : [];
+
         const rect = new fabric.Rect({
             width, height, fill: 'rgba(255, 165, 0, 0.35)',
             stroke: 'rgba(255, 140, 0, 0.9)', strokeWidth: 2,
@@ -355,7 +366,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         });
         const tempId = Date.now();
         const group = new fabric.Group([rect, text], { left, top, selectable: true });
-        (group as any).data = { tipo: 'stanza', label: name, roomType: type, tempId };
+        (group as any).data = { tipo: 'stanza', label: name, roomType: type, tempId, equipment };
         this.canvas.add(group);
 
         this.showRoomModal = false;
@@ -367,7 +378,29 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     cancelRoomCreation() {
         this.showRoomModal = false;
         this.pendingRoomRect = null;
+        this.newRoomEquipment = [];
         this.cdr.detectChanges();
+    }
+
+    addEquipment() {
+        const availableOptions = this.getFilteredEquipmentOptions(-1);
+        if (availableOptions.length > 0) {
+            // Pick the first available predefined option, or 'Altro' if none left
+            const nextType = availableOptions.find(opt => opt !== 'Altro') || 'Altro';
+            this.newRoomEquipment.push({ type: nextType, quantity: 1 });
+        }
+    }
+
+    getFilteredEquipmentOptions(index: number): string[] {
+        return this.equipmentOptions.filter(opt => {
+            if (opt === 'Altro') return true;
+            // Check if this option is already selected in ANY other row
+            return !this.newRoomEquipment.some((eq, i) => i !== index && eq.type === opt);
+        });
+    }
+
+    removeEquipment(index: number) {
+        this.newRoomEquipment.splice(index, 1);
     }
 
     private handleRoomLabelVisibility(e: any, opacity: number) {
@@ -492,7 +525,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     mapX: Math.round(stanza.left ?? 0),
                     mapY: Math.round(stanza.top ?? 0),
                     mapWidth: Math.round((stanza.width ?? 0) * (stanza.scaleX ?? 1)),
-                    mapHeight: Math.round((stanza.height ?? 0) * (stanza.scaleY ?? 1))
+                    mapHeight: Math.round((stanza.height ?? 0) * (stanza.scaleY ?? 1)),
+                    equipment: stanza.data?.equipment || []
                 };
 
                 console.log('[FASE A] Salvataggio stanza:', payload);

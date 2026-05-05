@@ -12,6 +12,7 @@ export interface Room {
     mapWidth?: number;
     mapHeight?: number;
     workspaces?: Workspace[];
+    equipment?: { name: string, quantity: number }[];
 }
 
 export interface RoomWithWorkspaces extends Room {

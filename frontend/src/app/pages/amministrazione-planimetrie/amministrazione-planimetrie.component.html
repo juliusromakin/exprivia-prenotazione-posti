@@ -213,6 +213,39 @@
                         <option value="OFFICE" class="bg-expriviaBlue">{{ 'PLANIMETRIA_EDITOR.MODAL.TYPE_OFFICE' | translate }}</option>
                     </select>
                 </div>
+
+                <!-- Sezione Attrezzatura (Solo per MEETING_ROOM) -->
+                <div *ngIf="newRoomType === 'MEETING_ROOM'" class="mt-4 space-y-3">
+                    <label class="block text-white/60 text-xs font-semibold uppercase">{{ 'PLANIMETRIA_EDITOR.MODAL.EQUIPMENT' | translate }}</label>
+                    
+                    <div *ngFor="let eq of newRoomEquipment; let i = index" class="flex gap-2 items-start" @slideUp>
+                        <div class="flex-1">
+                            <select [(ngModel)]="eq.type" 
+                                class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all cursor-pointer text-sm">
+                                <option *ngFor="let opt of getFilteredEquipmentOptions(i)" [value]="opt" class="bg-expriviaBlue">{{ opt }}</option>
+                            </select>
+                            <input *ngIf="eq.type === 'Altro'" type="text" [(ngModel)]="eq.customName" maxlength="50"
+                                class="mt-1.5 w-full bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all text-sm"
+                                [placeholder]="'PLANIMETRIA_EDITOR.MODAL.CUSTOM_EQUIPMENT_NAME' | translate">
+                        </div>
+                        <div class="flex flex-col">
+                            <input type="number" [(ngModel)]="eq.quantity" min="1" max="99"
+                                class="w-20 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all text-sm">
+                        </div>
+                        <button (click)="removeEquipment(i)" class="p-2.5 text-white/40 hover:text-red-400 transition-colors bg-white/5 rounded-lg border border-white/10">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                    </div>
+
+                    <button (click)="addEquipment()" 
+                        [disabled]="getFilteredEquipmentOptions(-1).length === 0"
+                        [class.opacity-50]="getFilteredEquipmentOptions(-1).length === 0"
+                        [class.cursor-not-allowed]="getFilteredEquipmentOptions(-1).length === 0"
+                        class="w-full py-2.5 border border-dashed border-white/20 rounded-lg text-white/60 text-xs font-semibold hover:bg-white/5 hover:text-white hover:border-white/40 transition-all flex items-center justify-center gap-2 group">
+                        <i class="fas fa-plus text-[10px] group-hover:scale-110 transition-transform"></i>
+                        {{ 'PLANIMETRIA_EDITOR.MODAL.ADD_EQUIPMENT' | translate }}
+                    </button>
+                </div>
             </div>
 
             <div class="flex gap-3 mt-8">

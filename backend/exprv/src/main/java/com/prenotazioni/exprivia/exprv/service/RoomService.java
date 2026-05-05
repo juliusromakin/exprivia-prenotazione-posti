@@ -71,6 +71,7 @@ public class RoomService {
             entity.setFloor(floor);
         }
 
+        validateEquipment(entity);
         return roomMapper.toDto(roomRepository.save(entity));
     }
 
@@ -87,8 +88,21 @@ public class RoomService {
             existingRoom.setFloor(floor);
         }
 
+        validateEquipment(existingRoom);
         roomRepository.save(existingRoom);
         return roomMapper.toDto(existingRoom);
+    }
+
+    private void validateEquipment(Room entity) {
+        if (entity.getEquipment() != null && !entity.getEquipment().isEmpty()) {
+            java.util.Set<String> names = new java.util.HashSet<>();
+            for (com.prenotazioni.exprivia.exprv.entity.Equipment e : entity.getEquipment()) {
+                String name = e.getName().toLowerCase().trim();
+                if (!names.add(name)) {
+                    throw new AppException("Attrezzatura duplicata rilevata: " + e.getName(), HttpStatus.BAD_REQUEST);
+                }
+            }
+        }
     }
 
     @Transactional
