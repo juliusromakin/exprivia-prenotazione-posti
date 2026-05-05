@@ -55,6 +55,13 @@ export class NavigationService {
       badges: [UserRole.ADMIN],
     },
     {
+      label: "SIDEBAR.BADGE_MANAGEMENT",
+      icon: "shield-check",
+      route: "/dashboard/badge-management",
+      adminOnly: true,
+      badges: [UserRole.ADMIN],
+    },
+    {
       label: "Gestione Planimetrie",
       icon: "map",
       route: "/amministrazione-planimetrie",

@@ -48,7 +48,16 @@ import {
   ChartBar,
   LayoutDashboard,
   X,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCw,
+  ShieldCheck,
+  Zap,
+  ZapOff,
+  ShieldOff,
+  GitBranch,
+  CheckCircle,
+  AlertCircle,
+  Trash2
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -119,7 +128,16 @@ bootstrapApplication(AppComponent, {
         ChartBar,
         LayoutDashboard,
         X,
-        ArrowLeft
+        ArrowLeft,
+        RefreshCw,
+        ShieldCheck,
+        Zap,
+        ZapOff,
+        ShieldOff,
+        GitBranch,
+        CheckCircle,
+        AlertCircle,
+        Trash2
       })
     ),
     AxiosService,

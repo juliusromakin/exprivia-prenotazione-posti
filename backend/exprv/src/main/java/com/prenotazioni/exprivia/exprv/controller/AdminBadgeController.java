@@ -1,7 +1,6 @@
 package com.prenotazioni.exprivia.exprv.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.prenotazioni.exprivia.exprv.dto.BadgeDTO;
 import com.prenotazioni.exprivia.exprv.entity.Badge;
+import com.prenotazioni.exprivia.exprv.mapper.BadgeMapper;
 import com.prenotazioni.exprivia.exprv.service.BadgeService;
 
 import jakarta.validation.Valid;
@@ -19,39 +19,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminBadgeController {
 
+    private final BadgeMapper badgeMapper;
     private final BadgeService badgeService;
-
-    private BadgeDTO convertToDto(Badge badge) {
-        return new BadgeDTO(badge.getId(), badge.getName(), badge.getType(), badge.getDescription(),
-                badge.getParentIds(), badge.getIsActive());
-    }
 
     @GetMapping
     public ResponseEntity<List<BadgeDTO>> getAllBadges() {
-        List<BadgeDTO> badges = badgeService.getAllBadges().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(badges);
+        return ResponseEntity.ok(badgeMapper.toDtoList(badgeService.getAllBadges()));
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<BadgeDTO> getBadge(@PathVariable String name) {
         Badge badge = badgeService.getBadgeByName(name);
-        return ResponseEntity.ok(convertToDto(badge));
+        return ResponseEntity.ok(badgeMapper.toDto(badge));
     }
 
     @PostMapping
     public ResponseEntity<BadgeDTO> createBadge(@Valid @RequestBody BadgeDTO badgeDto) {
-        Badge created = badgeService.createBadge(badgeDto.getName(), badgeDto.getType(), badgeDto.getIsActive());
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(created));
+        Badge created = badgeService.createBadge(badgeDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(badgeMapper.toDto(created));
     }
 
-    @PutMapping("/{name}")
+    @PutMapping("/{id}")
     public ResponseEntity<BadgeDTO> updateBadge(
-            @PathVariable String name,
+            @PathVariable Integer id,
             @RequestBody BadgeDTO badgeDto) {
-        Badge updated = badgeService.updateBadgeStatus(name, badgeDto.getIsActive());
-        return ResponseEntity.ok(convertToDto(updated));
+        Badge updated = badgeService.updateBadge(id, badgeDto);
+        return ResponseEntity.ok(badgeMapper.toDto(updated));
     }
 
     @DeleteMapping("/{name}")

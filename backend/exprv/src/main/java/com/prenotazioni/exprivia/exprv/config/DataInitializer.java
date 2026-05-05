@@ -39,15 +39,36 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("--- INITIALIZING DATA (BADGE MODEL) ---");
 
         // Inizializziamo i badge di base
+        Badge reserveAction = initBadge("ACTION_RESERVE_WORKSPACE", BadgeType.ACTION);
+        Badge manageReservationsAction = initBadge("ACTION_MANAGE_RESERVATIONS", BadgeType.ACTION);
+        Badge adminPanelAction = initBadge("ACTION_ADMIN_PANEL", BadgeType.ACTION);
+
         Badge userRole = initBadge(AuthoritiesConstants.USER, BadgeType.ROLE);
         Badge adminRole = initBadge(AuthoritiesConstants.ADMIN, BadgeType.ROLE);
+        Badge buildmanRole = initBadge(AuthoritiesConstants.BUILDMAN, BadgeType.ROLE);
 
-        // Esempio di Gerarchia: l'Admin eredita tutto quello che ha lo User
+        // Gerarchia: ROLE_USER eredita l'azione di prenotazione
+        if (userRole.getParentIds() == null || userRole.getParentIds().isEmpty()) {
+            if(userRole.getParentIds() == null) userRole.setParentIds(new java.util.ArrayList<>());
+            userRole.getParentIds().add(reserveAction.getId());
+            badgeRepository.save(userRole);
+        }
+
+        // Gerarchia: ROLE_ADMIN eredita ROLE_USER + azioni amministrative
         if (adminRole.getParentIds() == null || adminRole.getParentIds().isEmpty()) {
             if(adminRole.getParentIds() == null) adminRole.setParentIds(new java.util.ArrayList<>());
             adminRole.getParentIds().add(userRole.getId());
+            adminRole.getParentIds().add(manageReservationsAction.getId());
+            adminRole.getParentIds().add(adminPanelAction.getId());
             badgeRepository.save(adminRole);
-            System.out.println("DEBUG - Hierarchy created: ROLE_ADMIN inherits ROLE_USER");
+            System.out.println("DEBUG - Hierarchy created: ROLE_ADMIN inherits ROLE_USER and Admin Actions");
+        }
+
+        // Gerarchia: ROLE_BUILDMAN eredita ROLE_USER
+        if (buildmanRole.getParentIds() == null || buildmanRole.getParentIds().isEmpty()) {
+            if(buildmanRole.getParentIds() == null) buildmanRole.setParentIds(new java.util.ArrayList<>());
+            buildmanRole.getParentIds().add(userRole.getId());
+            badgeRepository.save(buildmanRole);
         }
 
         initDuration("Full Day", 540);

@@ -9,7 +9,6 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.BadgeType;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -68,4 +67,5 @@ public class Badge implements Serializable {
         this.type = type;
         this.isActive = isActive != null ? isActive : true;
     }
+
 }
