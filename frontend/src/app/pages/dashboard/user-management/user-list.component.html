@@ -193,6 +193,23 @@
                   : ('USER_MANAGEMENT.TABLE.ROLE_EMPLOYEE' | translate)
                   }}
                 </span>
+              <td class="px-4 sm:px-6 py-4">
+                <div class="flex flex-wrap gap-1">
+                  <!-- Ruolo Primario (Admin o Employee) -->
+                  <span [class]="user.badges.includes('ROLE_ADMIN') ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-blue-100 text-blue-800 border border-blue-200'"
+                    class="px-2 py-1 inline-flex text-[10px] leading-4 font-semibold rounded-full uppercase tracking-wider">
+                    {{ user.badges.includes('ROLE_ADMIN') ? 'Administrator' : 'Employee' }}
+                  </span>
+
+                  <!-- Altri Badge (escludendo ROLE_ADMIN e ROLE_USER che sono già rappresentati dal ruolo primario) -->
+                  <ng-container *ngFor="let badge of user.badges">
+                    <span *ngIf="badge !== 'ROLE_ADMIN' && badge !== 'ROLE_USER'"
+                      [class]="getBadgeClass(badge)"
+                      class="px-2 py-1 inline-flex text-[10px] leading-4 font-semibold rounded-full uppercase tracking-wider">
+                      {{ formatBadgeName(badge) }}
+                    </span>
+                  </ng-container>
+                </div>
               </td>
 
               <!-- Azioni -->

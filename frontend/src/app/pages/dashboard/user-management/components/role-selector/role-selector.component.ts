@@ -43,7 +43,7 @@ export class RoleSelectorComponent implements OnInit {
             icon: icon,
             color: color,
             bg: bg,
-            isActive: auth.is_active
+            isActive: auth.isActive
           };
         });
 

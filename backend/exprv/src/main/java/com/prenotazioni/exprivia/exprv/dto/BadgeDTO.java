@@ -28,5 +28,5 @@ public class BadgeDTO {
 
     private List<Integer> parentIds;
 
-    private Boolean is_active;
+    private Boolean isActive;
 }

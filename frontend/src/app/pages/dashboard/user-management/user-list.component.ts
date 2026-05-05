@@ -414,4 +414,15 @@ export class UserListComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  getBadgeClass(badge: string): string {
+    if (badge === 'ROLE_ADMIN') return 'bg-purple-100 text-purple-800 border border-purple-200';
+    if (badge === 'ROLE_USER') return 'bg-blue-100 text-blue-800 border border-blue-200';
+    if (badge.startsWith('ROLE_')) return 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+    return 'bg-gray-100 text-gray-800 border border-gray-200';
+  }
+
+  formatBadgeName(badge: string): string {
+    return badge.replace(/^ROLE_/, '').replace(/_/g, ' ');
+  }
 }

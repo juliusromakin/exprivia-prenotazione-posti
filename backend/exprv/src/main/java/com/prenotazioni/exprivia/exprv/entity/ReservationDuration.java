@@ -10,9 +10,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "reservation_duration")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservationDuration {
 
     @Id
@@ -23,43 +31,16 @@ public class ReservationDuration {
     private Integer minutes;
 
     @Column(name = "is_active")
-    private Boolean is_active = true;
+    private Boolean isActive = true;
 
     @OneToMany(mappedBy = "reservationDuration")
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
-    public ReservationDuration() {
-    }
-
-    public ReservationDuration(String name, Integer minutes, Boolean is_active) {
+    public ReservationDuration(String name, Integer minutes, Boolean isActive) {
         this.name = name;
         this.minutes = minutes;
-        this.is_active = is_active;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(Integer minutes) {
-        this.minutes = minutes;
-    }
-
-    public Boolean getIs_active() {
-        return is_active;
-    }
-
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+        this.isActive = isActive != null ? isActive : true;
     }
 
 }

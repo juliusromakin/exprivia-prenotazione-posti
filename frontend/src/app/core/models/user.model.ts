@@ -17,7 +17,7 @@ export interface badgeDTO {
     type: 'ROLE' | 'ACTION';
     description?: string;
     parentIds?: number[];
-    is_active: boolean;
+    isActive: boolean;
 }
 
 export interface UserSummary {

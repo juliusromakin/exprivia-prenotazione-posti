@@ -61,12 +61,11 @@ public class Badge implements Serializable {
     private Set<User> users = new HashSet<>();
 
     @Column(name = "is_active")
-    private Boolean is_active = true;
+    private Boolean isActive = true;
 
-    public Badge(String name, BadgeType type, Boolean is_active) {
+    public Badge(String name, BadgeType type, Boolean isActive) {
         this.name = name;
         this.type = type;
-        this.is_active = is_active != null ? is_active : true;
+        this.isActive = isActive != null ? isActive : true;
     }
-
 }

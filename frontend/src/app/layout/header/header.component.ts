@@ -122,7 +122,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   get isAdmin(): boolean {
-    return this.currentUser?.authorities?.includes('ROLE_ADMIN') ?? false;
+    return this.currentUser?.badges?.includes('ROLE_ADMIN') ?? false;
   }
 
   getFlag(lang: string): string {

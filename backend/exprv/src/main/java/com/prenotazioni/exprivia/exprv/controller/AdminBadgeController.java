@@ -22,7 +22,8 @@ public class AdminBadgeController {
     private final BadgeService badgeService;
 
     private BadgeDTO convertToDto(Badge badge) {
-        return new BadgeDTO(badge.getId(), badge.getName(), badge.getType(), badge.getDescription(), badge.getParentIds(), badge.getIs_active());
+        return new BadgeDTO(badge.getId(), badge.getName(), badge.getType(), badge.getDescription(),
+                badge.getParentIds(), badge.getIsActive());
     }
 
     @GetMapping
@@ -41,7 +42,7 @@ public class AdminBadgeController {
 
     @PostMapping
     public ResponseEntity<BadgeDTO> createBadge(@Valid @RequestBody BadgeDTO badgeDto) {
-        Badge created = badgeService.createBadge(badgeDto.getName(), badgeDto.getType(), badgeDto.getIs_active());
+        Badge created = badgeService.createBadge(badgeDto.getName(), badgeDto.getType(), badgeDto.getIsActive());
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(created));
     }
 
@@ -49,7 +50,7 @@ public class AdminBadgeController {
     public ResponseEntity<BadgeDTO> updateBadge(
             @PathVariable String name,
             @RequestBody BadgeDTO badgeDto) {
-        Badge updated = badgeService.updateBadgeStatus(name, badgeDto.getIs_active());
+        Badge updated = badgeService.updateBadgeStatus(name, badgeDto.getIsActive());
         return ResponseEntity.ok(convertToDto(updated));
     }
 

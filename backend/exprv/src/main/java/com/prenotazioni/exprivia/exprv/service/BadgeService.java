@@ -41,7 +41,7 @@ public class BadgeService {
      */
     public Badge createBadge(String name, BadgeType type, Boolean isActive) {
         String formattedName = name.toUpperCase().trim();
-        
+
         if (type == BadgeType.ROLE && !formattedName.startsWith("ROLE_")) {
             formattedName = "ROLE_" + formattedName;
         }
@@ -57,20 +57,21 @@ public class BadgeService {
 
     public Badge updateBadgeStatus(String name, Boolean isActive) {
         Badge badge = getBadgeByName(name);
-        badge.setIs_active(isActive);
+        badge.setIsActive(isActive);
         return badgeRepository.save(badge);
     }
 
     @Transactional
     public void deleteBadge(String name) {
         Badge badge = getBadgeByName(name);
-        badge.setIs_active(false); // Soft delete
+        badge.setIsActive(false); // Soft delete
         badgeRepository.save(badge);
 
-        // Pulizia: rimuovere l'ID di questo badge da tutti gli array parent_ids degli altri
+        // Pulizia: rimuovere l'ID di questo badge da tutti gli array parent_ids degli
+        // altri
         List<Badge> allBadges = badgeRepository.findAll();
-        for(Badge b : allBadges) {
-            if(b.getParentIds() != null && b.getParentIds().contains(badge.getId())) {
+        for (Badge b : allBadges) {
+            if (b.getParentIds() != null && b.getParentIds().contains(badge.getId())) {
                 b.getParentIds().remove(badge.getId());
                 badgeRepository.save(b);
             }
@@ -82,13 +83,14 @@ public class BadgeService {
      */
     public Set<String> flattenBadges(Set<Badge> initialBadges) {
         Set<String> flattened = new HashSet<>();
-        if (initialBadges == null || initialBadges.isEmpty()) return flattened;
+        if (initialBadges == null || initialBadges.isEmpty())
+            return flattened;
 
         // Fetch all active badges once to build a lookup map
         Map<Integer, Badge> badgeMap = badgeRepository.findAll().stream()
-            .filter(Badge::getIs_active)
-            .collect(Collectors.toMap(Badge::getId, b -> b));
-        
+                .filter(Badge::getIsActive)
+                .collect(Collectors.toMap(Badge::getId, b -> b));
+
         for (Badge badge : initialBadges) {
             resolveHierarchy(badge, flattened, badgeMap);
         }
@@ -96,7 +98,7 @@ public class BadgeService {
     }
 
     private void resolveHierarchy(Badge badge, Set<String> result, Map<Integer, Badge> badgeMap) {
-        if (badge == null || !badge.getIs_active() || result.contains(badge.getName())) {
+        if (badge == null || !badge.getIsActive() || result.contains(badge.getName())) {
             return;
         }
 
@@ -154,34 +156,36 @@ public class BadgeService {
         Badge inherited = getBadgeByName(inheritedBadgeName);
 
         Map<Integer, Badge> badgeMap = badgeRepository.findAll().stream()
-            .collect(Collectors.toMap(Badge::getId, b -> b));
+                .collect(Collectors.toMap(Badge::getId, b -> b));
 
         if (hasCycle(badge, inherited, badgeMap)) {
             throw new RuntimeException("Ciclo infinito rilevato! Impossibile collegare i badge.");
         }
 
-        if(badge.getParentIds() == null) {
+        if (badge.getParentIds() == null) {
             badge.setParentIds(new ArrayList<>());
         }
-        
-        if(!badge.getParentIds().contains(inherited.getId())) {
+
+        if (!badge.getParentIds().contains(inherited.getId())) {
             badge.getParentIds().add(inherited.getId());
             badgeRepository.save(badge);
         }
     }
 
     private boolean hasCycle(Badge source, Badge target, Map<Integer, Badge> badgeMap) {
-        // Se target eredita da source (direttamente o indirettamente), aggiungerlo crea un ciclo
-        if(target.getId().equals(source.getId())) return true;
-        
-        if(target.getParentIds() != null) {
-            for(Integer pId : target.getParentIds()) {
+        // Se target eredita da source (direttamente o indirettamente), aggiungerlo crea
+        // un ciclo
+        if (target.getId().equals(source.getId()))
+            return true;
+
+        if (target.getParentIds() != null) {
+            for (Integer pId : target.getParentIds()) {
                 Badge pBadge = badgeMap.get(pId);
-                if(pBadge != null && hasCycle(source, pBadge, badgeMap)) {
+                if (pBadge != null && hasCycle(source, pBadge, badgeMap)) {
                     return true;
                 }
             }
         }
         return false;
     }
-}
+}

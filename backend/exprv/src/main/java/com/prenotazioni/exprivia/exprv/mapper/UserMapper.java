@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.prenotazioni.exprivia.exprv.dto.AdminCreateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
@@ -19,6 +20,7 @@ import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
 import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
+import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
@@ -30,18 +32,21 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface UserMapper {
+public abstract class UserMapper {
+
+    @Autowired
+    protected BadgeRepository badgeRepository;
 
     /**
      * Converte un'entità User in UserDTO.
      */
     @Mapping(target = "badges", source = "badges", qualifiedByName = "badgesToStrings")
-    UserDTO toDto(User user);
+    public abstract UserDTO toDto(User user);
 
     /**
      * Converte un'entità User in AdminDTO.
      */
-    default AdminDTO toAdminDto(User user) {
+    public AdminDTO toAdminDto(User user) {
         if (user == null) {
             return null;
         }
@@ -55,56 +60,55 @@ public interface UserMapper {
     @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    User toEntity(UserDTO userDTO);
+    public abstract User toEntity(UserDTO userDTO);
 
     /**
      * Converte un AdminCreateUserDTO in entità User (per creazioni tramite Admin).
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
+    @Mapping(target = "password", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "badges", source = "badges", qualifiedByName = "stringsToBadges")
-    User toEntity(AdminCreateUserDTO adminCreateUserDTO);
+    public abstract User toEntity(AdminCreateUserDTO adminCreateUserDTO);
 
     /**
-     * Converte un UserSignupDTO in entità User (per registrazioni pubbliche
-     * standard).
+     * Converte un UserSignupDTO in entità User (per registrazioni pubbliche standard).
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
-    @Mapping(target = "badges", ignore = true) // Niente ruoli per sicurezza!
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    @Mapping(target = "enabled", ignore = true) // Gestito di default nel DB
-    User toEntity(UserSignupDTO userSignupDTO);
+    @Mapping(target = "enabled", ignore = true)
+    public abstract User toEntity(UserSignupDTO userSignupDTO);
 
     /**
      * Aggiorna profilo utente da parte dell'utente stesso
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true) // Gestita separatamente
+    @Mapping(target = "password", ignore = true)
     @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "enabled", ignore = true)
-    void updateEntityFromUserUpdateDto(UserUpdateDTO updateDTO, @MappingTarget User user);
+    public abstract void updateEntityFromUserUpdateDto(UserUpdateDTO updateDTO, @MappingTarget User user);
 
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    void updateUserFromDto(UserDTO userDTO, @MappingTarget User user);
+    public abstract void updateUserFromDto(UserDTO userDTO, @MappingTarget User user);
 
     /**
      * Converte una lista di entità User in una lista di UserDTO.
      */
-    List<UserDTO> toDtoList(List<User> users);
+    public abstract List<UserDTO> toDtoList(List<User> users);
 
     /**
      * Converte una lista di entità Users in una lista di AdminDTO.
      */
-    default List<AdminDTO> toAdminDtoList(List<User> users) {
+    public List<AdminDTO> toAdminDtoList(List<User> users) {
         if (users == null) {
             return null;
         }
@@ -117,7 +121,7 @@ public interface UserMapper {
      * Converte un set di Badge in un set di stringhe.
      */
     @Named("badgesToStrings")
-    default Set<String> badgesToStrings(Set<Badge> badges) {
+    public Set<String> badgesToStrings(Set<Badge> badges) {
         if (badges == null) {
             return new HashSet<>();
         }
@@ -128,20 +132,17 @@ public interface UserMapper {
     }
 
     /**
-     * Converte un set di stringhe in un set di Badge.
+     * Converte un set di stringhe in un set di Badge reali dal database.
      */
     @Named("stringsToBadges")
-    default Set<Badge> stringsToBadges(Set<String> badgesAsString) {
+    public Set<Badge> stringsToBadges(Set<String> badgesAsString) {
         if (badgesAsString == null) {
             return new HashSet<>();
         }
         return badgesAsString.stream()
                 .filter(name -> name != null && !name.isEmpty())
-                .map(name -> {
-                    Badge auth = new Badge();
-                    auth.setName(name);
-                    return auth;
-                })
+                .map(name -> badgeRepository.findByName(name)
+                        .orElseThrow(() -> new RuntimeException("Badge non trovato: " + name)))
                 .collect(Collectors.toSet());
     }
 
@@ -149,5 +150,5 @@ public interface UserMapper {
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "badges", source = "badges", qualifiedByName = "stringsToBadges")
-    void updateEntityFromAdminDto(AdminUpdateUserDTO adminUpdateDTO, @MappingTarget User user);
+    public abstract void updateEntityFromAdminDto(AdminUpdateUserDTO adminUpdateDTO, @MappingTarget User user);
 }
