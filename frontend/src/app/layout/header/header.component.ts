@@ -79,8 +79,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
-        if (user?.authorities) {
-          this.navigationService.updateNavigationItems(user.authorities);
+        if (user?.badges) {
+          this.navigationService.updateNavigationItems(user.badges);
         }
       });
   }
@@ -143,18 +143,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   isNavItemVisible(item: NavItem): boolean {
-    if (!this.currentUser?.authorities) {
+    if (!this.currentUser?.badges) {
       return false;
     }
 
-    if (item.adminOnly && !this.currentUser.authorities.includes('ROLE_ADMIN')) {
+    if (item.adminOnly && !this.currentUser.badges.includes('ROLE_ADMIN')) {
       return false;
     }
 
     return (
-      !item.authorities ||
-      item.authorities.some((auth) =>
-        this.currentUser?.authorities?.includes(auth)
+      !item.badges ||
+      item.badges.some((auth) =>
+        this.currentUser?.badges?.includes(auth)
       )
     );
   }

@@ -610,7 +610,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   private checkUserRole(): void {
     this.authService.getIdentity().pipe(takeUntil(this.destroy$)).subscribe(user => {
-      this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+      this.isAdmin = user?.badges?.includes('ROLE_ADMIN') || false;
       if (this.isAdmin) this.loadUsers();
     });
   }

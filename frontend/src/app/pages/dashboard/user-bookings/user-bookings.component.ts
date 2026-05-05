@@ -90,7 +90,7 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     this.authService.getIdentity()
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+        this.isAdmin = user?.badges?.includes('ROLE_ADMIN') || false;
       });
   }
 
@@ -99,7 +99,7 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     this.authService.getIdentity().pipe(
       takeUntil(this.destroy$),
       switchMap(user => {
-        this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+        this.isAdmin = user?.badges?.includes('ROLE_ADMIN') || false;
         if (this.isAdmin) {
           return this.reservationService.getReservations();
         } else if (user?.email) {

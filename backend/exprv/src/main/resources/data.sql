@@ -1,8 +1,3 @@
--- Inserimento Authority
-INSERT INTO authority (authority_name) VALUES ('ROLE_USER'), ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
-
--- Inserimento Authority
-INSERT INTO authority (authority_name) VALUES ('ROLE_USER'), ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
 
 -- Inserimento Durate Prenotazione
 INSERT INTO reservation_duration (duration_name, minutes, is_active) VALUES 

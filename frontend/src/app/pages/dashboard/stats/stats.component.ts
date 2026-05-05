@@ -74,7 +74,7 @@ export class StatsComponent implements OnInit, OnDestroy {
     this.authService.getIdentity()
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        this.isAdmin = user?.authorities?.includes('ROLE_ADMIN') || false;
+        this.isAdmin = user?.badges?.includes('ROLE_ADMIN') || false;
       });
   }
 

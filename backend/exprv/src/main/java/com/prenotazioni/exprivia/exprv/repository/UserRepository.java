@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO user_authority (user_id, authority_name) VALUES (:userId, :authority)", nativeQuery = true)
-    void saveUserAuthority(Integer userId, String authority);
+    @Query(value = "INSERT INTO user_badge (user_id, badge_id) VALUES (:userId, :badgeId)", nativeQuery = true)
+    void saveUserBadge(Integer userId, Integer badgeId);
 }

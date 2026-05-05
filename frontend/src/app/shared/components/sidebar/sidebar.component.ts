@@ -79,8 +79,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   // Metodo per convertire i ruoli in nomi visualizzabili
-  getRoleDisplayName(authorities: string[] | undefined): string {
-    if (!authorities?.length) {
+  getRoleDisplayName(badges: string[] | undefined): string {
+    if (!badges?.length) {
       return "Ruolo sconosciuto";
     }
 
@@ -89,7 +89,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       ROLE_USER: "Dipendente",
     };
 
-    const primaryRole = authorities.find((role) => role in roleMap);
+    const primaryRole = badges.find((role) => role in roleMap);
     return roleMap[primaryRole || ""] || "Ruolo sconosciuto";
   }
 
@@ -143,11 +143,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
       )
       .subscribe((user) => {
         this.currentUser = user;
-        this.isAdmin = user?.authorities?.includes("ROLE_ADMIN") || false;
+        this.isAdmin = user?.badges?.includes("ROLE_ADMIN") || false;
 
         // Aggiorna gli elementi di navigazione in base alle autorizzazioni
-        if (user?.authorities) {
-          this.navigationService.updateNavigationItems(user.authorities);
+        if (user?.badges) {
+          this.navigationService.updateNavigationItems(user.badges);
         }
       });
   }
@@ -172,7 +172,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   // Verifica se un elemento di navigazione deve essere visualizzato
   isNavItemVisible(item: NavItem): boolean {
-    if (!this.currentUser?.authorities) {
+    if (!this.currentUser?.badges) {
       return false;
     }
 
@@ -181,9 +181,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
 
     return (
-      !item.authorities ||
-      item.authorities.some((auth) =>
-        this.currentUser?.authorities?.includes(auth)
+      !item.badges ||
+      item.badges.some((auth) =>
+        this.currentUser?.badges?.includes(auth)
       )
     );
   }

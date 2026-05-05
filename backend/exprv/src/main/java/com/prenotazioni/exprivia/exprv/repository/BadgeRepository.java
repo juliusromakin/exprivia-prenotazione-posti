@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 
 @Repository
-public interface AuthorityRepository extends JpaRepository<Authority, String> {
-    Optional<Authority> findByName(String name);
+public interface BadgeRepository extends JpaRepository<Badge, Integer> {
+    Optional<Badge> findByName(String name);
 }

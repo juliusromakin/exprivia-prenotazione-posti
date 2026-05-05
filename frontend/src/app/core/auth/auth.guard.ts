@@ -32,9 +32,9 @@ export const AuthGuard = (
             });
           }
 
-          const authorities = route.data['authorities'] as string[];
+          const badges = route.data['badges'] as string[];
 
-          if (!authorities || authorities.length === 0) {
+          if (!badges || badges.length === 0) {
             // Se siamo autenticati nella home o login, andiamo alla dashboard di prenotazione
             if (state.url === '/login' || state.url === '/') {
               return router.createUrlTree(['/dashboard/prenotazione-posizione']);
@@ -42,7 +42,7 @@ export const AuthGuard = (
             return true;
           }
 
-          if (authService.hasAnyAuthority(authorities)) {
+          if (authService.hasAnybadge(badges)) {
             return true;
           }
 

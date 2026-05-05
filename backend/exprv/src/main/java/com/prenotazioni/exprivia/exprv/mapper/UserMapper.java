@@ -17,7 +17,7 @@ import com.prenotazioni.exprivia.exprv.dto.AdminUpdateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserUpdateDTO;
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -35,7 +35,7 @@ public interface UserMapper {
     /**
      * Converte un'entità User in UserDTO.
      */
-    @Mapping(target = "authorities", source = "authorities", qualifiedByName = "authoritiesToStrings")
+    @Mapping(target = "badges", source = "badges", qualifiedByName = "badgesToStrings")
     UserDTO toDto(User user);
 
     /**
@@ -52,7 +52,7 @@ public interface UserMapper {
      * Converte un UserDTO in entità User.
      */
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     User toEntity(UserDTO userDTO);
@@ -64,7 +64,7 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    @Mapping(target = "authorities", source = "authorities", qualifiedByName = "stringsToAuthorities")
+    @Mapping(target = "badges", source = "badges", qualifiedByName = "stringsToBadges")
     User toEntity(AdminCreateUserDTO adminCreateUserDTO);
 
     /**
@@ -73,7 +73,7 @@ public interface UserMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true) // Ignorata qui perché verrà criptata a mano nel service
-    @Mapping(target = "authorities", ignore = true) // Niente ruoli per sicurezza!
+    @Mapping(target = "badges", ignore = true) // Niente ruoli per sicurezza!
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "enabled", ignore = true) // Gestito di default nel DB
@@ -84,14 +84,14 @@ public interface UserMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true) // Gestita separatamente
-    @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "enabled", ignore = true)
     void updateEntityFromUserUpdateDto(UserUpdateDTO updateDTO, @MappingTarget User user);
 
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "badges", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     void updateUserFromDto(UserDTO userDTO, @MappingTarget User user);
@@ -114,31 +114,31 @@ public interface UserMapper {
     }
 
     /**
-     * Converte un set di Authority in un set di stringhe.
+     * Converte un set di Badge in un set di stringhe.
      */
-    @Named("authoritiesToStrings")
-    default Set<String> authoritiesToStrings(Set<Authority> authorities) {
-        if (authorities == null) {
+    @Named("badgesToStrings")
+    default Set<String> badgesToStrings(Set<Badge> badges) {
+        if (badges == null) {
             return new HashSet<>();
         }
-        return authorities.stream()
-                .map(Authority::getName)
+        return badges.stream()
+                .map(Badge::getName)
                 .filter(name -> name != null)
                 .collect(Collectors.toSet());
     }
 
     /**
-     * Converte un set di stringhe in un set di Authority.
+     * Converte un set di stringhe in un set di Badge.
      */
-    @Named("stringsToAuthorities")
-    default Set<Authority> stringsToAuthorities(Set<String> authoritiesAsString) {
-        if (authoritiesAsString == null) {
+    @Named("stringsToBadges")
+    default Set<Badge> stringsToBadges(Set<String> badgesAsString) {
+        if (badgesAsString == null) {
             return new HashSet<>();
         }
-        return authoritiesAsString.stream()
+        return badgesAsString.stream()
                 .filter(name -> name != null && !name.isEmpty())
                 .map(name -> {
-                    Authority auth = new Authority();
+                    Badge auth = new Badge();
                     auth.setName(name);
                     return auth;
                 })
@@ -148,6 +148,6 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
-    @Mapping(target = "authorities", source = "authorities", qualifiedByName = "stringsToAuthorities")
+    @Mapping(target = "badges", source = "badges", qualifiedByName = "stringsToBadges")
     void updateEntityFromAdminDto(AdminUpdateUserDTO adminUpdateDTO, @MappingTarget User user);
 }

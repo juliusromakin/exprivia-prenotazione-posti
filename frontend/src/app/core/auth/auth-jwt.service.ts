@@ -9,7 +9,7 @@ interface AuthResponse {
   email: string;
   name: string;
   lastName: string;
-  authorities: string[];
+  badges: string[];
 }
 
 @Injectable({
@@ -67,7 +67,7 @@ export class AuthJwtService {
     return this.tokenService.getRoles();
   }
 
-  hasAnyAuthority(requiredRoles: string[]): boolean {
+  hasAnybadge(requiredRoles: string[]): boolean {
     const userRoles = this.getUserRoles();
     return requiredRoles.some(role => userRoles.includes(role));
   }

@@ -98,11 +98,11 @@ export interface DialogData {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Assegnazione Ruoli e Permessi</label>
                 <app-role-selector 
-                  [assignedRoles]="userForm.get('authorities')?.value || []"
-                  (rolesChanged)="userForm.get('authorities')?.setValue($event); userForm.get('authorities')?.markAsTouched()">
+                  [assignedRoles]="userForm.get('badges')?.value || []"
+                  (rolesChanged)="userForm.get('badges')?.setValue($event); userForm.get('badges')?.markAsTouched()">
                 </app-role-selector>
                 <!-- Messaggio di errore per ruoli mancanti -->
-                <div *ngIf="userForm.get('authorities')?.invalid && userForm.get('authorities')?.touched" 
+                <div *ngIf="userForm.get('badges')?.invalid && userForm.get('badges')?.touched" 
                      class="text-sm text-red-600 mt-2 flex items-center">
                   <i class="fas fa-exclamation-circle mr-1"></i>
                   Seleziona almeno un ruolo per poter procedere
@@ -181,7 +181,7 @@ export class UserFormDialogComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
-      authorities: [[], [Validators.required, Validators.minLength(1)]],
+      badges: [[], [Validators.required, Validators.minLength(1)]],
       enabled: [true]
     });
   }
@@ -192,7 +192,7 @@ export class UserFormDialogComponent implements OnInit {
         name: this.data.user.name || '',
         lastName: this.data.user.lastName || '',
         email: this.data.user.email || '',
-        authorities: this.data.user.authorities || ['ROLE_USER'],
+        badges: this.data.user.badges || ['ROLE_USER'],
         enabled: this.data.user.enabled !== false // Default to true if not specified
       });
 

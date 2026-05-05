@@ -1,0 +1,295 @@
+
+> exprivia@0.0.0 build
+> ng build
+
+[33m>[39m Building...
+[32m√[39m Building...
+Application bundle generation failed. [9.968 seconds]
+
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992012: Component imports must be standalone components, directives, pipes, or must be NgModules.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/account/password/forgot-password/forgotpwd.component.ts:28:4:
+[37m      28 │     [32mHeaderComponent[37m
+         ╵     [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992012: Component imports must be standalone components, directives, pipes, or must be NgModules.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/account/register/register.component.ts:32:4:
+[37m      32 │     [32mHeaderComponent[37m,
+         ╵     [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/app.component.ts:11:33:
+[37m      11 │ import { TranslateService } from [32m"@ngx-translate/core"[37m;
+         ╵                                  [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992003: No suitable injection token for parameter 'translate' of class 'AppComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/app.component.ts:27:12:
+[37m      27 │     private [32mtranslate[37m: TranslateService,
+         ╵             [32m~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/app.component.ts:27:23:
+[37m      27 │     private translate: [32mTranslateService[37m,
+         ╵                        [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/core"[0m
+
+    src/app/layout/header/header.component.ts:13:50:
+[37m      13 │ ... { TranslateService, TranslateModule } from [32m"@ngx-translate/core"[37m;
+         ╵                                                [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/core" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/layout/header/header.component.ts:13:50:
+[37m      13 │ ... { TranslateService, TranslateModule } from [32m"@ngx-translate/core"[37m;
+         ╵                                                [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992003: No suitable injection token for parameter 'translate' of class 'HeaderComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/layout/header/header.component.ts:42:12:
+[37m      42 │     private [32mtranslate[37m: TranslateService,
+         ╵             [32m~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/layout/header/header.component.ts:42:23:
+[37m      42 │     private translate: [32mTranslateService[37m,
+         ╵                        [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/core"[0m
+
+    src/app/login/login.component.ts:16:32:
+[37m      16 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+         ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/core" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.component.ts:16:32:
+[37m      16 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+         ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-991010: 'imports' must be an array of components, directives, pipes, or NgModules.
+  Value could not be determined statically.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.component.ts:32:4:
+[37m      32 │     [32mTranslateModule[37m
+         ╵     [32m~~~~~~~~~~~~~~~[0m
+
+  Unknown reference.
+
+    src/app/login/login.component.ts:32:4:
+[37m      32 │     [32mTranslateModule[37m
+         ╵     [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992012: Component imports must be standalone components, directives, pipes, or must be NgModules.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/admin-home/admin-home.component.ts:17:8:
+[37m      17 │         [32mHeaderComponent[37m,
+         ╵         [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "fabric"[0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:7:24:
+[37m      7 │ import * as fabric from [32m'fabric'[37m;
+        ╵                         [32m~~~~~~~~[0m
+
+  You can mark the path "fabric" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 'fabric' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:7:24:
+[37m      7 │ import * as fabric from [32m'fabric'[37m;
+        ╵                         [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992012: Component imports must be standalone components, directives, pipes, or must be NgModules.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:19:42:
+[37m      19 │ ...onModule, RouterModule, [32mHeaderComponent[37m, ButtonComponent, Forms...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'img' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:118:45:
+[37m      118 │         fabric.Image.fromURL(imageSrc).then(([32mimg[37m) => {
+          ╵                                              [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'e' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:146:45:
+[37m      146 │ ...anvas.on('selection:created', ([32me[37m) => this.handleRoomLabelVisib...
+          ╵                                   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'e' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:147:45:
+[37m      147 │ ...anvas.on('selection:updated', ([32me[37m) => this.handleRoomLabelVisib...
+          ╵                                   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'e' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:148:45:
+[37m      148 │         this.canvas.on('selection:cleared', ([32me[37m) => {
+          ╵                                              [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'obj' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:176:50:
+[37m      176 │                 this.canvas?.getObjects().forEach([32mobj[37m => {
+          ╵                                                   [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'obj' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:241:62:
+[37m      241 │                 const stanza = this.canvas!.getObjects().find([32mobj[37m =>
+          ╵                                                               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'o' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:299:85:
+[37m      299 │ ...is.canvas!.getObjects().filter([32mo[37m => (o as any).data?.tipo === ...
+          ╵                                   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'obj' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:316:35:
+[37m      316 │                     active.forEach([32mobj[37m => {
+          ╵                                    [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'p' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/amministrazione-planimetrie/amministrazione-planimetrie.component.ts:326:58:
+[37m      326 │ ...      postazioniDaRimuovere.forEach([32mp[37m => this.canvas?.remove(p));
+          ╵                                        [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-992012: Component imports must be standalone components, directives, pipes, or must be NgModules.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/dashboard/dashboard.component.ts:42:4:
+[37m      42 │     [32mHeaderComponent[37m,
+         ╵     [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/core"[0m
+
+    src/app/pages/home/home.component.ts:4:32:
+[37m      4 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+        ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/core" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/home/home.component.ts:4:32:
+[37m      4 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+        ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-991010: 'imports' must be an array of components, directives, pipes, or NgModules.
+  Value could not be determined statically.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/home/home.component.ts:18:8:
+[37m      18 │         [32mTranslateModule[37m,
+         ╵         [32m~~~~~~~~~~~~~~~[0m
+
+  Unknown reference.
+
+    src/app/pages/home/home.component.ts:18:8:
+[37m      18 │         [32mTranslateModule[37m,
+         ╵         [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/core"[0m
+
+    src/app/shared/components/feature-card/feature-card.component.ts:7:32:
+[37m      7 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+        ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/core" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/components/feature-card/feature-card.component.ts:7:32:
+[37m      7 │ import { TranslateModule } from [32m'@ngx-translate/core'[37m;
+        ╵                                 [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS-991010: 'imports' must be an array of components, directives, pipes, or NgModules.
+  Value could not be determined statically.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/components/feature-card/feature-card.component.ts:31:8:
+[37m      31 │         [32mTranslateModule[37m,
+         ╵         [32m~~~~~~~~~~~~~~~[0m
+
+  Unknown reference.
+
+    src/app/shared/components/feature-card/feature-card.component.ts:31:8:
+[37m      31 │         [32mTranslateModule[37m,
+         ╵         [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/core"[0m
+
+    src/main.ts:58:40:
+[37m      58 │ import { provideTranslateService } from [32m'@ngx-translate/core'[37m;
+         ╵                                         [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/core" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/core' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/main.ts:58:40:
+[37m      58 │ import { provideTranslateService } from [32m'@ngx-translate/core'[37m;
+         ╵                                         [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "@ngx-translate/http-loader"[0m
+
+    src/main.ts:59:43:
+[37m      59 │ ... { provideTranslateHttpLoader } from [32m'@ngx-translate/http-loader'[37m;
+         ╵                                         [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  You can mark the path "@ngx-translate/http-loader" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module '@ngx-translate/http-loader' or its corresponding type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/main.ts:59:43:
+[37m      59 │ ... { provideTranslateHttpLoader } from [32m'@ngx-translate/http-loader'[37m;
+         ╵                                         [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

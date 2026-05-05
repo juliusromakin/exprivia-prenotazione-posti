@@ -86,7 +86,7 @@
         <span class="font-medium whitespace-nowrap">{{ currentUser?.name }} {{ currentUser?.lastName }}</span>
       </div>
       <span class="text-sm text-gray-500 whitespace-nowrap">{{
-        getRoleDisplayName(currentUser?.authorities)
+        getRoleDisplayName(currentUser?.badges)
         }}</span>
     </div>
     <button (click)="logout()" [class.w-full]="!isCollapsed"

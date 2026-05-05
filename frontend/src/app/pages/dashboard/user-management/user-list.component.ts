@@ -114,9 +114,9 @@ export class UserListComponent implements OnInit, OnDestroy {
 
     // Apply role filter
     if (this.currentFilter === 'admin') {
-      filtered = filtered.filter(user => user.authorities?.includes('ROLE_ADMIN'));
+      filtered = filtered.filter(user => user.badges?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'user') {
-      filtered = filtered.filter(user => !user.authorities?.includes('ROLE_ADMIN'));
+      filtered = filtered.filter(user => !user.badges?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'inactive') {
       filtered = filtered.filter(user => !user.enabled);
     }
@@ -216,13 +216,13 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   getAdminCount(): number {
     return this.users.filter(user => 
-      user.authorities?.includes('ROLE_ADMIN')
+      user.badges?.includes('ROLE_ADMIN')
     ).length;
   }
 
   getUserCount(): number {
     return this.users.filter(user => 
-      !user.authorities?.includes('ROLE_ADMIN')
+      !user.badges?.includes('ROLE_ADMIN')
     ).length;
   }
 
@@ -355,7 +355,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
 
     const user = this.userToDelete;
-    const isAdmin = user.authorities && user.authorities.includes('ROLE_ADMIN');
+    const isAdmin = user.badges && user.badges.includes('ROLE_ADMIN');
     
     const message = [
       `Are you sure you want to delete the user ${user.name} ${user.lastName}?`,
@@ -376,7 +376,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         name: user.name,
         lastName: user.lastName,
         email: user.email,
-        authorities: user.authorities,
+        badges: user.badges,
         enabled: true
       });
       

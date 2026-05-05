@@ -8,19 +8,19 @@ public class AdminCreateUserDTO {
     private String lastName;
     private String email;
     private String password;
-    private Set<String> authorities;
+    private Set<String> badges;
     private Boolean enabled;
 
     public AdminCreateUserDTO() {
     }
 
-    public AdminCreateUserDTO(String name, String lastName, String email, String password, Set<String> authorities,
+    public AdminCreateUserDTO(String name, String lastName, String email, String password, Set<String> badges,
             Boolean enabled) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.authorities = authorities;
+        this.badges = badges;
         this.enabled = enabled;
     }
 
@@ -56,12 +56,12 @@ public class AdminCreateUserDTO {
         this.password = password;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public Set<String> getBadges() {
+        return badges;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
+    public void setBadges(Set<String> badges) {
+        this.badges = badges;
     }
 
     public Boolean getEnabled() {

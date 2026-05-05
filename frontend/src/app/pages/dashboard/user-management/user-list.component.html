@@ -183,12 +183,12 @@
               <!-- Role -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <span [class]="
-                    user.authorities.includes('ROLE_ADMIN')
+                    user.badges.includes('ROLE_ADMIN')
                       ? 'bg-purple-100 text-purple-800'
                       : 'bg-blue-100 text-blue-800'
                   " class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{
-                  user.authorities.includes('ROLE_ADMIN')
+                  user.badges.includes('ROLE_ADMIN')
                   ? 'Administrator'
                   : 'Employee'
                   }}

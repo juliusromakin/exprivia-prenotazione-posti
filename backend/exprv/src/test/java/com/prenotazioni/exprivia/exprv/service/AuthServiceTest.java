@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,21 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
-import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
+import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.security.jwt.JwtTokenProvider;
-import com.prenotazioni.exprivia.exprv.service.EmailService;
-import com.prenotazioni.exprivia.exprv.service.PasswordResetService;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -36,7 +31,7 @@ public class AuthServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private AuthorityRepository authorityRepository;
+    private BadgeRepository badgeRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -77,9 +72,9 @@ public class AuthServiceTest {
         when(userMapper.toEntity(any(UserSignupDTO.class))).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("hashed_password");
         
-        Authority authority = new Authority();
-        authority.setName("ROLE_USER");
-        when(authorityRepository.findByName("ROLE_USER")).thenReturn(Optional.of(authority));
+        Badge badge = new Badge();
+        badge.setName("ROLE_USER");
+        when(badgeRepository.findByName("ROLE_USER")).thenReturn(Optional.of(badge));
         
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDto(any(User.class))).thenReturn(new UserDTO());

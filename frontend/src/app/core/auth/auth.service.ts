@@ -115,7 +115,7 @@ export class AuthService {
       user &&
       typeof user.lastName === "string" &&
       typeof user.email === "string" &&
-      Array.isArray(user.authorities)
+      Array.isArray(user.badges)
     );
   }
 
@@ -132,13 +132,13 @@ export class AuthService {
     }
   }
 
-  hasAnyAuthority(authorities: string[]): boolean {
+  hasAnybadge(badges: string[]): boolean {
     const account = this.userIdentity.value;
-    if (!account || !account.authorities) {
+    if (!account || !account.badges) {
       return false;
     }
-    return authorities.some((authority) =>
-      account.authorities?.includes(authority)
+    return badges.some((badge) =>
+      account.badges?.includes(badge)
     );
   }
 

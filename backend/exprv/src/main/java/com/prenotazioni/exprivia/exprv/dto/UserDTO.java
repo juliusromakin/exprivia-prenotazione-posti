@@ -3,7 +3,7 @@ package com.prenotazioni.exprivia.exprv.dto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class UserDTO {
@@ -11,18 +11,18 @@ public class UserDTO {
     private String name;
     private String lastName;
     private String email;
-    private Set<String> authorities;
+    private Set<String> badges;
 
     public UserDTO() {
 
     }
 
-    public UserDTO(Integer id, String name, String lastName, String email, Set<String> authorities) {
+    public UserDTO(Integer id, String name, String lastName, String email, Set<String> badges) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.email = email;
-        this.authorities = authorities;
+        this.badges = badges;
     }
 
     public UserDTO(User user) {
@@ -30,8 +30,8 @@ public class UserDTO {
         this.name = user.getName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.authorities = user.getAuthorities().stream()
-                .map(Authority::getName)
+        this.badges = user.getBadges().stream()
+                .map(Badge::getName)
                 .collect(Collectors.toSet());
     }
 
@@ -67,12 +67,12 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public Set<String> getBadges() {
+        return badges;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
+    public void setBadges(Set<String> badges) {
+        this.badges = badges;
     }
 
 }

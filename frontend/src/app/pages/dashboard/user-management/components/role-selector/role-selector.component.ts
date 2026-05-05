@@ -22,11 +22,11 @@ export class RoleSelectorComponent implements OnInit {
 
   ngOnInit() {
     // Carichiamo i ruoli dal backend dinamicamente
-    this.adminService.getAuthorities().subscribe({
-      next: (authorities) => {
-        console.log("Ruoli ricevuti dal backend:", authorities);
+    this.adminService.getbadges().subscribe({
+      next: (badges) => {
+        console.log("Ruoli ricevuti dal backend:", badges);
         
-        this.allAvailableRoles = authorities.map(auth => {
+        this.allAvailableRoles = badges.map(auth => {
           // Usiamo uno stile uniforme per tutti i ruoli dinamici
           let icon = 'fa-user-tag';
           let color = 'text-gray-700';

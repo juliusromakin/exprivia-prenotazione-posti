@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
 import { AxiosService } from "./axios.service";
-import { User, AdminCreateUserRequest, AdminUpdateUserRequest, AuthorityDTO } from "../models";
+import { User, AdminCreateUserRequest, AdminUpdateUserRequest, badgeDTO } from "../models";
 
 @Injectable({
     providedIn: "root",
@@ -39,7 +39,7 @@ export class AdminService {
         );
     }
 
-    getAuthorities(): Observable<AuthorityDTO[]> {
-        return from(this.axiosService.get<AuthorityDTO[]>("/api/admin/authorities"));
+    getbadges(): Observable<badgeDTO[]> {
+        return from(this.axiosService.get<badgeDTO[]>("/api/admin/badges"));
     }
 }

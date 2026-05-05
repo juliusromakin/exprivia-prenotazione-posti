@@ -106,8 +106,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (isAuthenticated) {
           this.authService.getIdentity().subscribe((user) => {
             this.currentUser = user;
-            this.isAdmin = user?.authorities?.includes("ROLE_ADMIN") ?? false;
-            this.isUser = user?.authorities?.includes("ROLE_USER") ?? false;
+            this.isAdmin = user?.badges?.includes("ROLE_ADMIN") ?? false;
+            this.isUser = user?.badges?.includes("ROLE_USER") ?? false;
           });
         } else {
           this.currentUser = null;
@@ -145,8 +145,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.isAuthenticated) {
       this.authService.getIdentity().subscribe((user) => {
         this.currentUser = user;
-        this.isAdmin = user?.authorities?.includes("ROLE_ADMIN") ?? false;
-        this.isUser = user?.authorities?.includes("ROLE_USER") ?? false;
+        this.isAdmin = user?.badges?.includes("ROLE_ADMIN") ?? false;
+        this.isUser = user?.badges?.includes("ROLE_USER") ?? false;
       });
     }
   }

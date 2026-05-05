@@ -13,7 +13,7 @@ export const DASHBOARD_ROUTES: Routes = [
           import("./user-management/user-list.component").then(
             (m) => m.UserListComponent
           ),
-        data: { authorities: ["ROLE_ADMIN"] },
+        data: { badges: ["ROLE_ADMIN"] },
         canActivate: [UserRouteAccessService],
       },
       {
@@ -22,7 +22,7 @@ export const DASHBOARD_ROUTES: Routes = [
           import(
             "./prenotazione-posizione/prenotazione-posizione.component"
           ).then((m) => m.PrenotazionePosizioneComponent),
-        data: { authorities: ["ROLE_USER", "ROLE_ADMIN"] },
+        data: { badges: ["ROLE_USER", "ROLE_ADMIN"] },
         canActivate: [UserRouteAccessService],
       },
       {
@@ -31,7 +31,7 @@ export const DASHBOARD_ROUTES: Routes = [
           import("./user-bookings/user-bookings.component").then(
             (m) => m.UserBookingsComponent
           ),
-        data: { authorities: ["ROLE_ADMIN"] },
+        data: { badges: ["ROLE_ADMIN"] },
         canActivate: [UserRouteAccessService],
       },
       {
@@ -40,7 +40,7 @@ export const DASHBOARD_ROUTES: Routes = [
           import("../../account/update-user/update-user.component").then(
             (m) => m.UpdateUserComponent
           ),
-        data: { authorities: ["ROLE_ADMIN", "ROLE_USER"] },
+        data: { badges: ["ROLE_ADMIN", "ROLE_USER"] },
         canActivate: [UserRouteAccessService],
       },
       {
@@ -49,7 +49,7 @@ export const DASHBOARD_ROUTES: Routes = [
           import("./stats/stats.component").then(
             (m) => m.StatsComponent
           ),
-        data: { authorities: ["ROLE_ADMIN"] },
+        data: { badges: ["ROLE_ADMIN"] },
         canActivate: [UserRouteAccessService],
       },
 

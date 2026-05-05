@@ -6,17 +6,17 @@ public class AdminUpdateUserDTO {
     private String name;
     private String lastName;
     private String email;
-    private Set<String> authorities;
+    private Set<String> badges;
     private Boolean enabled;
 
     public AdminUpdateUserDTO() {
     }
 
-    public AdminUpdateUserDTO(String name, String lastName, String email, Set<String> authorities, Boolean enabled) {
+    public AdminUpdateUserDTO(String name, String lastName, String email, Set<String> badges, Boolean enabled) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
-        this.authorities = authorities;
+        this.badges = badges;
         this.enabled = enabled;
     }
 
@@ -44,12 +44,12 @@ public class AdminUpdateUserDTO {
         this.email = email;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public Set<String> getBadges() {
+        return badges;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
+    public void setBadges(Set<String> badges) {
+        this.badges = badges;
     }
 
     public Boolean getEnabled() {
