@@ -106,8 +106,8 @@ export class PlanimetriaInlineComponent implements OnChanges {
       const mouseY = event.clientY - rect.top - rect.height / 2;
 
       const scaleFactor = newScale / this.scale;
-      this.translateX = mouseX / this.scale + this.translateX - mouseX / newScale;
-      this.translateY = mouseY / this.scale + this.translateY - mouseY / newScale;
+      this.translateX = this.translateX + mouseX / newScale - mouseX / this.scale;
+      this.translateY = this.translateY + mouseY / newScale - mouseY / this.scale;
     }
 
     this.scale = newScale;
@@ -242,9 +242,9 @@ export class PlanimetriaInlineComponent implements OnChanges {
         const w = availableMap.get(ws.id!);
         const isSelectable = !!w;
 
-        // Offset adjusted to +7 for better alignment on the planimetria image
-        const centerX = ws.mapX + 4;
-        const centerY = ws.mapY + 4;
+        // Offset adjusted to +5 for better alignment on the planimetria image (radius is 5 in admin)
+        const centerX = ws.mapX + 5;
+        const centerY = ws.mapY + 5;
 
         this.markers.push({
           id: String(ws.id),
@@ -269,6 +269,26 @@ export class PlanimetriaInlineComponent implements OnChanges {
       width: (room.mapWidth / this.REF_WIDTH * 100) + '%',
       height: (room.mapHeight / this.REF_HEIGHT * 100) + '%',
     };
+  }
+
+  getAvailableCount(room: Room): number {
+    if (!room.workspaces) return 0;
+    
+    // Check if availability has been calculated (isAvailable is not undefined for at least one workspace)
+    const hasAvailabilityInfo = this.availableWorkspaces && this.availableWorkspaces.some(w => w.isAvailable !== undefined);
+    
+    if (hasAvailabilityInfo) {
+      // If we have availability info, count only those that are explicitly available
+      const availableIds = new Set(
+        this.availableWorkspaces
+          .filter(w => w.isAvailable === true)
+          .map(w => w.id)
+      );
+      return room.workspaces.filter(ws => availableIds.has(ws.id)).length;
+    }
+    
+    // If no availability info yet (e.g. time not selected), show total count
+    return room.workspaces.length;
   }
 
   selectMarker(marker: MarkerPosition, event: MouseEvent): void {
