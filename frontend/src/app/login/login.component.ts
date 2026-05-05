@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit, OnDestroy {
               
               if (!returnUrl) {
                 // Se è un admin, reindirizza alla home admin, altrimenti alla home base (che poi manderà alla dashboard)
-                if (user.authorities?.includes('ROLE_ADMIN')) {
+                if (user.badges?.includes('ROLE_ADMIN')) {
                   returnUrl = '/admin/homepage';
                 } else {
                   returnUrl = '/';

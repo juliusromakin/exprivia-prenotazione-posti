@@ -120,9 +120,9 @@ export class UserListComponent implements OnInit, OnDestroy {
 
     // Apply role filter
     if (this.currentFilter === 'admin') {
-      filtered = filtered.filter(user => user.authorities?.includes('ROLE_ADMIN'));
+      filtered = filtered.filter(user => user.badges?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'user') {
-      filtered = filtered.filter(user => !user.authorities?.includes('ROLE_ADMIN'));
+      filtered = filtered.filter(user => !user.badges?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'inactive') {
       filtered = filtered.filter(user => !user.enabled);
     }
@@ -237,13 +237,13 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   getAdminCount(): number {
     return this.users.filter(user => 
-      user.authorities?.includes('ROLE_ADMIN')
+      user.badges?.includes('ROLE_ADMIN')
     ).length;
   }
 
   getUserCount(): number {
     return this.users.filter(user => 
-      !user.authorities?.includes('ROLE_ADMIN')
+      !user.badges?.includes('ROLE_ADMIN')
     ).length;
   }
 
@@ -376,7 +376,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
 
     const user = this.userToDelete;
-    const isAdmin = user.authorities && user.authorities.includes('ROLE_ADMIN');
+    const isAdmin = user.badges && user.badges.includes('ROLE_ADMIN');
     
     const roleString = isAdmin ? this.translate.instant('USER_MANAGEMENT.TABLE.ROLE_ADMIN') : this.translate.instant('USER_MANAGEMENT.TABLE.ROLE_EMPLOYEE');
 
@@ -399,7 +399,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         name: user.name,
         lastName: user.lastName,
         email: user.email,
-        authorities: user.authorities,
+        badges: user.badges,
         enabled: true
       });
       
@@ -413,5 +413,16 @@ export class UserListComponent implements OnInit, OnDestroy {
         this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_DESC')
       );
     }
+  }
+
+  getBadgeClass(badge: string): string {
+    if (badge === 'ROLE_ADMIN') return 'bg-purple-100 text-purple-800 border border-purple-200';
+    if (badge === 'ROLE_USER') return 'bg-blue-100 text-blue-800 border border-blue-200';
+    if (badge.startsWith('ROLE_')) return 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+    return 'bg-gray-100 text-gray-800 border border-gray-200';
+  }
+
+  formatBadgeName(badge: string): string {
+    return badge.replace(/^ROLE_/, '').replace(/_/g, ' ');
   }
 }

@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       const isAdminDashboard = event.urlAfterRedirects.includes('/dashboard') && 
-        this.authService.hasAnyAuthority(['ROLE_ADMIN']);
+        this.authService.hasAnybadge(['ROLE_ADMIN']);
       
       this.showLayout = !isAdminDashboard;
     });

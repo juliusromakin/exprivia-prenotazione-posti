@@ -48,7 +48,7 @@ export class TokenService {
     try {
       const decodedToken = this.jwtHelper.decodeToken(token);
       // Check both common JWT role claim formats
-      const roles = decodedToken?.roles || decodedToken?.authorities || [];
+      const roles = decodedToken?.roles || decodedToken?.badges || [];
       if (Array.isArray(roles)) {
         return roles;
       }

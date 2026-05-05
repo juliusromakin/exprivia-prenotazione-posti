@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 public class AdminDTO {
@@ -13,7 +13,7 @@ public class AdminDTO {
     private String lastName;
     private String email;
     private Boolean enabled;
-    private Set<String> authorities;
+    private Set<String> badges;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
@@ -25,9 +25,9 @@ public class AdminDTO {
         this.enabled = user.getEnabled();
         this.createdDate = user.getCreatedDate();
         this.updatedDate = user.getUpdatedDate();
-        this.authorities = user.getAuthorities()
+        this.badges = user.getBadges()
                 .stream()
-                .map(Authority::getName)
+                .map(Badge::getName)
                 .collect(Collectors.toSet());
     }
 
@@ -71,12 +71,12 @@ public class AdminDTO {
         this.enabled = enabled;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public Set<String> getBadges() {
+        return badges;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
+    public void setBadges(Set<String> badges) {
+        this.badges = badges;
     }
 
     public LocalDateTime getCreatedDate() {

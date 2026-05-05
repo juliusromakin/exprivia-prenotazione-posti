@@ -57,7 +57,7 @@ public class ReservationDurationService {
     public void softDeleteDuration(String name) {
         ReservationDuration existingDuration = reservationDurationRepository.findByName(name)
                 .orElseThrow(() -> new AppException("Durata '" + name + "' non trovata", HttpStatus.NOT_FOUND));
-        existingDuration.setIs_active(false);
+        existingDuration.setIsActive(false);
         reservationDurationRepository.save(existingDuration);
     }
 

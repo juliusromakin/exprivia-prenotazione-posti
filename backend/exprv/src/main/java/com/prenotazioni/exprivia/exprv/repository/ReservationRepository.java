@@ -15,7 +15,7 @@ import com.prenotazioni.exprivia.exprv.entity.Reservation;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     @Query("SELECT DISTINCT r FROM Reservation r " +
            "LEFT JOIN FETCH r.user u " +
-           "LEFT JOIN FETCH u.authorities " +
+           "LEFT JOIN FETCH u.badges " +
            "LEFT JOIN FETCH r.workspace w " +
            "LEFT JOIN FETCH w.room room " +
            "LEFT JOIN FETCH r.reservationDuration " +

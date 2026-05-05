@@ -23,39 +23,28 @@ import com.prenotazioni.exprivia.exprv.dto.EmailDTO;
 import com.prenotazioni.exprivia.exprv.dto.ResetPasswordRequest;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserSignupDTO;
-import com.prenotazioni.exprivia.exprv.entity.Authority;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
-import com.prenotazioni.exprivia.exprv.repository.AuthorityRepository;
+import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
 import com.prenotazioni.exprivia.exprv.security.jwt.JwtTokenProvider;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final AuthorityRepository authorityRepository;
+    private final BadgeRepository badgeRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
     private final EmailService emailService;
-
-    public AuthService(UserRepository userRepository, AuthorityRepository authorityRepository,
-            PasswordEncoder passwordEncoder, UserMapper userMapper, JwtTokenProvider jwtTokenProvider,
-            AuthenticationManager authenticationManager, PasswordResetService passwordResetService,
-            EmailService emailService) {
-        this.userRepository = userRepository;
-        this.authorityRepository = authorityRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-        this.passwordResetService = passwordResetService;
-        this.emailService = emailService;
-    }
 
     public AuthResponseDTO login(CredentialsDto credentialsDto) {
         try {
@@ -69,8 +58,8 @@ public class AuthService {
 
             String jwt = jwtTokenProvider.generateToken(authentication);
 
-            boolean isAdmin = user.getAuthorities().stream()
-                    .anyMatch(auth -> auth.getName().equals("ROLE_ADMIN"));
+            boolean isAdmin = user.getBadges().stream()
+                    .anyMatch(badge -> badge.getName().equals("ROLE_ADMIN"));
 
             if (isAdmin) {
                 AdminDTO adminDTO = userMapper.toAdminDto(user);
@@ -98,7 +87,8 @@ public class AuthService {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("message", "Email non trovata nel sistema"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(java.util.Map.of("message", "Email non trovata nel sistema"));
         }
 
         try {
@@ -106,7 +96,8 @@ public class AuthService {
             emailService.sendPasswordResetEmail(email, token);
             return ResponseEntity.ok(java.util.Map.of("message", "Email inviata, controlla la tua posta elettronica"));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(java.util.Map.of("message", "Errore durante l'invio dell'email"));
+            return ResponseEntity.internalServerError()
+                    .body(java.util.Map.of("message", "Errore durante l'invio dell'email"));
         }
     }
 
@@ -134,34 +125,25 @@ public class AuthService {
 
     @Transactional
     public UserDTO creaUtente(UserSignupDTO registrationDTO) {
-        System.out.println("DEBUG - Avvio registrazione per email: " + registrationDTO.getEmail());
         validateRegistrationData(registrationDTO);
 
         if (userRepository.findByEmail(registrationDTO.getEmail()).isPresent()) {
-            System.out.println("DEBUG - Email già esistente: " + registrationDTO.getEmail());
             throw new AppException("Esiste già un utente con questa email!", HttpStatus.BAD_REQUEST);
         }
 
-        // Il Mapper ignorerà le authorities e la password per questioni di sicurezza, e
-        // is_active
         User user = userMapper.toEntity(registrationDTO);
-
-        // Impostiamo noi i dati sensibili in sicurezza!
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-        user.setEnabled(false); // L'utente non è attivo finché non verifica l'email!
+        user.setEnabled(true); 
 
-        Authority userAuthority = authorityRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new AppException("Ruolo ROLE_USER non trovato nel sistema",
+        Badge userBadge = badgeRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new AppException("Badge ROLE_USER non trovato nel sistema",
                         HttpStatus.INTERNAL_SERVER_ERROR));
 
-        Set<Authority> authorities = new HashSet<>();
-        authorities.add(userAuthority);
-        user.setAuthorities(authorities);
+        Set<Badge> badges = new HashSet<>();
+        badges.add(userBadge);
+        user.setBadges(badges);
 
-        System.out.println("DEBUG - Salvataggio nuovo utente (In attesa di approvazione Admin)...");
         User savedUser = userRepository.save(user);
-        
-        System.out.println("DEBUG - Registrazione completata con successo per: " + savedUser.getEmail());
         return userMapper.toDto(savedUser);
     }
 

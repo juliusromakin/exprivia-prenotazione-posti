@@ -11,7 +11,7 @@ export interface NavItem {
   icon: string;
   route: string;
   adminOnly?: boolean;
-  authorities?: string[];
+  badges?: string[];
   children?: NavItem[];
 }
 
@@ -25,47 +25,47 @@ export class NavigationService {
       label: "SIDEBAR.DASHBOARD",
       icon: "home",
       route: "/dashboard",
-      authorities: [UserRole.ADMIN],
+      badges: [UserRole.ADMIN],
     },
     {
       label: "SIDEBAR.USERS",
       icon: "users",
       route: "/dashboard/user-management",
       adminOnly: true,
-      authorities: [UserRole.ADMIN],
+      badges: [UserRole.ADMIN],
     },
     {
       label: "SIDEBAR.BOOKINGS",
       icon: "calendar",
       route: "/dashboard/bookings",
       // CORREZIONE LOGICA: Anche gli utenti devono poter vedere le loro prenotazioni!
-      authorities: [UserRole.ADMIN, UserRole.USER],
+      badges: [UserRole.ADMIN, UserRole.USER],
     },
     {
       label: "SIDEBAR.BOOK_WORKSPACE",
       icon: "layout-dashboard",
       route: "/dashboard/workspace-booking",
-      authorities: [UserRole.USER, UserRole.ADMIN],
+      badges: [UserRole.USER, UserRole.ADMIN],
     },
     {
       label: "SIDEBAR.STATISTICS",
       icon: "ChartBar",
       route: "/dashboard/statistics",
       adminOnly: true,
-      authorities: [UserRole.ADMIN],
+      badges: [UserRole.ADMIN],
     },
     {
       label: "Gestione Planimetrie",
       icon: "map",
       route: "/amministrazione-planimetrie",
       adminOnly: true,
-      authorities: [UserRole.ADMIN],
+      badges: [UserRole.ADMIN],
     },
     {
       label: "Update Profile",
       icon: "user",
       route: "/dashboard/update-user",
-      authorities: [UserRole.USER, UserRole.ADMIN],
+      badges: [UserRole.USER, UserRole.ADMIN],
     },
   ];
 
@@ -99,21 +99,21 @@ export class NavigationService {
       : currentRoute === checkRoute || currentRoute.startsWith(checkRoute);
   }
 
-  filterNavigationByAuthorities(userAuthorities: string[]): NavItem[] {
+  filterNavigationBybadges(userbadges: string[]): NavItem[] {
     return this.navigationItems
-      .map((item) => this.filterNavItem(item, userAuthorities))
+      .map((item) => this.filterNavItem(item, userbadges))
       .filter((item) => item !== null) as NavItem[];
   }
 
   private filterNavItem(
     item: NavItem,
-    userAuthorities: string[]
+    userbadges: string[]
   ): NavItem | null {
-    const hasAuthority =
-      !item.authorities ||
-      item.authorities.some((auth) => userAuthorities.includes(auth));
+    const hasbadge =
+      !item.badges ||
+      item.badges.some((auth) => userbadges.includes(auth));
 
-    if (!hasAuthority) {
+    if (!hasbadge) {
       return null;
     }
 
@@ -121,7 +121,7 @@ export class NavigationService {
 
     if (filteredItem.children) {
       filteredItem.children = filteredItem.children
-        .map((child) => this.filterNavItem(child, userAuthorities))
+        .map((child) => this.filterNavItem(child, userbadges))
         .filter((child) => child !== null) as NavItem[];
 
       if (filteredItem.children.length === 0) {
@@ -132,8 +132,8 @@ export class NavigationService {
     return filteredItem;
   }
 
-  updateNavigationItems(userAuthorities: string[]): void {
-    const filteredItems = this.filterNavigationByAuthorities(userAuthorities);
+  updateNavigationItems(userbadges: string[]): void {
+    const filteredItems = this.filterNavigationBybadges(userbadges);
     this.navigationSubject.next(filteredItems);
   }
 

@@ -19,19 +19,15 @@ import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AdminService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
-    public AdminService(UserRepository userRepository, UserMapper userMapper,
-            PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     private void validateUserData(AdminCreateUserDTO adminCreateUserDTO) {
         if (adminCreateUserDTO.getName() == null || adminCreateUserDTO.getName().isEmpty()) {
@@ -52,7 +48,7 @@ public class AdminService {
             throw new AppException("A user with this email already exists!", HttpStatus.BAD_REQUEST);
         }
 
-        if (adminCreateUserDTO.getAuthorities() == null || adminCreateUserDTO.getAuthorities().isEmpty()) {
+        if (adminCreateUserDTO.getBadges() == null || adminCreateUserDTO.getBadges().isEmpty()) {
             throw new AppException("At least one role must be specified for the user", HttpStatus.BAD_REQUEST);
         }
 

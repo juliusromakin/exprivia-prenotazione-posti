@@ -31,7 +31,7 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
     }
 
     // Reindirizza in base al ruolo
-    if (authService.hasAnyAuthority(['ROLE_ADMIN'])) {
+    if (authService.hasAnybadge(['ROLE_ADMIN'])) {
       return router.createUrlTree(["/admin/homepage"]);
     }
 
@@ -72,7 +72,7 @@ export const routes: Routes = [
     path: "amministrazione-planimetrie",
     component: AmministrazionePlanimetrieComponent,
     canActivate: [UserRouteAccessService],
-    data: { authorities: ["ROLE_ADMIN"] }
+    data: { badges: ["ROLE_ADMIN"] }
   },
   {
     path: "dashboard",

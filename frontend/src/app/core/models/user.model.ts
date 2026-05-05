@@ -6,14 +6,18 @@ export interface User {
     email: string;
     password?: string;
     enabled: boolean;
-    authorities: string[];
+    badges: string[];
     createdDate?: string | Date;
     updatedDate?: string | Date;
 }
 
-export interface AuthorityDTO {
+export interface badgeDTO {
+    id?: number;
     name: string;
-    is_active: boolean;
+    type: 'ROLE' | 'ACTION';
+    description?: string;
+    parentIds?: number[];
+    isActive: boolean;
 }
 
 export interface UserSummary {
@@ -42,7 +46,7 @@ export interface AdminCreateUserRequest {
     lastName: string;
     email: string;
     password?: string;
-    authorities: string[];
+    badges: string[];
     enabled: boolean;
 }
 
@@ -50,6 +54,6 @@ export interface AdminUpdateUserRequest {
     name?: string;
     lastName?: string;
     email?: string;
-    authorities?: string[];
+    badges?: string[];
     enabled?: boolean;
 }
