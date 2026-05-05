@@ -138,7 +138,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
     const checkAndAddDuration = (name: string, mins: number) => {
       if (isToday) {
-        const latestStartHour = 18 - (mins / 60);
+        const latestStartHour = 19 - (mins / 60);
         const latestStartInMinutes = latestStartHour * 60;
         if (latestStartInMinutes > (currentTimeInMinutes + 30)) {
           durations.add(name);
@@ -349,7 +349,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
     const slots: { startTime: string; endTime: string }[] = [];
     const startHour = 8;
-    const endHour = 18;
+    const endHour = 19;
     const durationMinutes = this.getDurationInMinutes(duration);
     if (!durationMinutes) { this.state.availableTimeSlots = []; return; }
 
@@ -360,6 +360,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (this.isFullDay(duration)) {
       if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '08:00', endTime: '17:00' });
       if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '09:00', endTime: '18:00' });
+      if (!isToday || (10 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '10:00', endTime: '19:00' });
     } else {
       const step = durationMinutes >= 60 ? 60 : 30;
       for (let hour = startHour; hour < endHour; hour += step / 60) {

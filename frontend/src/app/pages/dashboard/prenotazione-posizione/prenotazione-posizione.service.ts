@@ -13,7 +13,7 @@ import { ReservationService } from '@core/services/reservation.service';
 export class PrenotazionePosizioneService {
     private readonly WORKING_HOURS = {
         START: 8,
-        END: 18
+        END: 19
     };
 
   constructor(
@@ -151,6 +151,12 @@ export class PrenotazionePosizioneService {
         }
         if (isSlotAvailable(9, 18)) {
             const fullDaySlot = { startTime: '09:00', endTime: '18:00' };
+            if (!slots.some(s => s.startTime === fullDaySlot.startTime && s.endTime === fullDaySlot.endTime)) {
+                slots.push(fullDaySlot);
+            }
+        }
+        if (isSlotAvailable(10, 19)) {
+            const fullDaySlot = { startTime: '10:00', endTime: '19:00' };
             if (!slots.some(s => s.startTime === fullDaySlot.startTime && s.endTime === fullDaySlot.endTime)) {
                 slots.push(fullDaySlot);
             }
