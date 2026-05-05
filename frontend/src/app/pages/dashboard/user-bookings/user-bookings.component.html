@@ -5,10 +5,10 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">
-          {{ isAdmin ? 'All Reservations' : 'My Reservations' }}
+          {{ isAdmin ? ('RESERVATIONS.TITLE_ALL' | translate) : ('RESERVATIONS.TITLE_MY' | translate) }}
         </h1>
         <p class="text-gray-600 mt-1">
-          {{ isAdmin ? 'View and manage all system reservations' : 'View and manage your reservations' }}
+          {{ isAdmin ? ('RESERVATIONS.DESC_ALL' | translate) : ('RESERVATIONS.DESC_MY' | translate) }}
         </p>
       </div>
       <div class="flex items-center space-x-4">
@@ -17,7 +17,7 @@
           [disabled]="isLoading"
           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
           <i class="fas fa-sync-alt mr-2" [class.fa-spin]="isLoading"></i>
-          {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+          {{ isLoading ? ('RESERVATIONS.REFRESHING' | translate) : ('RESERVATIONS.REFRESH' | translate) }}
         </button>
       </div>
     </div>
@@ -31,26 +31,26 @@
         <!-- Search Bar -->
         <div class="relative w-full max-w-sm">
           <input type="text" [(ngModel)]="searchTerm" (keyup)="applySearchFilter()"
-                 placeholder="Search user, room, workspace..." 
+                 [placeholder]="'RESERVATIONS.SEARCH_PLACEHOLDER' | translate" 
                  class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500 outline-none" />
           <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
         </div>
 
         <!-- Status Filter -->
         <div class="flex flex-wrap gap-2">
-          <button (click)="setStatusFilter('all')" [class.bg-blue-600]="statusFilter === 'all'" [class.text-white]="statusFilter === 'all'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">All ({{ getStatusFilterCount('all') }})</button>
-          <button (click)="setStatusFilter('active')" [class.bg-green-600]="statusFilter === 'active'" [class.text-white]="statusFilter === 'active'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">Active ({{ getStatusFilterCount('active') }})</button>
-          <button (click)="setStatusFilter('expired')" [class.bg-orange-600]="statusFilter === 'expired'" [class.text-white]="statusFilter === 'expired'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">Expired ({{ getStatusFilterCount('expired') }})</button>
-          <button (click)="setStatusFilter('cancelled')" [class.bg-red-600]="statusFilter === 'cancelled'" [class.text-white]="statusFilter === 'cancelled'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">Cancelled ({{ getStatusFilterCount('cancelled') }})</button>
+          <button (click)="setStatusFilter('all')" [class.bg-blue-600]="statusFilter === 'all'" [class.text-white]="statusFilter === 'all'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_ALL' | translate }} ({{ getStatusFilterCount('all') }})</button>
+          <button (click)="setStatusFilter('active')" [class.bg-green-600]="statusFilter === 'active'" [class.text-white]="statusFilter === 'active'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_ACTIVE' | translate }} ({{ getStatusFilterCount('active') }})</button>
+          <button (click)="setStatusFilter('expired')" [class.bg-orange-600]="statusFilter === 'expired'" [class.text-white]="statusFilter === 'expired'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_EXPIRED' | translate }} ({{ getStatusFilterCount('expired') }})</button>
+          <button (click)="setStatusFilter('cancelled')" [class.bg-red-600]="statusFilter === 'cancelled'" [class.text-white]="statusFilter === 'cancelled'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_CANCELLED' | translate }} ({{ getStatusFilterCount('cancelled') }})</button>
         </div>
       </div>
       
       <div class="flex items-center gap-3">
         <button (click)="openExportModal()" [disabled]="isExporting || isLoading" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
-          <i class="fas fa-file-excel mr-2"></i> Export
+          <i class="fas fa-file-excel mr-2"></i> {{ 'RESERVATIONS.EXPORT' | translate }}
         </button>
         <button (click)="openNewBookingModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <i class="fas fa-plus mr-2"></i> New Reservation
+          <i class="fas fa-plus mr-2"></i> {{ 'RESERVATIONS.NEW_RESERVATION' | translate }}
         </button>
       </div>
     </div>
@@ -60,13 +60,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('startDate')">Date <i [class]="getSortIcon('startDate')"></i></th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-            <th *ngIf="isAdmin" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('user')">User <i [class]="getSortIcon('user')"></i></th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Room</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Workspace</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('startDate')">{{ 'RESERVATIONS.TABLE.DATE' | translate }} <i [class]="getSortIcon('startDate')"></i></th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.TIME' | translate }}</th>
+            <th *ngIf="isAdmin" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('user')">{{ 'RESERVATIONS.TABLE.USER' | translate }} <i [class]="getSortIcon('user')"></i></th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.STATUS' | translate }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -89,7 +89,7 @@
                   'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
                   'bg-red-100 text-red-800': reservation.status === 'DENIED'
                 }">
-                {{ reservation.status === 'CONFIRMED' ? 'Confirmed' : (reservation.status === 'NOT_CONFIRMED' ? 'Pending' : 'Denied') }}
+                {{ reservation.status === 'CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_CONFIRMED' | translate) : (reservation.status === 'NOT_CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_PENDING' | translate) : ('RESERVATIONS.TABLE.STATUS_DENIED' | translate)) }}
               </span>
             </td>
             <td class="px-4 py-4 text-sm">
@@ -100,7 +100,7 @@
           </tr>
           <tr *ngIf="!paginatedReservations.length && !isLoading">
             <td [attr.colspan]="isAdmin ? 7 : 6" class="px-4 py-12 text-center text-gray-500">
-              No reservations found.
+              {{ 'RESERVATIONS.TABLE.NO_RESERVATIONS' | translate }}
             </td>
           </tr>
         </tbody>
@@ -110,16 +110,16 @@
     <!-- Pagination -->
     <div *ngIf="totalItems > 0" class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
       <div class="flex items-center gap-2 text-sm text-gray-700">
-        Show:
+        {{ 'RESERVATIONS.PAGINATION.SHOW' | translate }}
         <select [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange($event)" class="border rounded px-2 py-1">
           <option *ngFor="let opt of pageOptions" [value]="opt">{{ opt }}</option>
         </select>
-        entries (Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ totalItems }})
+        {{ 'RESERVATIONS.PAGINATION.ENTRIES_SHOWING' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'RESERVATIONS.PAGINATION.OF' | translate }} {{ totalItems }})
       </div>
       <div class="flex items-center gap-1">
-        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.PREV' | translate }}</button>
         <button *ngFor="let p of pageNumbers" (click)="onPageChange(p)" [class.bg-blue-600]="p === currentPage" [class.text-white]="p === currentPage" class="px-3 py-1 border rounded">{{ p }}</button>
-        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.NEXT' | translate }}</button>
       </div>
     </div>
   </div>
@@ -131,44 +131,44 @@
 <div *ngIf="showExportModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
     <div class="px-6 py-4 bg-gray-50 border-b">
-      <h3 class="text-lg font-medium">Export Reservations</h3>
+      <h3 class="text-lg font-medium">{{ 'RESERVATIONS.EXPORT_MODAL.TITLE' | translate }}</h3>
     </div>
     <div class="p-6 space-y-4">
-      <p class="text-sm text-gray-600 mb-2">Choose export type:</p>
+      <p class="text-sm text-gray-600 mb-2">{{ 'RESERVATIONS.EXPORT_MODAL.CHOOSE_TYPE' | translate }}</p>
       
       <!-- Period Export -->
       <div class="space-y-4">
-        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Historical Snapshot</h4>
+        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ 'RESERVATIONS.EXPORT_MODAL.HISTORICAL_SNAPSHOT' | translate }}</h4>
         <div class="space-y-2">
           <button *ngFor="let p of exportPeriods" 
                   (click)="selectExportPeriod(p.value)" 
                   [class.ring-2]="selectedExportPeriod === p.value" 
                   [class.ring-blue-500]="selectedExportPeriod === p.value"
                   class="w-full text-left p-3 border rounded-lg hover:bg-blue-50 transition-all">
-            <div class="font-medium text-sm">{{ p.label }}</div>
-            <div class="text-xs text-gray-500">{{ p.description }}</div>
+            <div class="font-medium text-sm">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label | uppercase | translate) || p.label }}</div>
+            <div class="text-xs text-gray-500">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label | uppercase) + '_DESC' | translate }}</div>
           </button>
         </div>
       </div>
 
       <!-- Admin Daily Report (New) -->
       <div *ngIf="isAdmin" class="mt-6 pt-6 border-t border-gray-100 space-y-4">
-        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Formal Admin Report</h4>
+        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ 'RESERVATIONS.EXPORT_MODAL.FORMAL_ADMIN_REPORT' | translate }}</h4>
         <button (click)="selectDailyExport()"
                 [class.ring-2]="selectedExportType === 'daily'"
                 [class.ring-blue-500]="selectedExportType === 'daily'"
                 class="w-full text-left p-3 border rounded-lg hover:bg-blue-50 transition-all">
           <div class="flex items-center justify-between">
             <div>
-              <div class="font-medium text-sm text-blue-600">Daily Backend Report</div>
-              <div class="text-xs text-gray-500">Official Excel export for a specific date</div>
+              <div class="font-medium text-sm text-blue-600">{{ 'RESERVATIONS.EXPORT_MODAL.DAILY_BACKEND_REPORT' | translate }}</div>
+              <div class="text-xs text-gray-500">{{ 'RESERVATIONS.EXPORT_MODAL.DAILY_BACKEND_REPORT_DESC' | translate }}</div>
             </div>
             <i class="fas fa-file-excel text-green-600 text-xl"></i>
           </div>
           
           <!-- Date selector for daily export -->
           <div *ngIf="selectedExportType === 'daily'" class="mt-3 p-2 bg-blue-50 rounded" (click)="$event.stopPropagation()">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Select Date:</label>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ 'RESERVATIONS.EXPORT_MODAL.SELECT_DATE' | translate }}</label>
             <input type="date" 
                    [(ngModel)]="exportDate"
                    class="w-full border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-blue-500">
@@ -177,10 +177,10 @@
       </div>
     </div>
     <div class="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3">
-      <button (click)="closeExportModal()" class="px-4 py-2 border rounded-md">Cancel</button>
+      <button (click)="closeExportModal()" class="px-4 py-2 border rounded-md">{{ 'RESERVATIONS.EXPORT_MODAL.CANCEL' | translate }}</button>
       <button (click)="confirmExport()" [disabled]="isExporting || (!selectedExportPeriod && selectedExportType === 'period')" class="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50">
         <i *ngIf="isExporting" class="fas fa-spinner fa-spin mr-2"></i>
-        {{ isExporting ? 'Exporting...' : 'Confirm Export' }}
+        {{ isExporting ? ('RESERVATIONS.EXPORT_MODAL.EXPORTING' | translate) : ('RESERVATIONS.EXPORT_MODAL.CONFIRM_EXPORT' | translate) }}
       </button>
     </div>
   </div>
@@ -191,10 +191,10 @@
   [isLoading]="isLoading"
   [type]="'warning'"
   [data]="{ 
-    title: 'Confirm Deletion', 
+    title: 'RESERVATIONS.MESSAGES.CONFIRM_DELETE_TITLE' | translate, 
     message: getReservationDeleteConfirmationMessage(),
-    confirmButtonText: 'Delete',
-    cancelButtonText: 'Cancel'
+    confirmButtonText: 'RESERVATIONS.MESSAGES.CONFIRM' | translate,
+    cancelButtonText: 'RESERVATIONS.MESSAGES.CANCEL' | translate
   }"
   (confirm)="confirmDelete()"
   (cancel)="closeDeleteConfirmation()"

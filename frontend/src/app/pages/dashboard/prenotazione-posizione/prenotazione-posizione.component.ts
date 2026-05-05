@@ -15,6 +15,7 @@ import { map, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-inline.component';
 import { WorkspaceService } from "@core/services/workspace.service";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
@@ -25,7 +26,8 @@ import { WorkspaceService } from "@core/services/workspace.service";
     CalendarComponent,
     ToastModule,
     ConfirmationModalComponent,
-    PlanimetriaInlineComponent
+    PlanimetriaInlineComponent,
+    TranslateModule
   ],
   providers: [DatePipe],
   selector: "app-prenotazione-posizione",
@@ -91,7 +93,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private adminService: AdminService,
     private datePipe: DatePipe,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public translate: TranslateService
   ) {
     this.bookingForm = this.fb.group({
       selectedDate: [null, Validators.required],
@@ -121,6 +124,20 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     return name === 'Full Day';
   }
 
+  getDurationLabel(duration: string): string {
+    if (this.isFullDay(duration)) return this.translate.instant('BOOKING.TIME.FULL_DAY');
+    
+    const mapping: { [key: string]: string } = {
+      '4 hours': 'BOOKING.TIME.DURATIONS.4_ORE',
+      '2 hours': 'BOOKING.TIME.DURATIONS.2_ORE',
+      '1 hour': 'BOOKING.TIME.DURATIONS.1_ORA',
+      '30 minutes': 'BOOKING.TIME.DURATIONS.30_MINUTI'
+    };
+    
+    const key = mapping[duration];
+    return key ? this.translate.instant(key) : duration;
+  }
+
   isMeetingRoom(): boolean {
     const type = this.bookingForm.get('roomType')?.value;
     return type === RoomType.MEETING_ROOM || type === 'MeetingRoom' || type === 'MEETINGROOM';
@@ -138,7 +155,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
     const checkAndAddDuration = (name: string, mins: number) => {
       if (isToday) {
-        const latestStartHour = 18 - (mins / 60);
+        const latestStartHour = 19 - (mins / 60);
         const latestStartInMinutes = latestStartHour * 60;
         if (latestStartInMinutes > (currentTimeInMinutes + 30)) {
           durations.add(name);
@@ -207,9 +224,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           this.state.isLoading = false;
         },
         error: (err: any) => {
-          console.error('Critical error in loadBookingInfo:', err);
-          this.state.errorMessage = "Critical loading error";
-          this.toastService.showError('Loading Error', 'Unable to load information.');
+          console.error('Error loading information:', err);
+          this.state.errorMessage = this.translate.instant('BOOKING.MESSAGES.LOADING_ERROR_DESC');
+          this.toastService.showError(
+            this.translate.instant('BOOKING.MESSAGES.LOADING_ERROR_TITLE'), 
+            this.translate.instant('BOOKING.MESSAGES.LOADING_ERROR_DESC')
+          );
           this.state.isLoading = false;
         }
       });
@@ -349,7 +369,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
     const slots: { startTime: string; endTime: string }[] = [];
     const startHour = 8;
-    const endHour = 18;
+    const endHour = 19;
     const durationMinutes = this.getDurationInMinutes(duration);
     if (!durationMinutes) { this.state.availableTimeSlots = []; return; }
 
@@ -360,6 +380,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (this.isFullDay(duration)) {
       if (!isToday || (8 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '08:00', endTime: '17:00' });
       if (!isToday || (9 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '09:00', endTime: '18:00' });
+      if (!isToday || (10 * 60) > (currentTimeInMinutes + 30)) slots.push({ startTime: '10:00', endTime: '19:00' });
     } else {
       const step = durationMinutes >= 60 ? 60 : 30;
       for (let hour = startHour; hour < endHour; hour += step / 60) {
@@ -421,7 +442,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           const selected = workspaces.find(w => w.id === Number(currentWorkspaceId));
           if (selected && !selected.isAvailable) {
             this.bookingForm.patchValue({ workspaceId: "", roomId: null });
-            this.toastService.showInfo('Info', 'La postazione selezionata non è disponibile per questo orario.');
+            this.toastService.showInfo(
+              this.translate.instant('COMMON.INFO'), 
+              this.translate.instant('BOOKING.WORKSPACE.NOT_AVAILABLE')
+            );
           }
         }
       });
@@ -483,13 +507,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         })
       ).subscribe({
         next: () => {
-          this.toastService.showSuccess('Confirmed', 'Reservation created successfully');
+          this.toastService.showSuccess(
+            this.translate.instant('BOOKING.MESSAGES.CREATE_SUCCESS_TITLE'), 
+            this.translate.instant('BOOKING.MESSAGES.CREATE_SUCCESS_DESC')
+          );
           this.resetForm();
           this.loadMyReservations();
           this.state.isLoading = false;
         },
         error: (err) => {
-          this.toastService.showError('Error', err.message || 'Failed to create reservation');
+          this.toastService.showError(
+            this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_TITLE'), 
+            err.message || this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_DESC')
+          );
           this.state.isLoading = false;
         }
       });
@@ -523,7 +553,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         this.state.isLoading = false;
       },
       error: () => {
-        this.toastService.showError('Error', 'Unable to load reservations');
+        this.toastService.showError(
+          this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_TITLE'), 
+          this.translate.instant('RESERVATIONS.MESSAGES.LOADING_ERROR')
+        );
         this.state.isLoading = false;
       }
     });
@@ -535,7 +568,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   formatDate(date: any, format: string): string {
     const d = new Date(date);
-    return this.isValidDate(d) ? this.datePipe.transform(d, format)! : 'Invalid Date';
+    const lang = this.translate.currentLang === 'en' ? 'en-US' : 'it-IT';
+    return this.isValidDate(d) ? this.datePipe.transform(d, format, undefined, lang)! : 'Invalid Date';
   }
 
   getFormattedTimeRange(start: any, end: any): string {
@@ -618,7 +652,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   private loadUsers(): void {
     this.adminService.getAllUsers().pipe(takeUntil(this.destroy$)).subscribe({
       next: (users) => { this.users = users; this.filteredUsers = users; },
-      error: () => this.toastService.showError('Error', 'Unable to load users')
+      error: () => this.toastService.showError(
+        this.translate.instant('BOOKING.MESSAGES.LOADING_ERROR_TITLE'), 
+        this.translate.instant('USER_MANAGEMENT.MESSAGES.ERROR_LOAD')
+      )
     });
   }
 
@@ -666,14 +703,20 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.state.isLoading = true;
     forkJoin(requests).subscribe({
       next: () => {
-        this.toastService.showSuccess('Success', 'Reservations cancelled');
+        this.toastService.showSuccess(
+          this.translate.instant('BOOKING.MESSAGES.CREATE_SUCCESS_TITLE'), 
+          this.translate.instant('BOOKING.MESSAGES.CANCEL_SUCCESS')
+        );
         this.loadMyReservations();
         this.selectedReservations.clear();
         this.isSelectAllChecked = false;
         this.closeBulkCancelConfirmation();
       },
       error: () => {
-        this.toastService.showError('Error', 'Failed to cancel reservations');
+        this.toastService.showError(
+          this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_TITLE'), 
+          this.translate.instant('BOOKING.MESSAGES.CANCEL_ERROR')
+        );
         this.state.isLoading = false;
       }
     });

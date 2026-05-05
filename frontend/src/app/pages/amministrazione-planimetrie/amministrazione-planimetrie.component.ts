@@ -10,13 +10,14 @@ import { RoomService } from '../../core/services/room.service';
 import { WorkspaceService } from '../../core/services/workspace.service';
 
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 
 @Component({
     selector: 'app-amministrazione-planimetrie',
     standalone: true,
-    imports: [CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule],
+    imports: [CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule, TranslateModule],
     templateUrl: './amministrazione-planimetrie.component.html',
     animations: [
         authAnimations.fadeIn,
@@ -53,7 +54,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     constructor(
         private cdr: ChangeDetectorRef,
         private roomService: RoomService,
-        private workspaceService: WorkspaceService
+        private workspaceService: WorkspaceService,
+        private translate: TranslateService
     ) { }
 
     ngOnInit(): void { }
@@ -247,7 +249,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     this.isDragging = false;
                     this.isDrawing = false;
 
-                    const id = prompt("ID Postazione:", "1") || "1";
+                    const idPrompt = this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.DESK_ID_PROMPT');
+                    const id = prompt(idPrompt, "1") || "1";
 
                     const radius = 5;
                     const circle = new fabric.Circle({ radius, fill: 'rgba(59, 130, 246, 0.75)', stroke: '#1d4ed8', strokeWidth: 2, originX: 'center', originY: 'center' });
@@ -443,7 +446,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const postazioniCanvas = allObjects.filter(o => o.data?.tipo === 'postazione');
 
         if (stanzeCanvas.length === 0 && postazioniCanvas.length === 0) {
-            alert('Nessun elemento da salvare sul canvas.');
+            alert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.NO_ELEMENTS'));
             return;
         }
 
@@ -464,7 +467,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const stanzeVuote = stanzeCanvas.filter((s: any) => (capacityMap.get(s.data?.tempId) ?? 0) === 0);
         if (stanzeVuote.length > 0) {
             const nomi = stanzeVuote.map((s: any) => `"${s.data?.label ?? 'Senza nome'}"`).join(', ');
-            alert(`⚠️ Attenzione: le seguenti stanze non hanno postazioni:\n${nomi}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.`);
+            alert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_WARNING', { rooms: nomi }));
             return;
         }
 
@@ -526,11 +529,16 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 console.log('[FASE B] Postazione salvata con id:', savedWorkspace.id);
             }
 
-            alert(`✅ Salvataggio completato!\n• ${stanzeCanvas.length} stanza/e salvata/e\n• ${postazioniCanvas.length} postazione/i salvata/e`);
+            alert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
+                roomsCount: stanzeCanvas.length,
+                desksCount: postazioniCanvas.length
+            }));
 
         } catch (error: any) {
             console.error('[SALVATAGGIO] Errore durante il salvataggio:', error);
-            alert(`❌ Errore durante il salvataggio:\n${error?.message ?? 'Errore sconosciuto. Controlla la console.'}`);
+            alert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', {
+                error: error?.message ?? 'Unknown error'
+            }));
         } finally {
             this.isSaving = false;
             this.cdr.detectChanges();

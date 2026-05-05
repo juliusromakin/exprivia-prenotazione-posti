@@ -12,9 +12,9 @@
         </div>
         <h1
           class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--color-expriviaOrange)] via-[var(--color-expriviaOrange400)] to-[var(--color-expriviaOrange)] bg-clip-text text-transparent animate-gradient">
-          Accedi
+          {{ 'AUTH.LOGIN.TITLE' | translate }}
         </h1>
-        <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Inserisci le tue credenziali per accedere.</p>
+        <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
       </div>
 
       <!-- Form di login -->
@@ -23,17 +23,17 @@
         <!-- Email -->
         <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
           class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-          <label class="block text-sm font-medium mb-1" for="email">Email *</label>
-          <input matInput id="email" formControlName="email" placeholder="Email" type="email"
+          <label class="block text-sm font-medium mb-1" for="email">{{ 'AUTH.LOGIN.EMAIL' | translate }} *</label>
+          <input matInput id="email" formControlName="email" [placeholder]="'AUTH.LOGIN.EMAIL' | translate" type="email"
             class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
             [class.border-red-500]="emailInvalid" [attr.aria-invalid]="emailInvalid"
             [attr.aria-describedby]="emailInvalid ? 'email-error' : null" [disabled]="isLoading" />
           <div *ngIf="emailInvalid" class="text-xs text-red-600 mt-1" id="email-error" role="alert">
             <ng-container *ngIf="loginForm.get('email')?.hasError('required')">
-              L'email è obbligatoria.
+              {{ 'AUTH.LOGIN.ERRORS.EMAIL_REQUIRED' | translate }}
             </ng-container>
             <ng-container *ngIf="loginForm.get('email')?.hasError('email')">
-              Inserisci un'email valida.
+              {{ 'AUTH.LOGIN.ERRORS.EMAIL_INVALID' | translate }}
             </ng-container>
           </div>
         </div>
@@ -41,22 +41,22 @@
         <!-- Password -->
         <div [@slideUp]="{ value: '', params: { delay: '200ms' } }"
           class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-          <label class="block text-sm font-medium mb-1" for="password">Password *</label>
+          <label class="block text-sm font-medium mb-1" for="password">{{ 'AUTH.LOGIN.PASSWORD' | translate }} *</label>
           <div class="relative">
             <input matInput id="password" [type]="hidePwd ? 'password' : 'text'" formControlName="password"
-              placeholder="Password"
+              [placeholder]="'AUTH.LOGIN.PASSWORD' | translate"
               class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
               [class.border-red-500]="passwordInvalid" [attr.aria-invalid]="passwordInvalid"
               [attr.aria-describedby]="passwordInvalid ? 'password-error' : null" [disabled]="isLoading" />
             <button type="button" (click)="hidePwd = !hidePwd"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
-              [attr.aria-label]="hidePwd ? 'Mostra password' : 'Nascondi password'" [disabled]="isLoading">
+              [attr.aria-label]="hidePwd ? ('AUTH.COMMON.SHOW_PWD' | translate) : ('AUTH.COMMON.HIDE_PWD' | translate)" [disabled]="isLoading">
               <mat-icon class="w-6 h-6" aria-hidden="true">{{hidePwd ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
           </div>
           <div *ngIf="passwordInvalid" class="text-xs text-red-600 mt-1" id="password-error" role="alert">
             <ng-container *ngIf="loginForm.get('password')?.hasError('required')">
-              La password è obbligatoria.
+              {{ 'AUTH.LOGIN.ERRORS.PWD_REQUIRED' | translate }}
             </ng-container>
           </div>
         </div>
@@ -66,7 +66,7 @@
           <a [routerLink]="['/forgot-password']"
             class="text-sm text-[var(--color-expriviaOrange)] hover:text-[var(--color-expriviaOrange400)] transition-[var(--transition-colors)] relative group"
             [class.pointer-events-none]="isLoading" [class.opacity-50]="isLoading">
-            Password dimenticata?
+            {{ 'AUTH.LOGIN.FORGOT_PASSWORD' | translate }}
             <span
               class="absolute bottom-0 left-0 w-full h-0.5 bg-[var(--color-expriviaOrange)] transform scale-x-0 group-hover:scale-x-100 transition-[var(--transition-transform)]"></span>
           </a>
@@ -80,7 +80,7 @@
              aria-live="assertive">
           <mat-icon class="text-red-500 mt-0.5" aria-hidden="true">warning</mat-icon>
           <div class="flex-1">
-            <p class="text-sm font-medium text-red-800">Errore di accesso</p>
+            <p class="text-sm font-medium text-red-800">{{ 'AUTH.LOGIN.ERROR_TITLE' | translate }}</p>
             <p class="text-sm text-red-600">{{ errorMessage }}</p>
           </div>
           <button type="button" 
@@ -103,18 +103,20 @@
             <div class="relative flex items-center justify-center gap-2">
               <mat-spinner *ngIf="isLoading" diameter="20" class="mr-2" aria-hidden="true"></mat-spinner>
               <span *ngIf="!isLoading"
-                class="group-hover:scale-110 transition-[var(--transition-transform)]">Accedi</span>
+                class="group-hover:scale-110 transition-[var(--transition-transform)]">{{ 'AUTH.LOGIN.SUBMIT' | translate }}</span>
+              <span *ngIf="isLoading"
+                class="group-hover:scale-110 transition-[var(--transition-transform)]">{{ 'AUTH.LOGIN.LOGGING_IN' | translate }}</span>
             </div>
           </button>
         </div>
 
         <!-- Link Registrazione -->
         <div class="text-center text-sm mt-6" [@slideUp]="{ value: '', params: { delay: '500ms' } }">
-          <span class="text-gray-600">Non hai un account?</span>
+          <span class="text-gray-600">{{ 'AUTH.LOGIN.NO_ACCOUNT' | translate }}</span>
           <a [routerLink]="['/register']"
             class="text-sm text-[var(--color-expriviaOrange)] hover:text-[var(--color-expriviaOrange400)] transition-[var(--transition-colors)] ml-1 relative group"
             [class.pointer-events-none]="isLoading" [class.opacity-50]="isLoading">
-            Registrati
+            {{ 'AUTH.LOGIN.REGISTER_LINK' | translate }}
             <span
               class="absolute bottom-0 left-0 w-full h-0.5 bg-[var(--color-expriviaOrange)] transform scale-x-0 group-hover:scale-x-100 transition-[var(--transition-transform)]"></span>
           </a>

@@ -6,6 +6,7 @@ import { authAnimations } from '../../shared/animations/auth.animations';
 import { FeatureCardComponent, FeatureCardConfig } from '../../shared/components/feature-card/feature-card.component';
 import { ButtonComponent } from '../../shared/components/buttons/button.component';
 import { AuthService } from '../../core/auth/auth.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -16,7 +17,8 @@ import { Subject, takeUntil } from 'rxjs';
         RouterModule,
         HeaderComponent,
         FeatureCardComponent,
-        ButtonComponent
+        ButtonComponent,
+        TranslateModule
     ],
     templateUrl: './admin-home.component.html',
     animations: [
@@ -29,7 +31,7 @@ export class AdminHomeComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
     private destroy$ = new Subject<void>();
 
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService, private translate: TranslateService) { }
 
     ngOnInit(): void {
         this.authService
@@ -47,22 +49,22 @@ export class AdminHomeComponent implements OnInit, OnDestroy {
 
     featureCards: FeatureCardConfig[] = [
         {
-            title: 'Gestione Prenotazioni',
-            description: 'Visualizza, modifica e gestisci tutte le prenotazioni degli utenti in modo centralizzato.',
+            title: 'ADMIN_HOME.CARDS.BOOKINGS_TITLE',
+            description: 'ADMIN_HOME.CARDS.BOOKINGS_DESC',
             icon: 'event_note',
             features: [
-                'Vista completa prenotazioni',
-                'Approvazioni e cancellazioni'
+                'ADMIN_HOME.CARDS.BOOKINGS_FEAT_1',
+                'ADMIN_HOME.CARDS.BOOKINGS_FEAT_2'
             ],
             linkUrl: '/dashboard'
         },
         {
-            title: 'Gestione Planimetrie',
-            description: 'Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.',
+            title: 'ADMIN_HOME.CARDS.PLANS_TITLE',
+            description: 'ADMIN_HOME.CARDS.PLANS_DESC',
             icon: 'map',
             features: [
-                'Editor planimetria interattivo',
-                'Gestione postazioni'
+                'ADMIN_HOME.CARDS.PLANS_FEAT_1',
+                'ADMIN_HOME.CARDS.PLANS_FEAT_2'
             ],
             linkUrl: '/dashboard'
         }

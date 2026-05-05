@@ -1,61 +1,48 @@
 <div class="planimetria-inline-wrapper">
-
-  <!-- Header: legend + zoom controls -->
   <div class="planimetria-toolbar">
-    <!-- Legend -->
     <div class="planimetria-legend">
       <div class="legend-item">
         <div class="legend-dot available"></div>
-        <span>Available</span>
+        <span>{{ 'BOOKING.PLANIMETRIA.LEGEND.AVAILABLE' | translate }}</span>
       </div>
       <div class="legend-item">
         <div class="legend-dot unavailable"></div>
-        <span>Unavailable</span>
+        <span>{{ 'BOOKING.PLANIMETRIA.LEGEND.UNAVAILABLE' | translate }}</span>
       </div>
       <div class="legend-item">
         <div class="legend-dot selected"></div>
-        <span>Selected</span>
+        <span>{{ 'BOOKING.PLANIMETRIA.LEGEND.SELECTED' | translate }}</span>
       </div>
     </div>
 
-    <!-- Zoom controls -->
     <div class="zoom-controls">
-      <button type="button" class="zoom-btn" (click)="zoomIn()" title="Zoom in">
+      <button type="button" class="zoom-btn" (click)="zoomIn()" [title]="'BOOKING.PLANIMETRIA.ZOOM.IN' | translate">
         <i class="fas fa-search-plus"></i>
       </button>
       <span class="zoom-label">{{ (scale * 100).toFixed(0) }}%</span>
-      <button type="button" class="zoom-btn" (click)="zoomOut()" [disabled]="scale <= 1" title="Zoom out">
+      <button type="button" class="zoom-btn" (click)="zoomOut()" [disabled]="scale <= 1" [title]="'BOOKING.PLANIMETRIA.ZOOM.OUT' | translate">
         <i class="fas fa-search-minus"></i>
       </button>
-      <button type="button" class="zoom-btn reset" (click)="resetZoom()" *ngIf="isZoomed" title="Reset Zoom">
+      <button type="button" class="zoom-btn reset" (click)="resetZoom()" *ngIf="isZoomed" [title]="'BOOKING.PLANIMETRIA.ZOOM.RESET' | translate">
         <i class="fas fa-compress-arrows-alt"></i>
       </button>
     </div>
   </div>
 
-  <!-- Message if no workspaces to show -->
   <div *ngIf="markers.length === 0" class="no-markers-msg">
     <i class="fas fa-info-circle mr-2"></i>
-    Select room type, date and time to see available workspaces on the map.
+    {{ 'BOOKING.PLANIMETRIA.HINT.NO_MARKERS' | translate }}
   </div>
 
-  <!-- Viewport -->
   <div #mapViewport class="planimetria-viewport" [class.dragging]="isDragging" [class.zoomable]="!isZoomed"
     (wheel)="onWheel($event)" (mousedown)="onMouseDown($event)" (touchstart)="onTouchStart($event)"
     (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()">
-
-    <!-- Transformable Layer -->
     <div class="planimetria-transform-layer" [style.transform]="transformStyle">
-
-      <!-- Planimetria with markers -->
       <div class="planimetria-container">
         <img src="Planimetria.png" alt="Office Plan" class="planimetria-img" draggable="false">
-
-        <!-- Dynamic Rooms -->
         <div *ngFor="let room of rooms" class="floor-plan-room" [ngStyle]="getRoomStyle(room)">
           <span class="room-label">{{ room.name }}</span>
         </div>
-
         <div *ngFor="let marker of markers" class="floor-plan-marker" [class.available]="marker.available"
           [class.unavailable]="!marker.available" [class.selected]="marker.selected" [style.left.%]="marker.x"
           [style.top.%]="marker.y" [style.transform]="'translate(-50%, -50%) scale(' + (1 / scale) + ')'"
@@ -65,18 +52,15 @@
             <span class="tooltip-name">{{ getTooltipLine1(marker.tooltip) }}</span>
             <span class="tooltip-room">{{ getTooltipLine2(marker.tooltip) }}</span>
             <span class="tooltip-status" [class.available]="marker.available" [class.unavailable]="!marker.available">
-              {{ marker.available ? 'Available — click to select' : 'Unavailable' }}
+              {{ marker.available ? ('BOOKING.PLANIMETRIA.TOOLTIP.AVAILABLE' | translate) : ('BOOKING.PLANIMETRIA.TOOLTIP.UNAVAILABLE' | translate) }}
             </span>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Hint pan when zoomed -->
   <div *ngIf="isZoomed" class="pan-hint">
-    <i class="fas fa-hand-paper mr-1"></i> Drag to move
+    <i class="fas fa-hand-paper mr-1"></i> {{ 'BOOKING.PLANIMETRIA.HINT.DRAG_TO_MOVE' | translate }}
   </div>
-
 </div>

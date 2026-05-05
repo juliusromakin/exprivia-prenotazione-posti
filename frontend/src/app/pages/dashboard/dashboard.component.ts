@@ -28,6 +28,8 @@ import { DashboardService } from "./dashboard.service";
 import { PrenotazionePosizioneComponent } from "./prenotazione-posizione/prenotazione-posizione.component";
 import { UpdateUserComponent } from "../../account/update-user/update-user.component";
 import { SidebarService } from "../../shared/services/sidebar.service";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
+
 
 @Component({
   selector: "app-dashboard",
@@ -47,6 +49,7 @@ import { SidebarService } from "../../shared/services/sidebar.service";
     MatButtonModule,
     MatMenuModule,
     MatDividerModule,
+    TranslateModule,
 ],
   providers: [
     AuthService,
@@ -88,7 +91,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private utilsService: UtilsService,
     private dashboardService: DashboardService,
     private adminService: AdminService,
-    private sidebarService: SidebarService
+    private sidebarService: SidebarService,
+    private translate: TranslateService
   ) {}
 
   async ngOnInit() {
@@ -118,7 +122,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Aggiorna l'orario ogni secondo
     this.timeSubscription = interval(1000)
-      .pipe(map(() => new Date().toLocaleTimeString()))
+      .pipe(map(() => new Date().toLocaleTimeString(this.currentLang === 'en' ? 'en-US' : 'it-IT')))
       .subscribe((time) => {
         this.currentTime = time;
       });
@@ -195,6 +199,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openNewBookingModal(): void {
     this.router.navigate(['/dashboard/workspace-booking']);
+  }
+
+  cambiaLingua(lingua: string): void {
+    this.translate.use(lingua);
+  }
+
+  get currentLang(): string {
+    return this.translate.currentLang || this.translate.defaultLang || 'it';
+  }
+
+  get currentFlag(): string {
+    return this.getFlag(this.currentLang);
+  }
+
+  getFlag(lang: string): string {
+    switch(lang) {
+      case 'it': return 'https://flagcdn.com/w40/it.png';
+      case 'en': return 'https://flagcdn.com/w40/gb.png';
+      default: return 'https://flagcdn.com/w40/it.png';
+    }
   }
 
 }

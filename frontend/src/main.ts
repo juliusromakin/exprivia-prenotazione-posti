@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { importProvidersFrom, LOCALE_ID } from "@angular/core";
 import { registerLocaleData } from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import localeEn from "@angular/common/locales/en";
 import { AppComponent } from "./app/app.component";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -60,8 +61,9 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 // Importa la configurazione delle rotte
 
-// Register Italian locale
+// Register locales
 registerLocaleData(localeIt);
+registerLocaleData(localeEn);
 
 bootstrapApplication(AppComponent, {
   providers: [

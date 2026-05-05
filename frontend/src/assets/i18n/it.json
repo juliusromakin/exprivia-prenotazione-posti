@@ -1,4 +1,7 @@
 {
+  "FOOTER": {
+    "RIGHTS_RESERVED": "Tutti i diritti riservati."
+  },
   "HEADER": {
     "TITLE": "Prenotazione Posti",
     "LOGIN": "Accedi",
@@ -33,6 +36,563 @@
       "DESC": "Coordina facilmente le prenotazioni con il tuo team e gestisci gli spazi condivisi.",
       "BULLET_1": "Gestione team",
       "BULLET_2": "Spazi condivisi"
+    }
+  },
+  "DASHBOARD": {
+    "WELCOME_ADMIN": "Benvenuto",
+    "ADMIN_TITLE": "Dashboard Amministratore",
+    "ADMIN_DESC": "Panoramica completa del sistema di prenotazione",
+    "NEW_RESERVATION": "Nuova Prenotazione",
+    "NEW_RESERVATION_DESC": "Crea prenotazioni personali o per altri utenti",
+    "MANAGE_RESERVATIONS": "Gestione Prenotazioni",
+    "MANAGE_RESERVATIONS_DESC": "Visualizza e gestisci tutte le prenotazioni a sistema",
+    "USER_MANAGEMENT": "Gestione Utenti",
+    "USER_MANAGEMENT_DESC": "Gestisci gli utenti, i ruoli e i permessi del sistema",
+    "STATISTICS": "Statistiche Avanzate",
+    "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione",
+    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
+    "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici"
+  },
+  "ADMIN_HOME": {
+    "HERO_TITLE": "Gestisci il tuo piano di lavoro",
+    "HERO_DESC": "Pannello di controllo amministrativo per gestire prenotazioni e planimetrie aziendali in modo centralizzato.",
+    "GO_TO_DASHBOARD": "Vai alla Dashboard",
+    "MANAGE_PLANS": "Gestione Planimetrie",
+    "TOOLS_TITLE": "Strumenti di Amministrazione",
+    "TOOLS_DESC": "Tutto il necessario per gestire e ottimizzare gli spazi di lavoro aziendali",
+    "CARDS": {
+      "BOOKINGS_TITLE": "Gestione Prenotazioni",
+      "BOOKINGS_DESC": "Visualizza, modifica e gestisci tutte le prenotazioni degli utenti in modo centralizzato.",
+      "BOOKINGS_FEAT_1": "Vista completa prenotazioni",
+      "BOOKINGS_FEAT_2": "Approvazioni e cancellazioni",
+      "PLANS_TITLE": "Gestione Planimetrie",
+      "PLANS_DESC": "Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.",
+      "PLANS_FEAT_1": "Editor planimetria interattivo",
+      "PLANS_FEAT_2": "Gestione postazioni"
+    }
+  },
+  "PLANIMETRIA_EDITOR": {
+    "TITLE": "Gestione Planimetrie",
+    "SUBTITLE": "Seleziona la sede, poi modifica o carica la planimetria.",
+    "SELECT_SEDE": "Seleziona sede...",
+    "CONFIRM": "Conferma",
+    "CHANGE_SEDE": "Cambia Sede",
+    "MODES": {
+      "LABEL": "Modalità",
+      "SELECT": "Seleziona",
+      "SELECT_HINT": "Selezione & Pan",
+      "CREATE_ROOM": "Crea Stanza",
+      "CREATE_ROOM_HINT": "Disegno Stanza — trascina per creare",
+      "CREATE_DESK": "Crea Postazione",
+      "CREATE_DESK_HINT": "Posiziona Postazione — clicca per inserire",
+      "DRAG_HINT": "trascina",
+      "CLICK_HINT": "click"
+    },
+    "ACTIONS": {
+      "LABEL": "Azioni",
+      "SAVE": "Salva",
+      "SAVING": "Salvataggio...",
+      "UPLOAD": "Carica Planimetria"
+    },
+    "HINTS": {
+      "ZOOM": "Scroll = Zoom",
+      "PAN": "Drag sfondo = Pan",
+      "DRAG_CANVAS": "Trascina sul canvas",
+      "CLICK_PLACE": "Click per piazzare",
+      "DELETE": "Canc = Elimina",
+      "GRID": "Griglia: 10px"
+    },
+    "PLACEHOLDER": {
+      "UPLOAD_BTN": "Clicca per caricare una planimetria",
+      "SUPPORTED_FILES": "Supporta file .png",
+      "INITIAL_HINT": "Seleziona e conferma una sede per iniziare"
+    },
+    "MODAL": {
+      "TITLE": "Nuova Stanza",
+      "ROOM_NAME": "Nome Stanza",
+      "NAME_PLACEHOLDER": "Es. Stanza A1",
+      "ROOM_TYPE": "Tipo Stanza",
+      "TYPE_MEETING": "Sala Riunioni",
+      "TYPE_OFFICE": "Ufficio",
+      "CANCEL": "Annulla",
+      "CREATE": "Crea"
+    },
+    "ALERTS": {
+      "DESK_ID_PROMPT": "ID Postazione:",
+      "NO_ELEMENTS": "Nessun elemento da salvare sul canvas.",
+      "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{rooms}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
+      "SAVE_SUCCESS": " Salvataggio completato!\n• {roomsCount} stanza/e salvata/e\n• {desksCount} postazione/i salvata/e",
+      "SAVE_ERROR": " Errore durante il salvataggio:\n{error}"
+    }
+  },
+  "USER_MANAGEMENT": {
+    "TITLE": "Gestione Utenti",
+    "DESC": "Gestisci gli utenti del sistema e i loro ruoli",
+    "REFRESH": "Aggiorna",
+    "REFRESHING": "Aggiornamento...",
+    "TOTAL_USERS": "Utenti Totali",
+    "ADMINISTRATORS": "Amministratori",
+    "EMPLOYEES": "Dipendenti",
+    "PENDING_ACTIVATION": "In attesa di attivazione",
+    "SEARCH_PLACEHOLDER": "Cerca per nome, email...",
+    "FILTER_ALL": "Tutti",
+    "NEW_USER": "Nuovo Utente",
+    "TABLE": {
+      "FIRST_NAME": "Nome",
+      "LAST_NAME": "Cognome",
+      "EMAIL": "Email",
+      "STATUS": "Stato",
+      "ROLE": "Ruolo",
+      "ACTIONS": "Azioni",
+      "STATUS_ACTIVE": "Attivo",
+      "STATUS_INACTIVE": "Inattivo",
+      "ROLE_ADMIN": "Amministratore",
+      "ROLE_EMPLOYEE": "Dipendente",
+      "ACTIVATE_USER_TITLE": "Attiva Utente",
+      "ACTION_EDIT": "Modifica",
+      "ACTION_DELETE": "Elimina",
+      "NO_USERS_FOUND": "Nessun utente trovato"
+    },
+    "PAGINATION": {
+      "SHOW": "Mostra:",
+      "ITEMS_PER_PAGE": "elementi per pagina",
+      "SHOWING_START": "Visualizzati",
+      "SHOWING_OF": "su",
+      "SHOWING_RESULTS": "risultati"
+    },
+    "MESSAGES": {
+      "CONFIRM_DELETE_TITLE": "Conferma Eliminazione Utente",
+      "CONFIRM_DELETE_MSG1": "Sei sicuro di voler eliminare l'utente {{name}} {{lastName}}?",
+      "CONFIRM_DELETE_NAME": "Nome: {{name}} {{lastName}}",
+      "CONFIRM_DELETE_EMAIL": "Email: {{email}}",
+      "CONFIRM_DELETE_ROLE": "Ruolo: {{role}}",
+      "CONFIRM_DELETE_UNDONE": "Questa azione non può essere annullata.",
+      "CONFIRM": "Elimina",
+      "CANCEL": "Annulla",
+      "USER_ACTIVATED_TITLE": "Utente Attivato",
+      "USER_ACTIVATED_DESC": "L'account di {{name}} è ora attivo.",
+      "ACTIVATION_ERROR_TITLE": "Errore",
+      "ACTIVATION_ERROR_DESC": "Impossibile attivare l'utente.",
+      "USER_UPDATED": "Utente Aggiornato",
+      "USER_UPDATED_DESC": "Utente aggiornato con successo",
+      "USER_CREATED": "Utente Creato",
+      "USER_CREATED_DESC": "Utente creato con successo",
+      "OPERATION_ERROR": "Errore Operazione",
+      "UPDATE_ERROR": "Errore durante l'aggiornamento dell'utente",
+      "CREATE_ERROR": "Errore durante la creazione dell'utente",
+      "USER_DELETED": "Utente Eliminato",
+      "USER_DELETED_DESC": "Utente eliminato con successo",
+      "DELETE_ERROR": "Errore Eliminazione",
+      "DELETE_ERROR_DESC": "Errore durante l'eliminazione dell'utente",
+      "LOADING_ERROR": "Errore Caricamento",
+      "LOADING_ERROR_DESC": "Errore durante il caricamento degli utenti"
+    },
+    "FORM": {
+      "FIRST_NAME": "Nome",
+      "ENTER_FIRST_NAME": "Inserisci il nome",
+      "FIRST_NAME_REQ": "Il nome è obbligatorio",
+      "LAST_NAME": "Cognome",
+      "ENTER_LAST_NAME": "Inserisci il cognome",
+      "LAST_NAME_REQ": "Il cognome è obbligatorio",
+      "EMAIL": "Email",
+      "ENTER_EMAIL": "Inserisci l'indirizzo email",
+      "EMAIL_REQ": "L'email è obbligatoria",
+      "EMAIL_INVALID": "Inserisci un indirizzo email valido",
+      "PASSWORD": "Password",
+      "ENTER_PASSWORD": "Inserisci la password",
+      "PASSWORD_REQ": "La password è obbligatoria",
+      "PASSWORD_MIN": "La password deve contenere almeno 6 caratteri",
+      "ROLE_ASSIGN": "Assegnazione Ruoli e Permessi",
+      "ROLE_REQ": "Seleziona almeno un ruolo per poter procedere",
+      "ACCOUNT_ACTIVE": "Account Attivo",
+      "ACCOUNT_ACTIVE_DESC": "Abilita o disabilita l'accesso dell'utente al sistema",
+      "CANCEL": "Annulla",
+      "SAVING": "Salvataggio...",
+      "CREATING": "Creazione...",
+      "SAVE": "Salva",
+      "CREATE": "Crea",
+      "FILL_REQUIRED": "Per favore compila tutti i campi obbligatori"
+    }
+  },
+  "RESERVATIONS": {
+    "TITLE_ALL": "Tutte le Prenotazioni",
+    "TITLE_MY": "Le Mie Prenotazioni",
+    "DESC_ALL": "Visualizza e gestisci tutte le prenotazioni del sistema",
+    "DESC_MY": "Visualizza e gestisci le tue prenotazioni",
+    "REFRESH": "Aggiorna",
+    "REFRESHING": "Aggiornamento...",
+    "SEARCH_PLACEHOLDER": "Cerca utente, sala, postazione...",
+    "FILTER_ALL": "Tutti",
+    "FILTER_ACTIVE": "Attive",
+    "FILTER_EXPIRED": "Scadute",
+    "FILTER_CANCELLED": "Cancellate",
+    "EXPORT": "Esporta",
+    "NEW_RESERVATION": "Nuova Prenotazione",
+    "TABLE": {
+      "DATE": "Data",
+      "TIME": "Orario",
+      "USER": "Utente",
+      "ROOM": "Sala",
+      "WORKSPACE": "Postazione",
+      "STATUS": "Stato",
+      "ACTIONS": "Azioni",
+      "STATUS_CONFIRMED": "Confermata",
+      "STATUS_PENDING": "In Attesa",
+      "STATUS_DENIED": "Rifiutata",
+      "NO_RESERVATIONS": "Nessuna prenotazione trovata."
+    },
+    "PAGINATION": {
+      "SHOW": "Mostra:",
+      "ENTRIES_SHOWING": "elementi (Visualizzati",
+      "OF": "su",
+      "PREV": "Prec",
+      "NEXT": "Succ"
+    },
+    "EXPORT_MODAL": {
+      "TITLE": "Esporta Prenotazioni",
+      "CHOOSE_TYPE": "Scegli il tipo di esportazione:",
+      "HISTORICAL_SNAPSHOT": "Storico Prenotazioni",
+      "LAST_WEEK": "Ultima Settimana",
+      "LAST_WEEK_DESC": "Esporta le prenotazioni degli ultimi 7 giorni",
+      "LAST_MONTH": "Ultimo Mese",
+      "LAST_MONTH_DESC": "Esporta le prenotazioni degli ultimi 30 giorni",
+      "LAST_6_MONTHS": "Ultimi 6 Mesi",
+      "LAST_6_MONTHS_DESC": "Esporta le prenotazioni degli ultimi 6 mesi",
+      "FORMAL_ADMIN_REPORT": "Report Ufficiale Amministratore",
+      "DAILY_BACKEND_REPORT": "Report Giornaliero Backend",
+      "DAILY_BACKEND_REPORT_DESC": "Esportazione Excel ufficiale per una data specifica",
+      "SELECT_DATE": "Seleziona Data:",
+      "CANCEL": "Annulla",
+      "CONFIRM_EXPORT": "Conferma Esportazione",
+      "EXPORTING": "Esportazione in corso..."
+    },
+    "MESSAGES": {
+      "CONFIRM_DELETE_TITLE": "Conferma Eliminazione",
+      "CONFIRM_DELETE_MSG": "Sei sicuro di voler eliminare la prenotazione del {{date}}?",
+      "CONFIRM": "Elimina",
+      "CANCEL": "Annulla",
+      "ERROR_LOADING": "Impossibile caricare le prenotazioni",
+      "DELETE_SUCCESS": "Prenotazione eliminata con successo",
+      "DELETE_ERROR": "Errore durante l'eliminazione della prenotazione",
+      "EXPORT_DAILY_SUCCESS": "Report giornaliero esportato con successo",
+      "EXPORT_DAILY_ERROR": "Errore durante l'esportazione del report",
+      "EXPORT_SUCCESS": "File esportato con successo",
+      "SUCCESS": "Successo",
+      "ERROR": "Errore"
+    }
+  },
+  "STATS": {
+    "TITLE_ALL": "Statistiche di Sistema",
+    "TITLE_MY": "Le Tue Statistiche",
+    "DESC_ALL": "Panoramica completa delle prenotazioni del sistema",
+    "DESC_MY": "Panoramica delle tue prenotazioni",
+    "UPDATING": "Aggiornamento...",
+    "REFRESH": "Aggiorna",
+    "CARDS": {
+      "TOTAL_RESERVATIONS": "Prenotazioni Totali",
+      "TODAY": "Oggi",
+      "THIS_WEEK": "Questa Settimana",
+      "THIS_MONTH": "Questo Mese"
+    },
+    "QUICK_STATS": {
+      "MOST_POPULAR_ROOM": "Sala più Popolare",
+      "PREFERRED_TIME_SLOT": "Fascia Oraria Preferita",
+      "AVERAGE_DURATION": "Durata Media"
+    },
+    "CHARTS": {
+      "ROOM_UTILIZATION": "Utilizzo Sale",
+      "TIME_DISTRIBUTION": "Distribuzione Oraria",
+      "WEEKLY_TREND": "Andamento Settimanale",
+      "MONTHLY_TREND": "Andamento Mensile",
+      "NO_DATA": "Nessun dato disponibile"
+    },
+    "ADMIN": {
+      "ACTIVE_USERS": "Utenti Attivi",
+      "ROOMS_USED": "Sale Utilizzate",
+      "ACTIVE_TIME_SLOTS": "Fasce Orarie Attive",
+      "TODAYS_BOOKINGS": "Prenotazioni di Oggi"
+    },
+    "DAYS": {
+      "SUN": "Dom",
+      "MON": "Lun",
+      "TUE": "Mar",
+      "WED": "Mer",
+      "THU": "Gio",
+      "FRI": "Ven",
+      "SAT": "Sab"
+    },
+    "MONTHS": {
+      "JAN": "Gen",
+      "FEB": "Feb",
+      "MAR": "Mar",
+      "APR": "Apr",
+      "MAY": "Mag",
+      "JUN": "Giu",
+      "JUL": "Lug",
+      "AUG": "Ago",
+      "SEP": "Set",
+      "OCT": "Ott",
+      "NOV": "Nov",
+      "DEC": "Dic"
+    }
+  },
+  "BOOKING": {
+    "TITLE": "Nuova Prenotazione",
+    "STEP": "Step",
+    "STEPS": {
+      "DATE": "1. Seleziona una data",
+      "ROOM_TYPE": "2. Seleziona tipo sala",
+      "TIME": "3. Seleziona orario",
+      "WORKSPACE": "4. Seleziona una postazione dalla mappa"
+    },
+    "CALENDAR": {
+      "SELECT_DATE_HINT": "Seleziona una data dal calendario",
+      "SELECTED_DATE": "Data Selezionata"
+    },
+    "ROOM_TYPE": {
+      "SELECT_HINT": "Seleziona tipo sala"
+    },
+    "TIME": {
+      "SELECT_ROOM_FIRST": "Seleziona prima un tipo di sala",
+      "SELECT_DATE_FIRST": "Seleziona prima una data",
+      "DURATION": "Durata",
+      "SELECT_DURATION": "Seleziona durata",
+      "FULL_DAY": "Giornata Intera",
+      "DURATIONS": {
+        "4_ORE": "4 ore",
+        "2_ORE": "2 ore",
+        "1_ORA": "1 ora",
+        "30_MINUTI": "30 minuti"
+      }
+    },
+    "WORKSPACE": {
+      "MAP_INFO": "Completa i passaggi precedenti per vedere le postazioni disponibili.",
+      "SELECTED_INFO": "Postazione selezionata:",
+      "SELECT_FROM_MAP": "Clicca sulla mappa per scegliere una postazione",
+      "SELECTED": "Postazione Selezionata"
+    },
+    "ADMIN": {
+      "SELECT_USER": "Seleziona Utente (opzionale)",
+      "SEARCH_USER": "Cerca utente..."
+    },
+    "SUBMIT": {
+      "PROCESSING": "Elaborazione...",
+      "BOOK_NOW": "Prenota Ora"
+    },
+    "MY_RESERVATIONS": {
+      "TITLE": "Le Tue Prenotazioni",
+      "CANCEL_SELECTED": "Annulla",
+      "ALL": "Tutte",
+      "ACTIVE": "Attive",
+      "CANCELLED": "Cancellate"
+    },
+    "TABLE": {
+      "DATE": "Data",
+      "TIME": "Orario",
+      "ROOM": "Sala",
+      "WORKSPACE": "Postazione",
+      "STATUS": "Stato",
+      "ACTIONS": "Azioni",
+      "STATUS_CONFIRMED": "Confermata",
+      "STATUS_PENDING": "In Attesa",
+      "STATUS_DENIED": "Rifiutata",
+      "ACTION_CANCEL": "Annulla"
+    },
+    "MESSAGES": {
+      "LOADING_ERROR_TITLE": "Errore di Caricamento",
+      "LOADING_ERROR_DESC": "Impossibile caricare le informazioni sulle sale.",
+      "CREATE_SUCCESS_TITLE": "Confermata",
+      "CREATE_SUCCESS_DESC": "Prenotazione creata con successo",
+      "CREATE_ERROR_TITLE": "Errore",
+      "CREATE_ERROR_DESC": "Errore durante la creazione della prenotazione",
+      "CANCEL_SUCCESS": "Prenotazioni annullate",
+      "CANCEL_ERROR": "Errore durante l'annullamento delle prenotazioni",
+      "CONFIRM_CANCEL_TITLE": "Conferma Annullamento",
+      "CONFIRM_CANCEL_MSG": "Sei sicuro di voler annullare le prenotazioni selezionate?",
+      "CONFIRM": "Conferma",
+      "BACK": "Indietro"
+    },
+    "PLANIMETRIA": {
+      "LEGEND": {
+        "AVAILABLE": "Disponibile",
+        "UNAVAILABLE": "Non Disponibile",
+        "SELECTED": "Selezionata"
+      },
+      "ZOOM": {
+        "IN": "Ingrandisci",
+        "OUT": "Rimpicciolisci",
+        "RESET": "Reimposta Zoom"
+      },
+      "HINT": {
+        "NO_MARKERS": "Seleziona tipo sala, data e orario per vedere le postazioni disponibili sulla mappa.",
+        "DRAG_TO_MOVE": "Trascina per spostarti"
+      },
+      "TOOLTIP": {
+        "AVAILABLE": "Disponibile — clicca per selezionare",
+        "UNAVAILABLE": "Non Disponibile"
+      }
+    }
+  },
+  "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
+    "USERS": "Utenti",
+    "BOOKINGS": "Prenotazioni",
+    "BOOK_WORKSPACE": "Prenota Postazione",
+    "STATISTICS": "Statistiche",
+    "UPDATE_PROFILE": "Aggiorna Profilo",
+    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
+    "DISCONNECT": "Disconnetti",
+    "ROLE_ADMIN": "Amministratore",
+    "ROLE_USER": "Dipendente",
+    "UNKNOWN_ROLE": "Ruolo sconosciuto",
+    "EXPAND": "Espandi sidebar",
+    "COLLAPSE": "Comprimi sidebar"
+  },
+  "ACCOUNT": {
+    "TITLE": "Aggiorna Profilo",
+    "DESC": "Gestisci le tue informazioni personali e le impostazioni dell'account",
+    "BACK_TO_DASHBOARD": "Torna alla dashboard",
+    "RESET": "Reimposta",
+    "LOADING": "Caricamento profilo...",
+    "PERSONAL_INFO": {
+      "TITLE": "Informazioni Personali",
+      "DESC": "Aggiorna i tuoi dettagli personali",
+      "FIRST_NAME": "Nome",
+      "LAST_NAME": "Cognome",
+      "EMAIL": "Email",
+      "FIRST_NAME_HINT": "Inserisci il tuo nome",
+      "LAST_NAME_HINT": "Inserisci il tuo cognome",
+      "EMAIL_HINT": "email@esempio.it"
+    },
+    "PASSWORD": {
+      "TITLE": "Cambia Password",
+      "DESC": "Lascia questi campi vuoti se non desideri cambiare la password",
+      "CURRENT": "Password Attuale",
+      "CURRENT_HINT": "Inserisci la password attuale",
+      "NEW": "Nuova Password",
+      "NEW_HINT": "Inserisci la nuova password",
+      "CONFIRM": "Conferma Password",
+      "CONFIRM_HINT": "Conferma la nuova password",
+      "STRENGTH": "Robustezza",
+      "REQUIREMENTS": "Requisiti Password:",
+      "REQ_MIN_LENGTH": "Almeno 6 caratteri",
+      "REQ_UPPERCASE": "Almeno una lettera maiuscola",
+      "REQ_LOWERCASE": "Almeno una lettera minuscola",
+      "REQ_NUMBER": "Almeno un numero",
+      "STRENGTH_LEVELS": {
+        "WEAK": "Debole",
+        "FAIR": "Discreta",
+        "GOOD": "Buona",
+        "STRONG": "Forte"
+      }
+    },
+    "MESSAGES": {
+      "ERROR_TITLE": "Errore Aggiornamento",
+      "SUCCESS_TITLE": "Aggiornamento Completato",
+      "SUCCESS_DESC": "Le modifiche sono state salvate con successo",
+      "INVALID_DATE": "Data non valida"
+    },
+    "ACTIONS": {
+      "DELETE_ACCOUNT": "Elimina Account",
+      "SAVE_CHANGES": "Salva Modifiche"
+    },
+    "DELETE_MODAL": {
+      "TITLE": "Conferma Eliminazione Account",
+      "DESC": "Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile e tutti i tuoi dati saranno eliminati permanentemente.",
+      "CONFIRM": "Elimina Account",
+      "CANCEL": "Annulla"
+    },
+    "ERRORS": {
+      "REQUIRED": "Questo campo è obbligatorio",
+      "EMAIL_INVALID": "Inserisci un indirizzo email valido",
+      "MIN_LENGTH": "Deve essere di almeno 6 caratteri",
+      "PWD_MISMATCH": "Le password non corrispondono",
+      "CURRENT_PWD_REQ": "La password attuale è richiesta per impostarne una nuova"
+    }
+  },
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Accedi",
+      "SUBTITLE": "Inserisci le tue credenziali per accedere.",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "FORGOT_PASSWORD": "Password dimenticata?",
+      "SUBMIT": "Accedi",
+      "LOGGING_IN": "Accesso in corso...",
+      "NO_ACCOUNT": "Non hai un account?",
+      "REGISTER_LINK": "Registrati",
+      "ERROR_TITLE": "Errore di accesso",
+      "ERRORS": {
+        "EMAIL_REQUIRED": "L'email è obbligatoria.",
+        "EMAIL_INVALID": "Inserisci un'email valida.",
+        "PWD_REQUIRED": "La password è obbligatoria."
+      }
+    },
+    "REGISTER": {
+      "TITLE": "Crea il tuo account",
+      "SUBTITLE": "Compila il modulo per registrarti.",
+      "FIRST_NAME": "Nome",
+      "LAST_NAME": "Cognome",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "CONFIRM_PASSWORD": "Conferma password",
+      "SUBMIT": "Registrati",
+      "REGISTERING": "Registrazione...",
+      "ALREADY_HAVE_ACCOUNT": "Hai già un account?",
+      "LOGIN_LINK": "Accedi",
+      "ERRORS": {
+        "NAME_REQUIRED": "Il nome è obbligatorio.",
+        "LAST_NAME_REQUIRED": "Il cognome è obbligatorio.",
+        "EMAIL_REQUIRED": "L'email è obbligatoria.",
+        "EMAIL_INVALID": "Inserisci un'email valida.",
+        "PWD_REQUIRED": "La password è obbligatoria.",
+        "PWD_MIN_LENGTH": "La password deve essere di almeno 6 caratteri.",
+        "PWD_PATTERN": "La password deve contenere una maiuscola, una minuscola e un numero.",
+        "CONFIRM_PWD_REQUIRED": "Conferma la tua password.",
+        "PWD_MISMATCH": "Le password non coincidono.",
+        "GENERIC_ERROR": "Errore durante la registrazione. Riprova più tardi.",
+        "EMAIL_EXISTS": "Questa email è già registrata.",
+        "EMAIL_EXISTS_DESC": "Questa email è già registrata. Per favore, utilizza un'altra email o accedi."
+      },
+      "SUCCESS_TITLE": "Registrazione Completata",
+      "SUCCESS_DESC": "Il tuo account è stato creato con successo! Ora è in attesa di approvazione da parte dell'amministratore. Riceverai l'abilitazione a breve."
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Recupero Password",
+      "SUBTITLE": "Inserisci l'email associata al tuo account per ricevere il link di reimpostazione.",
+      "EMAIL_PLACEHOLDER": "nome.cognome@exprivia.com",
+      "SUBMIT": "Invia Email",
+      "SENDING": "Invio in corso...",
+      "ERRORS": {
+        "EMAIL_INVALID": "Inserisci una mail valida",
+        "EMAIL_NOT_FOUND": "Email non valida",
+        "GENERIC_ERROR": "Errore durante l'invio della richiesta"
+      },
+      "SUCCESS_MSG": "Controlla la tua email per reimpostare la password."
+    },
+    "RESET_PASSWORD": {
+      "TITLE": "Conferma Password",
+      "SUBTITLE": "Procedi con il cambio password.",
+      "NEW_PASSWORD": "Nuova Password",
+      "NEW_PASSWORD_PLACEHOLDER": "Inserisci la nuova password",
+      "CONFIRM_PASSWORD": "Conferma Password",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Ripeti la nuova password",
+      "SUBMIT": "Cambia Password",
+      "ERRORS": {
+        "PWD_REQUIRED": "Password richiesta",
+        "PWD_MIN_LENGTH": "La password deve essere di almeno 6 caratteri",
+        "PWD_PATTERN": "La password deve contenere una maiuscola, una minuscola e un numero",
+        "CONFIRM_PWD_REQUIRED": "Conferma password richiesta",
+        "PWD_MISMATCH": "Le password non coincidono",
+        "GENERIC_ERROR": "Errore durante il cambio password",
+        "TOKEN_MISSING": "Token mancante. Richiedi un nuovo link di reset.",
+        "INVALID_PASSWORD": "Password non valida"
+      },
+      "SUCCESS_MSG": "Password cambiata con successo!"
+    },
+    "COMMON": {
+      "SHOW_PWD": "Mostra password",
+      "HIDE_PWD": "Nascondi password"
     }
   }
 }

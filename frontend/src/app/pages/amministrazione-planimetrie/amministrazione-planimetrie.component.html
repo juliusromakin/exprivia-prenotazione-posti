@@ -21,10 +21,10 @@
                 <div>
                     <h1 id="admin-planimetrie-title"
                         class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                        Gestione Planimetrie
+                        {{ 'PLANIMETRIA_EDITOR.TITLE' | translate }}
                     </h1>
                     <p class="text-white/60 text-sm mt-1">
-                        Seleziona la sede, poi modifica o carica la planimetria.
+                        {{ 'PLANIMETRIA_EDITOR.SUBTITLE' | translate }}
                     </p>
                 </div>
 
@@ -36,7 +36,7 @@
                                    focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)]
                                    transition-colors cursor-pointer appearance-none
                                    disabled:opacity-50 disabled:cursor-not-allowed">
-                            <option value="" disabled selected class="text-gray-900">Seleziona sede...</option>
+                            <option value="" disabled selected class="text-gray-900">{{ 'PLANIMETRIA_EDITOR.SELECT_SEDE' | translate }}</option>
                             <option *ngFor="let sede of sedi" [value]="sede" class="text-gray-900">{{ sede }}</option>
                         </select>
                         <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -45,14 +45,14 @@
                     </div>
 
                     <!-- Conferma -->
-                    <app-button *ngIf="!isConfirmed" label="Conferma" type="primary" size="md" icon="fas fa-check"
+                    <app-button *ngIf="!isConfirmed" [label]="'PLANIMETRIA_EDITOR.CONFIRM' | translate" type="primary" size="md" icon="fas fa-check"
                         iconPosition="right" [disabled]="!selectedSede" (click)="onConfirm()"
-                        aria-label="Conferma selezione sede">
+                        [ariaLabel]="'PLANIMETRIA_EDITOR.CONFIRM' | translate">
                     </app-button>
 
                     <!-- Cambia Sede -->
-                    <app-button *ngIf="isConfirmed" label="Cambia Sede" type="ghost" size="md"
-                        icon="fas fa-exchange-alt" (click)="resetSede()" aria-label="Cambia sede">
+                    <app-button *ngIf="isConfirmed" [label]="'PLANIMETRIA_EDITOR.CHANGE_SEDE' | translate" type="ghost" size="md"
+                        icon="fas fa-exchange-alt" (click)="resetSede()" [ariaLabel]="'PLANIMETRIA_EDITOR.CHANGE_SEDE' | translate">
                     </app-button>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                     class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex flex-wrap items-center gap-2">
 
                     <!-- Label sezione modalità -->
-                    <span class="text-white/50 text-xs font-semibold uppercase tracking-widest">Modalità</span>
+                    <span class="text-white/50 text-xs font-semibold uppercase tracking-widest">{{ 'PLANIMETRIA_EDITOR.MODES.LABEL' | translate }}</span>
                     <div class="h-5 w-px bg-white/20"></div>
 
                     <!-- Pulsante SELECT -->
@@ -73,9 +73,9 @@
                         [class]="currentMode === 'SELECT'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--color-expriviaOrange)] text-white shadow-md transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
-                        aria-label="Modalità selezione">
+                        [attr.aria-label]="'PLANIMETRIA_EDITOR.MODES.SELECT' | translate">
                         <i class="fas fa-mouse-pointer"></i>
-                        <span>Seleziona</span>
+                        <span>{{ 'PLANIMETRIA_EDITOR.MODES.SELECT' | translate }}</span>
                     </button>
 
                     <!-- Pulsante ROOM -->
@@ -83,10 +83,10 @@
                         [class]="currentMode === 'ROOM'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-400 text-white shadow-md ring-2 ring-orange-300/50 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
-                        aria-label="Modalità disegno stanza">
+                        [attr.aria-label]="'PLANIMETRIA_EDITOR.MODES.CREATE_ROOM' | translate">
                         <i class="fas fa-plus-square"></i>
-                        <span>Crea Stanza</span>
-                        <span *ngIf="currentMode === 'ROOM'" class="text-white/70 font-normal">(trascina)</span>
+                        <span>{{ 'PLANIMETRIA_EDITOR.MODES.CREATE_ROOM' | translate }}</span>
+                        <span *ngIf="currentMode === 'ROOM'" class="text-white/70 font-normal">({{ 'PLANIMETRIA_EDITOR.MODES.DRAG_HINT' | translate }})</span>
                     </button>
 
                     <!-- Pulsante DESK -->
@@ -94,14 +94,14 @@
                         [class]="currentMode === 'DESK'
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-500 text-white shadow-md ring-2 ring-blue-400/50 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
-                        aria-label="Modalità posizionamento postazione">
+                        [attr.aria-label]="'PLANIMETRIA_EDITOR.MODES.CREATE_DESK' | translate">
                         <i class="fas fa-plus-circle"></i>
-                        <span>Crea Postazione</span>
-                        <span *ngIf="currentMode === 'DESK'" class="text-white/70 font-normal">(click)</span>
+                        <span>{{ 'PLANIMETRIA_EDITOR.MODES.CREATE_DESK' | translate }}</span>
+                        <span *ngIf="currentMode === 'DESK'" class="text-white/70 font-normal">({{ 'PLANIMETRIA_EDITOR.MODES.CLICK_HINT' | translate }})</span>
                     </button>
 
                     <div class="h-5 w-px bg-white/20 mx-1"></div>
-                    <span class="text-white/50 text-xs font-semibold uppercase tracking-widest">Azioni</span>
+                    <span class="text-white/50 text-xs font-semibold uppercase tracking-widest">{{ 'PLANIMETRIA_EDITOR.ACTIONS.LABEL' | translate }}</span>
                     <div class="h-5 w-px bg-white/20"></div>
 
                     <!-- Salva -->
@@ -109,31 +109,28 @@
                         [class]="isSaving
                             ? 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 text-white/30 cursor-not-allowed border border-white/10 transition-all'
                             : 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70 hover:bg-white/20 border border-white/10 transition-all'"
-                        aria-label="Salva dati planimetria">
+                        [attr.aria-label]="'PLANIMETRIA_EDITOR.ACTIONS.SAVE' | translate">
                         <i *ngIf="!isSaving" class="fas fa-save"></i>
                         <i *ngIf="isSaving" class="fas fa-spinner fa-spin"></i>
-                        <span>{{ isSaving ? 'Salvataggio...' : 'Salva' }}</span>
+                        <span>{{ isSaving ? ('PLANIMETRIA_EDITOR.ACTIONS.SAVING' | translate) : ('PLANIMETRIA_EDITOR.ACTIONS.SAVE' | translate) }}</span>
                     </button>
 
                     <!-- Carica File -->
-                    <app-button label="Carica Planimetria" type="ghost" size="sm" icon="fas fa-upload"
-                        (click)="fileInput.click()" aria-label="Carica file planimetria">
+                    <app-button [label]="'PLANIMETRIA_EDITOR.ACTIONS.UPLOAD' | translate" type="ghost" size="sm" icon="fas fa-upload"
+                        (click)="fileInput.click()" [ariaLabel]="'PLANIMETRIA_EDITOR.ACTIONS.UPLOAD' | translate">
                     </app-button>
 
                     <input type="file" #fileInput (change)="onFileSelected($event)" accept=".png" class="hidden" />
 
                     <!-- Suggerimenti contestuali -->
                     <div class="ml-auto flex items-center gap-4 text-white/40 text-xs">
-                        <span><i class="fas fa-search-plus mr-1"></i>Scroll = Zoom</span>
+                        <span><i class="fas fa-search-plus mr-1"></i>{{ 'PLANIMETRIA_EDITOR.HINTS.ZOOM' | translate }}</span>
                         <ng-container [ngSwitch]="currentMode">
-                            <span *ngSwitchCase="'SELECT'"><i class="fas fa-hand-paper mr-1"></i>Drag sfondo =
-                                Pan</span>
-                            <span *ngSwitchCase="'ROOM'"><i class="fas fa-expand-arrows-alt mr-1"></i>Trascina sul
-                                canvas</span>
-                            <span *ngSwitchCase="'DESK'"><i class="fas fa-mouse-pointer mr-1"></i>Click per
-                                piazzare</span>
+                            <span *ngSwitchCase="'SELECT'"><i class="fas fa-hand-paper mr-1"></i>{{ 'PLANIMETRIA_EDITOR.HINTS.PAN' | translate }}</span>
+                            <span *ngSwitchCase="'ROOM'"><i class="fas fa-expand-arrows-alt mr-1"></i>{{ 'PLANIMETRIA_EDITOR.HINTS.DRAG_CANVAS' | translate }}</span>
+                            <span *ngSwitchCase="'DESK'"><i class="fas fa-mouse-pointer mr-1"></i>{{ 'PLANIMETRIA_EDITOR.HINTS.CLICK_PLACE' | translate }}</span>
                         </ng-container>
-                        <span><i class="fas fa-trash mr-1"></i>Canc = Elimina</span>
+                        <span><i class="fas fa-trash mr-1"></i>{{ 'PLANIMETRIA_EDITOR.HINTS.DELETE' | translate }}</span>
                     </div>
                 </div>
 
@@ -142,18 +139,18 @@
                     <div [ngSwitch]="currentMode">
                         <span *ngSwitchCase="'SELECT'"
                             class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/70 border border-white/10">
-                            <i class="fas fa-mouse-pointer"></i> Modalità: Selezione & Pan
+                            <i class="fas fa-mouse-pointer"></i> {{ 'PLANIMETRIA_EDITOR.MODES.LABEL' | translate }}: {{ 'PLANIMETRIA_EDITOR.MODES.SELECT_HINT' | translate }}
                         </span>
                         <span *ngSwitchCase="'ROOM'"
                             class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-400/20 text-orange-300 border border-orange-400/30">
-                            <i class="fas fa-vector-square"></i> Modalità: Disegno Stanza — trascina per creare
+                            <i class="fas fa-vector-square"></i> {{ 'PLANIMETRIA_EDITOR.MODES.LABEL' | translate }}: {{ 'PLANIMETRIA_EDITOR.MODES.CREATE_ROOM_HINT' | translate }}
                         </span>
                         <span *ngSwitchCase="'DESK'"
                             class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                            <i class="fas fa-circle"></i> Modalità: Posiziona Postazione — clicca per inserire
+                            <i class="fas fa-circle"></i> {{ 'PLANIMETRIA_EDITOR.MODES.LABEL' | translate }}: {{ 'PLANIMETRIA_EDITOR.MODES.CREATE_DESK_HINT' | translate }}
                         </span>
                     </div>
-                    <span class="text-white/30 text-xs">Griglia: 10px</span>
+                    <span class="text-white/30 text-xs">{{ 'PLANIMETRIA_EDITOR.HINTS.GRID' | translate }}</span>
                 </div>
 
                 <!-- ── AREA MAPPA ── -->
@@ -169,8 +166,8 @@
                                     group-hover:bg-[var(--color-expriviaOrange)]/40 transition-colors">
                             <i class="fas fa-plus text-4xl text-[var(--color-expriviaOrange)]"></i>
                         </div>
-                        <p class="text-white font-medium text-lg">Clicca per caricare una planimetria</p>
-                        <p class="text-white/50 text-sm">Supporta file .png</p>
+                        <p class="text-white font-medium text-lg">{{ 'PLANIMETRIA_EDITOR.PLACEHOLDER.UPLOAD_BTN' | translate }}</p>
+                        <p class="text-white/50 text-sm">{{ 'PLANIMETRIA_EDITOR.PLACEHOLDER.SUPPORTED_FILES' | translate }}</p>
                     </div>
 
                     <!-- Canvas Fabric.js -->
@@ -185,7 +182,7 @@
             <div *ngIf="!isConfirmed" class="bg-white/5 border border-dashed border-white/20 rounded-xl
                         flex flex-col items-center justify-center py-24 gap-4" @scaleIn>
                 <i class="fas fa-map-marked-alt text-5xl text-white/20"></i>
-                <p class="text-white/40 text-base font-medium">Seleziona e conferma una sede per iniziare</p>
+                <p class="text-white/40 text-base font-medium">{{ 'PLANIMETRIA_EDITOR.PLACEHOLDER.INITIAL_HINT' | translate }}</p>
             </div>
 
         </div>
@@ -198,31 +195,32 @@
         <!-- Modal Content -->
         <div class="relative bg-expriviaBlue border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
             @scaleIn>
-            <h3 class="text-xl font-bold text-white mb-4">Nuova Stanza</h3>
+            <h3 class="text-xl font-bold text-white mb-4">{{ 'PLANIMETRIA_EDITOR.MODAL.TITLE' | translate }}</h3>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Nome Stanza</label>
+                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">{{ 'PLANIMETRIA_EDITOR.MODAL.ROOM_NAME' | translate }}</label>
                     <input type="text" [(ngModel)]="newRoomName"
                         class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all"
-                        placeholder="Es. Stanza A1">
+                        [placeholder]="'PLANIMETRIA_EDITOR.MODAL.NAME_PLACEHOLDER' | translate">
                 </div>
 
                 <div>
-                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">Tipo Stanza</label>
+                    <label class="block text-white/60 text-xs font-semibold uppercase mb-1.5">{{ 'PLANIMETRIA_EDITOR.MODAL.ROOM_TYPE' | translate }}</label>
                     <select [(ngModel)]="newRoomType"
                         class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-expriviaOrange transition-all cursor-pointer">
-                        <option value="MEETING_ROOM" class="bg-expriviaBlue">Sala Riunioni</option>
-                        <option value="OFFICE" class="bg-expriviaBlue">Ufficio</option>
+                        <option value="MEETING_ROOM" class="bg-expriviaBlue">{{ 'PLANIMETRIA_EDITOR.MODAL.TYPE_MEETING' | translate }}</option>
+                        <option value="OFFICE" class="bg-expriviaBlue">{{ 'PLANIMETRIA_EDITOR.MODAL.TYPE_OFFICE' | translate }}</option>
                     </select>
                 </div>
             </div>
 
             <div class="flex gap-3 mt-8">
-                <app-button label="Annulla" type="ghost" size="md" class="flex-1" (click)="cancelRoomCreation()">
+                <app-button [label]="'PLANIMETRIA_EDITOR.MODAL.CANCEL' | translate" type="ghost" size="md" class="flex-1" (click)="cancelRoomCreation()"
+                    [ariaLabel]="'PLANIMETRIA_EDITOR.MODAL.CANCEL' | translate">
                 </app-button>
-                <app-button label="Crea" type="primary" size="md" class="flex-1" [disabled]="!newRoomName"
-                    (click)="confirmRoomCreation()">
+                <app-button [label]="'PLANIMETRIA_EDITOR.MODAL.CREATE' | translate" type="primary" size="md" class="flex-1" [disabled]="!newRoomName"
+                    (click)="confirmRoomCreation()" [ariaLabel]="'PLANIMETRIA_EDITOR.MODAL.CREATE' | translate">
                 </app-button>
             </div>
         </div>

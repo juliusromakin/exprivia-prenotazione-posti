@@ -1,4 +1,7 @@
 {
+  "FOOTER": {
+    "RIGHTS_RESERVED": "All rights reserved."
+  },
   "HEADER": {
     "TITLE": "Workspace Reservation",
     "LOGIN": "Login",
@@ -35,5 +38,561 @@
       "BULLET_2": "Shared spaces"
     }
   },
-  "DASHBOARD": {}
+  "DASHBOARD": {
+    "WELCOME_ADMIN": "Welcome",
+    "ADMIN_TITLE": "Admin Dashboard",
+    "ADMIN_DESC": "Complete overview of the booking system",
+    "NEW_RESERVATION": "New Reservation",
+    "NEW_RESERVATION_DESC": "Create personal bookings or for other users",
+    "MANAGE_RESERVATIONS": "Manage Reservations",
+    "MANAGE_RESERVATIONS_DESC": "View and manage all system reservations",
+    "USER_MANAGEMENT": "User Management",
+    "USER_MANAGEMENT_DESC": "Administer users, roles and system permissions",
+    "STATISTICS": "Advanced Statistics",
+    "STATISTICS_DESC": "View detailed reports and analysis of the booking system",
+    "PLANIMETRIA_MANAGEMENT": "Plan Management",
+    "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans"
+  },
+  "ADMIN_HOME": {
+    "HERO_TITLE": "Manage your workspace",
+    "HERO_DESC": "Administrative control panel to manage bookings and office plans centrally.",
+    "GO_TO_DASHBOARD": "Go to Dashboard",
+    "MANAGE_PLANS": "Manage Floor Plans",
+    "TOOLS_TITLE": "Administration Tools",
+    "TOOLS_DESC": "Everything you need to manage and optimize corporate workspaces",
+    "CARDS": {
+      "BOOKINGS_TITLE": "Booking Management",
+      "BOOKINGS_DESC": "View, edit and manage all user bookings centrally.",
+      "BOOKINGS_FEAT_1": "Full booking view",
+      "BOOKINGS_FEAT_2": "Approvals and cancellations",
+      "PLANS_TITLE": "Plan Management",
+      "PLANS_DESC": "Intuitively configure and update office floor plans, managing workstations and meeting rooms.",
+      "PLANS_FEAT_1": "Interactive plan editor",
+      "PLANS_FEAT_2": "Workstation management"
+    }
+  },
+  "PLANIMETRIA_EDITOR": {
+    "TITLE": "Plan Management",
+    "SUBTITLE": "Select the location, then edit or upload the plan.",
+    "SELECT_SEDE": "Select location...",
+    "CONFIRM": "Confirm",
+    "CHANGE_SEDE": "Change Location",
+    "MODES": {
+      "LABEL": "Mode",
+      "SELECT": "Select",
+      "SELECT_HINT": "Selection & Pan",
+      "CREATE_ROOM": "Create Room",
+      "CREATE_ROOM_HINT": "Draw Room — drag to create",
+      "CREATE_DESK": "Create Workstation",
+      "CREATE_DESK_HINT": "Place Workstation — click to insert",
+      "DRAG_HINT": "drag",
+      "CLICK_HINT": "click"
+    },
+    "ACTIONS": {
+      "LABEL": "Actions",
+      "SAVE": "Save",
+      "SAVING": "Saving...",
+      "UPLOAD": "Upload Plan"
+    },
+    "HINTS": {
+      "ZOOM": "Scroll = Zoom",
+      "PAN": "Drag background = Pan",
+      "DRAG_CANVAS": "Drag on canvas",
+      "CLICK_PLACE": "Click to place",
+      "DELETE": "Del = Delete",
+      "GRID": "Grid: 10px"
+    },
+    "PLACEHOLDER": {
+      "UPLOAD_BTN": "Click to upload a plan",
+      "SUPPORTED_FILES": "Supports .png files",
+      "INITIAL_HINT": "Select and confirm a location to start"
+    },
+    "MODAL": {
+      "TITLE": "New Room",
+      "ROOM_NAME": "Room Name",
+      "NAME_PLACEHOLDER": "e.g. Room A1",
+      "ROOM_TYPE": "Room Type",
+      "TYPE_MEETING": "Meeting Room",
+      "TYPE_OFFICE": "Office",
+      "CANCEL": "Cancel",
+      "CREATE": "Create"
+    },
+    "ALERTS": {
+      "DESK_ID_PROMPT": "Workstation ID:",
+      "NO_ELEMENTS": "No elements to save on canvas.",
+      "EMPTY_ROOMS_WARNING": " Attention: the following rooms have no workstations:\n{rooms}\n\nAdd at least one workstation for each room before saving.",
+      "SAVE_SUCCESS": " Save completed!\n• {roomsCount} room(s) saved\n• {desksCount} workstation(s) saved",
+      "SAVE_ERROR": " Error during save:\n{error}"
+    }
+  },
+  "USER_MANAGEMENT": {
+    "TITLE": "User Management",
+    "DESC": "Manage system users and their roles",
+    "REFRESH": "Refresh",
+    "REFRESHING": "Refreshing...",
+    "TOTAL_USERS": "Total Users",
+    "ADMINISTRATORS": "Administrators",
+    "EMPLOYEES": "Employees",
+    "PENDING_ACTIVATION": "Pending Activation",
+    "SEARCH_PLACEHOLDER": "Search by name, email...",
+    "FILTER_ALL": "All",
+    "NEW_USER": "New User",
+    "TABLE": {
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "STATUS": "Status",
+      "ROLE": "Role",
+      "ACTIONS": "Actions",
+      "STATUS_ACTIVE": "Active",
+      "STATUS_INACTIVE": "Inactive",
+      "ROLE_ADMIN": "Administrator",
+      "ROLE_EMPLOYEE": "Employee",
+      "ACTIVATE_USER_TITLE": "Activate User",
+      "ACTION_EDIT": "Edit",
+      "ACTION_DELETE": "Delete",
+      "NO_USERS_FOUND": "No users found"
+    },
+    "PAGINATION": {
+      "SHOW": "Show:",
+      "ITEMS_PER_PAGE": "items per page",
+      "SHOWING_START": "Showing",
+      "SHOWING_OF": "of",
+      "SHOWING_RESULTS": "results"
+    },
+    "MESSAGES": {
+      "CONFIRM_DELETE_TITLE": "Confirm User Deletion",
+      "CONFIRM_DELETE_MSG1": "Are you sure you want to delete the user {{name}} {{lastName}}?",
+      "CONFIRM_DELETE_NAME": "Name: {{name}} {{lastName}}",
+      "CONFIRM_DELETE_EMAIL": "Email: {{email}}",
+      "CONFIRM_DELETE_ROLE": "Role: {{role}}",
+      "CONFIRM_DELETE_UNDONE": "This action cannot be undone.",
+      "CONFIRM": "Delete",
+      "CANCEL": "Cancel",
+      "USER_ACTIVATED_TITLE": "User Activated",
+      "USER_ACTIVATED_DESC": "The account of {{name}} is now active.",
+      "ACTIVATION_ERROR_TITLE": "Error",
+      "ACTIVATION_ERROR_DESC": "Unable to activate the user.",
+      "USER_UPDATED": "User Updated",
+      "USER_UPDATED_DESC": "User updated successfully",
+      "USER_CREATED": "User Created",
+      "USER_CREATED_DESC": "User created successfully",
+      "OPERATION_ERROR": "Operation Error",
+      "UPDATE_ERROR": "Error updating user",
+      "CREATE_ERROR": "Error creating user",
+      "USER_DELETED": "User Deleted",
+      "USER_DELETED_DESC": "User deleted successfully",
+      "DELETE_ERROR": "Deletion Error",
+      "DELETE_ERROR_DESC": "Error deleting user",
+      "LOADING_ERROR": "Loading Error",
+      "LOADING_ERROR_DESC": "Error loading users"
+    },
+    "FORM": {
+      "FIRST_NAME": "First Name",
+      "ENTER_FIRST_NAME": "Enter first name",
+      "FIRST_NAME_REQ": "First name is required",
+      "LAST_NAME": "Last Name",
+      "ENTER_LAST_NAME": "Enter last name",
+      "LAST_NAME_REQ": "Last name is required",
+      "EMAIL": "Email",
+      "ENTER_EMAIL": "Enter email address",
+      "EMAIL_REQ": "Email is required",
+      "EMAIL_INVALID": "Enter a valid email address",
+      "PASSWORD": "Password",
+      "ENTER_PASSWORD": "Enter password",
+      "PASSWORD_REQ": "Password is required",
+      "PASSWORD_MIN": "Password must be at least 6 characters",
+      "ROLE_ASSIGN": "Role and Permission Assignment",
+      "ROLE_REQ": "Select at least one role to proceed",
+      "ACCOUNT_ACTIVE": "Account Active",
+      "ACCOUNT_ACTIVE_DESC": "Enable or disable user access to the system",
+      "CANCEL": "Cancel",
+      "SAVING": "Saving...",
+      "CREATING": "Creating...",
+      "SAVE": "Save",
+      "CREATE": "Create",
+      "FILL_REQUIRED": "Please fill all required fields"
+    }
+  },
+  "RESERVATIONS": {
+    "TITLE_ALL": "All Reservations",
+    "TITLE_MY": "My Reservations",
+    "DESC_ALL": "View and manage all system reservations",
+    "DESC_MY": "View and manage your reservations",
+    "REFRESH": "Refresh",
+    "REFRESHING": "Refreshing...",
+    "SEARCH_PLACEHOLDER": "Search user, room, workspace...",
+    "FILTER_ALL": "All",
+    "FILTER_ACTIVE": "Active",
+    "FILTER_EXPIRED": "Expired",
+    "FILTER_CANCELLED": "Cancelled",
+    "EXPORT": "Export",
+    "NEW_RESERVATION": "New Reservation",
+    "TABLE": {
+      "DATE": "Date",
+      "TIME": "Time",
+      "USER": "User",
+      "ROOM": "Room",
+      "WORKSPACE": "Workspace",
+      "STATUS": "Status",
+      "ACTIONS": "Actions",
+      "STATUS_CONFIRMED": "Confirmed",
+      "STATUS_PENDING": "Pending",
+      "STATUS_DENIED": "Denied",
+      "NO_RESERVATIONS": "No reservations found."
+    },
+    "PAGINATION": {
+      "SHOW": "Show:",
+      "ENTRIES_SHOWING": "entries (Showing",
+      "OF": "of",
+      "PREV": "Prev",
+      "NEXT": "Next"
+    },
+    "EXPORT_MODAL": {
+      "TITLE": "Export Reservations",
+      "CHOOSE_TYPE": "Choose export type:",
+      "HISTORICAL_SNAPSHOT": "Historical Snapshot",
+      "LAST_WEEK": "Last Week",
+      "LAST_WEEK_DESC": "Export reservations from the last 7 days",
+      "LAST_MONTH": "Last Month",
+      "LAST_MONTH_DESC": "Export reservations from the last 30 days",
+      "LAST_6_MONTHS": "Last 6 Months",
+      "LAST_6_MONTHS_DESC": "Export reservations from the last 6 months",
+      "FORMAL_ADMIN_REPORT": "Formal Admin Report",
+      "DAILY_BACKEND_REPORT": "Daily Backend Report",
+      "DAILY_BACKEND_REPORT_DESC": "Official Excel export for a specific date",
+      "SELECT_DATE": "Select Date:",
+      "CANCEL": "Cancel",
+      "CONFIRM_EXPORT": "Confirm Export",
+      "EXPORTING": "Exporting..."
+    },
+    "MESSAGES": {
+      "CONFIRM_DELETE_TITLE": "Confirm Deletion",
+      "CONFIRM_DELETE_MSG": "Are you sure you want to delete the reservation for {{date}}?",
+      "CONFIRM": "Delete",
+      "CANCEL": "Cancel",
+      "ERROR_LOADING": "Unable to load reservations",
+      "DELETE_SUCCESS": "Reservation deleted successfully",
+      "DELETE_ERROR": "Failed to delete reservation",
+      "EXPORT_DAILY_SUCCESS": "Daily report exported successfully",
+      "EXPORT_DAILY_ERROR": "Failed to export daily report",
+      "EXPORT_SUCCESS": "File exported successfully",
+      "SUCCESS": "Success",
+      "ERROR": "Error"
+    }
+  },
+  "STATS": {
+    "TITLE_ALL": "System Statistics",
+    "TITLE_MY": "Your Statistics",
+    "DESC_ALL": "Complete overview of system reservations",
+    "DESC_MY": "Overview of your reservations",
+    "UPDATING": "Updating...",
+    "REFRESH": "Refresh",
+    "CARDS": {
+      "TOTAL_RESERVATIONS": "Total Reservations",
+      "TODAY": "Today",
+      "THIS_WEEK": "This Week",
+      "THIS_MONTH": "This Month"
+    },
+    "QUICK_STATS": {
+      "MOST_POPULAR_ROOM": "Most Popular Room",
+      "PREFERRED_TIME_SLOT": "Preferred Time Slot",
+      "AVERAGE_DURATION": "Average Duration"
+    },
+    "CHARTS": {
+      "ROOM_UTILIZATION": "Room Utilization",
+      "TIME_DISTRIBUTION": "Time Distribution",
+      "WEEKLY_TREND": "Weekly Trend",
+      "MONTHLY_TREND": "Monthly Trend",
+      "NO_DATA": "No data available"
+    },
+    "ADMIN": {
+      "ACTIVE_USERS": "Active Users",
+      "ROOMS_USED": "Rooms Used",
+      "ACTIVE_TIME_SLOTS": "Active Time Slots",
+      "TODAYS_BOOKINGS": "Today's Bookings"
+    },
+    "DAYS": {
+      "SUN": "Sun",
+      "MON": "Mon",
+      "TUE": "Tue",
+      "WED": "Wed",
+      "THU": "Thu",
+      "FRI": "Fri",
+      "SAT": "Sat"
+    },
+    "MONTHS": {
+      "JAN": "Jan",
+      "FEB": "Feb",
+      "MAR": "Mar",
+      "APR": "Apr",
+      "MAY": "May",
+      "JUN": "Jun",
+      "JUL": "Jul",
+      "AUG": "Aug",
+      "SEP": "Sep",
+      "OCT": "Oct",
+      "NOV": "Nov",
+      "DEC": "Dec"
+    }
+  },
+  "BOOKING": {
+    "TITLE": "New Reservation",
+    "STEP": "Step",
+    "STEPS": {
+      "DATE": "1. Select a date",
+      "ROOM_TYPE": "2. Select Room Type",
+      "TIME": "3. Select Time",
+      "WORKSPACE": "4. Select a workspace from the map"
+    },
+    "CALENDAR": {
+      "SELECT_DATE_HINT": "Select a date from the calendar",
+      "SELECTED_DATE": "Selected Date"
+    },
+    "ROOM_TYPE": {
+      "SELECT_HINT": "Select room type"
+    },
+    "TIME": {
+      "SELECT_ROOM_FIRST": "Select a room type first",
+      "SELECT_DATE_FIRST": "Select a date first",
+      "DURATION": "Duration",
+      "SELECT_DURATION": "Select duration",
+      "FULL_DAY": "Full Day",
+      "DURATIONS": {
+        "4_ORE": "4 hours",
+        "2_ORE": "2 hours",
+        "1_ORA": "1 hour",
+        "30_MINUTI": "30 minutes"
+      }
+    },
+    "WORKSPACE": {
+      "MAP_INFO": "Complete previous steps to see available workspaces.",
+      "SELECTED_INFO": "Selected workspace:",
+      "SELECT_FROM_MAP": "Click on the map to choose a workspace",
+      "SELECTED": "Selected Workspace"
+    },
+    "ADMIN": {
+      "SELECT_USER": "Select User (optional)",
+      "SEARCH_USER": "Search user..."
+    },
+    "SUBMIT": {
+      "PROCESSING": "Processing...",
+      "BOOK_NOW": "Book Now"
+    },
+    "MY_RESERVATIONS": {
+      "TITLE": "Your Reservations",
+      "CANCEL_SELECTED": "Cancel",
+      "ALL": "All",
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled"
+    },
+    "TABLE": {
+      "DATE": "Date",
+      "TIME": "Time",
+      "ROOM": "Room",
+      "WORKSPACE": "Workspace",
+      "STATUS": "Status",
+      "ACTIONS": "Actions",
+      "STATUS_CONFIRMED": "Confirmed",
+      "STATUS_PENDING": "Pending",
+      "STATUS_DENIED": "Denied",
+      "ACTION_CANCEL": "Cancel"
+    },
+    "MESSAGES": {
+      "LOADING_ERROR_TITLE": "Loading Error",
+      "LOADING_ERROR_DESC": "Unable to load room information.",
+      "CREATE_SUCCESS_TITLE": "Confirmed",
+      "CREATE_SUCCESS_DESC": "Reservation created successfully",
+      "CREATE_ERROR_TITLE": "Error",
+      "CREATE_ERROR_DESC": "Failed to create reservation",
+      "CANCEL_SUCCESS": "Reservations cancelled",
+      "CANCEL_ERROR": "Failed to cancel reservations",
+      "CONFIRM_CANCEL_TITLE": "Confirm Cancellation",
+      "CONFIRM_CANCEL_MSG": "Are you sure you want to cancel the selected reservations?",
+      "CONFIRM": "Confirm",
+      "BACK": "Back"
+    },
+    "PLANIMETRIA": {
+      "LEGEND": {
+        "AVAILABLE": "Available",
+        "UNAVAILABLE": "Unavailable",
+        "SELECTED": "Selected"
+      },
+      "ZOOM": {
+        "IN": "Zoom in",
+        "OUT": "Zoom out",
+        "RESET": "Reset Zoom"
+      },
+      "HINT": {
+        "NO_MARKERS": "Select room type, date and time to see available workspaces on the map.",
+        "DRAG_TO_MOVE": "Drag to move"
+      },
+      "TOOLTIP": {
+        "AVAILABLE": "Available — click to select",
+        "UNAVAILABLE": "Unavailable"
+      }
+    }
+  },
+  "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
+    "USERS": "Users",
+    "BOOKINGS": "Bookings",
+    "BOOK_WORKSPACE": "Book Workspace",
+    "STATISTICS": "Statistics",
+    "UPDATE_PROFILE": "Update Profile",
+    "PLANIMETRIA_MANAGEMENT": "Floor Plans Management",
+    "DISCONNECT": "Disconnect",
+    "ROLE_ADMIN": "Administrator",
+    "ROLE_USER": "Employee",
+    "UNKNOWN_ROLE": "Unknown role",
+    "EXPAND": "Expand sidebar",
+    "COLLAPSE": "Collapse sidebar"
+  },
+  "ACCOUNT": {
+    "TITLE": "Update Profile",
+    "DESC": "Manage your personal information and account settings",
+    "BACK_TO_DASHBOARD": "Back to dashboard",
+    "RESET": "Reset",
+    "LOADING": "Loading profile data...",
+    "PERSONAL_INFO": {
+      "TITLE": "Personal Information",
+      "DESC": "Update your personal details",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "FIRST_NAME_HINT": "Enter your first name",
+      "LAST_NAME_HINT": "Enter your last name",
+      "EMAIL_HINT": "email@example.com"
+    },
+    "PASSWORD": {
+      "TITLE": "Change Password",
+      "DESC": "Leave these fields empty if you don't wish to change your password",
+      "CURRENT": "Current Password",
+      "CURRENT_HINT": "Enter current password",
+      "NEW": "New Password",
+      "NEW_HINT": "Enter new password",
+      "CONFIRM": "Confirm Password",
+      "CONFIRM_HINT": "Confirm new password",
+      "STRENGTH": "Strength",
+      "REQUIREMENTS": "Password Requirements:",
+      "REQ_MIN_LENGTH": "At least 6 characters",
+      "REQ_UPPERCASE": "At least one uppercase letter",
+      "REQ_LOWERCASE": "At least one lowercase letter",
+      "REQ_NUMBER": "At least one number",
+      "STRENGTH_LEVELS": {
+        "WEAK": "Weak",
+        "FAIR": "Fair",
+        "GOOD": "Good",
+        "STRONG": "Strong"
+      }
+    },
+    "MESSAGES": {
+      "ERROR_TITLE": "Update Error",
+      "SUCCESS_TITLE": "Update Completed",
+      "SUCCESS_DESC": "Changes were saved successfully",
+      "INVALID_DATE": "Invalid Date"
+    },
+    "ACTIONS": {
+      "DELETE_ACCOUNT": "Delete Account",
+      "SAVE_CHANGES": "Save Changes"
+    },
+    "DELETE_MODAL": {
+      "TITLE": "Confirm Account Deletion",
+      "DESC": "Are you sure you want to delete your account? This action is irreversible and all your data will be permanently deleted.",
+      "CONFIRM": "Delete Account",
+      "CANCEL": "Cancel"
+    },
+    "ERRORS": {
+      "REQUIRED": "This field is required",
+      "EMAIL_INVALID": "Please enter a valid email address",
+      "MIN_LENGTH": "Must be at least 6 characters",
+      "PWD_MISMATCH": "Passwords do not match",
+      "CURRENT_PWD_REQ": "Current password is required to set a new one"
+    }
+  },
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Log In",
+      "SUBTITLE": "Enter your credentials to access.",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "FORGOT_PASSWORD": "Forgot password?",
+      "SUBMIT": "Log In",
+      "LOGGING_IN": "Logging in...",
+      "NO_ACCOUNT": "Don't have an account?",
+      "REGISTER_LINK": "Register",
+      "ERROR_TITLE": "Login Error",
+      "ERRORS": {
+        "EMAIL_REQUIRED": "Email is required.",
+        "EMAIL_INVALID": "Enter a valid email.",
+        "PWD_REQUIRED": "Password is required."
+      }
+    },
+    "REGISTER": {
+      "TITLE": "Create your account",
+      "SUBTITLE": "Fill in the form to register.",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "CONFIRM_PASSWORD": "Confirm password",
+      "SUBMIT": "Register",
+      "REGISTERING": "Registering...",
+      "ALREADY_HAVE_ACCOUNT": "Already have an account?",
+      "LOGIN_LINK": "Log In",
+      "ERRORS": {
+        "NAME_REQUIRED": "First name is required.",
+        "LAST_NAME_REQUIRED": "Last name is required.",
+        "EMAIL_REQUIRED": "Email is required.",
+        "EMAIL_INVALID": "Enter a valid email.",
+        "PWD_REQUIRED": "Password is required.",
+        "PWD_MIN_LENGTH": "Password must be at least 6 characters.",
+        "PWD_PATTERN": "Password must contain uppercase, lowercase and a number.",
+        "CONFIRM_PWD_REQUIRED": "Confirm your password.",
+        "PWD_MISMATCH": "Passwords do not match.",
+        "GENERIC_ERROR": "Error during registration. Please try again later.",
+        "EMAIL_EXISTS": "This email is already registered.",
+        "EMAIL_EXISTS_DESC": "This email is already registered. Please use another email or log in."
+      },
+      "SUCCESS_TITLE": "Registration Completed",
+      "SUCCESS_DESC": "Your account has been created successfully! It is now waiting for administrator approval. You will be enabled shortly."
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Password Recovery",
+      "SUBTITLE": "Enter the email associated with your account to receive the reset link.",
+      "EMAIL_PLACEHOLDER": "name.lastname@exprivia.com",
+      "SUBMIT": "Send Email",
+      "SENDING": "Sending...",
+      "ERRORS": {
+        "EMAIL_INVALID": "Enter a valid email",
+        "EMAIL_NOT_FOUND": "Invalid email",
+        "GENERIC_ERROR": "Error during request"
+      },
+      "SUCCESS_MSG": "Check your email to reset your password."
+    },
+    "RESET_PASSWORD": {
+      "TITLE": "Confirm Password",
+      "SUBTITLE": "Proceed with changing your password.",
+      "NEW_PASSWORD": "New Password",
+      "NEW_PASSWORD_PLACEHOLDER": "Enter new password",
+      "CONFIRM_PASSWORD": "Confirm Password",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Repeat new password",
+      "SUBMIT": "Change Password",
+      "ERRORS": {
+        "PWD_REQUIRED": "Password required",
+        "PWD_MIN_LENGTH": "Password must be at least 6 characters",
+        "PWD_PATTERN": "Password must contain uppercase, lowercase and a number",
+        "CONFIRM_PWD_REQUIRED": "Confirm password required",
+        "PWD_MISMATCH": "Passwords do not match",
+        "GENERIC_ERROR": "Error during password change",
+        "TOKEN_MISSING": "Token missing. Request a new reset link.",
+        "INVALID_PASSWORD": "Invalid password"
+      },
+      "SUCCESS_MSG": "Password changed successfully!"
+    },
+    "COMMON": {
+      "SHOW_PWD": "Show password",
+      "HIDE_PWD": "Hide password"
+    }
+  }
 }

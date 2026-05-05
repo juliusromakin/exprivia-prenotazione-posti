@@ -28,6 +28,7 @@ export class ButtonComponent {
   @Input() icon?: string;
   @Input() iconPosition: IconPosition = 'left';
   @Input() disabled: boolean = false;
+  @Input() ariaLabel: string = '';
   @Input() routerLink?: string;
   @Input() fullWidth: boolean = false;
   @Output() onClick = new EventEmitter<MouseEvent>();

@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { ForgotPasswordService } from "./forgotpwd.service";
 import { LucideAngularModule } from "lucide-angular";
 import { authAnimations } from "@/app/shared/animations/auth.animations";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 
 @Component({
   selector: 'app-forgotpwd',
@@ -25,7 +26,8 @@ import { authAnimations } from "@/app/shared/animations/auth.animations";
     MatProgressSpinnerModule,
     MatSnackBarModule,
     LucideAngularModule,
-    HeaderComponent
+    HeaderComponent,
+    TranslateModule
   ],
   animations: [
       authAnimations.fadeIn,
@@ -44,7 +46,8 @@ export class ForgotpwdComponent {
     private forgotPasswordService: ForgotPasswordService,
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {
     this.forgotPwdForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -64,16 +67,17 @@ export class ForgotpwdComponent {
       try {
         const email = this.forgotPwdForm.get('email')?.value;
         if (!email) {
-          throw new Error('Email non valida');
+          throw new Error(this.translate.instant('AUTH.FORGOT_PASSWORD.ERRORS.EMAIL_NOT_FOUND'));
         }
 
         await this.forgotPasswordService.forgotPassword(email);
         
-        this.showSuccess('Controlla la tua email per reimpostare la password.');
+        this.showSuccess(this.translate.instant('AUTH.FORGOT_PASSWORD.SUCCESS_MSG'));
         await this.router.navigate(['/accedi']);
       } catch (error) {
-        this.errorMessage = error instanceof Error ? error.message : 'Errore durante l\'invio della richiesta';
-        this.showError(this.errorMessage);
+        const msg = error instanceof Error ? error.message : this.translate.instant('AUTH.FORGOT_PASSWORD.ERRORS.GENERIC_ERROR');
+        this.errorMessage = msg;
+        this.showError(msg);
       } finally {
         this.isLoading = false;
       }
@@ -81,7 +85,7 @@ export class ForgotpwdComponent {
   }
 
   private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Chiudi', {
+    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
@@ -90,7 +94,7 @@ export class ForgotpwdComponent {
   }
 
   private showError(message: string): void {
-    this.snackBar.open(message, 'Chiudi', {
+    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',

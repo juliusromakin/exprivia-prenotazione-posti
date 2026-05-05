@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface CalendarDay {
   date: Date;
@@ -12,7 +13,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,12 +33,27 @@ export class CalendarComponent {
   @Output() monthChange = new EventEmitter<Date>();
 
   currentDate = new Date();
-  weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+  
   private _days: CalendarDay[] = [];
   private _selectedDates: Date[] = [];
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
+  ) {
     this.updateDays();
+  }
+
+  get weekDays(): string[] {
+    return [
+      this.translate.instant('STATS.DAYS.MON'),
+      this.translate.instant('STATS.DAYS.TUE'),
+      this.translate.instant('STATS.DAYS.WED'),
+      this.translate.instant('STATS.DAYS.THU'),
+      this.translate.instant('STATS.DAYS.FRI'),
+      this.translate.instant('STATS.DAYS.SAT'),
+      this.translate.instant('STATS.DAYS.SUN')
+    ];
   }
 
   get currentMonth(): number {
@@ -49,7 +65,8 @@ export class CalendarComponent {
   }
 
   getMonthName(): string {
-    return this.currentDate.toLocaleString('it-IT', { month: 'long' });
+    const lang = this.translate.currentLang === 'en' ? 'en-US' : 'it-IT';
+    return this.currentDate.toLocaleString(lang, { month: 'long' });
   }
 
   isCurrentMonth(): boolean {

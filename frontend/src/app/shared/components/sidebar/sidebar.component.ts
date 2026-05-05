@@ -12,6 +12,7 @@ import { LoginService } from "../../../login/login.service";
 import { NavigationService, NavItem } from "@core/services/navigation.service";
 import { SidebarService } from "../../services/sidebar.service";
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 
 const SIDEBAR_STATE_KEY = 'sidebarCollapsed';
 
@@ -26,6 +27,7 @@ const SIDEBAR_STATE_KEY = 'sidebarCollapsed';
     MatIconModule,
     MatTooltipModule,
     LucideAngularModule,
+    TranslateModule
   ],
   animations: [
     trigger('sidebarWidth', [
@@ -57,7 +59,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // Screen width threshold for automatic collapse (in pixels)
   private readonly COLLAPSE_WIDTH = 768;
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     this.handleResponsiveSidebar();
     this.sidebarService.updateForWindowResize();
@@ -67,7 +69,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private loginService: LoginService,
     private navigationService: NavigationService,
-    private sidebarService: SidebarService
+    private sidebarService: SidebarService,
+    private translate: TranslateService
   ) {
     // Sync with sidebar service
     this.isCollapsed = this.sidebarService.isCollapsed;
@@ -81,16 +84,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // Metodo per convertire i ruoli in nomi visualizzabili
   getRoleDisplayName(badges: string[] | undefined): string {
     if (!badges?.length) {
-      return "Ruolo sconosciuto";
+      return this.translate.instant('SIDEBAR.UNKNOWN_ROLE');
     }
 
     const roleMap: { [key: string]: string } = {
-      ROLE_ADMIN: "Amministratore",
-      ROLE_USER: "Dipendente",
+      ROLE_ADMIN: 'SIDEBAR.ROLE_ADMIN',
+      ROLE_USER: 'SIDEBAR.ROLE_USER',
     };
 
     const primaryRole = badges.find((role) => role in roleMap);
-    return roleMap[primaryRole || ""] || "Ruolo sconosciuto";
+    const key = roleMap[primaryRole || ""];
+    return key ? this.translate.instant(key) : this.translate.instant('SIDEBAR.UNKNOWN_ROLE');
   }
 
   ngOnInit(): void {

@@ -6,6 +6,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { AdminService } from '@core/services/admin.service';
 import { StatisticsService } from '@core/services/statistics.service';
 import { Reservation, User, RoomStats, StatisticsCount } from '@core/models';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface StatsData {
   totalBookings: number;
@@ -26,7 +27,7 @@ interface StatsData {
 @Component({
   selector: 'app-stats',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './stats.component.html',
   styleUrls: ['./stats.component.css']
 })
@@ -57,12 +58,21 @@ export class StatsComponent implements OnInit, OnDestroy {
     private reservationService: ReservationService,
     private statisticsService: StatisticsService,
     private authService: AuthService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
     this.checkUserRole();
     this.loadStats();
+
+    // Reload stats (which recalculates labels) when language changes
+    this.translate.onLangChange
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        // Only recalculate strings, or we can just reload stats to be safe
+        this.loadStats(true);
+      });
   }
 
   ngOnDestroy(): void {
@@ -193,7 +203,15 @@ export class StatsComponent implements OnInit, OnDestroy {
     // Use backend Daily Statistics for Weekly Trend
     if (dailyStats && dailyStats.length > 0) {
       // Map backend data to trend days
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const days = [
+        this.translate.instant('STATS.DAYS.SUN'), 
+        this.translate.instant('STATS.DAYS.MON'), 
+        this.translate.instant('STATS.DAYS.TUE'), 
+        this.translate.instant('STATS.DAYS.WED'), 
+        this.translate.instant('STATS.DAYS.THU'), 
+        this.translate.instant('STATS.DAYS.FRI'), 
+        this.translate.instant('STATS.DAYS.SAT')
+      ];
       const trend = days.map(day => ({ day, count: 0 }));
       
       dailyStats.forEach(ds => {
@@ -257,7 +275,15 @@ export class StatsComponent implements OnInit, OnDestroy {
   }
 
   private calculateWeeklyTrend(reservations: Reservation[]): { day: string; count: number }[] {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const days = [
+        this.translate.instant('STATS.DAYS.SUN'), 
+        this.translate.instant('STATS.DAYS.MON'), 
+        this.translate.instant('STATS.DAYS.TUE'), 
+        this.translate.instant('STATS.DAYS.WED'), 
+        this.translate.instant('STATS.DAYS.THU'), 
+        this.translate.instant('STATS.DAYS.FRI'), 
+        this.translate.instant('STATS.DAYS.SAT')
+      ];
     const trend = days.map(day => ({ day, count: 0 }));
     
     const today = new Date();
@@ -284,7 +310,20 @@ export class StatsComponent implements OnInit, OnDestroy {
   }
 
   private calculateMonthlyTrend(reservations: Reservation[]): { month: string; count: number }[] {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+        this.translate.instant('STATS.MONTHS.JAN'), 
+        this.translate.instant('STATS.MONTHS.FEB'), 
+        this.translate.instant('STATS.MONTHS.MAR'), 
+        this.translate.instant('STATS.MONTHS.APR'), 
+        this.translate.instant('STATS.MONTHS.MAY'), 
+        this.translate.instant('STATS.MONTHS.JUN'), 
+        this.translate.instant('STATS.MONTHS.JUL'), 
+        this.translate.instant('STATS.MONTHS.AUG'), 
+        this.translate.instant('STATS.MONTHS.SEP'), 
+        this.translate.instant('STATS.MONTHS.OCT'), 
+        this.translate.instant('STATS.MONTHS.NOV'), 
+        this.translate.instant('STATS.MONTHS.DEC')
+      ];
     const trend = [];
     
     const today = new Date();

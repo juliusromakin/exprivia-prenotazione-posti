@@ -26,15 +26,22 @@
         <div class="flex justify-between items-center">
           <div class="space-y-1">
             <h1 class="text-2xl font-semibold text-gray-900">
-              Welcome, {{ currentUser?.name }}
+              {{ 'DASHBOARD.WELCOME_ADMIN' | translate }}, {{ currentUser?.name }}
             </h1>
             <p class="text-sm text-gray-500">
-              {{ currentDate | date : "EEEE d MMMM yyyy" }} - {{ currentTime }}
+              {{ currentDate | date : "EEEE d MMMM yyyy" : undefined : currentLang }} - {{ currentTime }}
             </p>
           </div>
 
           <!-- Notifications -->
           <div class="flex items-center gap-4">
+            <!-- Language Selector -->
+            <button [matMenuTriggerFor]="langMenuDashboard" class="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)] border border-gray-200">
+                <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+                <span>{{ currentLang | uppercase }}</span>
+                <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+            </button>
+
             <button
               class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
             >
@@ -74,8 +81,8 @@
           <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h2>
-                <p class="text-gray-600">Complete overview of the booking system</p>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ 'DASHBOARD.ADMIN_TITLE' | translate }}</h2>
+                <p class="text-gray-600">{{ 'DASHBOARD.ADMIN_DESC' | translate }}</p>
               </div>
             </div>
           </div>
@@ -90,8 +97,8 @@
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">New Reservation</h3>
-              <p class="text-sm text-gray-500">Create personal bookings or for other users</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.NEW_RESERVATION' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'DASHBOARD.NEW_RESERVATION_DESC' | translate }}</p>
             </button>
 
             <!-- Manage Bookings -->
@@ -102,8 +109,8 @@
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">Manage Reservations</h3>
-              <p class="text-sm text-gray-500">View and manage all system reservations</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.MANAGE_RESERVATIONS' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'DASHBOARD.MANAGE_RESERVATIONS_DESC' | translate }}</p>
             </button>
 
             <!-- User Management -->
@@ -114,8 +121,8 @@
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">User Management</h3>
-              <p class="text-sm text-gray-500">Administer users, roles and system permissions</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.USER_MANAGEMENT' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'DASHBOARD.USER_MANAGEMENT_DESC' | translate }}</p>
             </button>
           </div>
 
@@ -129,8 +136,8 @@
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">Gestione Planimetrie</h3>
-              <p class="text-sm text-gray-500">Disegna e gestisci le planimetrie degli uffici</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.PLANIMETRIA_MANAGEMENT' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'DASHBOARD.PLANIMETRIA_MANAGEMENT_DESC' | translate }}</p>
             </button>
 
             <!-- Statistics -->
@@ -141,8 +148,8 @@
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">Advanced Statistics</h3>
-              <p class="text-sm text-gray-500">View detailed reports and analysis of the booking system</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.STATISTICS' | translate }}</h3>
+              <p class="text-sm text-gray-500">{{ 'DASHBOARD.STATISTICS_DESC' | translate }}</p>
             </button>
           </div>
         </ng-container>
@@ -155,4 +162,13 @@
     </main>
   </div>
 </div>
-
+<mat-menu #langMenuDashboard="matMenu" class="rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] mt-1">
+    <button mat-menu-item (click)="cambiaLingua('it')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+        <img src="https://flagcdn.com/w40/it.png" alt="IT" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+        <span class="font-medium text-gray-700">IT</span>
+    </button>
+    <button mat-menu-item (click)="cambiaLingua('en')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+        <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+        <span class="font-medium text-gray-700">EN</span>
+    </button>
+</mat-menu>

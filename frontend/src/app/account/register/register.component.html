@@ -11,9 +11,9 @@
         </div>
         <h1
           class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--color-expriviaOrange)] via-[var(--color-expriviaOrange400)] to-[var(--color-expriviaOrange)] bg-clip-text text-transparent animate-gradient">
-          Crea il tuo account
+          {{ 'AUTH.REGISTER.TITLE' | translate }}
         </h1>
-        <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Compila il modulo per registrarti.</p>
+        <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">{{ 'AUTH.REGISTER.SUBTITLE' | translate }}</p>
       </div>
 
       <!-- Form di registrazione -->
@@ -24,15 +24,15 @@
           <div class="w-full sm:w-1/2">
             <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
               class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-              <label class="block text-sm font-medium mb-1" for="name">Nome *</label>
-              <input matInput id="name" formControlName="name" placeholder="Nome"
+              <label class="block text-sm font-medium mb-1" for="name">{{ 'AUTH.REGISTER.FIRST_NAME' | translate }} *</label>
+              <input matInput id="name" formControlName="name" [placeholder]="'AUTH.REGISTER.FIRST_NAME' | translate"
                 class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
                 aria-required="true" [attr.aria-invalid]="registerForm.get('name')?.invalid"
                 [attr.aria-describedby]="registerForm.get('name')?.invalid ? 'name-error' : null" />
               <div
                 *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)"
                 class="text-xs text-red-600 mt-1" id="name-error" role="alert">
-                Il nome è obbligatorio.
+                {{ 'AUTH.REGISTER.ERRORS.NAME_REQUIRED' | translate }}
               </div>
             </div>
           </div>
@@ -40,15 +40,15 @@
           <div class="w-full sm:w-1/2">
             <div [@slideUp]="{ value: '', params: { delay: '100ms' } }"
               class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-              <label class="block text-sm font-medium mb-1" for="lastName">Cognome *</label>
-              <input matInput id="lastName" formControlName="lastName" placeholder="Cognome"
+              <label class="block text-sm font-medium mb-1" for="lastName">{{ 'AUTH.REGISTER.LAST_NAME' | translate }} *</label>
+              <input matInput id="lastName" formControlName="lastName" [placeholder]="'AUTH.REGISTER.LAST_NAME' | translate"
                 class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
                 aria-required="true" [attr.aria-invalid]="registerForm.get('lastName')?.invalid"
                 [attr.aria-describedby]="registerForm.get('lastName')?.invalid ? 'lastName-error' : null" />
               <div
                 *ngIf="registerForm.get('lastName')?.invalid && (registerForm.get('lastName')?.dirty || registerForm.get('lastName')?.touched)"
                 class="text-xs text-red-600 mt-1" id="lastName-error" role="alert">
-                Il cognome è obbligatorio.
+                {{ 'AUTH.REGISTER.ERRORS.LAST_NAME_REQUIRED' | translate }}
               </div>
             </div>
           </div>
@@ -57,8 +57,8 @@
         <!-- Email -->
         <div [@slideUp]="{ value: '', params: { delay: '200ms' } }"
           class="transform hover:scale-[1.02] transition-[var(--transition-transform)]">
-          <label class="block text-sm font-medium mb-1" for="email">Email *</label>
-          <input matInput id="email" formControlName="email" placeholder="Email" type="email"
+          <label class="block text-sm font-medium mb-1" for="email">{{ 'AUTH.REGISTER.EMAIL' | translate }} *</label>
+          <input matInput id="email" formControlName="email" [placeholder]="'AUTH.REGISTER.EMAIL' | translate" type="email"
             class="w-full border border-gray-300 rounded-[var(--radius-lg)] px-3 py-2 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
             aria-required="true" [attr.aria-invalid]="registerForm.get('email')?.invalid"
             [attr.aria-describedby]="registerForm.get('email')?.invalid ? 'email-error' : null" />
@@ -73,16 +73,16 @@
           <!-- Password -->
           <div [@slideUp]="{ value: '', params: { delay: '300ms' } }"
             class="transform hover:scale-[1.02] transition-[var(--transition-transform)] w-full sm:w-1/2">
-            <label class="block text-sm font-medium mb-1" for="password">Password *</label>
+            <label class="block text-sm font-medium mb-1" for="password">{{ 'AUTH.REGISTER.PASSWORD' | translate }} *</label>
             <div class="relative w-full">
               <input matInput id="password" [type]="hidePwd ? 'password' : 'text'" formControlName="password"
-                placeholder="Password"
+                [placeholder]="'AUTH.REGISTER.PASSWORD' | translate"
                 class="w-full h-11 border border-gray-300 rounded-[var(--radius-lg)] px-3 pr-14 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
                 aria-required="true" [attr.aria-invalid]="registerForm.get('password')?.invalid"
                 [attr.aria-describedby]="registerForm.get('password')?.invalid ? 'password-error' : null" />
               <button type="button" (click)="hidePwd = !hidePwd"
                 class="absolute right-2 top-0 h-11 flex items-center justify-center w-10 text-gray-500 hover:text-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
-                [attr.aria-label]="hidePwd ? 'Mostra password' : 'Nascondi password'">
+                [attr.aria-label]="hidePwd ? ('AUTH.COMMON.SHOW_PWD' | translate) : ('AUTH.COMMON.HIDE_PWD' | translate)">
                 <mat-icon class="text-lg" aria-hidden="true">{{hidePwd ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
             </div>
@@ -94,16 +94,16 @@
           <!-- Conferma password -->
           <div [@slideUp]="{ value: '', params: { delay: '300ms' } }"
             class="transform hover:scale-[1.02] transition-[var(--transition-transform)] w-full sm:w-1/2">
-            <label class="block text-sm font-medium mb-1" for="confirmPassword">Conferma password *</label>
+            <label class="block text-sm font-medium mb-1" for="confirmPassword">{{ 'AUTH.REGISTER.CONFIRM_PASSWORD' | translate }} *</label>
             <div class="relative w-full">
               <input matInput id="confirmPassword" [type]="hideConfirmPwd ? 'password' : 'text'"
-                formControlName="confirmPassword" placeholder="Conferma password"
+                formControlName="confirmPassword" [placeholder]="'AUTH.REGISTER.CONFIRM_PASSWORD' | translate"
                 class="w-full h-11 border border-gray-300 rounded-[var(--radius-lg)] px-3 pr-14 focus:outline-none focus:border-[var(--color-expriviaOrange)] focus:ring-1 focus:ring-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
                 aria-required="true" [attr.aria-invalid]="registerForm.get('confirmPassword')?.invalid"
                 [attr.aria-describedby]="registerForm.get('confirmPassword')?.invalid ? 'confirm-password-error' : null" />
               <button type="button" (click)="hideConfirmPwd = !hideConfirmPwd"
                 class="absolute right-2 top-0 h-11 flex items-center justify-center w-10 text-gray-500 hover:text-[var(--color-expriviaOrange)] transition-[var(--transition-colors)]"
-                [attr.aria-label]="hideConfirmPwd ? 'Mostra password' : 'Nascondi password'">
+                [attr.aria-label]="hideConfirmPwd ? ('AUTH.COMMON.SHOW_PWD' | translate) : ('AUTH.COMMON.HIDE_PWD' | translate)">
                 <mat-icon class="text-lg" aria-hidden="true">{{hideConfirmPwd ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
             </div>
@@ -130,7 +130,10 @@
             <div class="relative w-full h-full flex items-center justify-center gap-2">
               <mat-spinner *ngIf="isLoading" [diameter]="24" class="!text-white"></mat-spinner>
               <span *ngIf="!isLoading" class="text-white font-medium text-base group-hover:scale-110 transition-transform duration-300">
-                Registrati
+                {{ 'AUTH.REGISTER.SUBMIT' | translate }}
+              </span>
+              <span *ngIf="isLoading" class="text-white font-medium text-base group-hover:scale-110 transition-transform duration-300">
+                {{ 'AUTH.REGISTER.REGISTERING' | translate }}
               </span>
             </div>
           </button>
@@ -147,10 +150,10 @@
 
         <!-- Link Login -->
         <div class="text-center text-sm mt-6" [@slideUp]="{ value: '', params: { delay: '500ms' } }">
-          <span class="text-gray-600">Hai già un account?</span>
+          <span class="text-gray-600">{{ 'AUTH.REGISTER.ALREADY_HAVE_ACCOUNT' | translate }}</span>
           <a [routerLink]="['/login']"
             class="text-sm text-[var(--color-expriviaOrange)] hover:text-[var(--color-expriviaOrange400)] transition-[var(--transition-colors)] ml-1 relative group">
-            Accedi
+            {{ 'AUTH.REGISTER.LOGIN_LINK' | translate }}
             <span
               class="absolute bottom-0 left-0 w-full h-0.5 bg-[var(--color-expriviaOrange)] transform scale-x-0 group-hover:scale-x-100 transition-[var(--transition-transform)]"></span>
           </a>

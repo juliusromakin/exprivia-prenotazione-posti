@@ -14,6 +14,7 @@ import { throwError } from 'rxjs';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../shared/services/toast.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -31,6 +32,7 @@ import { ToastService } from '../../shared/services/toast.service';
     MatIconModule,
     HeaderComponent,
     ToastModule,
+    TranslateModule
   ],
   providers: [],
   styleUrls: ['../../shared/styles/toast.styles.css'],
@@ -79,7 +81,8 @@ export class RegisterComponent {
     private registerService: RegisterService,
     private toastService: ToastService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private translate: TranslateService
   ) {
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -124,13 +127,13 @@ export class RegisterComponent {
   getEmailErrorMessage(): string {
     const control = this.registerForm.get('email');
     if (control?.hasError('required')) {
-      return 'L\'email è obbligatoria';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.EMAIL_REQUIRED');
     }
     if (control?.hasError('email')) {
-      return 'Inserisci un indirizzo email valido';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.EMAIL_INVALID');
     }
     if (control?.hasError('emailExists')) {
-      return 'Questa email è già registrata';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.EMAIL_EXISTS');
     }
     return '';
   }
@@ -148,13 +151,13 @@ export class RegisterComponent {
   getPasswordErrorMessage(): string {
     const control = this.registerForm.get('password');
     if (control?.hasError('required')) {
-      return 'La password è obbligatoria';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.PWD_REQUIRED');
     }
     if (control?.hasError('minlength')) {
-      return 'La password deve contenere almeno 6 caratteri';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.PWD_MIN_LENGTH');
     }
     if (control?.hasError('pattern')) {
-      return 'La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.PWD_PATTERN');
     }
     return '';
   }
@@ -162,10 +165,10 @@ export class RegisterComponent {
   getConfirmPasswordErrorMessage(): string {
     const control = this.registerForm.get('confirmPassword');
     if (control?.hasError('required')) {
-      return 'La conferma password è obbligatoria';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.CONFIRM_PWD_REQUIRED');
     }
     if (control?.hasError('passwordMismatch')) {
-      return 'Le password non coincidono';
+      return this.translate.instant('AUTH.REGISTER.ERRORS.PWD_MISMATCH');
     }
     return '';
   }
@@ -192,9 +195,9 @@ export class RegisterComponent {
             // Access the message from the ErrorDto JSON if available
             const backendError = error.response?.data?.message || 
                                 error.response?.data || 
-                                'Errore durante la registrazione. Riprova più tardi.';
+                                this.translate.instant('AUTH.REGISTER.ERRORS.GENERIC_ERROR');
             
-            let errorMessage = (typeof backendError === 'string') ? backendError : 'Errore durante la registrazione.';
+            let errorMessage = (typeof backendError === 'string') ? backendError : this.translate.instant('AUTH.REGISTER.ERRORS.GENERIC_ERROR');
 
             // Check for specific error cases (matching the strings from AuthService.java)
             if (error.response?.status === 400 && 
@@ -202,10 +205,10 @@ export class RegisterComponent {
                 errorMessage.toLowerCase().includes('email già esistente') ||
                 errorMessage.toLowerCase().includes('email already exists'))) {
               this.registerForm.get('email')?.setErrors({ emailExists: true });
-              errorMessage = 'Questa email è già registrata. Per favore, utilizza un\'altra email o accedi.';
+              errorMessage = this.translate.instant('AUTH.REGISTER.ERRORS.EMAIL_EXISTS_DESC');
             }
 
-            this.showErrorToast('Errore Registrazione', errorMessage);
+            this.showErrorToast(this.translate.instant('AUTH.REGISTER.ERRORS.GENERIC_ERROR'), errorMessage);
             return throwError(() => new Error(errorMessage));
           }),
           finalize(() => {
@@ -214,8 +217,8 @@ export class RegisterComponent {
           tap(() => {
             console.log('Registration success, showing success toast...');
             this.showSuccessToast(
-              'Registrazione Completata',
-              'Il tuo account è stato creato con successo! Ora è in attesa di approvazione da parte dell\'amministratore. Riceverai l\'abilitazione a breve.'
+              this.translate.instant('AUTH.REGISTER.SUCCESS_TITLE'),
+              this.translate.instant('AUTH.REGISTER.SUCCESS_DESC')
             );
             console.log('Navigating to login...');
             this.router.navigate(['/login']);

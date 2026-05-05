@@ -1,6 +1,6 @@
 <button *ngIf="!routerLink" [type]="type" [disabled]="disabled" [class]="getButtonClasses()"
     (click)="onClick.emit($event)" matRipple [matRippleColor]="getRippleColor()" [matRippleCentered]="true"
-    [matRippleUnbounded]="false">
+    [matRippleUnbounded]="false" [attr.aria-label]="ariaLabel">
     <span class="relative flex items-center justify-center gap-2 z-10">
         <i *ngIf="icon && iconPosition === 'left'" [class]="getIconClasses()" [class]="icon"></i>
         <span [class]="getTextClasses()">{{ label }}</span>
@@ -9,7 +9,7 @@
 </button>
 
 <a *ngIf="routerLink" [routerLink]="routerLink" [class]="getButtonClasses()" matRipple
-    [matRippleColor]="getRippleColor()" [matRippleCentered]="true" [matRippleUnbounded]="false">
+    [matRippleColor]="getRippleColor()" [matRippleCentered]="true" [matRippleUnbounded]="false" [attr.aria-label]="ariaLabel">
     <span class="relative flex items-center justify-center gap-2 z-10">
         <i *ngIf="icon && iconPosition === 'left'" [class]="getIconClasses()" [class]="icon"></i>
         <span [class]="getTextClasses()">{{ label }}</span>
