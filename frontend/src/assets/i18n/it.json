@@ -1,4 +1,7 @@
 {
+  "FOOTER": {
+    "RIGHTS_RESERVED": "Tutti i diritti riservati."
+  },
   "HEADER": {
     "TITLE": "Prenotazione Posti",
     "LOGIN": "Accedi",
@@ -44,9 +47,83 @@
     "MANAGE_RESERVATIONS": "Gestione Prenotazioni",
     "MANAGE_RESERVATIONS_DESC": "Visualizza e gestisci tutte le prenotazioni a sistema",
     "USER_MANAGEMENT": "Gestione Utenti",
-    "USER_MANAGEMENT_DESC": "Amministra gli utenti, i ruoli e i permessi del sistema",
+    "USER_MANAGEMENT_DESC": "Gestisci gli utenti, i ruoli e i permessi del sistema",
     "STATISTICS": "Statistiche Avanzate",
-    "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione"
+    "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione",
+    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
+    "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici"
+  },
+  "ADMIN_HOME": {
+    "HERO_TITLE": "Gestisci il tuo piano di lavoro",
+    "HERO_DESC": "Pannello di controllo amministrativo per gestire prenotazioni e planimetrie aziendali in modo centralizzato.",
+    "GO_TO_DASHBOARD": "Vai alla Dashboard",
+    "MANAGE_PLANS": "Gestione Planimetrie",
+    "TOOLS_TITLE": "Strumenti di Amministrazione",
+    "TOOLS_DESC": "Tutto il necessario per gestire e ottimizzare gli spazi di lavoro aziendali",
+    "CARDS": {
+      "BOOKINGS_TITLE": "Gestione Prenotazioni",
+      "BOOKINGS_DESC": "Visualizza, modifica e gestisci tutte le prenotazioni degli utenti in modo centralizzato.",
+      "BOOKINGS_FEAT_1": "Vista completa prenotazioni",
+      "BOOKINGS_FEAT_2": "Approvazioni e cancellazioni",
+      "PLANS_TITLE": "Gestione Planimetrie",
+      "PLANS_DESC": "Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.",
+      "PLANS_FEAT_1": "Editor planimetria interattivo",
+      "PLANS_FEAT_2": "Gestione postazioni"
+    }
+  },
+  "PLANIMETRIA_EDITOR": {
+    "TITLE": "Gestione Planimetrie",
+    "SUBTITLE": "Seleziona la sede, poi modifica o carica la planimetria.",
+    "SELECT_SEDE": "Seleziona sede...",
+    "CONFIRM": "Conferma",
+    "CHANGE_SEDE": "Cambia Sede",
+    "MODES": {
+      "LABEL": "Modalità",
+      "SELECT": "Seleziona",
+      "SELECT_HINT": "Selezione & Pan",
+      "CREATE_ROOM": "Crea Stanza",
+      "CREATE_ROOM_HINT": "Disegno Stanza — trascina per creare",
+      "CREATE_DESK": "Crea Postazione",
+      "CREATE_DESK_HINT": "Posiziona Postazione — clicca per inserire",
+      "DRAG_HINT": "trascina",
+      "CLICK_HINT": "click"
+    },
+    "ACTIONS": {
+      "LABEL": "Azioni",
+      "SAVE": "Salva",
+      "SAVING": "Salvataggio...",
+      "UPLOAD": "Carica Planimetria"
+    },
+    "HINTS": {
+      "ZOOM": "Scroll = Zoom",
+      "PAN": "Drag sfondo = Pan",
+      "DRAG_CANVAS": "Trascina sul canvas",
+      "CLICK_PLACE": "Click per piazzare",
+      "DELETE": "Canc = Elimina",
+      "GRID": "Griglia: 10px"
+    },
+    "PLACEHOLDER": {
+      "UPLOAD_BTN": "Clicca per caricare una planimetria",
+      "SUPPORTED_FILES": "Supporta file .png",
+      "INITIAL_HINT": "Seleziona e conferma una sede per iniziare"
+    },
+    "MODAL": {
+      "TITLE": "Nuova Stanza",
+      "ROOM_NAME": "Nome Stanza",
+      "NAME_PLACEHOLDER": "Es. Stanza A1",
+      "ROOM_TYPE": "Tipo Stanza",
+      "TYPE_MEETING": "Sala Riunioni",
+      "TYPE_OFFICE": "Ufficio",
+      "CANCEL": "Annulla",
+      "CREATE": "Crea"
+    },
+    "ALERTS": {
+      "DESK_ID_PROMPT": "ID Postazione:",
+      "NO_ELEMENTS": "Nessun elemento da salvare sul canvas.",
+      "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{rooms}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
+      "SAVE_SUCCESS": " Salvataggio completato!\n• {roomsCount} stanza/e salvata/e\n• {desksCount} postazione/i salvata/e",
+      "SAVE_ERROR": " Errore durante il salvataggio:\n{error}"
+    }
   },
   "USER_MANAGEMENT": {
     "TITLE": "Gestione Utenti",
@@ -363,6 +440,7 @@
     "BOOK_WORKSPACE": "Prenota Postazione",
     "STATISTICS": "Statistiche",
     "UPDATE_PROFILE": "Aggiorna Profilo",
+    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
     "DISCONNECT": "Disconnetti",
     "ROLE_ADMIN": "Amministratore",
     "ROLE_USER": "Dipendente",

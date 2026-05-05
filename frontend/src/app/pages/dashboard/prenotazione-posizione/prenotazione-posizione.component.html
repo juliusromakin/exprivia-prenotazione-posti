@@ -1,11 +1,10 @@
 <!-- Main Container -->
 <div class="max-w-7xl mx-auto p-4 sm:p-6">
-  <!-- Booking Form Section -->
   <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6">
     <div class="flex items-center justify-between mb-6">
-      <h3 class="text-xl font-semibold text-gray-800">New Reservation</h3>
+      <h3 class="text-xl font-semibold text-gray-800">{{ 'BOOKING.TITLE' | translate }}</h3>
       <div class="flex items-center space-x-2">
-        <span class="text-sm text-gray-500">Step</span>
+        <span class="text-sm text-gray-500">{{ 'BOOKING.STEP' | translate }}</span>
         <div class="flex space-x-1">
           <div class="w-2 h-2 rounded-full"
             [ngClass]="{'bg-blue-600': state.selectedDates.length > 0, 'bg-gray-300': state.selectedDates.length === 0}">
@@ -24,13 +23,10 @@
     </div>
 
     <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="space-y-6">
-
-      <!-- Calendar and Time Selection Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Calendar Section -->
         <div class="md:col-span-2">
           <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">1. Select a date</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.DATE' | translate }}</h4>
             <div class="max-w-[100vw] overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
               <app-calendar [selectedDates]="state.selectedDates" (dateSelectionChange)="onDateSelectionChange($event)"
                 (monthChange)="onMonthChange($event)">
@@ -38,16 +34,15 @@
             </div>
           </div>
 
-          <!-- Planimetria interattiva -->
           <div class="bg-gray-50 rounded-lg p-4 mt-4">
-            <h4 class="text-sm font-medium text-gray-700 mb-1">4. Select a workspace from the map</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-1">{{ 'BOOKING.STEPS.WORKSPACE' | translate }}</h4>
             <p *ngIf="!bookingForm.get('timeSlot')?.value" class="text-xs text-gray-400 mb-2">
-              <i class="fas fa-info-circle mr-1"></i>Complete previous steps to see available workspaces.
+              <i class="fas fa-info-circle mr-1"></i>{{ 'BOOKING.WORKSPACE.MAP_INFO' | translate }}
             </p>
             <p *ngIf="bookingForm.get('timeSlot')?.value && bookingForm.get('workspaceId')?.value"
               class="text-xs text-green-600 font-medium mb-2">
               <i class="fas fa-check-circle mr-1"></i>
-              Selected workspace: {{ getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
+              {{ 'BOOKING.WORKSPACE.SELECTED_INFO' | translate }} {{ getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
             </p>
             <app-planimetria-inline [rooms]="state.rooms" [availableWorkspaces]="$any(state.availableWorkspaces)"
               [selectedWorkspaceId]="$any(getSelectedWorkspaceId())"
@@ -57,40 +52,37 @@
         </div>
 
         <div class="flex flex-col gap-4">
-          <!-- Office Location (Compact) -->
           <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 shadow-sm">
             <label class="text-xs font-semibold text-blue-800 mb-1.5 flex items-center">
-              <i class="fas fa-map-marker-alt mr-1.5"></i> OFFICE LOCATION
+              <i class="fas fa-map-marker-alt mr-1.5"></i> {{ 'COMMON.OFFICE_LOCATION' | translate }}
             </label>
             <select [(ngModel)]="selectedLocation" (change)="onLocationChange()" [ngModelOptions]="{standalone: true}"
               class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
               <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
             </select>
           </div>
-          <!-- Selected Dates Summary -->
           <div class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">Selected Date</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.CALENDAR.SELECTED_DATE' | translate }}</h4>
             <div class="flex flex-col gap-2 min-h-[48px] max-h-[200px]">
               <div *ngIf="state.selectedDates.length === 0"
                 class="flex items-center justify-center h-full text-gray-400 text-sm">
-                Select a date from the calendar
+                {{ 'BOOKING.CALENDAR.SELECT_DATE_HINT' | translate }}
               </div>
               <div *ngIf="state.selectedDates.length === 1"
                 class="flex items-center text-sm text-gray-600 py-2 px-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                <span>{{ state.selectedDates[0] | date:'EEEE d MMMM yyyy':'':'en' }}</span>
+                <span>{{ formatDate(state.selectedDates[0], 'EEEE d MMMM yyyy') }}</span>
               </div>
             </div>
           </div>
 
-          <!-- User Selection (only for admins) -->
           <div *ngIf="isAdmin" class="p-4 bg-blue-50 rounded-lg border border-blue-200">
             <h4 class="text-sm font-medium text-gray-700 mb-3">
               <i class="fas fa-user-cog text-blue-600 mr-2"></i>
-              Select User (optional)
+              {{ 'BOOKING.ADMIN.SELECT_USER' | translate }}
             </h4>
             <div class="relative">
               <input type="text" [(ngModel)]="userSearchTerm" (ngModelChange)="filterUsers()"
-                (focus)="showUserDropdown = true" (blur)="onUserInputBlur()" placeholder="Search user..."
+                (focus)="showUserDropdown = true" (blur)="onUserInputBlur()" [placeholder]="'BOOKING.ADMIN.SEARCH_USER' | translate"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 [ngModelOptions]="{standalone: true}">
               <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
@@ -101,8 +93,6 @@
                 <i class="fas fa-search text-gray-400"></i>
               </div>
             </div>
-
-            <!-- User Dropdown -->
             <div *ngIf="showUserDropdown && filteredUsers.length > 0"
               class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <div *ngFor="let user of filteredUsers; trackBy: trackByUser" (click)="selectUser(user)"
@@ -117,36 +107,34 @@
             </div>
           </div>
 
-          <!-- Room Type Selection -->
           <div class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">2. Select Room Type</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.ROOM_TYPE' | translate }}</h4>
             <select formControlName="roomType"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Select room type</option>
+              <option value="">{{ 'BOOKING.ROOM_TYPE.SELECT_HINT' | translate }}</option>
               <option *ngFor="let type of filteredRoomTypes" [value]="type">
                 {{ type }}
               </option>
             </select>
           </div>
 
-          <!-- Time Slot Selection -->
           <div class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">3. Select Time</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.TIME' | translate }}</h4>
             <div *ngIf="!bookingForm.get('roomType')?.value" class="text-sm text-gray-500 mb-2">
-              Select a room type first
+              {{ 'BOOKING.TIME.SELECT_ROOM_FIRST' | translate }}
             </div>
             <div *ngIf="bookingForm.get('roomType')?.value && state.selectedDates.length === 0"
               class="text-sm text-gray-500 mb-2">
-              Select a date first
+              {{ 'BOOKING.TIME.SELECT_DATE_FIRST' | translate }}
             </div>
             <div *ngIf="bookingForm.get('roomType')?.value && state.selectedDates.length > 0">
               <div class="mb-3">
-                <label for="slotDuration" class="block text-xs font-medium text-gray-600 mb-1">Duration</label>
+                <label for="slotDuration" class="block text-xs font-medium text-gray-600 mb-1">{{ 'BOOKING.TIME.DURATION' | translate }}</label>
                 <select id="slotDuration" formControlName="slotDuration"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="">Select duration</option>
+                  <option value="">{{ 'BOOKING.TIME.SELECT_DURATION' | translate }}</option>
                   <option *ngFor="let duration of availableDurations" [value]="duration">
-                    {{ isFullDay(duration) ? 'Full Day' : duration }}
+                    {{ getDurationLabel(duration) }}
                   </option>
                 </select>
               </div>
@@ -164,35 +152,32 @@
             </div>
           </div>
 
-          <!-- Room Selection -->
           <div *ngIf="bookingForm.get('timeSlot')?.value" class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">4. Select Room</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.TABLE.ROOM' | translate }}</h4>
             <select formControlName="roomId"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option [value]="null">Select room</option>
+              <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
               <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
                 {{ room.name }}
               </option>
             </select>
           </div>
 
-          <!-- Workstation Selection -->
           <div *ngIf="bookingForm.get('roomId')?.value" class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">5. Select Workstation</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.TABLE.WORKSPACE' | translate }}</h4>
             <select formControlName="workspaceId"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Select workstation</option>
+              <option value="">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
               <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
                 {{ workspace.name }}
               </option>
             </select>
           </div>
 
-          <!-- Selected workspace - summary -->
           <div *ngIf="bookingForm.get('timeSlot')?.value" class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">Selected Workspace</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-2">{{ 'BOOKING.WORKSPACE.SELECTED' | translate }}</h4>
             <div *ngIf="!bookingForm.get('workspaceId')?.value" class="text-sm text-gray-500">
-              Click on the map to choose a workspace
+              {{ 'BOOKING.WORKSPACE.SELECT_FROM_MAP' | translate }}
             </div>
             <div *ngIf="bookingForm.get('workspaceId')?.value"
               class="flex items-center text-sm text-green-700 font-medium bg-green-50 rounded-lg px-3 py-2">
@@ -201,11 +186,10 @@
             </div>
           </div>
 
-          <!-- Submit Button -->
           <div class="p-4 bg-gray-50 rounded-lg">
             <button type="submit" [disabled]="!isFormValid() || state.isLoading"
               class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-              {{ state.isLoading ? 'Processing...' : 'Book Now' }}
+              {{ state.isLoading ? ('BOOKING.SUBMIT.PROCESSING' | translate) : ('BOOKING.SUBMIT.BOOK_NOW' | translate) }}
             </button>
           </div>
         </div>
@@ -213,23 +197,22 @@
     </form>
   </div>
 
-  <!-- User Bookings Section -->
   <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Your Reservations</h3>
+      <h3 class="text-lg font-semibold text-gray-800">{{ 'BOOKING.MY_RESERVATIONS.TITLE' | translate }}</h3>
       <div class="flex items-center space-x-2">
         <button *ngIf="getSelectedCount() > 0" type="button" (click)="bulkCancelReservations()"
           class="px-3 py-1 bg-red-600 text-white text-sm rounded-md">
-          Cancel ({{ getSelectedCount() }})
+          {{ 'BOOKING.MY_RESERVATIONS.CANCEL_SELECTED' | translate }} ({{ getSelectedCount() }})
         </button>
 
         <div class="flex space-x-1">
           <button (click)="setStatusFilter('tutti')" [class.bg-blue-600]="statusFilter === 'tutti'"
-            class="px-2 py-1 text-xs rounded">All</button>
+            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ALL' | translate }}</button>
           <button (click)="setStatusFilter('attive')" [class.bg-green-600]="statusFilter === 'attive'"
-            class="px-2 py-1 text-xs rounded">Active</button>
+            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ACTIVE' | translate }}</button>
           <button (click)="setStatusFilter('annullate')" [class.bg-red-600]="statusFilter === 'annullate'"
-            class="px-2 py-1 text-xs rounded">Cancelled</button>
+            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.CANCELLED' | translate }}</button>
         </div>
       </div>
     </div>
@@ -239,12 +222,12 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="p-2"><input type="checkbox" [checked]="isSelectAllChecked" (change)="toggleSelectAll()"></th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Room</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Workspace</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.DATE' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.TIME' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ROOM' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.WORKSPACE' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.STATUS' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -263,13 +246,13 @@
                   'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
                   'bg-red-100 text-red-800': reservation.status === 'DENIED'
                 }">
-                {{ reservation.status === 'CONFIRMED' ? 'Confirmed' : (reservation.status === 'NOT_CONFIRMED' ?
-                'Pending' : 'Denied') }}
+                {{ reservation.status === 'CONFIRMED' ? ('BOOKING.TABLE.STATUS_CONFIRMED' | translate) : (reservation.status === 'NOT_CONFIRMED' ?
+                ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
               </span>
             </td>
             <td class="p-2">
               <button (click)="cancelReservation(reservation)" [disabled]="!canCancelReservation(reservation)"
-                class="text-xs text-red-600 hover:underline">Cancel</button>
+                class="text-xs text-red-600 hover:underline">{{ 'BOOKING.TABLE.ACTION_CANCEL' | translate }}</button>
             </td>
           </tr>
         </tbody>
@@ -281,8 +264,8 @@
 <p-toast position="top-right"></p-toast>
 
 <app-confirmation-modal [show]="showBulkCancelConfirmation" [isLoading]="state.isLoading" [type]="'warning'" [data]="{
-    title: 'Confirm Cancellation',
-    message: 'Are you sure you want to cancel the selected reservations?',
-    confirmButtonText: 'Confirm',
-    cancelButtonText: 'Back'
+    title: 'BOOKING.MESSAGES.CONFIRM_CANCEL_TITLE' | translate,
+    message: 'BOOKING.MESSAGES.CONFIRM_CANCEL_MSG' | translate,
+    confirmButtonText: 'BOOKING.MESSAGES.CONFIRM' | translate,
+    cancelButtonText: 'BOOKING.MESSAGES.BACK' | translate
   }" (confirm)="confirmBulkCancel()" (cancel)="closeBulkCancelConfirmation()"></app-confirmation-modal>

@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Room, Workspace } from "@core/models";
+import { TranslateModule } from "@ngx-translate/core";
 
 interface MarkerPosition {
   id: string;
@@ -33,7 +34,7 @@ export interface PlanimetriaWorkspace {
 @Component({
   selector: "app-planimetria-inline",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: "./planimetria-inline.component.html",
   styleUrls: ["./planimetria-inline.component.css"],
 })

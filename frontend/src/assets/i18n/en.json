@@ -1,4 +1,7 @@
 {
+  "FOOTER": {
+    "RIGHTS_RESERVED": "All rights reserved."
+  },
   "HEADER": {
     "TITLE": "Workspace Reservation",
     "LOGIN": "Login",
@@ -35,9 +38,6 @@
       "BULLET_2": "Shared spaces"
     }
   },
-<<<<<<< Updated upstream
-  "DASHBOARD": {}
-=======
   "DASHBOARD": {
     "WELCOME_ADMIN": "Welcome",
     "ADMIN_TITLE": "Admin Dashboard",
@@ -49,7 +49,81 @@
     "USER_MANAGEMENT": "User Management",
     "USER_MANAGEMENT_DESC": "Administer users, roles and system permissions",
     "STATISTICS": "Advanced Statistics",
-    "STATISTICS_DESC": "View detailed reports and analysis of the booking system"
+    "STATISTICS_DESC": "View detailed reports and analysis of the booking system",
+    "PLANIMETRIA_MANAGEMENT": "Plan Management",
+    "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans"
+  },
+  "ADMIN_HOME": {
+    "HERO_TITLE": "Manage your workspace",
+    "HERO_DESC": "Administrative control panel to manage bookings and office plans centrally.",
+    "GO_TO_DASHBOARD": "Go to Dashboard",
+    "MANAGE_PLANS": "Manage Floor Plans",
+    "TOOLS_TITLE": "Administration Tools",
+    "TOOLS_DESC": "Everything you need to manage and optimize corporate workspaces",
+    "CARDS": {
+      "BOOKINGS_TITLE": "Booking Management",
+      "BOOKINGS_DESC": "View, edit and manage all user bookings centrally.",
+      "BOOKINGS_FEAT_1": "Full booking view",
+      "BOOKINGS_FEAT_2": "Approvals and cancellations",
+      "PLANS_TITLE": "Plan Management",
+      "PLANS_DESC": "Intuitively configure and update office floor plans, managing workstations and meeting rooms.",
+      "PLANS_FEAT_1": "Interactive plan editor",
+      "PLANS_FEAT_2": "Workstation management"
+    }
+  },
+  "PLANIMETRIA_EDITOR": {
+    "TITLE": "Plan Management",
+    "SUBTITLE": "Select the location, then edit or upload the plan.",
+    "SELECT_SEDE": "Select location...",
+    "CONFIRM": "Confirm",
+    "CHANGE_SEDE": "Change Location",
+    "MODES": {
+      "LABEL": "Mode",
+      "SELECT": "Select",
+      "SELECT_HINT": "Selection & Pan",
+      "CREATE_ROOM": "Create Room",
+      "CREATE_ROOM_HINT": "Draw Room — drag to create",
+      "CREATE_DESK": "Create Workstation",
+      "CREATE_DESK_HINT": "Place Workstation — click to insert",
+      "DRAG_HINT": "drag",
+      "CLICK_HINT": "click"
+    },
+    "ACTIONS": {
+      "LABEL": "Actions",
+      "SAVE": "Save",
+      "SAVING": "Saving...",
+      "UPLOAD": "Upload Plan"
+    },
+    "HINTS": {
+      "ZOOM": "Scroll = Zoom",
+      "PAN": "Drag background = Pan",
+      "DRAG_CANVAS": "Drag on canvas",
+      "CLICK_PLACE": "Click to place",
+      "DELETE": "Del = Delete",
+      "GRID": "Grid: 10px"
+    },
+    "PLACEHOLDER": {
+      "UPLOAD_BTN": "Click to upload a plan",
+      "SUPPORTED_FILES": "Supports .png files",
+      "INITIAL_HINT": "Select and confirm a location to start"
+    },
+    "MODAL": {
+      "TITLE": "New Room",
+      "ROOM_NAME": "Room Name",
+      "NAME_PLACEHOLDER": "e.g. Room A1",
+      "ROOM_TYPE": "Room Type",
+      "TYPE_MEETING": "Meeting Room",
+      "TYPE_OFFICE": "Office",
+      "CANCEL": "Cancel",
+      "CREATE": "Create"
+    },
+    "ALERTS": {
+      "DESK_ID_PROMPT": "Workstation ID:",
+      "NO_ELEMENTS": "No elements to save on canvas.",
+      "EMPTY_ROOMS_WARNING": " Attention: the following rooms have no workstations:\n{rooms}\n\nAdd at least one workstation for each room before saving.",
+      "SAVE_SUCCESS": " Save completed!\n• {roomsCount} room(s) saved\n• {desksCount} workstation(s) saved",
+      "SAVE_ERROR": " Error during save:\n{error}"
+    }
   },
   "USER_MANAGEMENT": {
     "TITLE": "User Management",
@@ -366,6 +440,7 @@
     "BOOK_WORKSPACE": "Book Workspace",
     "STATISTICS": "Statistics",
     "UPDATE_PROFILE": "Update Profile",
+    "PLANIMETRIA_MANAGEMENT": "Floor Plans Management",
     "DISCONNECT": "Disconnect",
     "ROLE_ADMIN": "Administrator",
     "ROLE_USER": "Employee",
@@ -520,5 +595,4 @@
       "HIDE_PWD": "Hide password"
     }
   }
->>>>>>> Stashed changes
 }

@@ -19,23 +19,22 @@
                         <h1 id="admin-hero-title"
                             class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
                             @slideUp>
-                            Gestisci il tuo piano di lavoro
+                            {{ 'ADMIN_HOME.HERO_TITLE' | translate }}
                         </h1>
                         <p class="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed max-w-[600px]" @slideUp>
-                            Pannello di controllo amministrativo per gestire prenotazioni e planimetrie aziendali in
-                            modo centralizzato.
+                            {{ 'ADMIN_HOME.HERO_DESC' | translate }}
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4" @scaleIn>
                         <!-- Dashboard button -->
-                        <app-button label="Vai alla Dashboard" type="primary" size="lg" icon="fas fa-tachometer-alt"
+                        <app-button [label]="'ADMIN_HOME.GO_TO_DASHBOARD' | translate" type="primary" size="lg" icon="fas fa-tachometer-alt"
                             iconPosition="right" routerLink="/dashboard" class="w-full sm:w-auto"
-                            aria-label="Vai alla dashboard"></app-button>
+                            [ariaLabel]="'ADMIN_HOME.GO_TO_DASHBOARD' | translate"></app-button>
 
                         <!-- Gestione Planimetrie -->
-                        <app-button label="Gestione Planimetrie" type="primary" size="lg" icon="fas fa-map"
+                        <app-button [label]="'ADMIN_HOME.MANAGE_PLANS' | translate" type="primary" size="lg" icon="fas fa-map"
                             iconPosition="right" routerLink="/amministrazione-planimetrie" class="w-full sm:w-auto"
-                            aria-label="Vai alla gestione planimetrie"></app-button>
+                            [ariaLabel]="'ADMIN_HOME.MANAGE_PLANS' | translate"></app-button>
                     </div>
                 </div>
 
@@ -44,7 +43,7 @@
                     <div class="relative w-full max-w-2xl">
                         <div class="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-[var(--color-expriviaOrange)] to-[var(--color-expriviaOrange400)] rounded-[var(--radius-2xl)] blur-xl sm:blur-2xl opacity-20"
                             aria-hidden="true"></div>
-                        <img alt="Pannello di amministrazione per la gestione degli spazi di lavoro"
+                        <img [alt]="'ADMIN_HOME.HERO_TITLE' | translate"
                             class="relative aspect-video overflow-hidden rounded-[var(--radius-xl)] object-cover object-center shadow-[var(--shadow-xl)] transform transition-[var(--transition-transform)] hover:scale-[1.02]"
                             height="550" src="assets/images/workspace.jpg" width="800" loading="eager"
                             fetchpriority="high" />
@@ -60,9 +59,9 @@
             <!-- Section Header -->
             <div class="text-center mb-8 sm:mb-12" @fadeIn>
                 <h2 id="admin-features-title" class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
-                    Strumenti di Amministrazione</h2>
-                <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">Tutto il necessario per
-                    gestire e ottimizzare gli spazi di lavoro aziendali</p>
+                    {{ 'ADMIN_HOME.TOOLS_TITLE' | translate }}</h2>
+                <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
+                    {{ 'ADMIN_HOME.TOOLS_DESC' | translate }}</p>
             </div>
 
             <div class="grid gap-4 sm:gap-6 md:grid-cols-2 max-w-3xl mx-auto items-stretch">

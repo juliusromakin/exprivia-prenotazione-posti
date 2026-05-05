@@ -5,7 +5,6 @@ import { RouterOutlet, Router, NavigationEnd } from "@angular/router"
 import { FooterComponent } from "./layout/footer/footer.component";
 import { filter } from "rxjs";
 import { UpdateUserComponent } from "./account/update-user/update-user.component";
-import { HeaderComponent } from "./layout/header/header.component";
 import { AuthService } from "./core/auth/auth.service";
 // 1. HO AGGIUNTO L'IMPORT QUI SOTTO:
 import { TranslateService } from "@ngx-translate/core";
@@ -15,7 +14,7 @@ import { TranslateService } from "@ngx-translate/core";
   selector: "app-root",
   standalone: true,
   // HO AGGIUNTO HeaderComponent QUI SOTTO:
-  imports: [CommonModule, RouterOutlet, FooterComponent, HeaderComponent],
+  imports: [CommonModule, RouterOutlet, FooterComponent],
   templateUrl: "./app.component.html",
 })
 export class AppComponent implements OnInit {

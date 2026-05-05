@@ -22,33 +22,33 @@ export class NavigationService {
 
   private readonly navigationItems: NavItem[] = [
     {
-      label: "Dashboard",
+      label: "SIDEBAR.DASHBOARD",
       icon: "home",
       route: "/dashboard",
       authorities: [UserRole.ADMIN],
     },
     {
-      label: "Users",
+      label: "SIDEBAR.USERS",
       icon: "users",
       route: "/dashboard/user-management",
       adminOnly: true,
       authorities: [UserRole.ADMIN],
     },
     {
-      label: "Bookings",
+      label: "SIDEBAR.BOOKINGS",
       icon: "calendar",
       route: "/dashboard/bookings",
       // CORREZIONE LOGICA: Anche gli utenti devono poter vedere le loro prenotazioni!
       authorities: [UserRole.ADMIN, UserRole.USER],
     },
     {
-      label: "Book Workspace",
+      label: "SIDEBAR.BOOK_WORKSPACE",
       icon: "layout-dashboard",
       route: "/dashboard/workspace-booking",
       authorities: [UserRole.USER, UserRole.ADMIN],
     },
     {
-      label: "Statistics",
+      label: "SIDEBAR.STATISTICS",
       icon: "ChartBar",
       route: "/dashboard/statistics",
       adminOnly: true,
