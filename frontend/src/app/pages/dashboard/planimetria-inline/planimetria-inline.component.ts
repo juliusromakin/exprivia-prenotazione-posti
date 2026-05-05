@@ -237,21 +237,18 @@ export class PlanimetriaInlineComponent implements OnChanges {
       workspacesToRender.push(...this.availableWorkspaces);
     }
 
-    for (const ws of workspacesToRender) {
+        for (const ws of workspacesToRender) {
       if (ws.mapX !== undefined && ws.mapY !== undefined) {
         const w = availableMap.get(ws.id!);
         const isSelectable = !!w;
 
-        // Offset adjusted to +5 for better alignment on the planimetria image (radius is 5 in admin)
-        const centerX = ws.mapX + 5;
-        const centerY = ws.mapY + 5;
-
+        // mapX/mapY ora salvano già il centro esatto del marker (getBoundingRect() centrato)
         this.markers.push({
           id: String(ws.id),
           label: ws.name,
           tooltip: `${ws.name}\n${ws.roomName || ''}`,
-          x: (centerX / this.REF_WIDTH) * 100,
-          y: (centerY / this.REF_HEIGHT) * 100,
+          x: (ws.mapX / this.REF_WIDTH) * 100,
+          y: (ws.mapY / this.REF_HEIGHT) * 100,
           available: isSelectable ? (w.isAvailable !== false) : true,
           selected: this.selectedWorkspaceId === ws.id,
         });

@@ -121,11 +121,13 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
 
         fabric.Image.fromURL(imageSrc).then((img) => {
             if (!this.canvas) return;
-            const scale = Math.min(this.canvas.width! / img.width!, this.canvas.height! / img.height!);
+            // Stira l'immagine per riempire esattamente il canvas 800x450 (no letterboxing)
+            // → le coordinate canvas (0,0)-(800,450) corrispondono 1:1 alla planimetria-inline
             img.set({
-                scaleX: scale, scaleY: scale,
-                originX: 'center', originY: 'center',
-                left: this.canvas.width! / 2, top: this.canvas.height! / 2,
+                scaleX: this.canvas.width! / img.width!,
+                scaleY: this.canvas.height! / img.height!,
+                originX: 'left', originY: 'top',
+                left: 0, top: 0,
                 selectable: false, evented: false
             });
             this.canvas.backgroundImage = img;
@@ -516,16 +518,20 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 const tempId: number = stanza.data?.tempId;
                 const capacityCalcolata = capacityMap.get(tempId) ?? 1;
 
+                // Usa getBoundingRect() per ottenere la bounding box assoluta nel canvas
+                // (top-left reale + dimensioni reali) indipendentemente da originX/originY del gruppo
+                const bbox = stanza.getBoundingRect();
+
                 const payload = {
                     name: stanza.data?.label ?? 'Stanza',
                     roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
                     capacity: capacityCalcolata,    // ← calcolata dinamicamente
                     floorId: 1,                     // ← unico piano disponibile nel DB
                     enabled: true,
-                    mapX: Math.round(stanza.left ?? 0),
-                    mapY: Math.round(stanza.top ?? 0),
-                    mapWidth: Math.round((stanza.width ?? 0) * (stanza.scaleX ?? 1)),
-                    mapHeight: Math.round((stanza.height ?? 0) * (stanza.scaleY ?? 1)),
+                    mapX: Math.round(bbox.left),
+                    mapY: Math.round(bbox.top),
+                    mapWidth: Math.round(bbox.width),
+                    mapHeight: Math.round(bbox.height),
                     equipment: stanza.data?.equipment || []
                 };
 
@@ -549,13 +555,15 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     continue;
                 }
 
+                // Usa getBoundingRect() per ottenere il centro esatto del marker nel canvas
+                const pbbox = postazione.getBoundingRect();
                 const payload = {
                     name: postazione.data?.label ?? 'Postazione',
                     roomId: realRoomId,
                     capacity: 1,
                     enabled: true,
-                    mapX: Math.round(postazione.left ?? 0),
-                    mapY: Math.round(postazione.top ?? 0)
+                    mapX: Math.round(pbbox.left + pbbox.width / 2),
+                    mapY: Math.round(pbbox.top + pbbox.height / 2)
                 };
 
                 console.log('[FASE B] Salvataggio postazione:', payload);
