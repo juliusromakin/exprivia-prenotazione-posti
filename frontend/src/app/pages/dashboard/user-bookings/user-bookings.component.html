@@ -145,8 +145,8 @@
                   [class.ring-2]="selectedExportPeriod === p.value" 
                   [class.ring-blue-500]="selectedExportPeriod === p.value"
                   class="w-full text-left p-3 border rounded-lg hover:bg-blue-50 transition-all">
-            <div class="font-medium text-sm">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label | uppercase | translate) || p.label }}</div>
-            <div class="text-xs text-gray-500">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label | uppercase) + '_DESC' | translate }}</div>
+            <div class="font-medium text-sm">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label) | translate }}</div>
+            <div class="text-xs text-gray-500">{{ ('RESERVATIONS.EXPORT_MODAL.' + p.label + '_DESC') | translate }}</div>
           </button>
         </div>
       </div>

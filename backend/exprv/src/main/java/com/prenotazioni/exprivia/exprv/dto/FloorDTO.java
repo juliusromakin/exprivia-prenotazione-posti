@@ -2,6 +2,7 @@ package com.prenotazioni.exprivia.exprv.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.List;
 
 public class FloorDTO {
@@ -12,6 +13,8 @@ public class FloorDTO {
     private Integer buildingId;
     private Boolean enabled;
     private String imagePath;
+    private LocalDate validFrom;
+    private LocalDate validTo;
     private Double canvasWidth;
     private Double canvasHeight;
     private List<RoomDTO> rooms;
@@ -96,5 +99,21 @@ public class FloorDTO {
 
     public void setWorkspaces(List<WorkspaceDTO> workspaces) {
         this.workspaces = workspaces;
+    }
+
+    public LocalDate getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(LocalDate validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public LocalDate getValidTo() {
+        return validTo;
+    }
+
+    public void setValidTo(LocalDate validTo) {
+        this.validTo = validTo;
     }
 }
