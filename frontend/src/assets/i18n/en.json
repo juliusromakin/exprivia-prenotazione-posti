@@ -124,9 +124,9 @@
     "ALERTS": {
       "DESK_ID_PROMPT": "Workstation ID:",
       "NO_ELEMENTS": "No elements to save on canvas.",
-      "EMPTY_ROOMS_WARNING": " Attention: the following rooms have no workstations:\n{rooms}\n\nAdd at least one workstation for each room before saving.",
-      "SAVE_SUCCESS": " Save completed!\n• {roomsCount} room(s) saved\n• {desksCount} workstation(s) saved",
-      "SAVE_ERROR": " Error during save:\n{error}"
+      "EMPTY_ROOMS_WARNING": " Attention: the following rooms have no workstations:\n{{rooms}}\n\nAdd at least one workstation for each room before saving.",
+      "SAVE_SUCCESS": " Save completed!\n• {{roomsCount}} room(s) saved\n• {{desksCount}} workstation(s) saved",
+      "SAVE_ERROR": " Error during save:\n{{error}}"
     }
   },
   "USER_MANAGEMENT": {

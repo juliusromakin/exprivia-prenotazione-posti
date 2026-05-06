@@ -63,9 +63,9 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
   showExportModal = false;
   selectedExportPeriod: 'week' | 'month' | '6months' | null = null;
   exportPeriods = [
-    { value: 'week', label: 'Last Week', description: 'Export reservations from the last 7 days' },
-    { value: 'month', label: 'Last Month', description: 'Export reservations from the last 30 days' },
-    { value: '6months', label: 'Last 6 Months', description: 'Export reservations from the last 6 months' }
+    { value: 'week', label: 'LAST_WEEK' },
+    { value: 'month', label: 'LAST_MONTH' },
+    { value: '6months', label: 'LAST_6_MONTHS' }
   ];
   selectedExportType: 'period' | 'daily' = 'period';
   exportDate: string = new Date().toISOString().split('T')[0];

@@ -1,5 +1,6 @@
 package com.prenotazioni.exprivia.exprv.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,12 @@ public class Floor {
 
     @Column(name = "enabled")
     private Boolean enabled = true;
+
+    @Column(name = "valid_from")
+    private LocalDate validFrom;
+
+    @Column(name = "valid_to")
+    private LocalDate validTo;
 
     @Column(name = "image_path")
     private String imagePath;
@@ -130,5 +137,21 @@ public class Floor {
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    public LocalDate getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(LocalDate validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public LocalDate getValidTo() {
+        return validTo;
+    }
+
+    public void setValidTo(LocalDate validTo) {
+        this.validTo = validTo;
     }
 }
