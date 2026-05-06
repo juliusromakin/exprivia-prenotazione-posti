@@ -218,7 +218,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 console.warn('[MOVE] Postazione fuori dalle stanze, ripristino posizione.');
                 target.set({
                     left: (target as any)._lastLeft,
-                    top:  (target as any)._lastTop
+                    top: (target as any)._lastTop
                 });
                 target.setCoords();
                 this.canvas!.renderAll();
