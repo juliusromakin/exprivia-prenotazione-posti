@@ -21,17 +21,7 @@ import { TranslateModule, TranslateService } from "@ngx-translate/core";
   selector: "app-user-list",
   templateUrl: "./user-list.component.html",
   standalone: true,
-  styles: [`
-    :host {
-      display: block;
-      min-height: 100vh;
-    }
-    
-    /* Prevent layout shift by always reserving scrollbar space */
-    :host ::ng-deep body {
-      overflow-y: scroll;
-    }
-  `],
+
   imports: [
     CommonModule,
     LucideAngularModule,
@@ -42,7 +32,7 @@ import { TranslateModule, TranslateService } from "@ngx-translate/core";
     TranslateModule
   ],
   providers: [],
-  styleUrls: ['../../../shared/styles/toast.styles.css']
+  styleUrls: ['../../../shared/styles/toast.styles.css', './user-list.component.css']
 })
 export class UserListComponent implements OnInit, OnDestroy {
   users: User[] = [];

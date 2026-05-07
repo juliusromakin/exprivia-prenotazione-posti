@@ -15,13 +15,7 @@ import { Router } from '@angular/router';
       </div>
     </div>
   `,
-  styles: [`
-    .container {
-      min-height: 60vh;
-      display: flex;
-      align-items: center;
-    }
-  `]
+  styleUrl: './forbidden.component.css'
 })
 export class ForbiddenComponent {
   constructor(private router: Router) {}
