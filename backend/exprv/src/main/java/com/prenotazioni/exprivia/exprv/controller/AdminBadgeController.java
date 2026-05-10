@@ -48,8 +48,10 @@ public class AdminBadgeController {
     }
 
     @DeleteMapping("/{name}")
-    public ResponseEntity<Void> deleteBadge(@PathVariable String name) {
-        badgeService.deleteBadge(name);
+    public ResponseEntity<Void> deleteBadge(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "false") boolean preserveHierarchy) {
+        badgeService.deleteBadge(name, preserveHierarchy);
         return ResponseEntity.noContent().build();
     }
 

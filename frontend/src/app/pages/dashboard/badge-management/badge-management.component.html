@@ -103,26 +103,38 @@
           </div>
 
           <!-- Badge items -->
-          <button
+          <div
             *ngFor="let role of filteredRoles"
-            (click)="selectBadge(role)"
+            (dblclick)="selectBadge(role)"
+            draggable="true"
+            (dragstart)="onDragStart($event, role)"
             [class.ring-2]="isSelectedBadge(role)"
             [class.ring-blue-500]="isSelectedBadge(role)"
             [class.bg-blue-50]="isSelectedBadge(role)"
             [class.opacity-50]="!role.isActive"
-            class="w-full text-left px-3 py-2 rounded-lg hover:bg-blue-50 transition-all duration-150 group cursor-pointer">
+            class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 transition-all duration-150 group cursor-grab active:cursor-grabbing">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 min-w-0">
                 <lucide-icon name="shield" class="w-4 h-4 text-blue-500 flex-shrink-0"></lucide-icon>
                 <span class="text-sm font-semibold text-gray-800 truncate">{{ formatBadgeName(role.name) }}</span>
               </div>
-              <span *ngIf="role.parentIds && role.parentIds.length > 0"
-                class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full flex-shrink-0 font-bold">
-                +{{ role.parentIds.length }}
-              </span>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <span *ngIf="role.parentIds && role.parentIds.length > 0"
+                  class="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-bold">
+                  +{{ role.parentIds.length }}
+                </span>
+                <!-- Delete Button (Sidebar) -->
+                <button 
+                  *ngIf="!isProtectedBadge(role)"
+                  (click)="$event.stopPropagation(); deleteBadge(role)"
+                  class="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                  title="Elimina dal database">
+                  <lucide-icon name="trash-2" class="w-3.5 h-3.5"></lucide-icon>
+                </button>
+              </div>
             </div>
             <p *ngIf="role.description" class="text-xs text-gray-400 truncate mt-0.5 pl-6">{{ role.description }}</p>
-          </button>
+          </div>
         </div>
       </div>
 
@@ -162,26 +174,38 @@
             <p class="text-xs">Nessuna azione trovata</p>
           </div>
 
-          <button
+          <div
             *ngFor="let action of filteredActions"
-            (click)="selectBadge(action)"
+            (dblclick)="selectBadge(action)"
+            draggable="true"
+            (dragstart)="onDragStart($event, action)"
             [class.ring-2]="isSelectedBadge(action)"
             [class.ring-orange-500]="isSelectedBadge(action)"
             [class.bg-orange-50]="isSelectedBadge(action)"
             [class.opacity-50]="!action.isActive"
-            class="w-full text-left px-3 py-2 rounded-lg hover:bg-orange-50 transition-all duration-150 cursor-pointer">
+            class="w-full text-left px-3 py-2 rounded-full hover:bg-orange-50 transition-all duration-150 group cursor-grab active:cursor-grabbing">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 min-w-0">
                 <lucide-icon name="zap" class="w-4 h-4 text-orange-500 flex-shrink-0"></lucide-icon>
                 <span class="text-sm font-semibold text-gray-800 truncate">{{ formatBadgeName(action.name) }}</span>
               </div>
-              <span *ngIf="action.parentIds && action.parentIds.length > 0"
-                class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full flex-shrink-0 font-bold">
-                +{{ action.parentIds.length }}
-              </span>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <span *ngIf="action.parentIds && action.parentIds.length > 0"
+                  class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-bold">
+                  +{{ action.parentIds.length }}
+                </span>
+                <!-- Delete Button (Sidebar) -->
+                <button 
+                  *ngIf="!isProtectedBadge(action)"
+                  (click)="$event.stopPropagation(); deleteBadge(action)"
+                  class="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                  title="Elimina dal database">
+                  <lucide-icon name="trash-2" class="w-3.5 h-3.5"></lucide-icon>
+                </button>
+              </div>
             </div>
             <p *ngIf="action.description" class="text-xs text-gray-400 truncate mt-0.5 pl-6">{{ action.description }}</p>
-          </button>
+          </div>
         </div>
       </div>
     </div>
@@ -199,16 +223,95 @@
           <p class="text-xs mt-1">Crea un ruolo o un'azione per iniziare</p>
         </div>
 
-        <div *ngIf="allBadges.length > 0 && !selectedBadge" 
-          class="absolute top-3 left-1/2 -translate-x-1/2 bg-gray-800 bg-opacity-70 text-white text-xs px-3 py-1.5 rounded-full z-10 pointer-events-none">
-          Clicca un nodo per modificare le ereditarietà
+        <div *ngIf="allBadges.length > 0" 
+          class="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+          <!-- Palette Strumenti (Ora con icone sbloccate!) -->
+          <div class="flex gap-2">
+            <!-- Bottone PAN -->
+            <button
+              (click)="interactionMode = 'pan'; drawGraph()"
+              [class.bg-blue-600]="interactionMode === 'pan'"
+              [class.text-white]="interactionMode === 'pan'"
+              [class.bg-white]="interactionMode !== 'pan'"
+              [class.text-gray-500]="interactionMode !== 'pan'"
+              title="Sposta Mappa (Mano)"
+              class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
+              <lucide-icon name="hand" class="w-5 h-5"></lucide-icon>
+            </button>
+
+            <!-- Bottone SELEZIONE -->
+            <button
+              (click)="interactionMode = 'select'; drawGraph()"
+              [class.bg-blue-600]="interactionMode === 'select'"
+              [class.text-white]="interactionMode === 'select'"
+              [class.bg-white]="interactionMode !== 'select'"
+              [class.text-gray-500]="interactionMode !== 'select'"
+              title="Selezione a Rettangolo (Puntatore)"
+              class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
+              <lucide-icon name="mouse-pointer" class="w-5 h-5"></lucide-icon>
+            </button>
+
+            <!-- Bottone CONNESSIONE -->
+            <button
+              (click)="interactionMode = 'connect'; drawGraph()"
+              [class.bg-blue-600]="interactionMode === 'connect'"
+              [class.text-white]="interactionMode === 'connect'"
+              [class.bg-white]="interactionMode !== 'connect'"
+              [class.text-gray-500]="interactionMode !== 'connect'"
+              title="Crea Collegamento (Link)"
+              class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
+              <lucide-icon name="link" class="w-5 h-5"></lucide-icon>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1 flex">
+            <button
+              (click)="viewMode = 'full'; layoutAndDraw()"
+              [class.bg-blue-50]="viewMode === 'full'"
+              [class.text-blue-600]="viewMode === 'full'"
+              class="px-4 py-1.5 text-[10px] font-bold rounded-full transition-all cursor-pointer">
+              Full Tree
+            </button>
+            <button
+              (click)="viewMode = 'focus'; layoutAndDraw()"
+              [class.bg-blue-50]="viewMode === 'focus'"
+              [class.text-blue-600]="viewMode === 'focus'"
+              [disabled]="!selectedBadge"
+              class="px-4 py-1.5 text-[10px] font-bold rounded-full transition-all cursor-pointer disabled:opacity-50">
+              Focus
+            </button>
+          </div>
+          
+          <button
+            (click)="clearCanvas()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold shadow-lg transition-all cursor-pointer text-white"
+            [class.bg-blue-500]="viewMode === 'full'"
+            [class.bg-red-500]="viewMode !== 'full'"
+            [class.hover:bg-blue-600]="viewMode === 'full'"
+            [class.hover:bg-red-600]="viewMode !== 'full'">
+            <lucide-icon [name]="viewMode === 'full' ? 'refresh-cw' : 'trash-2'" class="w-3 h-3"></lucide-icon>
+            {{ viewMode === 'full' ? 'Reset Layout' : 'Clear Map' }}
+          </button>
+        </div>
+
+        <div *ngIf="nodes.length === 0 && !loading" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none bg-white bg-opacity-50">
+          <lucide-icon name="mouse-pointer" class="w-12 h-12 mb-4 text-blue-500 opacity-40"></lucide-icon>
+          <p class="text-lg font-bold text-gray-800">Schema Vuoto</p>
+          <p class="text-sm text-gray-500 mt-1">Trascina un badge dall'elenco di sinistra per iniziare</p>
+          <div class="mt-6 flex gap-3 text-[10px] text-gray-400">
+            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-[3px] bg-blue-400"></div> Ruoli</span>
+            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-orange-400"></div> Azioni</span>
+          </div>
         </div>
 
         <canvas
           #graphCanvas
-          class="w-full h-full"
           (mousedown)="onCanvasMouseDown($event)"
-          (mousemove)="onCanvasHover($event)">
+          (mousemove)="onCanvasHover($event)"
+          (wheel)="onCanvasWheel($event)"
+          (dragover)="onCanvasDragOver($event)"
+          (drop)="onCanvasDrop($event)"
+          class="w-full h-full">
         </canvas>
       </div>
 
@@ -306,26 +409,34 @@
                 <p class="text-[10px] text-gray-400 italic">Nessun ruolo trovato</p>
               </div>
               <div *ngFor="let role of filteredInheritanceRoles"
-                class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
                 [class.opacity-40]="!canInheritFrom(role)">
                 <div class="flex items-center gap-3 min-w-0">
                   <lucide-icon name="shield" class="w-4 h-4 text-blue-400 flex-shrink-0"></lucide-icon>
                   <span class="text-sm font-medium text-gray-700 truncate">{{ formatBadgeName(role.name) }}</span>
                 </div>
                 <!-- Toggle switch -->
-                <button
-                  *ngIf="canInheritFrom(role)"
-                  (click)="toggleInheritance(role)"
-                  class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 flex-shrink-0 cursor-pointer"
-                  [class.bg-blue-500]="isInheriting(role)"
-                  [class.bg-gray-200]="!isInheriting(role)"
-                  [disabled]="loading">
-                  <span
-                    class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
-                    [class.translate-x-4]="isInheriting(role)"
-                    [class.translate-x-1]="!isInheriting(role)">
-                  </span>
-                </button>
+                <div class="flex items-center gap-2">
+                  <lucide-icon
+                    *ngIf="isInheriting(role) && isRedundantInheritance(role.id!)"
+                    name="link-2-off"
+                    class="w-3.5 h-3.5 text-amber-500"
+                    title="Ereditarietà ridondante (già coperta da un altro ruolo)">
+                  </lucide-icon>
+                  <button
+                    *ngIf="canInheritFrom(role)"
+                    (click)="toggleInheritance(role)"
+                    class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 flex-shrink-0 cursor-pointer"
+                    [class.bg-blue-500]="isInheriting(role)"
+                    [class.bg-gray-200]="!isInheriting(role)"
+                    [disabled]="loading">
+                    <span
+                      class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
+                      [class.translate-x-4]="isInheriting(role)"
+                      [class.translate-x-1]="!isInheriting(role)">
+                    </span>
+                  </button>
+                </div>
                 <span *ngIf="!canInheritFrom(role)" class="text-[10px] text-gray-400 italic">sé stesso</span>
               </div>
             </div>
@@ -341,25 +452,33 @@
                 <p class="text-[10px] text-gray-400 italic">Nessuna azione trovata</p>
               </div>
               <div *ngFor="let action of filteredInheritanceActions"
-                class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-all duration-150"
+                class="flex items-center justify-between px-3 py-2.5 rounded-full hover:bg-gray-50 transition-all duration-150"
                 [class.opacity-40]="!canInheritFrom(action)">
                 <div class="flex items-center gap-3 min-w-0">
                   <lucide-icon name="zap" class="w-4 h-4 text-orange-400 flex-shrink-0"></lucide-icon>
                   <span class="text-sm font-medium text-gray-700 truncate">{{ formatBadgeName(action.name) }}</span>
                 </div>
-                <button
-                  *ngIf="canInheritFrom(action)"
-                  (click)="toggleInheritance(action)"
-                  class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 flex-shrink-0 cursor-pointer"
-                  [class.bg-orange-500]="isInheriting(action)"
-                  [class.bg-gray-200]="!isInheriting(action)"
-                  [disabled]="loading">
-                  <span
-                    class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
-                    [class.translate-x-4]="isInheriting(action)"
-                    [class.translate-x-1]="!isInheriting(action)">
-                  </span>
-                </button>
+                <div class="flex items-center gap-2">
+                  <lucide-icon
+                    *ngIf="isInheriting(action) && isRedundantInheritance(action.id!)"
+                    name="link-2-off"
+                    class="w-3.5 h-3.5 text-amber-500"
+                    title="Ereditarietà ridondante (già coperta da un altro percorso)">
+                  </lucide-icon>
+                  <button
+                    *ngIf="canInheritFrom(action)"
+                    (click)="toggleInheritance(action)"
+                    class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 flex-shrink-0 cursor-pointer"
+                    [class.bg-orange-500]="isInheriting(action)"
+                    [class.bg-gray-200]="!isInheriting(action)"
+                    [disabled]="loading">
+                    <span
+                      class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
+                      [class.translate-x-4]="isInheriting(action)"
+                      [class.translate-x-1]="!isInheriting(action)">
+                    </span>
+                  </button>
+                </div>
                 <span *ngIf="!canInheritFrom(action)" class="text-[10px] text-gray-400 italic">sé stesso</span>
               </div>
             </div>
@@ -398,7 +517,9 @@
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6" (click)="$event.stopPropagation()">
     <div class="flex items-center justify-between mb-5">
       <div class="flex items-center gap-3">
-        <div class="p-2 rounded-lg" [class.bg-blue-50]="createForm.type === 'ROLE'" [class.bg-orange-50]="createForm.type === 'ACTION'">
+        <div class="p-2" 
+          [class.rounded-xl]="createForm.type === 'ROLE'" [class.bg-blue-50]="createForm.type === 'ROLE'"
+          [class.rounded-full]="createForm.type === 'ACTION'" [class.bg-orange-50]="createForm.type === 'ACTION'">
           <lucide-icon
             [name]="createForm.type === 'ROLE' ? 'shield' : 'zap'"
             class="w-5 h-5"
@@ -466,6 +587,60 @@
           <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           Creazione...
         </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale Eliminazione Badge (Smart Delete) -->
+<div *ngIf="showDeleteModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm"
+  (click)="closeDeleteModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6" (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-3 text-red-600 mb-4">
+      <div class="p-2 bg-red-50 rounded-lg">
+        <lucide-icon name="alert-triangle" class="w-6 h-6"></lucide-icon>
+      </div>
+      <h3 class="text-xl font-bold">Conferma Disattivazione</h3>
+    </div>
+
+    <div class="space-y-4 mb-6">
+      <p class="text-gray-600 text-sm leading-relaxed">
+        Stai per disattivare il badge <strong class="text-gray-900">{{ formatBadgeName(badgeToDelete?.name || '') }}</strong>.
+      </p>
+
+      <!-- Opzione Bypass Transitivo -->
+      <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            [(ngModel)]="preserveHierarchyOnDelete"
+            class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
+          <div>
+            <p class="text-sm font-bold text-gray-800">Preserva Gerarchia (Consigliato)</p>
+            <p class="text-xs text-gray-500 leading-tight mt-0.5">
+              I badge che dipendono da questo erediteranno direttamente i suoi genitori. Evita la perdita accidentale di permessi.
+            </p>
+          </div>
+        </label>
+      </div>
+      
+      <p class="text-[11px] text-gray-400 italic font-medium">
+        Nota: Il badge non verrà eliminato fisicamente dal database, ma non sarà più assegnabile agli utenti.
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <button
+        (click)="closeDeleteModal()"
+        class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium cursor-pointer">
+        Annulla
+      </button>
+      <button
+        (click)="confirmDelete()"
+        [disabled]="loading"
+        class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-bold shadow-md shadow-red-100 disabled:opacity-50 cursor-pointer">
+        {{ loading ? 'Elaborazione...' : 'Conferma' }}
       </button>
     </div>
   </div>

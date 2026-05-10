@@ -52,10 +52,10 @@ export class BadgeManagementService {
     }
   }
 
-  async deleteBadge(name: string): Promise<void> {
+  async deleteBadge(name: string, preserveHierarchy: boolean = false): Promise<void> {
     try {
       this.loadingSubject.next(true);
-      await this.axiosService.delete(`${this.baseUrl}/${name}`);
+      await this.axiosService.delete(`${this.baseUrl}/${name}?preserveHierarchy=${preserveHierarchy}`);
       await this.loadBadges();
     } finally {
       this.loadingSubject.next(false);

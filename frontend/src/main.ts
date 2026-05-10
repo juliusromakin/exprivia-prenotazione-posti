@@ -57,7 +57,15 @@ import {
   GitBranch,
   CheckCircle,
   AlertCircle,
-  Trash2
+  Trash2,
+  Hand,
+  MousePointer,
+  Move,
+  Square,
+  Maximize,
+  AlertTriangle,
+  Link,
+  Link2
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -137,7 +145,15 @@ bootstrapApplication(AppComponent, {
         GitBranch,
         CheckCircle,
         AlertCircle,
-        Trash2
+        Trash2,
+        Hand,
+        MousePointer,
+        Move,
+        Square,
+        Maximize,
+        AlertTriangle,
+        Link,
+        Link2
       })
     ),
     AxiosService,

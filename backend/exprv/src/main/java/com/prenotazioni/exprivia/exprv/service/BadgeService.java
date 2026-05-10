@@ -1,6 +1,7 @@
 package com.prenotazioni.exprivia.exprv.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,12 +84,29 @@ public class BadgeService {
 
         String formattedName = formatBadgeName(badgeDto.getName(), badgeDto.getType());
 
-        // Se il nome cambia, verifichiamo l'unicità
         if (!badge.getName().equals(formattedName)) {
             if (badgeRepository.findByName(formattedName).isPresent()) {
                 throw new AppException("Il badge " + formattedName + " esiste già.", HttpStatus.CONFLICT);
             }
             badge.setName(formattedName);
+        }
+
+        if (badgeDto.getParentIds() != null && !badgeDto.getParentIds().isEmpty()) {
+            List<Badge> allBadges = badgeRepository.findAll();
+
+            Map<Integer, Badge> badgeMap = new HashMap<>();
+            for (Badge b : allBadges) {
+                badgeMap.put(b.getId(), b);
+            }
+
+            for (Integer pId : badgeDto.getParentIds()) {
+                if (isReachable(pId, id, badgeMap)) {
+                    Badge parent = badgeMap.get(pId);
+                    String parentName = (parent != null) ? parent.getName() : pId.toString();
+                    throw new AppException("Ciclo rilevato! Il badge " + parentName + " eredita gia da questo badge.",
+                            HttpStatus.BAD_REQUEST);
+                }
+            }
         }
 
         badge.setType(badgeDto.getType());
@@ -111,22 +129,43 @@ public class BadgeService {
     }
 
     /**
-     * Disattiva un badge (soft delete) e lo rimuove dalle gerarchie degli altri badge.
+     * Disattiva un badge (soft delete) e lo rimuove dalle gerarchie degli altri
+     * badge.
      */
     @Transactional
-    public void deleteBadge(String name) {
+    public void deleteBadge(String name, boolean preserveHierarchy) {
         Badge badge = getBadgeByName(name);
-        badge.setIsActive(false);
-        badgeRepository.save(badge);
 
-        // Pulizia: rimuovere l'ID di questo badge da tutti i riferimenti parent_ids
-        List<Badge> allBadges = badgeRepository.findAll();
-        for (Badge b : allBadges) {
-            if (b.getParentIds() != null && b.getParentIds().removeIf(id -> id.equals(badge.getId()))) {
-                badgeRepository.save(b);
+        List<Integer> grandParents = new ArrayList<>();
+        if (badge.getParentIds() != null) {
+            for (Integer gpId : badge.getParentIds()) {
+                grandParents.add(gpId);
             }
         }
-        log.info("Badge disattivato e rimosso dalle gerarchie: {}", name);
+
+        badge.setIsActive(false);
+        badge.setParentIds(new ArrayList<>());
+        badgeRepository.save(badge);
+
+        List<Badge> allBadges = badgeRepository.findAll();
+        for (Badge b : allBadges) {
+            if (b.getParentIds() != null && b.getParentIds().contains(badge.getId())) {
+                badgeRepository.save(b);
+
+                if (preserveHierarchy && !grandParents.isEmpty()) {
+                    b.getParentIds().remove(badge.getId());
+
+                    if (preserveHierarchy && !grandParents.isEmpty()) {
+                        for (Integer gpId : grandParents) {
+                            if (!gpId.equals(b.getId()) && !b.getParentIds().contains(gpId)) {
+                                b.getParentIds().add(gpId);
+                            }
+                        }
+                    }
+                    badgeRepository.save(b);
+                }
+            }
+        }
     }
 
     /**
@@ -138,10 +177,13 @@ public class BadgeService {
             return flattenedNames;
         }
 
-        // Cache di tutti i badge attivi per lookup veloce durante la ricorsione
-        Map<Integer, Badge> activeBadgeMap = badgeRepository.findAll().stream()
-                .filter(Badge::getIsActive)
-                .collect(Collectors.toMap(Badge::getId, b -> b));
+        List<Badge> allBadges = badgeRepository.findAll();
+        Map<Integer, Badge> activeBadgeMap = new HashMap<>();
+        for (Badge b : allBadges) {
+            if (b.getIsActive()) {
+                activeBadgeMap.put(b.getId(), b);
+            }
+        }
 
         for (Badge badge : initialBadges) {
             resolveHierarchy(badge, flattenedNames, activeBadgeMap);
@@ -167,7 +209,8 @@ public class BadgeService {
     }
 
     /**
-     * Helper per formattare il nome del badge in maiuscolo e aggiungere il prefisso ROLE_ se necessario.
+     * Helper per formattare il nome del badge in maiuscolo e aggiungere il prefisso
+     * ROLE_ se necessario.
      */
     private String formatBadgeName(String name, BadgeType type) {
         String formatted = name.toUpperCase().trim();
@@ -184,37 +227,42 @@ public class BadgeService {
         if (auth == null || !auth.isAuthenticated()) {
             return false;
         }
-        return auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(a -> a.equals(badgeName));
+        for (GrantedAuthority authority : auth.getAuthorities()) {
+            if (authority.getAuthority().equals(badgeName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<String> getCurrentUserBadges() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            return List.of();
+            return new ArrayList<>();
         }
-        return auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        List<String> badgeNames = new ArrayList<>();
+        for (GrantedAuthority authority : auth.getAuthorities()) {
+            badgeNames.add(authority.getAuthority());
+        }
+        return badgeNames;
     }
 
     public static boolean isAdmin() {
         return hasBadge(AuthoritiesConstants.ADMIN);
     }
 
-    /**
-     * Aggiunge una relazione di ereditarietà tra due badge esistenti.
-     */
     @Transactional
     public void addChild(String badgeName, String inheritedBadgeName) {
         Badge badge = getBadgeByName(badgeName);
         Badge inherited = getBadgeByName(inheritedBadgeName);
 
-        Map<Integer, Badge> badgeMap = badgeRepository.findAll().stream()
-                .collect(Collectors.toMap(Badge::getId, b -> b));
+        List<Badge> allBadges = badgeRepository.findAll();
+        Map<Integer, Badge> badgeMap = new HashMap<>();
+        for (Badge b : allBadges) {
+            badgeMap.put(b.getId(), b);
+        }
 
-        if (hasCycle(badge, inherited, badgeMap)) {
+        if (isReachable(inherited.getId(), badge.getId(), badgeMap)) {
             throw new AppException("Ciclo infinito rilevato! Impossibile collegare i badge.", HttpStatus.BAD_REQUEST);
         }
 
@@ -229,18 +277,20 @@ public class BadgeService {
         }
     }
 
-    private boolean hasCycle(Badge source, Badge target, Map<Integer, Badge> badgeMap) {
-        if (target.getId().equals(source.getId())) {
+    private boolean isReachable(Integer startId, Integer targetId, Map<Integer, Badge> badgeMap) {
+        if (startId.equals(targetId)) {
             return true;
         }
-        if (target.getParentIds() != null) {
-            for (Integer pId : target.getParentIds()) {
-                Badge pBadge = badgeMap.get(pId);
-                if (pBadge != null && hasCycle(source, pBadge, badgeMap)) {
+
+        Badge badge = badgeMap.get(startId);
+        if (badge != null && badge.getParentIds() != null) {
+            for (Integer pId : badge.getParentIds()) {
+                if (isReachable(pId, targetId, badgeMap)) {
                     return true;
                 }
             }
         }
         return false;
     }
+
 }
