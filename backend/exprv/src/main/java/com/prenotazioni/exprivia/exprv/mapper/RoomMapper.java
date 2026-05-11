@@ -2,6 +2,7 @@ package com.prenotazioni.exprivia.exprv.mapper;
 
 import java.util.List;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,7 +14,7 @@ import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
 import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.entity.Room;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EquipmentMapper.class})
 public interface RoomMapper {
 
     @Mapping(source = "id", target = "id")
@@ -42,5 +43,12 @@ public interface RoomMapper {
     SelectOptionDTO toSelectOptionDTO(Room entity);
 
     List<SelectOptionDTO> toSelectOptionDTOList(List<Room> entities);
+
+    @AfterMapping
+    default void linkEquipment(@MappingTarget Room room) {
+        if (room.getEquipment() != null) {
+            room.getEquipment().forEach(e -> e.setRoom(room));
+        }
+    }
 
 }

@@ -42,37 +42,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
-    :host {
-      display: block;
-    }
-
-    @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes spin-reverse {
-      from {
-        transform: rotate(360deg);
-      }
-      to {
-        transform: rotate(0deg);
-      }
-    }
-
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
-
-    .animate-spin-reverse {
-      animation: spin-reverse 1s linear infinite;
-    }
-  `]
+  styleUrl: './loading.component.css'
 })
 export class LoadingComponent {
   @Input() message: string = '';

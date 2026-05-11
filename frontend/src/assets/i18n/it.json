@@ -115,14 +115,18 @@
       "TYPE_MEETING": "Sala Riunioni",
       "TYPE_OFFICE": "Ufficio",
       "CANCEL": "Annulla",
-      "CREATE": "Crea"
+      "CREATE": "Crea",
+      "EQUIPMENT": "Attrezzatura",
+      "ADD_EQUIPMENT": "Aggiungi Attrezzatura",
+      "CUSTOM_EQUIPMENT_NAME": "Nome attrezzatura personalizzata",
+      "QUANTITY": "Quantità"
     },
     "ALERTS": {
       "DESK_ID_PROMPT": "ID Postazione:",
       "NO_ELEMENTS": "Nessun elemento da salvare sul canvas.",
-      "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{rooms}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
-      "SAVE_SUCCESS": " Salvataggio completato!\n• {roomsCount} stanza/e salvata/e\n• {desksCount} postazione/i salvata/e",
-      "SAVE_ERROR": " Errore durante il salvataggio:\n{error}"
+      "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{{rooms}}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
+      "SAVE_SUCCESS": " Salvataggio completato!\n• {{roomsCount}} stanza/e salvata/e\n• {{desksCount}} postazione/i salvata/e",
+      "SAVE_ERROR": " Errore durante il salvataggio:\n{{error}}"
     }
   },
   "USER_MANAGEMENT": {

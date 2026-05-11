@@ -35,40 +35,14 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     TranslateModule
   ],
   providers: [],
-  styleUrls: ['../../shared/styles/toast.styles.css'],
+  styleUrls: ['../../shared/styles/toast.styles.css', './register.component.css'],
   animations: [
     authAnimations.fadeIn,
     authAnimations.slideUp,
     authAnimations.shake,
     authAnimations.scaleIn
   ],
-  styles: [`
-    :host ::ng-deep .mat-mdc-raised-button {
-      --mdc-filled-button-container-color: transparent;
-      --mdc-filled-button-container-shape: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
-      height: 48px;
-      padding: 0;
-    }
 
-    :host ::ng-deep .mat-mdc-raised-button:hover {
-      box-shadow: var(--shadow-xl);
-      transform: scale(1.02);
-    }
-
-    :host ::ng-deep .mat-mdc-raised-button:disabled {
-      opacity: 0.5;
-    }
-
-    :host ::ng-deep .mat-mdc-raised-button .mdc-button__label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-    }
-  `]
 })
 export class RegisterComponent {
   registerForm: FormGroup;

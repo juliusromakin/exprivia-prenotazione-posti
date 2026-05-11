@@ -1,5 +1,6 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,8 @@ public class RoomDTO {
     private Double mapY;
     private Double mapWidth;
     private Double mapHeight;
+    @Valid
+    private java.util.List<EquipmentDTO> equipment;
 
     public RoomDTO() {
     }
@@ -122,6 +125,14 @@ public class RoomDTO {
 
     public void setMapHeight(Double mapHeight) {
         this.mapHeight = mapHeight;
+    }
+
+    public java.util.List<EquipmentDTO> getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(java.util.List<EquipmentDTO> equipment) {
+        this.equipment = equipment;
     }
 
 }

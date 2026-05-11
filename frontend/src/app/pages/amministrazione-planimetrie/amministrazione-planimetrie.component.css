@@ -1,0 +1,15 @@
+/* Colore del placeholder sfocato prima della digitazione */
+::ng-deep .planimetria-datepicker input::placeholder {
+    color: white !important;
+    opacity: 1 !important;
+}
+
+/* Colore dell'iconcina del calendario nel mat-datepicker */
+::ng-deep .planimetria-datepicker .mat-datepicker-toggle,
+::ng-deep .planimetria-datepicker .mat-datepicker-toggle button,
+::ng-deep .planimetria-datepicker .mat-datepicker-toggle mat-icon,
+::ng-deep .planimetria-datepicker .mat-datepicker-toggle svg,
+::ng-deep .planimetria-datepicker .mat-datepicker-toggle-default-icon {
+    color: white !important;
+    fill: white !important;
+}

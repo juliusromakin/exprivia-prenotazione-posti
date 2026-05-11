@@ -221,6 +221,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
             workspaces: (workspaces as Workspace[]).filter(w => w.roomId === room.id)
           }));
 
+          // Initialize availableWorkspaces with all workspaces enriched with room info
+          // Filter out workspaces without coordinates (cannot be shown on map)
+          this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
+            (room.workspaces || [])
+              .filter(w => w.mapX != null && w.mapY != null)
+              .map(w => ({
+                ...w,
+                roomId: room.id!,
+                roomName: room.name!,
+                roomType: room.roomType!
+              }))
+          );
+
           this.state.isLoading = false;
         },
         error: (err: any) => {
@@ -239,37 +252,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.bookingForm.get("roomType")?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(type => {
+        // Only reset room-specific selections, keep time selection
         this.bookingForm.patchValue({
           roomId: null,
-          workspaceId: "",
-          slotDuration: "",
-          timeSlot: ""
+          workspaceId: ""
         });
-
-        if (type) {
-          const filteredRooms = this.state.rooms.filter(s => s.roomType === type || (typeof s.roomType === 'string' && s.roomType.toUpperCase() === String(type).toUpperCase()));
-          const allWorkspaces: any[] = filteredRooms
-            .flatMap(room => (room.workspaces || []).map(w => ({
-              ...w,
-              roomId: room.id!,
-              roomName: room.name!,
-              roomType: room.roomType!
-            })));
-
-          if (this.isMeetingRoom()) {
-            const uniqueRooms = new Map<number, any>();
-            allWorkspaces.forEach(w => {
-              if (!uniqueRooms.has(w.roomId)) {
-                uniqueRooms.set(w.roomId, { ...w, name: w.roomName });
-              }
-            });
-            this.state.availableWorkspaces = Array.from(uniqueRooms.values());
-          } else {
-            this.state.availableWorkspaces = allWorkspaces;
-          }
-        } else {
-          this.state.availableWorkspaces = [];
-        }
       });
 
     this.bookingForm.get("slotDuration")?.valueChanges
@@ -296,9 +283,20 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         if (workspaceId) {
           const selectedWorkspace = this.state.availableWorkspaces.find(p => p.id === Number(workspaceId));
           if (selectedWorkspace) {
-            // Only patch roomId if it's different to avoid loops
+            const updates: any = {};
+            
+            // Sync roomType
+            if (this.bookingForm.get('roomType')?.value !== selectedWorkspace.roomType) {
+              updates.roomType = selectedWorkspace.roomType;
+            }
+            
+            // Sync roomId
             if (this.bookingForm.get('roomId')?.value !== selectedWorkspace.roomId) {
-              this.bookingForm.patchValue({ roomId: selectedWorkspace.roomId }, { emitEvent: false });
+              updates.roomId = selectedWorkspace.roomId;
+            }
+
+            if (Object.keys(updates).length > 0) {
+              this.bookingForm.patchValue(updates, { emitEvent: false });
             }
           }
         } else {
@@ -410,12 +408,31 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       this.reservationService.getAvailableTimeSlots(selectedDate, workspace.id!)
         .pipe(
           map(availableSlots => {
-            // Restore precise check with normalization for robust matching
+            // Robust check: ensure ALL 30-min intervals within the slot are available
             const normalize = (time: string) => (time || '').replace(/\s/g, '').replace(/^0/, '');
-            const target = normalize(startTime);
+            
+            // Helper to convert "HH:mm" to total minutes
+            const toMinutes = (t: string) => {
+              const [h, m] = t.split(':').map(Number);
+              return h * 60 + m;
+            };
 
-            const isAvailable = availableSlots && availableSlots.some(s =>
-              normalize(s).includes(target)
+            const startMinutes = toMinutes(startTime);
+            const endMinutes = toMinutes(endTime);
+            
+            // Generate all 30-min interval starts within the selected slot
+            const requiredIntervals: string[] = [];
+            for (let m = startMinutes; m < endMinutes; m += 30) {
+              const hStr = Math.floor(m / 60).toString().padStart(2, '0');
+              const mStr = (m % 60).toString().padStart(2, '0');
+              requiredIntervals.push(`${hStr}:${mStr}`);
+            }
+
+            const normalizedAvailable = (availableSlots || []).map(normalize);
+            
+            // A workspace is available ONLY if every required interval is in the available list
+            const isAvailable = requiredIntervals.length > 0 && requiredIntervals.every(interval => 
+              normalizedAvailable.includes(normalize(interval))
             );
 
             return {
@@ -461,7 +478,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   onWorkspaceSelectedFromPlanimetria(workspaceId: number): void {
     const selectedWorkspace = this.state.availableWorkspaces.find(p => p.id === workspaceId);
     if (!selectedWorkspace) return;
-    this.bookingForm.patchValue({ workspaceId: String(workspaceId), roomId: selectedWorkspace.roomId });
+    
+    // Set workspaceId - the subscription will handle roomId and roomType sync
+    this.bookingForm.patchValue({ 
+      workspaceId: String(workspaceId)
+    });
+    
     this.cdr.detectChanges();
   }
 
@@ -530,7 +552,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.bookingForm.reset({ roomType: "" });
     this.state.selectedDates = [];
     this.state.availableTimeSlots = [];
-    this.state.availableWorkspaces = [];
+    
+    // Re-initialize availableWorkspaces from rooms instead of clearing it
+    // This keeps the map populated for the "standard" view and future selections
+    this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
+      (room.workspaces || []).map(w => ({
+        ...w,
+        roomId: room.id!,
+        roomName: room.name!,
+        roomType: room.roomType!,
+        isAvailable: undefined
+      }))
+    );
+
     if (this.isAdmin) this.clearUserSearch();
   }
 

@@ -41,21 +41,24 @@
       <div class="planimetria-container">
         <img src="Planimetria.png" alt="Office Plan" class="planimetria-img" draggable="false">
         <div *ngFor="let room of rooms" class="floor-plan-room" [ngStyle]="getRoomStyle(room)">
-          <span class="room-label">{{ room.name }}</span>
+          <span class="room-label" *ngIf="scale >= 1.5">{{ room.name }}</span>
+          <span class="room-count" *ngIf="scale < 1.5" [class.empty]="getAvailableCount(room) === 0">{{ getAvailableCount(room) }}</span>
         </div>
-        <div *ngFor="let marker of markers" class="floor-plan-marker" [class.available]="marker.available"
-          [class.unavailable]="!marker.available" [class.selected]="marker.selected" [style.left.%]="marker.x"
-          [style.top.%]="marker.y" [style.transform]="'translate(-50%, -50%) scale(' + (1 / scale) + ')'"
-          (click)="selectMarker(marker, $event)">
-          <span class="marker-label">{{ marker.label }}</span>
-          <div class="marker-tooltip">
-            <span class="tooltip-name">{{ getTooltipLine1(marker.tooltip) }}</span>
-            <span class="tooltip-room">{{ getTooltipLine2(marker.tooltip) }}</span>
-            <span class="tooltip-status" [class.available]="marker.available" [class.unavailable]="!marker.available">
-              {{ marker.available ? ('BOOKING.PLANIMETRIA.TOOLTIP.AVAILABLE' | translate) : ('BOOKING.PLANIMETRIA.TOOLTIP.UNAVAILABLE' | translate) }}
-            </span>
+        <ng-container *ngIf="scale >= 1.5">
+          <div *ngFor="let marker of markers" class="floor-plan-marker" [class.available]="marker.available"
+            [class.unavailable]="!marker.available" [class.selected]="marker.selected" [style.left.%]="marker.x"
+            [style.top.%]="marker.y" [style.transform]="'translate(-50%, -50%) scale(' + (1 / scale) + ')'"
+            (click)="selectMarker(marker, $event)">
+            <span class="marker-label">{{ marker.label }}</span>
+            <div class="marker-tooltip">
+              <span class="tooltip-name">{{ getTooltipLine1(marker.tooltip) }}</span>
+              <span class="tooltip-room">{{ getTooltipLine2(marker.tooltip) }}</span>
+              <span class="tooltip-status" [class.available]="marker.available" [class.unavailable]="!marker.available">
+                {{ marker.available ? ('BOOKING.PLANIMETRIA.TOOLTIP.AVAILABLE' | translate) : ('BOOKING.PLANIMETRIA.TOOLTIP.UNAVAILABLE' | translate) }}
+              </span>
+            </div>
           </div>
-        </div>
+        </ng-container>
       </div>
     </div>
   </div>

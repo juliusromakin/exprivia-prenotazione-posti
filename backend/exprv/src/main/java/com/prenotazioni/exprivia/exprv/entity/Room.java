@@ -56,6 +56,9 @@ public class Room {
     @JsonIgnore
     private List<Workspace> workspaces = new ArrayList<>();
 
+    @OneToMany(mappedBy = "room", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<Equipment> equipment = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "id_floor")
     private Floor floor;
@@ -193,6 +196,14 @@ public class Room {
 
     public void setMapHeight(Double mapHeight) {
         this.mapHeight = mapHeight;
+    }
+
+    public List<Equipment> getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(List<Equipment> equipment) {
+        this.equipment = equipment;
     }
 
 }

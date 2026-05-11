@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Prevent layout shift by always reserving scrollbar space */
+:host ::ng-deep body {
+  overflow-y: scroll;
+}
