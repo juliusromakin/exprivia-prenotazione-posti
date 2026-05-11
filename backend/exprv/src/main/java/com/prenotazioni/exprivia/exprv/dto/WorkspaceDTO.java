@@ -17,22 +17,18 @@ public class WorkspaceDTO {
     private Integer roomId;
     
     private Boolean enabled;
-    private Double mapX;
-    private Double mapY;
 
     public WorkspaceDTO() {
     }
 
     public WorkspaceDTO(Integer id, String name, Integer capacity, WorkspaceStatus workspaceStatus,
-            Integer roomId, Boolean enabled, Double mapY, Double mapX) {
+            Integer roomId, Boolean enabled) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.workspaceStatus = workspaceStatus;
         this.roomId = roomId;
         this.enabled = enabled;
-        this.mapY = mapY;
-        this.mapX = mapX;
     }
 
     public Integer getId() {
@@ -83,20 +79,6 @@ public class WorkspaceDTO {
         this.enabled = enabled;
     }
 
-    public Double getMapX() {
-        return mapX;
-    }
 
-    public void setMapX(Double mapX) {
-        this.mapX = mapX;
-    }
-
-    public Double getMapY() {
-        return mapY;
-    }
-
-    public void setMapY(Double mapY) {
-        this.mapY = mapY;
-    }
 
 }

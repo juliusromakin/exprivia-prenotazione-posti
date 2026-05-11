@@ -26,15 +26,21 @@ public class RoomService {
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceService workspaceService;
     private final FloorRepository floorRepository;
+    private final com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository floorPlanRepository;
+    private final com.prenotazioni.exprivia.exprv.repository.RoomPositionRepository roomPositionRepository;
 
     public RoomService(RoomRepository roomRepository, RoomMapper roomMapper, 
                        WorkspaceRepository workspaceRepository, @Lazy WorkspaceService workspaceService,
-                       FloorRepository floorRepository) {
+                       FloorRepository floorRepository,
+                       com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository floorPlanRepository,
+                       com.prenotazioni.exprivia.exprv.repository.RoomPositionRepository roomPositionRepository) {
         this.roomRepository = roomRepository;
         this.roomMapper = roomMapper;
         this.workspaceRepository = workspaceRepository;
         this.workspaceService = workspaceService;
         this.floorRepository = floorRepository;
+        this.floorPlanRepository = floorPlanRepository;
+        this.roomPositionRepository = roomPositionRepository;
     }
 
     public List<RoomDTO> findAllRooms(boolean enabledOnly) {
@@ -60,19 +66,36 @@ public class RoomService {
                 .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND)));
     }
 
+    @Transactional
     public RoomDTO createRoom(RoomDTO roomDTO) {
-        Room entity = roomMapper.toEntity(roomDTO);
-        entity.setId(null);
+        Room entity = null;
 
         if (roomDTO.getFloorId() != null) {
             Floor floor = floorRepository.findById(roomDTO.getFloorId())
                     .orElseThrow(() -> new AppException("Floor with ID " + roomDTO.getFloorId() + " not found",
                             HttpStatus.NOT_FOUND));
-            entity.setFloor(floor);
+
+            // Check if room with same name exists on this floor
+            java.util.Optional<Room> existingRoomOpt = roomRepository.findByFloorId(floor.getId()).stream()
+                    .filter(r -> r.getName().equalsIgnoreCase(roomDTO.getName()))
+                    .findFirst();
+
+            if (existingRoomOpt.isPresent()) {
+                entity = existingRoomOpt.get();
+            } else {
+                entity = roomMapper.toEntity(roomDTO);
+                entity.setId(null);
+                entity.setFloor(floor);
+            }
+        } else {
+            entity = roomMapper.toEntity(roomDTO);
+            entity.setId(null);
         }
 
         validateEquipment(entity);
-        return roomMapper.toDto(roomRepository.save(entity));
+        Room savedRoom = roomRepository.save(entity);
+
+        return roomMapper.toDto(savedRoom);
     }
 
     @Transactional
@@ -89,8 +112,9 @@ public class RoomService {
         }
 
         validateEquipment(existingRoom);
-        roomRepository.save(existingRoom);
-        return roomMapper.toDto(existingRoom);
+        Room savedRoom = roomRepository.save(existingRoom);
+
+        return roomMapper.toDto(savedRoom);
     }
 
     private void validateEquipment(Room entity) {
