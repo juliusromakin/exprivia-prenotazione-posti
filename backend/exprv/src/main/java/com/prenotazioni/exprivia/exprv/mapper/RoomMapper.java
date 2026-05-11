@@ -47,7 +47,9 @@ public interface RoomMapper {
     @AfterMapping
     default void linkEquipment(@MappingTarget Room room) {
         if (room.getEquipment() != null) {
-            room.getEquipment().forEach(e -> e.setRoom(room));
+            for (com.prenotazioni.exprivia.exprv.entity.Equipment e : room.getEquipment()) {
+                e.setRoom(room);
+            }
         }
     }
 

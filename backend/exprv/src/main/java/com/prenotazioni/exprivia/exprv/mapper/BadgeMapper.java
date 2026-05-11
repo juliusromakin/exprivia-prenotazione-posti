@@ -4,16 +4,34 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.prenotazioni.exprivia.exprv.dto.BadgeDTO;
 import com.prenotazioni.exprivia.exprv.entity.Badge;
+import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface BadgeMapper {
+public abstract class BadgeMapper {
 
-    BadgeDTO toDto(Badge badge);
+    @Autowired
+    protected BadgeRepository badgeRepository;
 
-    Badge toEntity(BadgeDTO badgeDTO);
+    public abstract BadgeDTO toDto(Badge badge);
 
-    List<BadgeDTO> toDtoList(List<Badge> badges);
+    public abstract Badge toEntity(BadgeDTO badgeDTO);
+
+    public abstract List<BadgeDTO> toDtoList(List<Badge> badges);
+
+    // Conversione singola per Set<String> <-> Set<Badge> in altri mapper
+    public String map(Badge badge) {
+        return (badge != null) ? badge.getName() : null;
+    }
+
+    public Badge map(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        return badgeRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Badge non trovato: " + name));
+    }
 }

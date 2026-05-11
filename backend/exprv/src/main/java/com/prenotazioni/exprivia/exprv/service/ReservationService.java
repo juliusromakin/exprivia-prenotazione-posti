@@ -15,6 +15,9 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.prenotazioni.exprivia.exprv.dto.ReservationDTO;
@@ -48,6 +51,20 @@ public class ReservationService {
         this.durationRepository = durationRepository;
         this.reservationMapper = reservationMapper;
         this.emailService = emailService;
+    }
+
+    private void verifyOwnershipOrAny(String targetEmail, String anyAuthority) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            throw new AccessDeniedException("Utente non autenticato");
+        }
+
+        boolean hasAny = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(anyAuthority));
+
+        if (!hasAny && targetEmail != null && !targetEmail.equals(auth.getName())) {
+            throw new AccessDeniedException("Non hai i permessi per agire su questa risorsa");
+        }
     }
 
     public void validateReservationDTO(ReservationDTO reservationDTO) {
@@ -86,12 +103,17 @@ public class ReservationService {
     }
 
     public ReservationDTO findReservationById(Integer id) {
-        return reservationMapper.toDto(reservationRepository.findById(id)
+        Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(
-                        () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                        () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
+        
+        verifyOwnershipOrAny(reservation.getUser().getEmail(), "ACTION_RESERVATION_READ_ANY");
+        
+        return reservationMapper.toDto(reservation);
     }
 
     public List<ReservationDTO> findReservationsByUserEmail(String email) {
+        verifyOwnershipOrAny(email, "ACTION_RESERVATION_READ_ANY");
         return reservationMapper.toDtoList(reservationRepository.findByUserEmail(email));
     }
 
@@ -108,6 +130,8 @@ public class ReservationService {
 
         User user = userRepository.findById(reservationDTO.getUserId())
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+
+        verifyOwnershipOrAny(user.getEmail(), "ACTION_RESERVATION_CREATE_ANY");
 
         Workspace workspace = workspaceRepository.findById(reservationDTO.getWorkspaceId())
                 .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
@@ -139,10 +163,13 @@ public class ReservationService {
                         () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
 
         reservationMapper.updateReservationFromDto(reservationDTO, existingReservation);
+        
+        verifyOwnershipOrAny(existingReservation.getUser().getEmail(), "ACTION_RESERVATION_UPDATE_ANY");
 
         if (reservationDTO.getUserId() != null) {
             User user = userRepository.findById(reservationDTO.getUserId())
                     .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+            verifyOwnershipOrAny(user.getEmail(), "ACTION_RESERVATION_UPDATE_ANY");
             existingReservation.setUser(user);
         }
         if (reservationDTO.getWorkspaceId() != null) {
@@ -163,7 +190,9 @@ public class ReservationService {
         
         // Se lo stato è cambiato in DENIED, invia email
         if (oldStatus != ReservationStatus.DENIED && savedReservation.getStatus() == ReservationStatus.DENIED) {
-            sendStatusEmail(savedReservation, true); // Admin action
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdminAction = !savedReservation.getUser().getEmail().equals(auth.getName());
+            sendStatusEmail(savedReservation, isAdminAction); // Admin action
         }
 
         return reservationMapper.toDto(savedReservation);
@@ -173,8 +202,13 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
         
+        verifyOwnershipOrAny(reservation.getUser().getEmail(), "ACTION_RESERVATION_DELETE_ANY");
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdminAction = !reservation.getUser().getEmail().equals(auth.getName());
+        
         // Notifica cancellazione via email prima di eliminare
-        sendStatusEmail(reservation, true); // Considerata azione admin se fatta da questo service generico
+        sendStatusEmail(reservation, isAdminAction); // Considerata azione admin se fatta da questo service generico
         
         reservationRepository.deleteById(id);
     }
