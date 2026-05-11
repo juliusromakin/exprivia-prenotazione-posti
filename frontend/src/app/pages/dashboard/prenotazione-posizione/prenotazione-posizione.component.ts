@@ -222,10 +222,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           }));
 
           // Initialize availableWorkspaces with all workspaces enriched with room info
-          // Filter out workspaces without coordinates (cannot be shown on map)
+          // Filter out workspaces without coordinates (cannot be shown on map) or at (0,0) (phantom)
           this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
             (room.workspaces || [])
-              .filter(w => w.mapX != null && w.mapY != null)
+              .filter(w => w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0))
               .map(w => ({
                 ...w,
                 roomId: room.id!,
@@ -556,13 +556,15 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     // Re-initialize availableWorkspaces from rooms instead of clearing it
     // This keeps the map populated for the "standard" view and future selections
     this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
-      (room.workspaces || []).map(w => ({
-        ...w,
-        roomId: room.id!,
-        roomName: room.name!,
-        roomType: room.roomType!,
-        isAvailable: undefined
-      }))
+      (room.workspaces || [])
+        .filter(w => w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0))
+        .map(w => ({
+          ...w,
+          roomId: room.id!,
+          roomName: room.name!,
+          roomType: room.roomType!,
+          isAvailable: undefined
+        }))
     );
 
     if (this.isAdmin) this.clearUserSearch();

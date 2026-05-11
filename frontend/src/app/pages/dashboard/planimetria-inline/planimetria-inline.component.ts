@@ -238,28 +238,32 @@ export class PlanimetriaInlineComponent implements OnChanges {
     }
 
         for (const ws of workspacesToRender) {
-      if (ws.mapX !== undefined && ws.mapY !== undefined) {
-        const w = availableMap.get(ws.id!);
-        const isSelectable = !!w;
+          if (ws.mapX != null && ws.mapY != null && (ws.mapX > 0 || ws.mapY > 0)) {
+            const w = availableMap.get(ws.id!);
+            const isSelectable = !!w;
 
-        // mapX/mapY ora salvano già il centro esatto del marker (getBoundingRect() centrato)
-        this.markers.push({
-          id: String(ws.id),
-          label: ws.name,
-          tooltip: `${ws.name}\n${ws.roomName || ''}`,
-          x: (ws.mapX / this.REF_WIDTH) * 100,
-          y: (ws.mapY / this.REF_HEIGHT) * 100,
-          available: isSelectable ? (w.isAvailable !== false) : true,
-          selected: this.selectedWorkspaceId === ws.id,
-        });
-      }
-    }
+            this.markers.push({
+              id: String(ws.id),
+              label: ws.name,
+              tooltip: `${ws.name}\n${ws.roomName || ''}`,
+              x: (ws.mapX / this.REF_WIDTH) * 100,
+              y: (ws.mapY / this.REF_HEIGHT) * 100,
+              available: isSelectable ? (w.isAvailable !== false) : true,
+              selected: this.selectedWorkspaceId === ws.id,
+            });
+          }
+        }
   }
 
   getRoomStyle(room: Room): any {
-    if (room.mapX === undefined || room.mapY === undefined || room.mapWidth === undefined || room.mapHeight === undefined) {
+    if (room.mapX == null || room.mapY == null || room.mapWidth == null || room.mapHeight == null) {
       return { display: 'none' };
     }
+    
+    if (room.mapX === 0 && room.mapY === 0 && room.mapWidth === 0 && room.mapHeight === 0) {
+      return { display: 'none' };
+    }
+
     return {
       left: (room.mapX / this.REF_WIDTH * 100) + '%',
       top: (room.mapY / this.REF_HEIGHT * 100) + '%',
