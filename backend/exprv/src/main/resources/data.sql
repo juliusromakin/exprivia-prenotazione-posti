@@ -7,8 +7,8 @@ INSERT INTO reservation_duration (duration_name, minutes, is_active) VALUES
 ON CONFLICT (duration_name) DO NOTHING;
 
 -- Inserimento Sede, Edificio e Piano se non esistono
-INSERT INTO location (name, enabled, created_date, updated_date)
-SELECT 'Sede Principale', true, NOW(), NOW()
+INSERT INTO location (name, city, enabled, created_date, updated_date)
+SELECT 'Sede Principale', 'ROMA', true, NOW(), NOW()
 WHERE NOT EXISTS (SELECT 1 FROM location WHERE name = 'Sede Principale');
 
 INSERT INTO building (address, id_location, enabled, created_date, updated_date)

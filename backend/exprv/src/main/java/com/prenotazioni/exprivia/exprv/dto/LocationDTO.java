@@ -1,5 +1,6 @@
 package com.prenotazioni.exprivia.exprv.dto;
 
+import com.prenotazioni.exprivia.exprv.enumerati.Cities;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,12 +14,15 @@ public class LocationDTO {
     @NotNull(message = "Lo stato della sede è obbligatorio")
     private Boolean enabled;
 
+    private Cities city;
+
     public LocationDTO() {
     }
 
-    public LocationDTO(Integer id, String name) {
+    public LocationDTO(Integer id, String name, Cities city) {
         this.id = id;
         this.name = name;
+        this.city = city;
     }
 
     public Integer getId() {
@@ -43,6 +47,14 @@ public class LocationDTO {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Cities getCity() {
+        return city;
+    }
+
+    public void setCity(Cities city) {
+        this.city = city;
     }
 
 }
