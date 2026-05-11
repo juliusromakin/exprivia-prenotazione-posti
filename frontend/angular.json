@@ -34,7 +34,7 @@
             "styles": [
               "src/styles.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/tailwind.css"      
+              "src/tailwind.css"
             ],
             "scripts": []
           },
