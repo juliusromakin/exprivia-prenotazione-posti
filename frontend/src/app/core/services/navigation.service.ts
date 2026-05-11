@@ -62,6 +62,13 @@ export class NavigationService {
       badges: [UserRole.ADMIN],
     },
     {
+      label: "Gestione Sedi",
+      icon: "building",
+      route: "/dashboard/gestione-sedi",
+      adminOnly: true,
+      badges: [UserRole.ADMIN],
+    },
+    {
       label: "Update Profile",
       icon: "user",
       route: "/dashboard/update-user",

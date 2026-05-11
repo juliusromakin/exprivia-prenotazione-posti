@@ -48,7 +48,12 @@ import {
   ChartBar,
   LayoutDashboard,
   X,
-  ArrowLeft
+  ArrowLeft,
+  Building,
+  Building2,
+  Trash2,
+  PlusCircle,
+  Minus
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -119,7 +124,12 @@ bootstrapApplication(AppComponent, {
         ChartBar,
         LayoutDashboard,
         X,
-        ArrowLeft
+        ArrowLeft,
+        Building,
+        Building2,
+        Trash2,
+        PlusCircle,
+        Minus
       })
     ),
     AxiosService,
