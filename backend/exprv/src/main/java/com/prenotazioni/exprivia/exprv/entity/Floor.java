@@ -46,20 +46,7 @@ public class Floor {
     @Column(name = "enabled")
     private Boolean enabled = true;
 
-    @Column(name = "valid_from")
-    private LocalDate validFrom;
 
-    @Column(name = "valid_to")
-    private LocalDate validTo;
-
-    @Column(name = "image_path")
-    private String imagePath;
-
-    @Column(name = "canvas_width")
-    private Double canvasWidth;
-
-    @Column(name = "canvas_height")
-    private Double canvasHeight;
 
     @OneToMany(mappedBy = "floor")
     @JsonIgnore
@@ -107,51 +94,11 @@ public class Floor {
         this.enabled = enabled;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    public Double getCanvasWidth() {
-        return canvasWidth;
-    }
-
-    public void setCanvasWidth(Double canvasWidth) {
-        this.canvasWidth = canvasWidth;
-    }
-
-    public Double getCanvasHeight() {
-        return canvasHeight;
-    }
-
-    public void setCanvasHeight(Double canvasHeight) {
-        this.canvasHeight = canvasHeight;
-    }
-
     public List<Room> getRooms() {
         return rooms;
     }
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
-    }
-
-    public LocalDate getValidFrom() {
-        return validFrom;
-    }
-
-    public void setValidFrom(LocalDate validFrom) {
-        this.validFrom = validFrom;
-    }
-
-    public LocalDate getValidTo() {
-        return validTo;
-    }
-
-    public void setValidTo(LocalDate validTo) {
-        this.validTo = validTo;
     }
 }

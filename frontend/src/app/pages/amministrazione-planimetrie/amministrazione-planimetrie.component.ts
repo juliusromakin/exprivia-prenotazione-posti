@@ -8,7 +8,7 @@ import * as fabric from 'fabric';
 import { lastValueFrom } from 'rxjs';
 import { RoomService } from '../../core/services/room.service';
 import { WorkspaceService } from '../../core/services/workspace.service';
-import { PlanimetriaService, Planimetria } from '../../core/services/planimetria.service';
+import { PlanimetriaService, Planimetria, FloorDTO } from '../../core/services/planimetria.service';
 
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -55,8 +55,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
 
     // Modale selezione planimetria esistente
     showPlanimetriaModal = false;
-    listaPlanimetrie: Planimetria[] = [];
+    listaPlanimetrie: FloorDTO[] = [];
     isLoadingPlanimetrie = false;
+    selectedFloorId: number | null = null;
 
     // Dettagli stanza selezionata per il pannello laterale
     stanzaSelezionata: any = null;
@@ -121,10 +122,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         return `${y}-${m}-${d}`;
     }
 
-    formattaPlanimetria(p: Planimetria): string {
-        const from = p.validFrom ?? '?';
-        if (!p.validTo) return `Dal ${from} - Fine indeterminata`;
-        return `Dal ${from} al ${p.validTo}`;
+    formattaPlanimetria(p: FloorDTO): string {
+        return p.name || 'Piano senza nome';
     }
 
     onFineIndeterminataChange(): void {
@@ -181,28 +180,31 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         this.cdr.detectChanges();
     }
 
-    selezionaPlanimetria(planimetria: Planimetria): void {
+    selezionaPlanimetria(planimetria: FloorDTO): void {
         this.showPlanimetriaModal = false;
-
-        if (planimetria.validFrom) {
-            this.validFrom = new Date(planimetria.validFrom);
-        }
-        if (planimetria.validTo) {
-            this.validTo = new Date(planimetria.validTo);
-            this.fineIndeterminata = false;
-        } else {
-            this.validTo = null;
-            this.fineIndeterminata = true;
-        }
+        this.selectedFloorId = planimetria.id ?? null;
 
         if (planimetria.id) {
             this.planimetriaService.getPlanimetria(planimetria.id).subscribe({
                 next: (dettaglio) => {
-                    const imgPath = dettaglio.imagePath ?? planimetria.imagePath ?? null;
+                    if (dettaglio.validFrom) {
+                        this.validFrom = new Date(dettaglio.validFrom);
+                    } else {
+                        this.validFrom = null;
+                    }
+                    if (dettaglio.validTo) {
+                        this.validTo = new Date(dettaglio.validTo);
+                        this.fineIndeterminata = false;
+                    } else {
+                        this.validTo = null;
+                        this.fineIndeterminata = true;
+                    }
+
+                    const imgPath = dettaglio.imagePath ?? null;
                     if (imgPath) {
                         this.imageUrl = imgPath;
                         this.cdr.detectChanges();
-                        setTimeout(() => this.caricaPlanimetriaSelezionata(dettaglio), 0);
+                        setTimeout(() => this.caricaPlanimetriaSelezionata(planimetria, dettaglio), 0);
                     }
                 },
                 error: () => { this.cdr.detectChanges(); }
@@ -210,10 +212,117 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         }
     }
 
-    private caricaPlanimetriaSelezionata(dettaglio: Planimetria): void {
-        if (!this.imageUrl) return;
-        this.initCanvas(this.imageUrl);
-        // TODO: renderizzare stanze e postazioni da dettaglio.rooms / dettaglio.workspaces
+    private caricaPlanimetriaSelezionata(floor: FloorDTO, plan: Planimetria): void {
+        if (!this.imageUrl || !this.canvas) return;
+        this.canvas.clear();
+        
+        fabric.Image.fromURL(this.imageUrl).then((img) => {
+            if (!this.canvas) return;
+            img.set({
+                scaleX: this.canvas.width! / img.width!,
+                scaleY: this.canvas.height! / img.height!,
+                originX: 'left', originY: 'top',
+                left: 0, top: 0,
+                selectable: false, evented: false
+            });
+            this.canvas.backgroundImage = img;
+            
+            const idMap = new Map<number, number>();
+            
+            if (plan.rooms && floor.rooms) {
+                plan.rooms.forEach(pos => {
+                    const room = floor.rooms!.find(r => r.id === pos.roomId);
+                    if (!room) return;
+                    
+                    const left = pos.mapX;
+                    const top = pos.mapY;
+                    const width = pos.mapWidth;
+                    const height = pos.mapHeight;
+                    const name = room.name;
+                    const type = room.roomType;
+                    const equipment = room.equipment || [];
+                    
+                    const centerX = left + width / 2;
+                    const centerY = top + height / 2;
+                    
+                    const rect = new fabric.Rect({ 
+                        width, height, 
+                        fill: 'rgba(255, 165, 0, 0.35)', 
+                        stroke: 'rgba(255, 140, 0, 0.9)', 
+                        strokeWidth: 2, 
+                        originX: 'center', originY: 'center' 
+                    });
+                    const text = new fabric.Text(name, { 
+                        fontSize: 14, fill: '#fff', 
+                        backgroundColor: 'rgba(0,0,0,0.6)', 
+                        originX: 'center', originY: 'center', 
+                        opacity: 0 
+                    });
+                    
+                    const group = new fabric.Group([rect, text], { 
+                        left: centerX, top: centerY, 
+                        originX: 'center', originY: 'center',
+                        selectable: this.currentMode === 'SELECT' 
+                    });
+                    
+                    (group as any).data = { 
+                        tipo: 'stanza', 
+                        label: name, 
+                        roomType: type, 
+                        tempId: room.id,
+                        id: room.id, 
+                        equipment 
+                    };
+                    
+                    this.canvas!.add(group);
+                    group.setCoords();
+                    idMap.set(room.id, room.id);
+                });
+            }
+            
+            if (plan.workspaces && floor.workspaces) {
+                plan.workspaces.forEach(pos => {
+                    const ws = floor.workspaces!.find(w => w.id === pos.workspaceId);
+                    if (!ws) return;
+                    
+                    const x = pos.mapX;
+                    const y = pos.mapY;
+                    const label = ws.name;
+                    const tempRoomId = ws.roomId;
+                    
+                    const radius = 5;
+                    const circle = new fabric.Circle({ 
+                        radius, 
+                        fill: 'rgba(59, 130, 246, 0.75)', 
+                        stroke: '#1d4ed8', 
+                        strokeWidth: 2, 
+                        originX: 'center', originY: 'center' 
+                    });
+                    const textDesk = new fabric.Text(label, { 
+                        fontSize: 7, fill: '#fff', 
+                        fontWeight: 'bold', 
+                        originX: 'center', originY: 'center' 
+                    });
+                    const groupDesk = new fabric.Group([circle, textDesk], { 
+                        left: x, top: y, 
+                        originX: 'center', originY: 'center',
+                        selectable: this.currentMode === 'SELECT' 
+                    });
+                    
+                    (groupDesk as any).data = { 
+                        tipo: 'postazione', 
+                        label, 
+                        tempRoomId, 
+                        id: ws.id 
+                    };
+                    
+                    this.canvas!.add(groupDesk);
+                    groupDesk.setCoords();
+                });
+            }
+            
+            this.canvas.renderAll();
+        });
     }
 
     // ── Canvas ─────────────────────────────────────────────────────────────
@@ -658,46 +767,87 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
 
         try {
             const tempIdToRealId = new Map<number, number>();
+            
+            // 1. Salva le stanze logiche che sono NUOVE
             for (const stanza of stanzeCanvas) {
                 const tempId: number = stanza.data?.tempId;
                 const capacityCalcolata = capacityMap.get(tempId) ?? 1;
-                const bbox = stanza.getBoundingRect();
-                const payload = {
-                    name: stanza.data?.label ?? 'Stanza',
-                    roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
-                    capacity: capacityCalcolata,
-                    floorId: 1,
-                    enabled: true,
-                    mapX: Math.round(bbox.left),
-                    mapY: Math.round(bbox.top),
-                    mapWidth: Math.round(bbox.width),
-                    mapHeight: Math.round(bbox.height),
-                    equipment: stanza.data?.equipment || [],
-                    // Aggiungi date al payload stanza se necessario
-                    validFrom: validFromStr,
-                    validTo: validToStr
-                };
-                const savedRoom = await lastValueFrom(this.roomService.createRoom(payload));
-                if (tempId !== undefined && savedRoom.id !== undefined) {
-                    tempIdToRealId.set(tempId, savedRoom.id);
+                
+                if (stanza.data?.id) {
+                    // Stanza già esistente, mappa il suo ID
+                    tempIdToRealId.set(tempId, stanza.data.id);
+                } else {
+                    // Nuova stanza da creare logically
+                    const payload = {
+                        name: stanza.data?.label ?? 'Stanza',
+                        roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
+                        capacity: capacityCalcolata,
+                        floorId: this.selectedFloorId || 1,
+                        enabled: true,
+                        equipment: stanza.data?.equipment || []
+                    };
+                    const savedRoom = await lastValueFrom(this.roomService.createRoom(payload));
+                    if (tempId !== undefined && savedRoom.id !== undefined) {
+                        tempIdToRealId.set(tempId, savedRoom.id);
+                        stanza.data.id = savedRoom.id; // Salva l'ID reale sul canvas per i salvataggi futuri
+                    }
                 }
             }
 
+            // 2. Salva le postazioni logiche che sono NUOVE
             for (const postazione of postazioniCanvas) {
                 const tempRoomId: number | undefined = postazione.data?.tempRoomId;
                 const realRoomId = tempRoomId !== undefined ? tempIdToRealId.get(tempRoomId) : undefined;
                 if (realRoomId === undefined) continue;
-                const pbbox = postazione.getBoundingRect();
-                const payload = {
-                    name: postazione.data?.label ?? 'Postazione',
-                    roomId: realRoomId,
-                    capacity: 1,
-                    enabled: true,
-                    mapX: Math.round(pbbox.left + pbbox.width / 2),
-                    mapY: Math.round(pbbox.top + pbbox.height / 2)
-                };
-                await lastValueFrom(this.workspaceService.createWorkspace(payload as any));
+
+                if (postazione.data?.id) {
+                    // Postazione già esistente
+                    // Nessun bisogno di creare logically
+                } else {
+                    // Nuova postazione logica
+                    const payload = {
+                        name: postazione.data?.label ?? 'Postazione',
+                        roomId: realRoomId,
+                        capacity: 1,
+                        enabled: true
+                    };
+                    const savedWorkspace = await lastValueFrom(this.workspaceService.createWorkspace(payload as any));
+                    if (savedWorkspace.id !== undefined) {
+                        postazione.data.id = savedWorkspace.id; // Salva l'ID reale sul canvas
+                    }
+                }
             }
+
+            // 3. Costruisci il payload completo della Planimetria (FloorPlanDTO)
+            const planPayload: Planimetria = {
+                floorId: this.selectedFloorId || 1,
+                validFrom: validFromStr,
+                validTo: validToStr,
+                canvasWidth: this.canvas.width,
+                canvasHeight: this.canvas.height,
+                imagePath: this.imageUrl || 'Planimetria.png',
+                rooms: stanzeCanvas.map(stanza => {
+                    const bbox = stanza.getBoundingRect();
+                    return {
+                        roomId: stanza.data.id,
+                        mapX: Math.round(bbox.left),
+                        mapY: Math.round(bbox.top),
+                        mapWidth: Math.round(bbox.width),
+                        mapHeight: Math.round(bbox.height)
+                    };
+                }),
+                workspaces: postazioniCanvas.map(postazione => {
+                    const pbbox = postazione.getBoundingRect();
+                    return {
+                        workspaceId: postazione.data.id,
+                        mapX: Math.round(pbbox.left + pbbox.width / 2),
+                        mapY: Math.round(pbbox.top + pbbox.height / 2)
+                    };
+                })
+            };
+
+            // 4. Salva l'intero schema spaziale su FloorPlan
+            await lastValueFrom(this.planimetriaService.salvaDatiPlanimetria(planPayload));
 
             this.showAlert('Salvataggio Completato', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
                 roomsCount: stanzeCanvas.length,
