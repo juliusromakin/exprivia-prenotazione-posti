@@ -16,6 +16,7 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
 import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-inline.component';
 import { WorkspaceService } from "@core/services/workspace.service";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { PlanimetriaService } from "@core/services/planimetria.service";
 
 @Component({
   standalone: true,
@@ -94,6 +95,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
+    private planimetriaService: PlanimetriaService,
     public translate: TranslateService
   ) {
     this.bookingForm = this.fb.group({
@@ -199,17 +201,67 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.state.isLoading = true;
     this.state.errorMessage = "";
 
-    forkJoin({
-      rooms: this.roomService.getAllRooms().pipe(catchError(err => {
-        console.error('Error loading rooms:', err);
-        return of([]);
-      })),
-      workspaces: this.workspaceService.getWorkspaces().pipe(catchError(err => {
-        console.error('Error loading workspaces:', err);
-        return of([]);
-      }))
-    }).pipe(takeUntil(this.destroy$))
-      .subscribe({
+    let buildingId = 1;
+    if (this.selectedLocation === 'Milano') buildingId = 2;
+    else if (this.selectedLocation === 'Molfetta') buildingId = 3;
+
+    this.planimetriaService.getPlanimetrieByEdificio(buildingId).pipe(
+      switchMap(floors => {
+        if (!floors || floors.length === 0) return of({ rooms: [], workspaces: [] });
+
+        const planimetryCalls = floors.map(floor =>
+          this.planimetriaService.getPlanimetria(floor.id!).pipe(
+            map(plan => ({ floor, plan })),
+            catchError(() => of({ floor, plan: null }))
+          )
+        );
+
+        return forkJoin(planimetryCalls).pipe(
+          map(results => {
+            const allRooms: Room[] = [];
+            const allWorkspaces: Workspace[] = [];
+
+            results.forEach(({ floor, plan }) => {
+              // Copy to avoid mutating original list cache if any
+              const floorRooms: Room[] = floor.rooms ? JSON.parse(JSON.stringify(floor.rooms)) : [];
+              const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
+
+              if (plan) {
+                // Map room coordinates
+                if (plan.rooms) {
+                  floorRooms.forEach(r => {
+                    const rPos = plan.rooms!.find(p => p.roomId === r.id);
+                    if (rPos) {
+                      r.mapX = rPos.mapX;
+                      r.mapY = rPos.mapY;
+                      r.mapWidth = rPos.mapWidth;
+                      r.mapHeight = rPos.mapHeight;
+                    }
+                  });
+                }
+
+                // Map workspace coordinates
+                if (plan.workspaces) {
+                  floorWorkspaces.forEach(w => {
+                    const wPos = plan.workspaces!.find(p => p.workspaceId === w.id);
+                    if (wPos) {
+                      w.mapX = wPos.mapX;
+                      w.mapY = wPos.mapY;
+                    }
+                  });
+                }
+              }
+
+              allRooms.push(...floorRooms);
+              allWorkspaces.push(...floorWorkspaces);
+            });
+
+            return { rooms: allRooms, workspaces: allWorkspaces };
+          })
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
         next: ({ rooms, workspaces }) => {
           if (rooms.length === 0 && workspaces.length === 0) {
             this.state.errorMessage = "No data found. Please check backend connection.";
@@ -222,10 +274,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           }));
 
           // Initialize availableWorkspaces with all workspaces enriched with room info
-          // Filter out workspaces without coordinates (cannot be shown on map)
+          // Filter out workspaces without coordinates (cannot be shown on map) or at (0,0) (phantom)
           this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
             (room.workspaces || [])
-              .filter(w => w.mapX != null && w.mapY != null)
+              .filter(w => w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0))
               .map(w => ({
                 ...w,
                 roomId: room.id!,
@@ -556,13 +608,15 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     // Re-initialize availableWorkspaces from rooms instead of clearing it
     // This keeps the map populated for the "standard" view and future selections
     this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
-      (room.workspaces || []).map(w => ({
-        ...w,
-        roomId: room.id!,
-        roomName: room.name!,
-        roomType: room.roomType!,
-        isAvailable: undefined
-      }))
+      (room.workspaces || [])
+        .filter(w => w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0))
+        .map(w => ({
+          ...w,
+          roomId: room.id!,
+          roomName: room.name!,
+          roomType: room.roomType!,
+          isAvailable: undefined
+        }))
     );
 
     if (this.isAdmin) this.clearUserSearch();

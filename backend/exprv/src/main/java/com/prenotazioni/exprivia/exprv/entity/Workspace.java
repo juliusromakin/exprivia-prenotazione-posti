@@ -60,18 +60,13 @@ public class Workspace {
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
-    @Column(name = "map_x")
-    private Double mapX;
 
-    @Column(name = "map_y")
-    private Double mapY;
 
     public Workspace() {
     }
 
     public Workspace(Integer id, String name, Integer capacity,
-            WorkspaceStatus status, Boolean enabled, Room room, List<Reservation> reservations, Double mapX,
-            Double mapY) {
+            WorkspaceStatus status, Boolean enabled, Room room, List<Reservation> reservations) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
@@ -79,8 +74,6 @@ public class Workspace {
         this.enabled = enabled;
         this.room = room;
         this.reservations = reservations;
-        this.mapX = mapX;
-        this.mapY = mapY;
     }
 
     public Integer getId() {
@@ -155,20 +148,6 @@ public class Workspace {
         this.reservations = reservations;
     }
 
-    public Double getMapX() {
-        return mapX;
-    }
 
-    public void setMapX(Double mapX) {
-        this.mapX = mapX;
-    }
-
-    public Double getMapY() {
-        return mapY;
-    }
-
-    public void setMapY(Double mapY) {
-        this.mapY = mapY;
-    }
 
 }

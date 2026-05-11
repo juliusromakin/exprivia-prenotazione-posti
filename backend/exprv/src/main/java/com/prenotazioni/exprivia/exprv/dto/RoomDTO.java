@@ -23,28 +23,19 @@ public class RoomDTO {
     
     @NotNull(message = "Il piano di appartenenza è obbligatorio")
     private Integer floorId;
-    private Double mapX;
-    private Double mapY;
-    private Double mapWidth;
-    private Double mapHeight;
     @Valid
     private java.util.List<EquipmentDTO> equipment;
 
     public RoomDTO() {
     }
 
-    public RoomDTO(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled, Integer floorId,
-            Double mapX, Double mapY, Double mapWidth, Double mapHeight) {
+    public RoomDTO(Integer id, String name, RoomType roomType, Integer capacity, Boolean enabled, Integer floorId) {
         this.id = id;
         this.name = name;
         this.roomType = roomType;
         this.capacity = capacity;
         this.enabled = enabled;
         this.floorId = floorId;
-        this.mapX = mapX;
-        this.mapY = mapY;
-        this.mapWidth = mapWidth;
-        this.mapHeight = mapHeight;
     }
 
     public Integer getId() {
@@ -95,37 +86,7 @@ public class RoomDTO {
         this.floorId = floorId;
     }
 
-    public Double getMapX() {
-        return mapX;
-    }
 
-    public void setMapX(Double mapX) {
-        this.mapX = mapX;
-    }
-
-    public Double getMapY() {
-        return mapY;
-    }
-
-    public void setMapY(Double mapY) {
-        this.mapY = mapY;
-    }
-
-    public Double getMapWidth() {
-        return mapWidth;
-    }
-
-    public void setMapWidth(Double mapWidth) {
-        this.mapWidth = mapWidth;
-    }
-
-    public Double getMapHeight() {
-        return mapHeight;
-    }
-
-    public void setMapHeight(Double mapHeight) {
-        this.mapHeight = mapHeight;
-    }
 
     public java.util.List<EquipmentDTO> getEquipment() {
         return equipment;
@@ -134,5 +95,7 @@ public class RoomDTO {
     public void setEquipment(java.util.List<EquipmentDTO> equipment) {
         this.equipment = equipment;
     }
+
+
 
 }

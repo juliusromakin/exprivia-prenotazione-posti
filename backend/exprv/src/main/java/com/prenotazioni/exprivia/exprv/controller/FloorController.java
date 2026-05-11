@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.prenotazioni.exprivia.exprv.dto.FloorDTO;
+import com.prenotazioni.exprivia.exprv.dto.FloorPlanDTO;
 import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
 import com.prenotazioni.exprivia.exprv.service.FloorService;
 
@@ -74,15 +75,14 @@ public class FloorController {
 
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
     @PostMapping("/planimetry/save")
-    public ResponseEntity<Void> savePlanimetry(@RequestBody FloorDTO floorDTO) {
-        floorService.savePlanimetry(floorDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<FloorPlanDTO> savePlanimetry(@RequestBody FloorPlanDTO floorPlanDTO) {
+        return ResponseEntity.ok(floorService.savePlanimetry(floorPlanDTO));
     }
 
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping("/{id}/planimetry")
-    public ResponseEntity<FloorDTO> getFloorPlanimetry(@PathVariable Integer id) {
-        return ResponseEntity.ok(floorService.getFloorPlanimetry(id));
+    public ResponseEntity<FloorPlanDTO> getFloorPlanimetry(@PathVariable Integer id, @RequestParam(required = false) java.time.LocalDate date) {
+        return ResponseEntity.ok(floorService.getFloorPlanimetry(id, date));
     }
 
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")

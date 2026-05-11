@@ -5,17 +5,39 @@ import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AxiosService } from './axios.service';
 
-/** Rappresenta una Planimetria (corrispondente a un Floor nel backend). */
+export interface RoomPosition {
+    id?: number;
+    roomId: number;
+    mapX: number;
+    mapY: number;
+    mapWidth: number;
+    mapHeight: number;
+}
+
+export interface WorkspacePosition {
+    id?: number;
+    workspaceId: number;
+    mapX: number;
+    mapY: number;
+}
+
 export interface Planimetria {
+    id?: number;
+    floorId?: number;
+    validFrom?: string | null;
+    validTo?: string | null;
+    imagePath?: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    rooms?: RoomPosition[];
+    workspaces?: WorkspacePosition[];
+}
+
+export interface FloorDTO {
     id?: number;
     name?: string;
     buildingId?: number;
     enabled?: boolean;
-    imagePath?: string;
-    validFrom?: string | null;   // formato YYYY-MM-DD (LocalDate)
-    validTo?: string | null;     // formato YYYY-MM-DD (LocalDate), null = fine indeterminata
-    canvasWidth?: number;
-    canvasHeight?: number;
     rooms?: any[];
     workspaces?: any[];
 }
@@ -28,10 +50,10 @@ export class PlanimetriaService {
 
     constructor(private axiosService: AxiosService) {}
 
-    /** Recupera tutte le planimetrie di un edificio (buildingId). */
-    getPlanimetrieByEdificio(buildingId: number, enabledOnly = false): Observable<Planimetria[]> {
+    /** Recupera tutti i piani di un edificio. */
+    getPlanimetrieByEdificio(buildingId: number, enabledOnly = false): Observable<FloorDTO[]> {
         return from(
-            this.axiosService.get<Planimetria[]>(
+            this.axiosService.get<FloorDTO[]>(
                 `${this.baseUrl}/building/${buildingId}`,
                 { params: { enabledOnly } }
             )
@@ -39,8 +61,8 @@ export class PlanimetriaService {
     }
 
     /** Recupera i dettagli completi di una planimetria (incluse stanze e postazioni). */
-    getPlanimetria(id: number): Observable<Planimetria> {
-        return from(this.axiosService.get<Planimetria>(`${this.baseUrl}/${id}/planimetry`));
+    getPlanimetria(id: number, date?: string): Observable<Planimetria> {
+        return from(this.axiosService.get<Planimetria>(`${this.baseUrl}/${id}/planimetry`, { params: date ? { date } : {} }));
     }
 
     /** Crea una nuova planimetria. */

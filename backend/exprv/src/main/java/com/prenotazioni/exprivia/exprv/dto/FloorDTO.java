@@ -12,11 +12,6 @@ public class FloorDTO {
     @NotNull(message = "L'edificio di appartenenza è obbligatorio")
     private Integer buildingId;
     private Boolean enabled;
-    private String imagePath;
-    private LocalDate validFrom;
-    private LocalDate validTo;
-    private Double canvasWidth;
-    private Double canvasHeight;
     private List<RoomDTO> rooms;
     private List<WorkspaceDTO> workspaces;
 
@@ -61,29 +56,7 @@ public class FloorDTO {
         this.enabled = enabled;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    public Double getCanvasWidth() {
-        return canvasWidth;
-    }
-
-    public void setCanvasWidth(Double canvasWidth) {
-        this.canvasWidth = canvasWidth;
-    }
-
-    public Double getCanvasHeight() {
-        return canvasHeight;
-    }
-
-    public void setCanvasHeight(Double canvasHeight) {
-        this.canvasHeight = canvasHeight;
-    }
 
     public List<RoomDTO> getRooms() {
         return rooms;
@@ -101,19 +74,5 @@ public class FloorDTO {
         this.workspaces = workspaces;
     }
 
-    public LocalDate getValidFrom() {
-        return validFrom;
-    }
 
-    public void setValidFrom(LocalDate validFrom) {
-        this.validFrom = validFrom;
-    }
-
-    public LocalDate getValidTo() {
-        return validTo;
-    }
-
-    public void setValidTo(LocalDate validTo) {
-        this.validTo = validTo;
-    }
 }
