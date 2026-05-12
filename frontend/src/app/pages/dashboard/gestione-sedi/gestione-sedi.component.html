@@ -3,42 +3,45 @@
   <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 mb-2">{{ 'GESTIONE_SEDI.TITLE' | translate }}</h1>
-        <p class="text-slate-700 font-medium">{{ 'GESTIONE_SEDI.SUBTITLE' | translate }}</p>
+        <h1 class="text-2xl font-bold text-slate-900 mb-1">{{ 'GESTIONE_SEDI.TITLE' | translate }}</h1>
+        <p class="text-slate-500 text-sm">{{ 'GESTIONE_SEDI.SUBTITLE' | translate }}</p>
       </div>
 
       <div class="flex items-center gap-3">
-        <button (click)="openNewLocationModal()"
+        <button (click)="loadLocations()"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer">
-          <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
-          {{ 'GESTIONE_SEDI.NEW_LOCATION' | translate }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- View Switcher (Filtri) -->
-  <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
-    <div class="flex items-center gap-4">
-      <span class="text-sm font-medium text-slate-500 uppercase tracking-wider">{{ 'GESTIONE_SEDI.FILTER_BY' | translate }}</span>
-      <div class="flex items-center bg-slate-50 rounded-lg p-1">
-        <button (click)="setView('tutti')"
-          [class]="currentView === 'tutti' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
-          class="px-6 py-2 text-sm font-medium rounded-md transition-all cursor-pointer uppercase tracking-widest">
-          {{ 'GESTIONE_SEDI.VIEWS.ALL' | translate }}
-        </button>
-        <button (click)="setView('sede')"
-          [class]="currentView === 'sede' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
-          class="px-6 py-2 text-sm font-medium rounded-md transition-all cursor-pointer uppercase tracking-widest">
-          {{ 'GESTIONE_SEDI.VIEWS.LOCATION' | translate }}
+          <lucide-icon name="refresh-cw" class="w-4 h-4 mr-2"></lucide-icon>
+          Aggiorna
         </button>
       </div>
     </div>
   </div>
 
   <!-- Table Section -->
-  <div
-    class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <!-- Table Header Area (Filtri + Bottone Nuova Sede) -->
+    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white">
+      <div class="flex items-center gap-2">
+        <button (click)="setView('tutti')"
+          [class]="currentView === 'tutti' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'"
+          class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
+          <lucide-icon name="layers" class="w-4 h-4"></lucide-icon>
+          {{ 'GESTIONE_SEDI.VIEWS.ALL' | translate }}
+        </button>
+        <button (click)="setView('sede')"
+          [class]="currentView === 'sede' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'"
+          class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
+          <lucide-icon name="building-2" class="w-4 h-4"></lucide-icon>
+          {{ 'GESTIONE_SEDI.VIEWS.LOCATION' | translate }}
+        </button>
+      </div>
+
+      <button (click)="openNewLocationModal()"
+        class="inline-flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer font-bold">
+        <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
+        {{ 'GESTIONE_SEDI.NEW_LOCATION' | translate }}
+      </button>
+    </div>
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-slate-100">
         <thead class="bg-slate-50/50">
@@ -287,12 +290,12 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">#</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">nome</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">data inizio</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">data fine</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">stato</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">azioni</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.INDEX' | translate }}</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.NAME' | translate }}</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.DATE_IN' | translate }}</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.DATE_FIN' | translate }}</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.STATUS' | translate }}</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.ACTIONS' | translate }}</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -300,7 +303,9 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{{ i + 1 }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{{ p.name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600">{{ p.publishDate | date:'dd/MM/yyyy' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600 uppercase">INDETERMINATO</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600 uppercase">
+                  {{ p.validTo ? (p.validTo | date:'dd/MM/yyyy') : ('GESTIONE_SEDI.PLANIMETRIA_MODAL.TABLE.INDETERMINATE' | translate) }}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <ng-container *ngIf="p.isActive !== false; else disabledBadge">
                     <span [class]="isFutureDate(p.publishDate) ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"

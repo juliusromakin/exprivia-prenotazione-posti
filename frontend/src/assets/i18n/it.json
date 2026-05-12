@@ -119,10 +119,11 @@
       "EQUIPMENT": "Attrezzatura",
       "ADD_EQUIPMENT": "Aggiungi Attrezzatura",
       "CUSTOM_EQUIPMENT_NAME": "Nome attrezzatura personalizzata",
-      "QUANTITY": "Quantità"
+      "QUANTITY": "Quantità",
+      "PLAN_NAME": "Nome Planimetria"
     },
     "ALERTS": {
-      "DESK_ID_PROMPT": "ID Postazione:",
+      "DESK_ID_PROMPT": "Numero postazione:",
       "NO_ELEMENTS": "Nessun elemento da salvare sul canvas.",
       "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{{rooms}}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
       "SAVE_SUCCESS": " Salvataggio completato!\n• {{roomsCount}} stanza/e salvata/e\n• {{desksCount}} postazione/i salvata/e",
@@ -642,11 +643,11 @@
       "NEW_PLAN": "Nuova planimetria",
       "TABLE": {
         "INDEX": "#",
-        "NAME": "NomePlan",
-        "DATE_IN": "dataIn",
-        "DATE_FIN": "data fin",
-        "STATUS": "stato",
-        "ACTIONS": "azioni",
+        "NAME": "NOME",
+        "DATE_IN": "DATA INIZIO",
+        "DATE_FIN": "DATA FINE",
+        "STATUS": "STATO",
+        "ACTIONS": "AZIONI",
         "INDETERMINATE": "INDETERMINATO"
       }
     },

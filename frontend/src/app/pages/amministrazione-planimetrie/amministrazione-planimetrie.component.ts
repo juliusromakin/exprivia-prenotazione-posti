@@ -46,6 +46,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     validFrom: Date | null = null;
     validTo: Date | null = null;
     fineIndeterminata = false;
+    planName = '';
 
     // Modale validità (mostrato al click su Salva)
     showValiditaModal = false;
@@ -261,6 +262,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     // ── Modale validità ────────────────────────────────────────────────────
     apriModaleValidita(): void {
         this.validitaError = false;
+        // Rimosso l'esempio pre-impostato come richiesto
         this.showValiditaModal = true;
         this.cdr.detectChanges();
     }
@@ -336,6 +338,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         this.showPlanimetriaModal = false;
         this.selectedFloorId = piano.floorId ?? null;
         this.selectedFloorPlanId = piano.id ?? null;
+        this.planName = piano.name || '';
 
         if (!piano.id) return;
 
@@ -1052,7 +1055,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             const planPayload: Planimetria = {
                 id: this.selectedFloorPlanId ?? undefined,
                 floorId: (this.selectedFloorId ?? this.selectedFloor)!,
-                name: `Layout Piano ${this.selectedFloor}`,
+                name: this.planName,
                 isActive: true,
                 validFrom: validFromStr,
                 validTo: validToStr,
