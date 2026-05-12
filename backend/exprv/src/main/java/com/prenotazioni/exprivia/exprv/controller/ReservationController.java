@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -31,27 +32,32 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_READ_ANY')")
     @GetMapping
     public ResponseEntity<List<ReservationDTO>> getAllReservations() {
         return ResponseEntity.ok(reservationService.findAllReservations());
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_READ_OWN')")
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Integer id) {
         return ResponseEntity.ok(reservationService.findReservationById(id));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_READ_OWN')")
     @GetMapping("/user")
     public ResponseEntity<List<ReservationDTO>> getReservationsByEmail(@RequestParam String email) {
         return ResponseEntity.ok(reservationService.findReservationsByUserEmail(email));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_READ_ANY')")
     @GetMapping("/day")
     public ResponseEntity<List<ReservationDTO>> getReservationsByDay(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(reservationService.findReservationsByDay(date));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_READ_ANY')")
     @GetMapping("/day-workspace")
     public ResponseEntity<List<ReservationDTO>> getReservationsByDayAndWorkspace(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -59,6 +65,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.findReservationsByDayAndWorkspace(date, workspaceId));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/available-times")
     public ResponseEntity<List<String>> getAvailableTimes(
             @RequestParam Integer workspaceId,
@@ -66,12 +73,14 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getAvailableTimes(workspaceId, date));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_CREATE_OWN')")
     @PostMapping
     public ResponseEntity<ReservationDTO> createReservation(@RequestBody ReservationDTO reservationDTO) {
         ReservationDTO created = reservationService.createReservation(reservationDTO);
         return ResponseEntity.status(201).body(created);
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_UPDATE_OWN')")
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDTO> updateReservation(@PathVariable Integer id,
             @RequestBody ReservationDTO reservationDTO) {
@@ -80,12 +89,14 @@ public class ReservationController {
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_DELETE_OWN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Integer id) {
         reservationService.deleteReservation(id);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('ACTION_RESERVATION_EXPORT')")
     @GetMapping("/export-excel")
     public ResponseEntity<byte[]> exportDailyReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {

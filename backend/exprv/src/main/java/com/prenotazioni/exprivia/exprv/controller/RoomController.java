@@ -19,12 +19,14 @@ public class RoomController {
         this.roomService = roomService;
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping
     public ResponseEntity<List<RoomDTO>> getAllRooms(
             @RequestParam(required = false, defaultValue = "false") boolean enabledOnly) {
         return ResponseEntity.ok(roomService.findAllRooms(enabledOnly));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping("/floor/{floorId}")
     public ResponseEntity<List<RoomDTO>> getRoomsByFloor(
             @PathVariable Integer floorId,
@@ -32,38 +34,40 @@ public class RoomController {
         return ResponseEntity.ok(roomService.findRoomsByFloorId(floorId, enabledOnly));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping("/floor/{floorId}/options")
     public ResponseEntity<List<SelectOptionDTO>> getRoomOptionsByFloor(@PathVariable Integer floorId) {
         return ResponseEntity.ok(roomService.getRoomOptionsByFloor(floorId));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<RoomDTO> getRoomById(@PathVariable Integer id) {
         return ResponseEntity.ok(roomService.findRoomById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_CREATE')")
     public ResponseEntity<RoomDTO> createRoom(@jakarta.validation.Valid @RequestBody RoomDTO roomDTO) {
         return ResponseEntity.ok(roomService.createRoom(roomDTO));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable Integer id,
             @jakarta.validation.Valid @RequestBody RoomDTO roomDTO) {
         return ResponseEntity.ok(roomService.updateRoom(id, roomDTO));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_DELETE')")
     public ResponseEntity<Void> softDeleteRoom(@PathVariable Integer id) {
         roomService.softDeleteRoom(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/hard")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_DELETE')")
     public ResponseEntity<Void> hardDeleteRoom(@PathVariable Integer id) {
         roomService.hardDeleteRoom(id);
         return ResponseEntity.noContent().build();

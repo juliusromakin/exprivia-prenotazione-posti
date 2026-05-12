@@ -53,6 +53,15 @@ export const DASHBOARD_ROUTES: Routes = [
         canActivate: [UserRouteAccessService],
       },
       {
+        path: "badge-management",
+        loadComponent: () =>
+          import("./badge-management/badge-management.component").then(
+            (m) => m.BadgeManagementComponent
+          ),
+        data: { badges: ["ROLE_ADMIN"] },
+        canActivate: [UserRouteAccessService],
+      },
+      {
         path: "gestione-sedi",
         loadComponent: () =>
           import("./gestione-sedi/gestione-sedi.component").then(

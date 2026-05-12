@@ -62,7 +62,22 @@ import {
   Edit3,
   Layers,
   Layout,
-  AlertCircle
+  AlertCircle,
+  RefreshCw,
+  ShieldCheck,
+  Zap,
+  ZapOff,
+  ShieldOff,
+  GitBranch,
+  CheckCircle,
+  Hand,
+  MousePointer,
+  Move,
+  Square,
+  Maximize,
+  AlertTriangle,
+  Link,
+  Link2
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -147,7 +162,22 @@ bootstrapApplication(AppComponent, {
         Edit3,
         Layers,
         Layout,
-        AlertCircle
+        AlertCircle,
+        RefreshCw,
+        ShieldCheck,
+        Zap,
+        ZapOff,
+        ShieldOff,
+        GitBranch,
+        CheckCircle,
+        Hand,
+        MousePointer,
+        Move,
+        Square,
+        Maximize,
+        AlertTriangle,
+        Link,
+        Link2
       })
     ),
     AxiosService,

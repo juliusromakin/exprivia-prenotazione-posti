@@ -40,6 +40,20 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
+    private void verifyOwnershipOrAny(String targetEmail, String anyAuthority) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            throw new AccessDeniedException("Utente non autenticato");
+        }
+
+        boolean hasAny = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(anyAuthority));
+
+        if (!hasAny && targetEmail != null && !targetEmail.equals(auth.getName())) {
+            throw new AccessDeniedException("Non hai i permessi per agire su questo profilo");
+        }
+    }
+
     /**
      * Retrieves all users from the database as AdminDTO (for ADMIN role users)
      */
@@ -78,6 +92,8 @@ public class UserService {
     public UserDTO updateUser(Integer id, UserUpdateDTO updateDTO) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
+
+        verifyOwnershipOrAny(existingUser.getEmail(), "ACTION_USER_UPDATE_ANY");
 
         if (updateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(updateDTO.getEmail());

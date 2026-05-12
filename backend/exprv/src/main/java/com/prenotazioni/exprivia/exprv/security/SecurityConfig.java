@@ -41,6 +41,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Preflight CORS (OPTIONS) - deve passare senza autenticazione
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         // Endpoint Pubblici (Swagger e Auth)
                         .requestMatchers(
                                 "/swagger-ui/**",

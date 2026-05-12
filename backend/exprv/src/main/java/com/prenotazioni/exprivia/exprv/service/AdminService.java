@@ -70,13 +70,7 @@ public class AdminService {
     }
 
     public AdminDTO updateUserByAdmin(Integer id, AdminUpdateUserDTO adminUpdateDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
+        if (!BadgeService.isAdmin()) {
             throw new AppException("Access denied: only an administrator can update a user", HttpStatus.FORBIDDEN);
         }
 
