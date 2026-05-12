@@ -256,7 +256,11 @@ export class GestioneSediComponent implements OnInit {
       payload.id = this.selectedLocationId;
       this.locationService.updateLocation(this.selectedLocationId, payload).subscribe({
         next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Sede', detail: 'Sede aggiornata con successo' });
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
+            detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION_SAVED') 
+          });
           this.showModal = false;
           this.loadLocations();
         },
@@ -268,7 +272,11 @@ export class GestioneSediComponent implements OnInit {
     } else {
       this.locationService.createLocation(payload).subscribe({
         next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Sede', detail: 'Sede creata con successo' });
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
+            detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION_SAVED') 
+          });
           this.showModal = false;
           this.loadLocations();
         },
@@ -278,12 +286,6 @@ export class GestioneSediComponent implements OnInit {
         }
       });
     }
-    this.messageService.add({ 
-      severity: 'success', 
-      summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
-      detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION_SAVED') 
-    });
-    this.showModal = false;
   }
 
   saveBuilding(): void {
@@ -308,7 +310,11 @@ export class GestioneSediComponent implements OnInit {
     this.loading = true;
     this.locationService.updateBuilding(this.selectedBuildingId, payload).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Edificio', detail: 'Dati edificio aggiornati con successo' });
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING'), 
+          detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING_SAVED') 
+        });
         this.showBuildingModal = false;
         this.loadLocations();
       },
@@ -317,12 +323,6 @@ export class GestioneSediComponent implements OnInit {
         this.loading = false;
       }
     });
-    this.messageService.add({ 
-      severity: 'success', 
-      summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING'), 
-      detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING_SAVED') 
-    });
-    this.showBuildingModal = false;
   }
 
   goToPlanimetriaManagement(): void {
