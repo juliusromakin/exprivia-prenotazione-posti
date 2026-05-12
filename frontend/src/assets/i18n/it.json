@@ -599,5 +599,90 @@
       "SHOW_PWD": "Mostra password",
       "HIDE_PWD": "Nascondi password"
     }
+  },
+  "GESTIONE_SEDI": {
+    "TITLE": "Gestione Sedi",
+    "SUBTITLE": "Gestisci le sedi aziendali e i relativi edifici",
+    "NEW_LOCATION": "Nuova Sede",
+    "FILTER_BY": "Filtra per:",
+    "VIEWS": {
+      "ALL": "Tutti",
+      "LOCATION": "Sede"
+    },
+    "TABLE": {
+      "ADDRESS": "Via",
+      "LOCATION_NAME": "Nome Sede",
+      "CITY": "Città",
+      "FLOORS_COUNT": "N.Piani",
+      "ACTIVE": "Attivo",
+      "ACTIONS": "Azioni",
+      "BUILDINGS": "Edifici"
+    },
+    "STATUS": {
+      "ACTIVE": "Attivo",
+      "INACTIVE": "Inattivo"
+    },
+    "DETAILS": {
+      "EMAIL": "Email",
+      "NO_EMAIL": "Nessuna email",
+      "PHONE": "Telefono",
+      "NO_PHONE": "Nessun telefono",
+      "SELECT_FLOOR": "Seleziona Piano",
+      "FLOOR": "Piano {{ floor }}",
+      "NO_FLOORS": "Nessun piano definito per questo edificio"
+    },
+    "PLANIMETRIA_MODAL": {
+      "TITLE": "Gestione Planimetria",
+      "NO_PLANS": "Nessuna planimetria",
+      "NO_PLANS_DESC": "Non ci sono ancora mappe caricate per questo piano.",
+      "UPLOADED_PLANS": "Planimetrie Caricate ({{ count }})",
+      "IN_FORCE_FROM": "In vigore dal:",
+      "STATUS_ACTIVE": "Attiva",
+      "STATUS_SCHEDULED": "Programmata",
+      "NEW_PLAN": "Nuova planimetria"
+    },
+    "BUILDING_MODAL": {
+      "TITLE": "Modifica Edificio",
+      "BUILDING_NAME": "Nome Edificio *",
+      "FLOORS_COUNT": "N. Piani *",
+      "ADDRESS": "Via / Indirizzo *",
+      "COORD_X": "Coord X",
+      "COORD_Y": "Coord Y",
+      "SAVE": "Salva Edificio"
+    },
+    "LOCATION_MODAL": {
+      "TITLE_EDIT": "Modifica Sede",
+      "TITLE_NEW": "Nuova Sede",
+      "LOCATION_NAME": "Nome Sede *",
+      "LOCATION_NAME_PLACEHOLDER": "es. Exprivia-bufalotta",
+      "CITY": "Città *",
+      "SELECT_CITY": "Seleziona una città",
+      "PHONE": "N. Telefonico",
+      "PHONE_PLACEHOLDER": "+39 02 ...",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "sede@azienda.it",
+      "ADD_BUILDINGS": "Inserire edifici?",
+      "ADD_BUILDINGS_HINT": "Puoi aggiungere edifici ora o farlo in seguito",
+      "BUILDING_NUMBER": "Edificio {{ index }}",
+      "BUILDING_NAME": "Nome *",
+      "BUILDING_NAME_PLACEHOLDER": "es. Ala A",
+      "FLOORS_COUNT": "N. Piani",
+      "ADDRESS": "Via",
+      "COORD_X": "Coord X",
+      "COORD_Y": "Coord Y",
+      "ADD_BUILDING_BTN": "Aggiungi edificio",
+      "SAVE": "Salva Modifiche"
+    },
+    "ACTIONS": {
+      "EDIT": "Modifica",
+      "DELETE": "Elimina",
+      "CANCEL": "Annulla"
+    },
+    "MESSAGES": {
+      "LOCATION": "Sede",
+      "LOCATION_SAVED": "Modifiche salvate (Front-end)",
+      "BUILDING": "Edificio",
+      "BUILDING_SAVED": "Dati edificio aggiornati (Front-end)"
+    }
   }
 }

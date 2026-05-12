@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { 
   LucideAngularModule
 } from 'lucide-angular';
@@ -135,7 +135,8 @@ export class GestioneSediComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.locationForm = this.fb.group({
       name: ['', Validators.required],
@@ -268,7 +269,11 @@ export class GestioneSediComponent implements OnInit {
       this.locationForm.markAllAsTouched();
       return;
     }
-    this.messageService.add({ severity: 'success', summary: 'Sede', detail: 'Modifiche salvate (Front-end)' });
+    this.messageService.add({ 
+      severity: 'success', 
+      summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
+      detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION_SAVED') 
+    });
     this.showModal = false;
   }
 
@@ -277,7 +282,11 @@ export class GestioneSediComponent implements OnInit {
       this.buildingForm.markAllAsTouched();
       return;
     }
-    this.messageService.add({ severity: 'success', summary: 'Edificio', detail: 'Dati edificio aggiornati (Front-end)' });
+    this.messageService.add({ 
+      severity: 'success', 
+      summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING'), 
+      detail: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING_SAVED') 
+    });
     this.showBuildingModal = false;
   }
 

@@ -599,5 +599,90 @@
       "SHOW_PWD": "Show password",
       "HIDE_PWD": "Hide password"
     }
+  },
+  "GESTIONE_SEDI": {
+    "TITLE": "Locations Management",
+    "SUBTITLE": "Manage corporate locations and their buildings",
+    "NEW_LOCATION": "New Location",
+    "FILTER_BY": "Filter by:",
+    "VIEWS": {
+      "ALL": "All",
+      "LOCATION": "Location"
+    },
+    "TABLE": {
+      "ADDRESS": "Address",
+      "LOCATION_NAME": "Location Name",
+      "CITY": "City",
+      "FLOORS_COUNT": "N. Floors",
+      "ACTIVE": "Active",
+      "ACTIONS": "Actions",
+      "BUILDINGS": "Buildings"
+    },
+    "STATUS": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "DETAILS": {
+      "EMAIL": "Email",
+      "NO_EMAIL": "No email",
+      "PHONE": "Phone",
+      "NO_PHONE": "No phone",
+      "SELECT_FLOOR": "Select Floor",
+      "FLOOR": "Floor {{ floor }}",
+      "NO_FLOORS": "No floors defined for this building"
+    },
+    "PLANIMETRIA_MODAL": {
+      "TITLE": "Floor Plan Management",
+      "NO_PLANS": "No floor plans",
+      "NO_PLANS_DESC": "There are no maps uploaded for this floor yet.",
+      "UPLOADED_PLANS": "Uploaded Floor Plans ({{ count }})",
+      "IN_FORCE_FROM": "Effective from:",
+      "STATUS_ACTIVE": "Active",
+      "STATUS_SCHEDULED": "Scheduled",
+      "NEW_PLAN": "New floor plan"
+    },
+    "BUILDING_MODAL": {
+      "TITLE": "Edit Building",
+      "BUILDING_NAME": "Building Name *",
+      "FLOORS_COUNT": "N. Floors *",
+      "ADDRESS": "Address / Location *",
+      "COORD_X": "Coord X",
+      "COORD_Y": "Coord Y",
+      "SAVE": "Save Building"
+    },
+    "LOCATION_MODAL": {
+      "TITLE_EDIT": "Edit Location",
+      "TITLE_NEW": "New Location",
+      "LOCATION_NAME": "Location Name *",
+      "LOCATION_NAME_PLACEHOLDER": "e.g. Exprivia-bufalotta",
+      "CITY": "City *",
+      "SELECT_CITY": "Select a city",
+      "PHONE": "Phone Number",
+      "PHONE_PLACEHOLDER": "+39 02 ...",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "location@company.com",
+      "ADD_BUILDINGS": "Add buildings?",
+      "ADD_BUILDINGS_HINT": "You can add buildings now or do it later",
+      "BUILDING_NUMBER": "Building {{ index }}",
+      "BUILDING_NAME": "Name *",
+      "BUILDING_NAME_PLACEHOLDER": "e.g. Wing A",
+      "FLOORS_COUNT": "N. Floors",
+      "ADDRESS": "Address",
+      "COORD_X": "Coord X",
+      "COORD_Y": "Coord Y",
+      "ADD_BUILDING_BTN": "Add building",
+      "SAVE": "Save Changes"
+    },
+    "ACTIONS": {
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "CANCEL": "Cancel"
+    },
+    "MESSAGES": {
+      "LOCATION": "Location",
+      "LOCATION_SAVED": "Changes saved (Front-end)",
+      "BUILDING": "Building",
+      "BUILDING_SAVED": "Building details updated (Front-end)"
+    }
   }
 }
