@@ -73,6 +73,12 @@ public class FloorController {
         return ResponseEntity.ok(floorService.getFloorOptionsByBuilding(buildingId));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
+    @GetMapping("/building/{buildingId}/planimetry/all")
+    public ResponseEntity<List<FloorPlanDTO>> getAllFloorPlanimetryByBuilding(@PathVariable Integer buildingId) {
+        return ResponseEntity.ok(floorService.getAllFloorPlansByBuildingId(buildingId));
+    }
+
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
     @PostMapping("/planimetry/save")
     public ResponseEntity<FloorPlanDTO> savePlanimetry(@RequestBody FloorPlanDTO floorPlanDTO) {

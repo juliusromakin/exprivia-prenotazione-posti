@@ -42,32 +42,10 @@
                     </div>
                 </div>
 
-                <!-- Filtro Sede + Conferma (Nascosto se c'è contesto) -->
-                <div *ngIf="!contextProvided" class="flex items-center gap-3">
-                    <div class="relative">
-                        <select id="sede-select" (change)="onSedeChange($event)" [disabled]="isConfirmed"
-                            class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl px-4 py-2.5 pr-10 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] transition-colors cursor-pointer appearance-none disabled:opacity-50 disabled:cursor-not-allowed">
-                            <option value="" disabled selected class="text-gray-900">{{ 'PLANIMETRIA_EDITOR.SELECT_SEDE' | translate }}</option>
-                            <option *ngFor="let sede of sedi" [value]="sede" class="text-gray-900">{{ sede }}</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-white/60 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <app-button *ngIf="!isConfirmed" [label]="'PLANIMETRIA_EDITOR.CONFIRM' | translate" type="primary" size="md" icon="fas fa-check"
-                        iconPosition="right" [disabled]="!selectedSede" (click)="onConfirm()"
-                        [ariaLabel]="'PLANIMETRIA_EDITOR.CONFIRM' | translate">
-                    </app-button>
-
-                    <app-button *ngIf="isConfirmed" [label]="'PLANIMETRIA_EDITOR.CHANGE_SEDE' | translate" type="ghost" size="md"
-                        icon="fas fa-exchange-alt" (click)="resetSede()" [ariaLabel]="'PLANIMETRIA_EDITOR.CHANGE_SEDE' | translate">
-                    </app-button>
-                </div>
             </div>
 
             <!-- EDITOR PANEL -->
-            <div *ngIf="isConfirmed" class="flex flex-col gap-4" @fadeIn>
+            <div class="flex flex-col gap-4" @fadeIn>
 
                 <!-- Toolbar Editor -->
                 <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex flex-wrap items-center gap-2">
@@ -229,13 +207,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <!-- PLACEHOLDER iniziale -->
-            <div *ngIf="!isConfirmed" class="bg-white/5 border border-dashed border-white/20 rounded-xl
-                        flex flex-col items-center justify-center py-24 gap-4" @scaleIn>
-                <i class="fas fa-map-marked-alt text-5xl text-white/20"></i>
-                <p class="text-white/40 text-base font-medium">{{ 'PLANIMETRIA_EDITOR.PLACEHOLDER.INITIAL_HINT' | translate }}</p>
             </div>
 
         </div>
@@ -400,24 +371,29 @@
             </div>
 
             <!-- Lista vuota -->
-            <div *ngIf="!isLoadingPlanimetrie && listaPlanimetrie.length === 0"
+            <div *ngIf="!isLoadingPlanimetrie && listaPiani.length === 0"
                 class="flex flex-col items-center justify-center py-12 gap-3">
                 <i class="fas fa-inbox text-3xl text-white/20"></i>
                 <p class="text-white/40 text-sm">Nessuna planimetria salvata trovata.</p>
             </div>
 
             <!-- Lista planimetrie -->
-            <div *ngIf="!isLoadingPlanimetrie && listaPlanimetrie.length > 0"
+            <div *ngIf="!isLoadingPlanimetrie && listaPiani.length > 0"
                 class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-                <button *ngFor="let p of listaPlanimetrie"
+                <button *ngFor="let p of listaPiani"
                     (click)="selezionaPlanimetria(p)"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--color-expriviaOrange)]/50 transition-all text-left group">
                     <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-expriviaOrange)]/20 transition-all">
                         <i class="fas fa-map text-white/50 group-hover:text-[var(--color-expriviaOrange)] text-sm transition-colors"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-white text-sm font-medium">{{ formattaPlanimetria(p) }}</p>
-                        <p *ngIf="p.rooms?.length" class="text-white/40 text-xs mt-0.5">{{ p.rooms!.length }} stanz{{ p.rooms!.length === 1 ? 'a' : 'e' }}</p>
+                        <p class="text-white text-sm font-medium">{{ p.floorName || 'Piano' }}</p>
+                        <p class="text-white/40 text-xs mt-0.5">
+                            <span>{{ p.validFrom ? (p.validFrom | date:'dd/MM/yyyy') : '?' }}</span>
+                            <span class="mx-1">→</span>
+                            <span>{{ p.validTo ? (p.validTo | date:'dd/MM/yyyy') : 'Indeterminata' }}</span>
+                        </p>
+                        <p *ngIf="p.rooms?.length" class="text-white/30 text-xs">{{ p.rooms!.length }} stanz{{ p.rooms!.length === 1 ? 'a' : 'e' }} posizionat{{ p.rooms!.length === 1 ? 'a' : 'e' }}</p>
                     </div>
                     <i class="fas fa-chevron-right text-white/20 group-hover:text-[var(--color-expriviaOrange)] transition-colors text-xs"></i>
                 </button>
@@ -457,8 +433,15 @@
     <div *ngIf="alertModal.show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-[var(--color-expriviaBlue)] border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+                <div [ngClass]="{
+                        'bg-green-500/20': alertModal.type === 'success',
+                        'bg-red-500/20': alertModal.type === 'error',
+                        'bg-orange-500/20': alertModal.type === 'warning'
+                    }"
+                    class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i *ngIf="alertModal.type === 'success'" class="fas fa-check-circle text-green-400 text-xl"></i>
+                    <i *ngIf="alertModal.type === 'error'" class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+                    <i *ngIf="alertModal.type === 'warning'" class="fas fa-exclamation-circle text-orange-400 text-xl"></i>
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-white">{{ alertModal.title }}</h3>

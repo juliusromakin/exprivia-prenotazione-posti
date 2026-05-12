@@ -24,6 +24,7 @@ export interface WorkspacePosition {
 export interface Planimetria {
     id?: number;
     floorId?: number;
+    floorName?: string;
     validFrom?: string | null;
     validTo?: string | null;
     imagePath?: string;
@@ -58,6 +59,11 @@ export class PlanimetriaService {
                 { params: { enabledOnly } }
             )
         );
+    }
+
+    /** Recupera tutti i FloorPlan (planimetrie) di un edificio, tutti i piani. */
+    getAllPlansByBuilding(buildingId: number): Observable<Planimetria[]> {
+        return from(this.axiosService.get<Planimetria[]>(`${this.baseUrl}/building/${buildingId}/planimetry/all`));
     }
 
     /** Recupera i dettagli completi di una planimetria (incluse stanze e postazioni). */

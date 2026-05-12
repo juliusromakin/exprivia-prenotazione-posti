@@ -179,31 +179,44 @@ public class FloorService {
         Floor floor = floorRepository.findById(floorPlanDTO.getFloorId())
                 .orElseThrow(() -> new AppException("Floor not found", HttpStatus.NOT_FOUND));
 
-        LocalDate dateToSearch = floorPlanDTO.getValidFrom() != null ? floorPlanDTO.getValidFrom() : LocalDate.now();
-        com.prenotazioni.exprivia.exprv.entity.FloorPlan floorPlan = floorPlanRepository.findActiveFloorPlan(floor.getId(), dateToSearch)
-                .orElseGet(() -> {
-                    com.prenotazioni.exprivia.exprv.entity.FloorPlan fp = new com.prenotazioni.exprivia.exprv.entity.FloorPlan();
-                    fp.setFloor(floor);
-                    fp.setValidFrom(dateToSearch);
-                    return fp;
-                });
+        LocalDate newValidFrom = floorPlanDTO.getValidFrom() != null ? floorPlanDTO.getValidFrom() : LocalDate.now();
 
+        com.prenotazioni.exprivia.exprv.entity.FloorPlan floorPlan;
+
+        if (floorPlanDTO.getId() != null) {
+            // L'utente ha caricato una pianimetria esistente
+            Optional<com.prenotazioni.exprivia.exprv.entity.FloorPlan> existingOpt =
+                    floorPlanRepository.findById(floorPlanDTO.getId());
+            if (existingOpt.isPresent() && existingOpt.get().getValidFrom().equals(newValidFrom)) {
+                // Stessa data → aggiorna quella esistente
+                floorPlan = existingOpt.get();
+            } else {
+                // Data cambiata → crea una NUOVA pianimetria (quella vecchia rimane intatta)
+                floorPlan = new com.prenotazioni.exprivia.exprv.entity.FloorPlan();
+                floorPlan.setFloor(floor);
+                floorPlan.setValidFrom(newValidFrom);
+            }
+        } else {
+            // Nessuna pianimetria esistente selezionata → crea sempre nuova
+            floorPlan = new com.prenotazioni.exprivia.exprv.entity.FloorPlan();
+            floorPlan.setFloor(floor);
+            floorPlan.setValidFrom(newValidFrom);
+        }
+
+        floorPlan.setValidFrom(newValidFrom);
+        if (floorPlanDTO.getValidTo() != null) {
+            floorPlan.setValidTo(floorPlanDTO.getValidTo());
+        }
         if (floorPlanDTO.getCanvasWidth() != null) {
             floorPlan.setCanvasWidth(floorPlanDTO.getCanvasWidth());
         }
         if (floorPlanDTO.getCanvasHeight() != null) {
             floorPlan.setCanvasHeight(floorPlanDTO.getCanvasHeight());
         }
-        if (floorPlanDTO.getValidFrom() != null) {
-            floorPlan.setValidFrom(floorPlanDTO.getValidFrom());
-        }
-        if (floorPlanDTO.getValidTo() != null) {
-            floorPlan.setValidTo(floorPlanDTO.getValidTo());
-        }
         if (floorPlanDTO.getImagePath() != null) {
             floorPlan.setImagePath(floorPlanDTO.getImagePath());
         }
-        
+
         floorPlan = floorPlanRepository.save(floorPlan);
 
         // Update positions of rooms
@@ -219,7 +232,7 @@ public class FloorService {
                 updateWorkspacePosition(floorPlan, workspaceDto);
             }
         }
-        
+
         return getFloorPlanDto(floorPlan);
     }
 
@@ -265,15 +278,40 @@ public class FloorService {
         if (date == null) date = LocalDate.now();
         Optional<com.prenotazioni.exprivia.exprv.entity.FloorPlan> fpOpt = floorPlanRepository.findActiveFloorPlan(floorId, date);
         if (fpOpt.isEmpty()) {
+            // Fallback: nessuna planimetria attiva per la data richiesta (es. validFrom futuro).
+            // Restituiamo l'ultima pianimetria salvata per questo piano.
+            java.util.List<com.prenotazioni.exprivia.exprv.entity.FloorPlan> allPlans =
+                floorPlanRepository.findAllByFloorIdOrderByValidFromDesc(floorId);
+            if (!allPlans.isEmpty()) {
+                fpOpt = Optional.of(allPlans.get(0));
+            }
+        }
+        if (fpOpt.isEmpty()) {
             throw new AppException("Planimetria non trovata per la data richiesta", HttpStatus.NOT_FOUND);
         }
         return getFloorPlanDto(fpOpt.get());
+    }
+
+    /** Restituisce tutti i FloorPlan di tutti i piani di un edificio. */
+    public List<FloorPlanDTO> getAllFloorPlansByBuildingId(Integer buildingId) {
+        List<Floor> floors = floorRepository.findByBuildingId(buildingId);
+        List<FloorPlanDTO> result = new ArrayList<>();
+        for (Floor floor : floors) {
+            List<com.prenotazioni.exprivia.exprv.entity.FloorPlan> plans =
+                    floorPlanRepository.findAllByFloorIdOrderByValidFromDesc(floor.getId());
+            for (com.prenotazioni.exprivia.exprv.entity.FloorPlan plan : plans) {
+                FloorPlanDTO dto = getFloorPlanDto(plan);
+                result.add(dto);
+            }
+        }
+        return result;
     }
     
     private FloorPlanDTO getFloorPlanDto(com.prenotazioni.exprivia.exprv.entity.FloorPlan fp) {
         FloorPlanDTO dto = new FloorPlanDTO();
         dto.setId(fp.getId());
         dto.setFloorId(fp.getFloor().getId());
+        dto.setFloorName(fp.getFloor().getName());
         dto.setValidFrom(fp.getValidFrom());
         dto.setValidTo(fp.getValidTo());
         dto.setImagePath(fp.getImagePath());
