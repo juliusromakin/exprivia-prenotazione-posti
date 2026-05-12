@@ -20,16 +20,16 @@
   <!-- View Switcher (Filtri) -->
   <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
     <div class="flex items-center gap-4">
-      <span class="text-sm font-black text-slate-600 uppercase tracking-wider">{{ 'GESTIONE_SEDI.FILTER_BY' | translate }}</span>
+      <span class="text-sm font-medium text-slate-500 uppercase tracking-wider">{{ 'GESTIONE_SEDI.FILTER_BY' | translate }}</span>
       <div class="flex items-center bg-slate-50 rounded-lg p-1">
         <button (click)="setView('tutti')"
           [class]="currentView === 'tutti' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
-          class="px-6 py-2 text-sm font-black rounded-md transition-all cursor-pointer uppercase tracking-widest">
+          class="px-6 py-2 text-sm font-medium rounded-md transition-all cursor-pointer uppercase tracking-widest">
           {{ 'GESTIONE_SEDI.VIEWS.ALL' | translate }}
         </button>
         <button (click)="setView('sede')"
           [class]="currentView === 'sede' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
-          class="px-6 py-2 text-sm font-black rounded-md transition-all cursor-pointer uppercase tracking-widest">
+          class="px-6 py-2 text-sm font-medium rounded-md transition-all cursor-pointer uppercase tracking-widest">
           {{ 'GESTIONE_SEDI.VIEWS.LOCATION' | translate }}
         </button>
       </div>
@@ -44,46 +44,46 @@
         <thead class="bg-slate-50/50">
           <tr *ngIf="currentView === 'tutti'">
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">#
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">#
             </th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ADDRESS' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.LOCATION_NAME' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.CITY' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.FLOORS_COUNT' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ACTIVE' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ACTIONS' | translate }}</th>
           </tr>
 
           <tr *ngIf="currentView === 'sede'">
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">#
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">#
             </th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.LOCATION_NAME' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.CITY' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.BUILDINGS' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ACTIVE' | translate }}</th>
             <th
-              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ACTIONS' | translate }}</th>
           </tr>
         </thead>
@@ -96,22 +96,22 @@
                 [class.border-l-4]="expandedRowIndex === i"
                 [class.border-blue-600]="expandedRowIndex === i"
                 class="hover:bg-slate-50 transition-all duration-200 cursor-pointer group border-l-4 border-transparent">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
                   <div class="flex items-center gap-2">
                     <lucide-icon [name]="expandedRowIndex === i ? 'chevron-down' : 'chevron-right'"
                       class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors"></lucide-icon>
                     {{ i + 1 }}
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.via }}
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{{ item.via }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-slate-900">{{ item.sedeName
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{{ item.sedeName
                   }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.city }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-black">{{ item.nPiani }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{{ item.city }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{{ item.nPiani }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                    class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
+                    class="px-3 py-1 text-[10px] font-medium rounded-full uppercase">
                     {{ (item.enabled ? 'GESTIONE_SEDI.STATUS.ACTIVE' : 'GESTIONE_SEDI.STATUS.INACTIVE') | translate }}
                   </span>
                 </td>
@@ -141,8 +141,8 @@
                           <lucide-icon name="building-2" class="w-5 h-5"></lucide-icon>
                         </div>
                         <div>
-                          <h3 class="text-lg font-black text-slate-900">{{ item.sedeName }}</h3>
-                          <p class="text-sm text-slate-700 font-bold">{{ item.city }} - {{ item.via }}</p>
+                          <h3 class="text-lg font-medium text-slate-900">{{ item.sedeName }}</h3>
+                          <p class="text-sm text-slate-500 font-medium">{{ item.city }} - {{ item.via }}</p>
                         </div>
                       </div>
 
@@ -151,9 +151,9 @@
                           class="p-4 bg-white rounded-xl border border-slate-300 group hover:border-blue-500 transition-all shadow-md hover:shadow-lg">
                           <div class="flex items-center gap-3 mb-1">
                             <lucide-icon name="mail" class="w-4 h-4 text-blue-600"></lucide-icon>
-                            <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ 'GESTIONE_SEDI.DETAILS.EMAIL' | translate }}</span>
+                            <span class="text-[10px] font-medium uppercase text-slate-400 tracking-widest">{{ 'GESTIONE_SEDI.DETAILS.EMAIL' | translate }}</span>
                           </div>
-                          <p class="text-sm font-black text-slate-900 truncate">{{
+                          <p class="text-sm font-medium text-slate-900 truncate">{{
                             item.originalLoc.email || ('GESTIONE_SEDI.DETAILS.NO_EMAIL' | translate) }}</p>
                         </div>
 
@@ -161,9 +161,9 @@
                           class="p-4 bg-white rounded-xl border border-slate-300 group hover:border-blue-500 transition-all shadow-md hover:shadow-lg">
                           <div class="flex items-center gap-3 mb-1">
                             <lucide-icon name="phone" class="w-4 h-4 text-blue-600"></lucide-icon>
-                            <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ 'GESTIONE_SEDI.DETAILS.PHONE' | translate }}</span>
+                            <span class="text-[10px] font-medium uppercase text-slate-400 tracking-widest">{{ 'GESTIONE_SEDI.DETAILS.PHONE' | translate }}</span>
                           </div>
-                          <p class="text-sm font-black text-slate-900">{{ item.originalLoc.phoneNumber
+                          <p class="text-sm font-medium text-slate-900">{{ item.originalLoc.phoneNumber
                             || ('GESTIONE_SEDI.DETAILS.NO_PHONE' | translate) }}</p>
                         </div>
                       </div>
@@ -176,7 +176,7 @@
                         class="bg-slate-200/50 rounded-2xl border border-slate-300 p-6 h-full flex flex-col">
                         <div class="flex items-center gap-3 mb-6 pb-3 border-b border-slate-300">
                           <lucide-icon name="map" class="w-5 h-5 text-blue-600"></lucide-icon>
-                          <h4 class="font-black text-blue-900 uppercase tracking-widest text-sm">{{ 'GESTIONE_SEDI.DETAILS.SELECT_FLOOR' | translate }}</h4>
+                          <h4 class="font-medium text-slate-700 uppercase tracking-widest text-sm">{{ 'GESTIONE_SEDI.DETAILS.SELECT_FLOOR' | translate }}</h4>
                         </div>
 
                         <!-- Griglia Pulsanti Piani -->
@@ -189,7 +189,7 @@
                               class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-2 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all border border-slate-200">
                               <lucide-icon name="layers" class="w-5 h-5"></lucide-icon>
                             </div>
-                            <span class="text-sm font-black text-slate-900 group-hover:text-white">{{ 'GESTIONE_SEDI.DETAILS.FLOOR' | translate:{ floor: floor } }}</span>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-white">{{ 'GESTIONE_SEDI.DETAILS.FLOOR' | translate:{ floor: floor } }}</span>
                           </button>
                         </div>
 
@@ -210,19 +210,19 @@
           <ng-container *ngIf="currentView === 'sede'">
             <tr *ngFor="let item of displayRows; let i = index"
               class="hover:bg-slate-50 transition-all duration-200 cursor-pointer border-l-4 border-transparent hover:border-blue-200">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ i + 1 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-slate-900">{{ item.sedeName
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{{ i + 1 }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{{ item.sedeName
                 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.city }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{{ item.city }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                 <span
-                  class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-bold">
+                  class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-medium">
                   {{ item.edificiCount }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                  class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
+                  class="px-3 py-1 text-[10px] font-medium rounded-full uppercase">
                   {{ (item.enabled ? 'GESTIONE_SEDI.STATUS.ACTIVE' : 'GESTIONE_SEDI.STATUS.INACTIVE') | translate }}
                 </span>
               </td>
@@ -343,37 +343,37 @@
     <form [formGroup]="buildingForm" (ngSubmit)="saveBuilding()" class="p-6 space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.BUILDING_NAME' | translate }}</label>
+          <label class="block text-sm font-medium text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.BUILDING_NAME' | translate }}</label>
           <input type="text" formControlName="name"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.FLOORS_COUNT' | translate }}</label>
+          <label class="block text-sm font-medium text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.FLOORS_COUNT' | translate }}</label>
           <input type="number" formControlName="numFloors"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2 md:col-span-2">
-          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.ADDRESS' | translate }}</label>
+          <label class="block text-sm font-medium text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.ADDRESS' | translate }}</label>
           <input type="text" formControlName="address"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.COORD_X' | translate }}</label>
+          <label class="block text-sm font-medium text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.COORD_X' | translate }}</label>
           <input type="number" formControlName="coordX"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.COORD_Y' | translate }}</label>
+          <label class="block text-sm font-medium text-slate-500 uppercase tracking-widest">{{ 'GESTIONE_SEDI.BUILDING_MODAL.COORD_Y' | translate }}</label>
           <input type="number" formControlName="coordY"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
       </div>
 
       <div class="flex gap-4 pt-4 border-t border-slate-100">
         <button type="button" (click)="closeModal()"
-          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-black rounded-xl transition-all cursor-pointer">{{ 'GESTIONE_SEDI.ACTIONS.CANCEL' | translate }}</button>
+          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-all cursor-pointer">{{ 'GESTIONE_SEDI.ACTIONS.CANCEL' | translate }}</button>
         <button type="submit"
-          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black shadow-lg shadow-blue-500/20 active:scale-95 transition-all cursor-pointer">{{ 'GESTIONE_SEDI.BUILDING_MODAL.SAVE' | translate }}</button>
+          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/20 active:scale-95 transition-all cursor-pointer">{{ 'GESTIONE_SEDI.BUILDING_MODAL.SAVE' | translate }}</button>
       </div>
     </form>
   </div>
@@ -481,7 +481,7 @@
             </div>
           </div>
           <button type="button" (click)="addBuildingRow()"
-            class="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 font-black cursor-pointer shadow-sm active:scale-95">
+            class="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer shadow-sm active:scale-95">
             <lucide-icon name="plus-circle" class="w-5 h-5"></lucide-icon>
             {{ 'GESTIONE_SEDI.LOCATION_MODAL.ADD_BUILDING_BTN' | translate }}
           </button>
@@ -491,9 +491,9 @@
       <div
         class="flex gap-4 pt-4 border-t border-slate-100 sticky bottom-0 bg-white pb-2 z-10">
         <button type="button" (click)="closeModal()"
-          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl transition-all cursor-pointer">{{ 'GESTIONE_SEDI.ACTIONS.CANCEL' | translate }}</button>
+          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-all cursor-pointer">{{ 'GESTIONE_SEDI.ACTIONS.CANCEL' | translate }}</button>
         <button type="submit"
-          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30 cursor-pointer">{{ 'GESTIONE_SEDI.LOCATION_MODAL.SAVE' | translate }}</button>
+          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 cursor-pointer">{{ 'GESTIONE_SEDI.LOCATION_MODAL.SAVE' | translate }}</button>
       </div>
     </form>
   </div>
