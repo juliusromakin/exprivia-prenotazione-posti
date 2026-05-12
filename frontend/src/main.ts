@@ -77,7 +77,9 @@ import {
   Maximize,
   AlertTriangle,
   Link,
-  Link2
+  Link2,
+  MoreVertical,
+  Slash
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -177,7 +179,9 @@ bootstrapApplication(AppComponent, {
         Maximize,
         AlertTriangle,
         Link,
-        Link2
+        Link2,
+        MoreVertical,
+        Slash
       })
     ),
     AxiosService,

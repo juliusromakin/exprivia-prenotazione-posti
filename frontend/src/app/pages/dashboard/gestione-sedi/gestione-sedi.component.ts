@@ -9,6 +9,7 @@ import {
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { LocationService } from '../../../core/services/location.service';
+import { PlanimetriaService, FloorDTO } from '../../../core/services/planimetria.service';
 
 interface Edificio {
   id?: number;
@@ -20,7 +21,7 @@ interface Edificio {
   locationId?: number;
   enabled?: boolean;
   sedeName?: string;
-  planimetrie?: { id: number, name: string, publishDate: Date }[];
+  planimetrie?: { id: number, name: string, publishDate: Date, enabled?: boolean }[];
 }
 
 interface Sede {
@@ -70,6 +71,34 @@ export class GestioneSediComponent implements OnInit {
   currentView: 'tutti' | 'sede' = 'tutti';
   predefinedCitta = ['Roma', 'Molfetta', 'Milano'];
   expandedRowIndex: number | null = null;
+  activeMenuIndex: number | null = null;
+
+  toggleActionMenu(index: number, event: Event): void {
+    event.stopPropagation();
+    this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
+  }
+
+  toggleFloorStatus(plan: any): void {
+    const newStatus = !plan.enabled;
+    this.planimetriaService.toggleFloorStatus(plan.id, newStatus).subscribe({
+      next: () => {
+        plan.enabled = newStatus;
+        this.activeMenuIndex = null;
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Successo', 
+          detail: `Planimetria ${newStatus ? 'abilitata' : 'disabilitata'} correttamente` 
+        });
+      },
+      error: () => {
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Errore', 
+          detail: 'Impossibile aggiornare lo stato della planimetria' 
+        });
+      }
+    });
+  }
 
   isFutureDate(date: Date): boolean {
     return date > new Date();
@@ -80,7 +109,8 @@ export class GestioneSediComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private translate: TranslateService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private planimetriaService: PlanimetriaService
   ) {
     this.locationForm = this.fb.group({
       name: ['', Validators.required],
@@ -167,9 +197,20 @@ export class GestioneSediComponent implements OnInit {
   }
 
   openPlanimetriaModal(building: Edificio, floor: number): void {
-    this.selectedBuilding = building;
+    this.selectedBuilding = { ...building };
     this.selectedFloor = floor;
     this.showPlanimetriaModal = true;
+    
+    // Carica le planimetrie reali dal servizio
+    if (building.id) {
+      this.planimetriaService.getPlanimetrieByEdificio(building.id).subscribe({
+        next: (plans: FloorDTO[]) => {
+          if (this.selectedBuilding) {
+            this.selectedBuilding.planimetrie = plans as any;
+          }
+        }
+      });
+    }
   }
 
   get buildingsArray(): FormArray {
@@ -326,7 +367,7 @@ export class GestioneSediComponent implements OnInit {
     });
   }
 
-  goToPlanimetriaManagement(): void {
+  goToPlanimetriaManagement(planId?: number): void {
     if (this.selectedBuilding && this.selectedFloor) {
       this.router.navigate(['/amministrazione-planimetrie'], {
         queryParams: {
@@ -334,7 +375,8 @@ export class GestioneSediComponent implements OnInit {
           buildingId: this.selectedBuilding.id,
           floor: this.selectedFloor,
           locationName: this.selectedBuilding.sedeName,
-          buildingName: this.selectedBuilding.name
+          buildingName: this.selectedBuilding.name,
+          planId: planId
         }
       });
     } else {

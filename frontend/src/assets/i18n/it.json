@@ -639,7 +639,16 @@
       "IN_FORCE_FROM": "In vigore dal:",
       "STATUS_ACTIVE": "Attiva",
       "STATUS_SCHEDULED": "Programmata",
-      "NEW_PLAN": "Nuova planimetria"
+      "NEW_PLAN": "Nuova planimetria",
+      "TABLE": {
+        "INDEX": "#",
+        "NAME": "NomePlan",
+        "DATE_IN": "dataIn",
+        "DATE_FIN": "data fin",
+        "STATUS": "stato",
+        "ACTIONS": "azioni",
+        "INDETERMINATE": "INDETERMINATO"
+      }
     },
     "BUILDING_MODAL": {
       "TITLE": "Modifica Edificio",

@@ -80,4 +80,15 @@ export class AxiosService {
     const response = await this.axiosInstance.delete<T>(url, config);
     return response.data;
   }
+
+  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data, {
+      ...config,
+      headers: {
+        ...config?.headers,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  }
 }

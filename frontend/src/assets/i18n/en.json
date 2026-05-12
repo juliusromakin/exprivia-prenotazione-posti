@@ -639,7 +639,16 @@
       "IN_FORCE_FROM": "Effective from:",
       "STATUS_ACTIVE": "Active",
       "STATUS_SCHEDULED": "Scheduled",
-      "NEW_PLAN": "New floor plan"
+      "NEW_PLAN": "New floor plan",
+      "TABLE": {
+        "INDEX": "#",
+        "NAME": "PlanName",
+        "DATE_IN": "startDate",
+        "DATE_FIN": "endDate",
+        "STATUS": "status",
+        "ACTIONS": "actions",
+        "INDETERMINATE": "INDETERMINATE"
+      }
     },
     "BUILDING_MODAL": {
       "TITLE": "Edit Building",

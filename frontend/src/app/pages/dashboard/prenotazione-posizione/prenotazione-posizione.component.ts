@@ -205,7 +205,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (this.selectedLocation === 'Milano') buildingId = 2;
     else if (this.selectedLocation === 'Molfetta') buildingId = 3;
 
-    this.planimetriaService.getPlanimetrieByEdificio(buildingId).pipe(
+    this.planimetriaService.getPlanimetrieByEdificio(buildingId, true).pipe(
       switchMap(floors => {
         if (!floors || floors.length === 0) return of({ rooms: [], workspaces: [] });
 

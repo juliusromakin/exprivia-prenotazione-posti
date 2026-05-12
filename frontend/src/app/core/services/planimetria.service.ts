@@ -100,4 +100,8 @@ export class PlanimetriaService {
             } as any)
         );
     }
+    /** Attiva o disattiva un piano (planimetria). */
+    toggleFloorStatus(id: number, enabled: boolean): Observable<void> {
+        return from(this.axiosService.patch<void>(`${this.baseUrl}/${id}/status`, null, { params: { enabled } }));
+    }
 }
