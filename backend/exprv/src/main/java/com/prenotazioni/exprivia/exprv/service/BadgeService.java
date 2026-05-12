@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.prenotazioni.exprivia.exprv.dto.BadgeDTO;
 import com.prenotazioni.exprivia.exprv.entity.Badge;
+import com.prenotazioni.exprivia.exprv.enumerati.AppAuthority;
 import com.prenotazioni.exprivia.exprv.enumerati.BadgeType;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
@@ -40,7 +41,9 @@ public class BadgeService {
      * Recupera tutti i badge presenti nel sistema.
      */
     public List<Badge> getAllBadges() {
-        return badgeRepository.findAll();
+        return badgeRepository.findAll().stream()
+                .filter(badge -> !badge.getName().equals(AppAuthority.ROLE_ADMIN.name()))
+                .collect(Collectors.toList());
     }
 
     /**

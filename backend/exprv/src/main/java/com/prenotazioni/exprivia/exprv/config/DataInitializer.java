@@ -91,20 +91,15 @@ public class DataInitializer implements CommandLineRunner {
         addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_RESERVATION_DELETE_ANY.name()));
         addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_RESERVATION_EXPORT.name()));
 
-        // ROLE_ADMIN: Eredita HR + CRUD Amministrativi
+        // ROLE_ADMIN: Eredita HR + TUTTE le altre azioni (Superuser)
         addParentLink(roleAdmin, roleHr);
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_USER_CREATE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_USER_READ.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_USER_UPDATE_ANY.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_USER_DELETE_ANY.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_FLOORPLAN_CREATE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_FLOORPLAN_UPDATE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_FLOORPLAN_DELETE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_BADGE_CREATE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_BADGE_READ.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_BADGE_UPDATE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_BADGE_DELETE.name()));
-        addParentLink(roleAdmin, badgeMap.get(AppAuthority.ACTION_RESERVATION_APPROVE.name()));
+        
+        log.info("Elevating ROLE_ADMIN to Superuser (all actions)...");
+        for (Badge b : badgeMap.values()) {
+            if (b.getType() == BadgeType.ACTION) {
+                addParentLink(roleAdmin, b);
+            }
+        }
 
         // Salva le modifiche alla gerarchia
         badgeRepository.saveAll(badgeMap.values());
