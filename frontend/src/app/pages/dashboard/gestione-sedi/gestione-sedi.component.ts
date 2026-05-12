@@ -19,6 +19,7 @@ interface Edificio {
   coordY: number;
   locationId?: number;
   enabled?: boolean;
+  sedeName?: string;
   planimetrie?: { id: number, name: string, publishDate: Date }[];
 }
 
@@ -134,7 +135,7 @@ export class GestioneSediComponent implements OnInit {
               city: loc.city,
               nPiani: ed.numFloors,
               enabled: loc.enabled,
-              originalEdificio: { ...ed, locationId: loc.id }, // Riferimento per edit edificio
+              originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name }, // Riferimento per edit edificio
               originalLoc: loc      // Riferimento per fallback
             });
           });
@@ -326,7 +327,19 @@ export class GestioneSediComponent implements OnInit {
   }
 
   goToPlanimetriaManagement(): void {
-    this.router.navigate(['/amministrazione-planimetrie']);
+    if (this.selectedBuilding && this.selectedFloor) {
+      this.router.navigate(['/amministrazione-planimetrie'], {
+        queryParams: {
+          locationId: this.selectedBuilding.locationId,
+          buildingId: this.selectedBuilding.id,
+          floor: this.selectedFloor,
+          locationName: this.selectedBuilding.sedeName,
+          buildingName: this.selectedBuilding.name
+        }
+      });
+    } else {
+      this.router.navigate(['/amministrazione-planimetrie']);
+    }
   }
 
   goToBookings(): void {

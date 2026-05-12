@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { authAnimations } from '../../shared/animations/auth.animations';
 import { ButtonComponent } from '../../shared/components/buttons/button.component';
@@ -11,6 +11,7 @@ import { WorkspaceService } from '../../core/services/workspace.service';
 import { PlanimetriaService, Planimetria, FloorDTO } from '../../core/services/planimetria.service';
 
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +25,7 @@ export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
     selector: 'app-amministrazione-planimetrie',
     standalone: true,
     imports: [
-        CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule, TranslateModule,
+        CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule, LucideAngularModule, TranslateModule,
         MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatCheckboxModule
     ],
     templateUrl: './amministrazione-planimetrie.component.html',
@@ -58,6 +59,14 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     listaPlanimetrie: FloorDTO[] = [];
     isLoadingPlanimetrie = false;
     selectedFloorId: number | null = null;
+    
+    // Contesto passato da Gestione Sedi
+    contextProvided = false;
+    locationId: number | null = null;
+    buildingId: number | null = null;
+    selectedFloor: number | null = null;
+    locationName = '';
+    buildingName = '';
 
     // Dettagli stanza selezionata per il pannello laterale
     stanzaSelezionata: any = null;
@@ -108,10 +117,26 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         private roomService: RoomService,
         private workspaceService: WorkspaceService,
         private planimetriaService: PlanimetriaService,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private route: ActivatedRoute
     ) { }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        this.route.queryParams.subscribe(params => {
+            if (params['locationId'] && params['buildingId'] && params['floor']) {
+                this.contextProvided = true;
+                this.locationId = +params['locationId'];
+                this.buildingId = +params['buildingId'];
+                this.selectedFloor = +params['floor'];
+                this.locationName = params['locationName'] || '';
+                this.buildingName = params['buildingName'] || '';
+                this.selectedSede = this.locationName;
+                
+                // Forza la conferma automatica visto che il contesto è già noto
+                this.onConfirm();
+            }
+        });
+    }
 
     // ── Utilità date ───────────────────────────────────────────────────────
     private formatDateYMD(date: Date | null): string | null {
