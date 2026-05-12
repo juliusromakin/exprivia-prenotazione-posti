@@ -20,8 +20,17 @@ public class Building {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "address")
     private String address;
+
+    @Column(name = "coord_x")
+    private Double coordX;
+
+    @Column(name = "coord_y")
+    private Double coordY;
 
     @ManyToOne
     @JoinColumn(name = "id_location")
@@ -45,9 +54,12 @@ public class Building {
     public Building() {
     }
 
-    public Building(Integer id, String address, Location location, List<Floor> floors) {
+    public Building(Integer id, String name, String address, Double coordX, Double coordY, Location location, List<Floor> floors) {
         this.id = id;
+        this.name = name;
         this.address = address;
+        this.coordX = coordX;
+        this.coordY = coordY;
         this.location = location;
         this.floors = floors;
     }
@@ -60,12 +72,36 @@ public class Building {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Double getCoordX() {
+        return coordX;
+    }
+
+    public void setCoordX(Double coordX) {
+        this.coordX = coordX;
+    }
+
+    public Double getCoordY() {
+        return coordY;
+    }
+
+    public void setCoordY(Double coordY) {
+        this.coordY = coordY;
     }
 
     public Location getLocation() {

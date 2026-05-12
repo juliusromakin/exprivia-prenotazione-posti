@@ -54,7 +54,17 @@ public class LocationService {
     public LocationDTO createLocation(LocationDTO locationDTO) {
         Location location = locationMapper.toEntity(locationDTO);
         location.setId(null); // Forza la creazione di un nuovo record
-        return locationMapper.toDto(locationRepository.save(location));
+        Location savedLocation = locationRepository.save(location);
+
+        if (locationDTO.getBuildings() != null && !locationDTO.getBuildings().isEmpty()) {
+            for (com.prenotazioni.exprivia.exprv.dto.BuildingDTO bDto : locationDTO.getBuildings()) {
+                bDto.setLocationId(savedLocation.getId());
+                buildingService.createBuilding(bDto);
+            }
+            savedLocation.setBuildings(buildingRepository.findByLocationId(savedLocation.getId()));
+        }
+
+        return locationMapper.toDto(savedLocation);
     }
 
     @Transactional
@@ -62,8 +72,21 @@ public class LocationService {
         Location existingLocation = locationRepository.findById(id)
                 .orElseThrow(() -> new AppException("Location with ID " + id + " not found", HttpStatus.NOT_FOUND));
         locationMapper.updateLocationFromDto(locationDTO, existingLocation);
-        locationRepository.save(existingLocation);
-        return locationMapper.toDto(existingLocation);
+        Location savedLocation = locationRepository.save(existingLocation);
+
+        if (locationDTO.getBuildings() != null) {
+            for (com.prenotazioni.exprivia.exprv.dto.BuildingDTO bDto : locationDTO.getBuildings()) {
+                bDto.setLocationId(savedLocation.getId());
+                if (bDto.getId() == null) {
+                    buildingService.createBuilding(bDto);
+                } else {
+                    buildingService.updateBuilding(bDto.getId(), bDto);
+                }
+            }
+            savedLocation.setBuildings(buildingRepository.findByLocationId(savedLocation.getId()));
+        }
+
+        return locationMapper.toDto(savedLocation);
     }
 
     @Transactional

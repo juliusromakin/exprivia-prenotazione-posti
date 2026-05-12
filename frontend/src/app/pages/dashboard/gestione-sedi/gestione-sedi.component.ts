@@ -8,18 +8,22 @@ import {
 } from 'lucide-angular';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { LocationService } from '../../../core/services';
 
 interface Edificio {
+  id?: number;
   name: string;
   address: string;
   numFloors: number;
   coordX: number;
   coordY: number;
+  locationId?: number;
+  enabled?: boolean;
   planimetrie?: { id: number, name: string, publishDate: Date }[];
 }
 
 interface Sede {
-  id: number;
+  id?: number;
   name: string;
   city: string;
   enabled: boolean;
@@ -46,73 +50,7 @@ interface Sede {
   styleUrls: ['./gestione-sedi.component.css']
 })
 export class GestioneSediComponent implements OnInit {
-  locations: Sede[] = [
-    {
-      id: 1,
-      name: 'Exprivia-Molfetta',
-      city: 'Molfetta',
-      enabled: true,
-      phoneNumber: '080 123456',
-      email: 'molfetta@exprivia.it',
-      edifici: [
-        { 
-          name: 'Edificio 1', 
-          address: 'Via Molfetta, 1', 
-          numFloors: 3, 
-          coordX: 10, 
-          coordY: 10, 
-          planimetrie: [
-            { id: 1, name: 'Piano Terra - Standard', publishDate: new Date('2024-01-01') },
-            { id: 2, name: 'Piano Terra - Expo 2024', publishDate: new Date('2024-10-15') }
-          ] 
-        },
-        { 
-          name: 'Edificio 2', 
-          address: 'Via Molfetta, 2', 
-          numFloors: 3, 
-          coordX: 20, 
-          coordY: 20, 
-          planimetrie: [
-            { id: 3, name: 'Area Uffici A', publishDate: new Date('2023-12-01') }
-          ] 
-        },
-        { name: 'Edificio 3', address: 'Via Molfetta, 3', numFloors: 3, coordX: 30, coordY: 30, planimetrie: [] }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Exprivia-Bufalotta',
-      city: 'Roma',
-      enabled: true,
-      phoneNumber: '06 987654',
-      email: 'roma@exprivia.it',
-      edifici: [
-        { 
-          name: 'Sede Roma 1', 
-          address: 'Via Bufalotta, 104', 
-          numFloors: 1, 
-          coordX: 50, 
-          coordY: 50, 
-          planimetrie: [
-            { id: 4, name: 'Layout Unico 2024', publishDate: new Date('2024-01-01') },
-            { id: 5, name: 'Nuovo Layout 2025', publishDate: new Date('2025-01-01') }
-          ] 
-        },
-        { 
-          name: 'Sede Roma 2', 
-          address: 'Via Tiburtina, 40', 
-          numFloors: 5, 
-          coordX: 60, 
-          coordY: 60, 
-          planimetrie: [
-            { id: 6, name: 'Piano 1 - Attuale', publishDate: new Date('2024-02-01') },
-            { id: 7, name: 'Piano 1 - Restyling Luglio', publishDate: new Date('2024-07-01') }
-          ] 
-        }
-      ]
-    }
-  ];
-
+  locations: Sede[] = [];
   loading = false;
   showModal = false;
   showBuildingModal = false;
@@ -120,6 +58,10 @@ export class GestioneSediComponent implements OnInit {
   isEditing = false;
   selectedFloor: number | null = null;
   selectedBuilding: Edificio | null = null;
+
+  selectedLocationId?: number;
+  selectedBuildingId?: number;
+  selectedBuildingLocationId?: number;
 
   locationForm: FormGroup;
   buildingForm: FormGroup;
@@ -136,7 +78,8 @@ export class GestioneSediComponent implements OnInit {
     private fb: FormBuilder,
     private messageService: MessageService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private locationService: LocationService
   ) {
     this.locationForm = this.fb.group({
       name: ['', Validators.required],
@@ -158,30 +101,51 @@ export class GestioneSediComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadLocations();
+  }
+
+  loadLocations(): void {
+    this.loading = true;
+    this.locationService.getAllLocations().subscribe({
+      next: (data: any[]) => {
+        this.locations = data.map(item => ({
+          ...item,
+          enabled: item.enabled ?? true,
+          edifici: item.edifici || []
+        }));
+        this.loading = false;
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Errore', detail: 'Impossibile caricare le sedi dal server' });
+        this.loading = false;
+      }
+    });
   }
 
   get displayRows(): any[] {
     if (this.currentView === 'tutti') {
       const rows: any[] = [];
       this.locations.forEach(loc => {
-        loc.edifici.forEach(ed => {
-          rows.push({
-            via: ed.address,
-            sedeName: loc.name,
-            city: loc.city,
-            nPiani: ed.numFloors,
-            enabled: loc.enabled,
-            originalEdificio: ed, // Riferimento per edit edificio
-            originalLoc: loc      // Riferimento per fallback
+        if (loc.edifici) {
+          loc.edifici.forEach(ed => {
+            rows.push({
+              via: ed.address,
+              sedeName: loc.name,
+              city: loc.city,
+              nPiani: ed.numFloors,
+              enabled: loc.enabled,
+              originalEdificio: { ...ed, locationId: loc.id }, // Riferimento per edit edificio
+              originalLoc: loc      // Riferimento per fallback
+            });
           });
-        });
+        }
       });
       return rows;
     } else {
       return this.locations.map(loc => ({
         sedeName: loc.name,
         city: loc.city,
-        edificiCount: loc.edifici.length,
+        edificiCount: loc.edifici ? loc.edifici.length : 0,
         enabled: loc.enabled,
         originalLoc: loc
       }));
@@ -213,6 +177,7 @@ export class GestioneSediComponent implements OnInit {
 
   addBuildingRow(data?: Edificio): void {
     const buildingGroup = this.fb.group({
+      id: [data?.id || null],
       name: [data?.name || '', Validators.required],
       numFloors: [data?.numFloors || 1, [Validators.required, Validators.min(1)]],
       address: [data?.address || '', Validators.required],
@@ -228,6 +193,7 @@ export class GestioneSediComponent implements OnInit {
 
   openNewLocationModal(): void {
     this.isEditing = false;
+    this.selectedLocationId = undefined;
     this.locationForm.reset({ enabled: true, addBuildings: false });
     this.buildingsArray.clear();
     this.showModal = true;
@@ -235,6 +201,7 @@ export class GestioneSediComponent implements OnInit {
 
   editLocation(loc: Sede): void {
     this.isEditing = true;
+    this.selectedLocationId = loc.id;
     this.showModal = true;
     this.locationForm.patchValue({
       name: loc.name,
@@ -242,14 +209,18 @@ export class GestioneSediComponent implements OnInit {
       phoneNumber: loc.phoneNumber || '',
       email: loc.email || '',
       enabled: loc.enabled,
-      addBuildings: loc.edifici.length > 0
+      addBuildings: loc.edifici && loc.edifici.length > 0
     });
     this.buildingsArray.clear();
-    loc.edifici.forEach(ed => this.addBuildingRow(ed));
+    if (loc.edifici) {
+      loc.edifici.forEach(ed => this.addBuildingRow(ed));
+    }
   }
 
   editBuilding(ed: Edificio): void {
     this.showBuildingModal = true;
+    this.selectedBuildingId = ed.id;
+    this.selectedBuildingLocationId = ed.locationId;
     this.buildingForm.patchValue({
       name: ed.name,
       numFloors: ed.numFloors,
@@ -269,6 +240,44 @@ export class GestioneSediComponent implements OnInit {
       this.locationForm.markAllAsTouched();
       return;
     }
+
+    const formValue = this.locationForm.value;
+    const payload: any = {
+      name: formValue.name,
+      city: formValue.city ? formValue.city.toUpperCase() : null,
+      phoneNumber: formValue.phoneNumber,
+      email: formValue.email,
+      enabled: formValue.enabled,
+      edifici: formValue.addBuildings ? formValue.buildings : []
+    };
+
+    this.loading = true;
+    if (this.isEditing && this.selectedLocationId) {
+      payload.id = this.selectedLocationId;
+      this.locationService.updateLocation(this.selectedLocationId, payload).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sede', detail: 'Sede aggiornata con successo' });
+          this.showModal = false;
+          this.loadLocations();
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Errore', detail: 'Errore durante il salvataggio della sede' });
+          this.loading = false;
+        }
+      });
+    } else {
+      this.locationService.createLocation(payload).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sede', detail: 'Sede creata con successo' });
+          this.showModal = false;
+          this.loadLocations();
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Errore', detail: 'Errore durante la creazione della sede' });
+          this.loading = false;
+        }
+      });
+    }
     this.messageService.add({ 
       severity: 'success', 
       summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
@@ -282,6 +291,32 @@ export class GestioneSediComponent implements OnInit {
       this.buildingForm.markAllAsTouched();
       return;
     }
+
+    if (!this.selectedBuildingId) return;
+
+    const formValue = this.buildingForm.value;
+    const payload: any = {
+      id: this.selectedBuildingId,
+      name: formValue.name,
+      address: formValue.address,
+      numFloors: formValue.numFloors,
+      coordX: formValue.coordX,
+      coordY: formValue.coordY,
+      locationId: this.selectedBuildingLocationId
+    };
+
+    this.loading = true;
+    this.locationService.updateBuilding(this.selectedBuildingId, payload).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Edificio', detail: 'Dati edificio aggiornati con successo' });
+        this.showBuildingModal = false;
+        this.loadLocations();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Errore', detail: 'Errore durante l\'aggiornamento dell\'edificio' });
+        this.loading = false;
+      }
+    });
     this.messageService.add({ 
       severity: 'success', 
       summary: this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING'), 

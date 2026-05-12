@@ -13,14 +13,16 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {BuildingMapper.class})
 public interface LocationMapper {
 
     LocationDTO toDto(Location entity);
 
+    @Mapping(target = "buildings", ignore = true)
     Location toEntity(LocationDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "buildings", ignore = true)
     void updateLocationFromDto(LocationDTO dto, @MappingTarget Location entity);
 
     List<LocationDTO> toDtoList(List<Location> reservationDurationList);

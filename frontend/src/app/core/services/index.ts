@@ -10,4 +10,5 @@ export * from './calendar.service';
 export * from './navigation.service';
 export * from './reservation-duration.service';
 export * from './statistics.service';
+export * from './location.service';
 

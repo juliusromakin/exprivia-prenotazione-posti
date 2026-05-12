@@ -45,6 +45,12 @@ public class Location {
     @Column(name = "enabled")
     private Boolean enabled = true;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "email")
+    private String email;
+
     @OneToMany(mappedBy = "location")
     @JsonIgnore
     private List<Building> buildings = new ArrayList<>();
@@ -52,10 +58,12 @@ public class Location {
     public Location() {
     }
 
-    public Location(Integer id, String name, Cities city, List<Building> buildings) {
+    public Location(Integer id, String name, Cities city, String phoneNumber, String email, List<Building> buildings) {
         this.id = id;
         this.name = name;
         this.city = city;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.buildings = buildings;
     }
 
@@ -81,6 +89,22 @@ public class Location {
 
     public void setCity(Cities city) {
         this.city = city;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getEnabled() {

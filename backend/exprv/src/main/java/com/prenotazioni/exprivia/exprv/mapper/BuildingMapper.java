@@ -17,6 +17,7 @@ import org.mapstruct.ReportingPolicy;
 public interface BuildingMapper {
     
     @Mapping(source = "location.id", target = "locationId")
+    @Mapping(expression = "java(entity.getFloors() != null ? (int) entity.getFloors().stream().filter(f -> f.getEnabled() != null && f.getEnabled()).count() : 0)", target = "numFloors")
     BuildingDTO toDto(Building entity);
 
     @Mapping(target = "location", ignore = true)

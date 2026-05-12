@@ -73,6 +73,19 @@ public class BuildingService {
         }
 
         Building savedBuilding = buildingRepository.save(building);
+
+        if (buildingDTO.getNumFloors() != null && buildingDTO.getNumFloors() > 0) {
+            java.util.List<Floor> createdFloors = new java.util.ArrayList<>();
+            for (int i = 1; i <= buildingDTO.getNumFloors(); i++) {
+                Floor floor = new Floor();
+                floor.setName("Piano " + i);
+                floor.setBuilding(savedBuilding);
+                floor.setEnabled(true);
+                createdFloors.add(floorRepository.save(floor));
+            }
+            savedBuilding.setFloors(createdFloors);
+        }
+
         return buildingMapper.toDto(savedBuilding);
     }
 
@@ -90,8 +103,26 @@ public class BuildingService {
             existingBuilding.setLocation(location);
         }
 
-        buildingRepository.save(existingBuilding);
-        return buildingMapper.toDto(existingBuilding);
+        Building savedBuilding = buildingRepository.save(existingBuilding);
+
+        if (buildingDTO.getNumFloors() != null) {
+            long currentCount = savedBuilding.getFloors() != null ? 
+                savedBuilding.getFloors().stream().filter(f -> f.getEnabled() != null && f.getEnabled()).count() : 0;
+            if (buildingDTO.getNumFloors() > currentCount) {
+                if (savedBuilding.getFloors() == null) {
+                    savedBuilding.setFloors(new java.util.ArrayList<>());
+                }
+                for (long i = currentCount + 1; i <= buildingDTO.getNumFloors(); i++) {
+                    Floor floor = new Floor();
+                    floor.setName("Piano " + i);
+                    floor.setBuilding(savedBuilding);
+                    floor.setEnabled(true);
+                    savedBuilding.getFloors().add(floorRepository.save(floor));
+                }
+            }
+        }
+
+        return buildingMapper.toDto(savedBuilding);
     }
 
     @Transactional
