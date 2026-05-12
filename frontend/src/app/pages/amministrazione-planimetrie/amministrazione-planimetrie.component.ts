@@ -139,18 +139,69 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     }
 
     // ── Utilità date ───────────────────────────────────────────────────────
-    private formatDateYMD(date: Date | null): string | null {
-        if (!date) return null;
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
+    parseTypedDate(value: any): Date | null {
+        if (!value) return null;
+
+        // Se è già un oggetto Date, verifichiamo che sia valido
+        if (value instanceof Date) {
+            return isNaN(value.getTime()) ? null : value;
+        }
+
+        if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if (!trimmed) return null;
+
+            // Formato italiano: dd/MM/yyyy o dd-MM-yyyy
+            const dmyRegex = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+            const matchDmy = trimmed.match(dmyRegex);
+            if (matchDmy) {
+                const day = parseInt(matchDmy[1], 10);
+                const month = parseInt(matchDmy[2], 10) - 1; // Mese 0-index in JS
+                const year = parseInt(matchDmy[3], 10);
+                const parsedDate = new Date(year, month, day);
+                if (parsedDate.getFullYear() === year && parsedDate.getMonth() === month && parsedDate.getDate() === day) {
+                    return parsedDate;
+                }
+            }
+
+            // Formato ISO: yyyy-MM-dd
+            const ymdRegex = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/;
+            const matchYmd = trimmed.match(ymdRegex);
+            if (matchYmd) {
+                const year = parseInt(matchYmd[1], 10);
+                const month = parseInt(matchYmd[2], 10) - 1;
+                const day = parseInt(matchYmd[3], 10);
+                const parsedDate = new Date(year, month, day);
+                if (parsedDate.getFullYear() === year && parsedDate.getMonth() === month && parsedDate.getDate() === day) {
+                    return parsedDate;
+                }
+            }
+
+            // Fallback: parsing nativo Date
+            const timestamp = Date.parse(trimmed);
+            if (!isNaN(timestamp)) {
+                return new Date(timestamp);
+            }
+        }
+
+        return null;
+    }
+
+    private formatDateYMD(date: any): string | null {
+        const parsed = this.parseTypedDate(date);
+        if (!parsed) return null;
+        const y = parsed.getFullYear();
+        const m = String(parsed.getMonth() + 1).padStart(2, '0');
+        const d = String(parsed.getDate()).padStart(2, '0');
         return `${y}-${m}-${d}`;
     }
 
     formattaPianimetria(p: Planimetria): string {
         const piano = p.floorName || 'Piano';
-        const da = p.validFrom ? new Date(p.validFrom).toLocaleDateString('it-IT') : '?';
-        const a = p.validTo ? new Date(p.validTo).toLocaleDateString('it-IT') : 'Indeterminata';
+        const daObj = this.parseTypedDate(p.validFrom);
+        const aObj = this.parseTypedDate(p.validTo);
+        const da = daObj ? daObj.toLocaleDateString('it-IT') : '?';
+        const a = aObj ? aObj.toLocaleDateString('it-IT') : 'Indeterminata';
         return `${piano}  ·  ${da} → ${a}`;
     }
 
@@ -177,10 +228,31 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     }
 
     async confermaSalvataggio(): Promise<void> {
-        if (!this.validFrom) {
+        const fromDate = this.parseTypedDate(this.validFrom);
+        if (!fromDate) {
             this.validitaError = true;
+            this.cdr.detectChanges();
             return;
         }
+
+        // Aggiorna il modello con l'oggetto Date corretto in locale
+        this.validFrom = fromDate;
+
+        if (!this.fineIndeterminata) {
+            const toDate = this.parseTypedDate(this.validTo);
+            if (!toDate) {
+                this.showAlert('Data Fine Non Valida', 'La Data Fine inserita non è valida o è vuota. Seleziona "Fine indeterminata" se non c\'è una data di fine.');
+                return;
+            }
+            if (toDate < fromDate) {
+                this.showAlert('Periodo Non Valido', 'La Data Fine deve essere successiva o uguale alla Data Inizio.');
+                return;
+            }
+            this.validTo = toDate;
+        } else {
+            this.validTo = null;
+        }
+
         this.validitaError = false;
         this.showValiditaModal = false;
         this.cdr.detectChanges();
@@ -228,12 +300,12 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         console.log('[Planimetria] Caricamento diretto FloorPlan:', piano);
 
         if (piano.validFrom) {
-            this.validFrom = new Date(piano.validFrom);
+            this.validFrom = this.parseTypedDate(piano.validFrom);
         } else {
             this.validFrom = null;
         }
         if (piano.validTo) {
-            this.validTo = new Date(piano.validTo);
+            this.validTo = this.parseTypedDate(piano.validTo);
             this.fineIndeterminata = false;
         } else {
             this.validTo = null;
