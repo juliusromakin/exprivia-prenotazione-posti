@@ -610,7 +610,7 @@
       "LOCATION": "Location"
     },
     "TABLE": {
-      "ADDRESS": "Address",
+      "ADDRESS": "Street / Address",
       "LOCATION_NAME": "Location Name",
       "CITY": "City",
       "FLOORS_COUNT": "N. Floors",
@@ -643,7 +643,7 @@
     },
     "BUILDING_MODAL": {
       "TITLE": "Edit Building",
-      "BUILDING_NAME": "Building Name *",
+      "BUILDING_NAME": "Location Name *",
       "FLOORS_COUNT": "N. Floors *",
       "ADDRESS": "Address / Location *",
       "COORD_X": "Coord X",
