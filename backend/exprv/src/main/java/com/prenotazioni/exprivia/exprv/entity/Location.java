@@ -1,9 +1,12 @@
 package com.prenotazioni.exprivia.exprv.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.prenotazioni.exprivia.exprv.enumerati.Cities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -27,6 +30,10 @@ public class Location {
     @Column(name = "name")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "city")
+    private Cities city;
+
     @CreationTimestamp
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -45,9 +52,10 @@ public class Location {
     public Location() {
     }
 
-    public Location(Integer id, String name, List<Building> buildings) {
+    public Location(Integer id, String name, Cities city, List<Building> buildings) {
         this.id = id;
         this.name = name;
+        this.city = city;
         this.buildings = buildings;
     }
 
@@ -65,6 +73,14 @@ public class Location {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Cities getCity() {
+        return city;
+    }
+
+    public void setCity(Cities city) {
+        this.city = city;
     }
 
     public Boolean getEnabled() {
