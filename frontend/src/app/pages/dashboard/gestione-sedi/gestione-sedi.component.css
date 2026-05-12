@@ -25,3 +25,33 @@
 .animate-zoom-in {
   animation: zoomIn 0.2s ease-out;
 }
+
+/* Transizione fluida per l'espansione della riga */
+tr {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expanded-row-container {
+  perspective: 1000px;
+}
+
+/* Effetto vetro per le card interne */
+.glass-effect {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark .glass-effect {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* Animazione pulsante per l'area planimetrie */
+@keyframes pulse-border {
+  0% { border-color: rgba(59, 130, 246, 0.2); }
+  50% { border-color: rgba(59, 130, 246, 0.5); }
+  100% { border-color: rgba(59, 130, 246, 0.2); }
+}
+
+.planimetria-placeholder:hover {
+  animation: pulse-border 2s infinite;
+}

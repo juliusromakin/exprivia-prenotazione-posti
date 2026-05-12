@@ -53,7 +53,16 @@ import {
   Building2,
   Trash2,
   PlusCircle,
-  Minus
+  Minus,
+  ChevronRight,
+  Phone,
+  Info,
+  Ghost,
+  FileText,
+  Edit3,
+  Layers,
+  Layout,
+  AlertCircle
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -129,7 +138,16 @@ bootstrapApplication(AppComponent, {
         Building2,
         Trash2,
         PlusCircle,
-        Minus
+        Minus,
+        ChevronRight,
+        Phone,
+        Info,
+        Ghost,
+        FileText,
+        Edit3,
+        Layers,
+        Layout,
+        AlertCircle
       })
     ),
     AxiosService,

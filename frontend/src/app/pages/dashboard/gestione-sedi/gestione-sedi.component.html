@@ -1,12 +1,12 @@
 <div class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
   <!-- Header Section -->
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700">
+  <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Gestione Sedi</h1>
-        <p class="text-gray-600 dark:text-slate-400">Gestisci le sedi aziendali e i relativi edifici</p>
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">Gestione Sedi</h1>
+        <p class="text-slate-700 font-medium">Gestisci le sedi aziendali e i relativi edifici</p>
       </div>
-      
+
       <div class="flex items-center gap-3">
         <button (click)="openNewLocationModal()"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer">
@@ -18,17 +18,17 @@
   </div>
 
   <!-- View Switcher (Filtri) -->
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-slate-700">
+  <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
     <div class="flex items-center gap-4">
-      <span class="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filtra per:</span>
-      <div class="flex items-center bg-gray-100 dark:bg-slate-900 rounded-lg p-1">
-        <button (click)="setView('tutti')" 
-          [class]="currentView === 'tutti' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-slate-300'"
+      <span class="text-sm font-black text-slate-600 uppercase tracking-wider">Filtra per:</span>
+      <div class="flex items-center bg-slate-50 rounded-lg p-1">
+        <button (click)="setView('tutti')"
+          [class]="currentView === 'tutti' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
           class="px-6 py-2 text-sm font-black rounded-md transition-all cursor-pointer uppercase tracking-widest">
           Tutti
         </button>
-        <button (click)="setView('sede')" 
-          [class]="currentView === 'sede' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-slate-300'"
+        <button (click)="setView('sede')"
+          [class]="currentView === 'sede' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'"
           class="px-6 py-2 text-sm font-black rounded-md transition-all cursor-pointer uppercase tracking-widest">
           Sede
         </button>
@@ -37,72 +37,200 @@
   </div>
 
   <!-- Table Section -->
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+  <div
+    class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-        <thead class="bg-gray-50 dark:bg-slate-900/50">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-slate-50/50">
           <tr *ngIf="currentView === 'tutti'">
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">#</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Via</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Nome Sede</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Città</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">N.Piani</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Attivo</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Azioni</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">#
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Via</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Nome Sede</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Città</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              N.Piani</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Attivo</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Azioni</th>
           </tr>
 
           <tr *ngIf="currentView === 'sede'">
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">#</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Nome Sede</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Città</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Edifici</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Attivo</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Azioni</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">#
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Nome Sede</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Città</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Edifici</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Attivo</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-black text-slate-900 uppercase tracking-widest">
+              Azioni</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+        <tbody class="divide-y divide-slate-100">
           <!-- Body TUTTI -->
           <ng-container *ngIf="currentView === 'tutti'">
-            <tr *ngFor="let item of displayRows; let i = index" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ i + 1 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-300 font-medium">{{ item.via }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">{{ item.sedeName }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-300">{{ item.city }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-300">{{ item.nPiani }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
-                  attivo
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex items-center gap-3">
-                   <button (click)="editBuilding(item.originalEdificio)" class="text-blue-600 hover:text-blue-900 cursor-pointer transition-transform active:scale-90"><lucide-icon name="edit" class="w-4 h-4"></lucide-icon></button>
-                   <button class="text-red-600 hover:text-red-900 cursor-pointer"><lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon></button>
-                </div>
-              </td>
-            </tr>
+            <ng-container *ngFor="let item of displayRows; let i = index">
+              <tr (click)="toggleRow(i)" 
+                [class.bg-blue-50]="expandedRowIndex === i"
+                [class.border-l-4]="expandedRowIndex === i"
+                [class.border-blue-600]="expandedRowIndex === i"
+                class="hover:bg-slate-50 transition-all duration-200 cursor-pointer group border-l-4 border-transparent">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold">
+                  <div class="flex items-center gap-2">
+                    <lucide-icon [name]="expandedRowIndex === i ? 'chevron-down' : 'chevron-right'"
+                      class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors"></lucide-icon>
+                    {{ i + 1 }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.via }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-slate-900">{{ item.sedeName
+                  }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.city }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-black">{{ item.nPiani }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                    class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
+                    attivo
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex items-center gap-3">
+                    <button (click)="$event.stopPropagation(); editBuilding(item.originalEdificio)"
+                      class="text-blue-600 hover:text-blue-900 cursor-pointer transition-transform active:scale-90"><lucide-icon
+                        name="edit" class="w-4 h-4"></lucide-icon></button>
+                    <button (click)="$event.stopPropagation()"
+                      class="text-red-600 hover:text-red-900 cursor-pointer"><lucide-icon name="trash-2"
+                        class="w-4 h-4"></lucide-icon></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row Espansa -->
+              <tr *ngIf="expandedRowIndex === i"
+                class="bg-slate-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                <td colspan="7" class="px-8 py-6">
+                  <div
+                    class="bg-white rounded-2xl shadow-2xl border border-slate-300 p-6 flex flex-col md:flex-row gap-8">
+                    <!-- Info Sede -->
+                    <div class="flex-1 space-y-6">
+                      <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+                        <div class="p-2 bg-blue-600 rounded-lg text-white">
+                          <lucide-icon name="building-2" class="w-5 h-5"></lucide-icon>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-black text-slate-900">{{ item.sedeName }}</h3>
+                          <p class="text-sm text-slate-700 font-bold">{{ item.city }} - {{ item.via }}</p>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div
+                          class="p-4 bg-white rounded-xl border border-slate-300 group hover:border-blue-500 transition-all shadow-md hover:shadow-lg">
+                          <div class="flex items-center gap-3 mb-1">
+                            <lucide-icon name="mail" class="w-4 h-4 text-blue-600"></lucide-icon>
+                            <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Email</span>
+                          </div>
+                          <p class="text-sm font-black text-slate-900 truncate">{{
+                            item.originalLoc.email || 'Nessuna email' }}</p>
+                        </div>
+
+                        <div
+                          class="p-4 bg-white rounded-xl border border-slate-300 group hover:border-blue-500 transition-all shadow-md hover:shadow-lg">
+                          <div class="flex items-center gap-3 mb-1">
+                            <lucide-icon name="phone" class="w-4 h-4 text-blue-600"></lucide-icon>
+                            <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Telefono</span>
+                          </div>
+                          <p class="text-sm font-black text-slate-900">{{ item.originalLoc.phoneNumber
+                            || 'Nessun telefono' }}</p>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Area Planimetrie -->
+                    <div class="flex-1">
+                      <div
+                        class="bg-slate-200/50 rounded-2xl border border-slate-300 p-6 h-full flex flex-col">
+                        <div class="flex items-center gap-3 mb-6 pb-3 border-b border-slate-300">
+                          <lucide-icon name="map" class="w-5 h-5 text-blue-600"></lucide-icon>
+                          <h4 class="font-black text-blue-900 uppercase tracking-widest text-sm">Seleziona Piano</h4>
+                        </div>
+
+                        <!-- Griglia Pulsanti Piani -->
+                        <div
+                          class="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                          <button *ngFor="let floor of getFloorsArray(item.nPiani)"
+                            (click)="openPlanimetriaModal(item.originalEdificio, floor)"
+                            class="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-300 hover:border-blue-600 hover:bg-blue-600 transition-all shadow-md hover:shadow-xl cursor-pointer active:scale-95">
+                            <div
+                              class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-2 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all border border-slate-200">
+                              <lucide-icon name="layers" class="w-5 h-5"></lucide-icon>
+                            </div>
+                            <span class="text-sm font-black text-slate-900 group-hover:text-white">Piano {{ floor }}</span>
+                          </button>
+                        </div>
+
+                        <div *ngIf="item.nPiani === 0"
+                          class="flex flex-col items-center justify-center py-10 text-gray-400">
+                          <lucide-icon name="alert-circle" class="w-10 h-10 mb-2 opacity-20"></lucide-icon>
+                          <p class="text-sm italic">Nessun piano definito per questo edificio</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
           </ng-container>
 
           <!-- Body SEDE -->
           <ng-container *ngIf="currentView === 'sede'">
-            <tr *ngFor="let item of displayRows; let i = index" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ i + 1 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">{{ item.sedeName }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-300">{{ item.city }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-300">
-                <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-bold">
+            <tr *ngFor="let item of displayRows; let i = index"
+              class="hover:bg-slate-50 transition-all duration-200 cursor-pointer border-l-4 border-transparent hover:border-blue-200">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ i + 1 }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-slate-900">{{ item.sedeName
+                }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ item.city }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">
+                <span
+                  class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-bold">
                   {{ item.edificiCount }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
+                <span [class]="item.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
                   attivo
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-3">
-                   <button (click)="editLocation(item.originalLoc)" class="text-blue-600 hover:text-blue-900 cursor-pointer transition-transform active:scale-90"><lucide-icon name="edit" class="w-4 h-4"></lucide-icon></button>
-                   <button class="text-red-600 hover:text-red-900 cursor-pointer"><lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon></button>
+                  <button (click)="editLocation(item.originalLoc)"
+                    class="text-blue-600 hover:text-blue-900 cursor-pointer transition-transform active:scale-90"><lucide-icon
+                      name="edit" class="w-4 h-4"></lucide-icon></button>
+                  <button class="text-red-600 hover:text-red-900 cursor-pointer"><lucide-icon name="trash-2"
+                      class="w-4 h-4"></lucide-icon></button>
                 </div>
               </td>
             </tr>
@@ -113,136 +241,256 @@
   </div>
 </div>
 
-<!-- Modal Modifica SOLO Edificio (Vista TUTTI) -->
-<div *ngIf="showBuildingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all animate-in zoom-in duration-300">
-    <div class="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-blue-50 dark:bg-slate-900/50 rounded-t-2xl">
-      <div class="flex items-center gap-3">
-        <lucide-icon name="building-2" class="w-6 h-6 text-blue-600"></lucide-icon>
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Modifica Edificio</h2>
+<!-- Modal Planimetria (Nuovo Pop-up) -->
+<div *ngIf="showPlanimetriaModal"
+  class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+  <div
+    class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl transform transition-all animate-in zoom-in duration-300 overflow-hidden border border-slate-100">
+    <div
+      class="p-6 border-b border-slate-100 flex justify-between items-center bg-white text-slate-900">
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-blue-50 rounded-xl">
+          <lucide-icon name="map" class="w-6 h-6 text-blue-600"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Gestione Planimetria</h2>
+          <p class="text-xs text-slate-700 font-bold">{{ selectedBuilding?.name }} - Piano {{ selectedFloor }}</p>
+        </div>
       </div>
-      <button (click)="closeModal()" class="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full cursor-pointer">
-        <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
+      <button (click)="showPlanimetriaModal = false"
+        class="p-2 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+        <lucide-icon name="x" class="w-6 h-6 text-slate-400"></lucide-icon>
       </button>
     </div>
-    
+
+    <div class="p-8 space-y-6 bg-slate-100">
+      <div *ngIf="selectedBuilding?.planimetrie?.length === 0" class="flex flex-col items-center justify-center py-12 text-center space-y-4">
+        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-slate-300 shadow-sm border border-slate-100">
+          <lucide-icon name="map" class="w-10 h-10"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-slate-900">Nessuna planimetria</h3>
+          <p class="text-slate-500">Non ci sono ancora mappe caricate per questo piano.</p>
+        </div>
+      </div>
+
+      <div *ngIf="selectedBuilding && selectedBuilding.planimetrie && selectedBuilding.planimetrie?.length! > 0" class="space-y-4">
+        <h3 class="text-sm font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
+          <lucide-icon name="layers" class="w-4 h-4 text-blue-600"></lucide-icon>
+          Planimetrie Caricate ({{ selectedBuilding?.planimetrie?.length }})
+        </h3>
+        
+        <div class="grid gap-3">
+          <div *ngFor="let p of selectedBuilding?.planimetrie" 
+            class="group p-4 bg-white rounded-2xl border border-slate-300 hover:border-blue-500 transition-all flex items-center justify-between shadow-md hover:shadow-lg">
+            <div class="flex items-center gap-4">
+              <div [class]="isFutureDate(p.publishDate) ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'"
+                class="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
+                <lucide-icon [name]="isFutureDate(p.publishDate) ? 'clock' : 'circle-check'" class="w-6 h-6"></lucide-icon>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900">{{ p.name }}</h4>
+                <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                  <lucide-icon name="calendar" class="w-3 h-3"></lucide-icon>
+                  <span>In vigore dal: {{ p.publishDate | date:'dd/MM/yyyy' }}</span>
+                  <span *ngIf="!isFutureDate(p.publishDate)" class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] uppercase font-black">Attiva</span>
+                  <span *ngIf="isFutureDate(p.publishDate)" class="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] uppercase font-black">Programmata</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" title="Modifica">
+                <lucide-icon name="edit" class="w-5 h-5"></lucide-icon>
+              </button>
+              <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Elimina">
+                <lucide-icon name="trash-2" class="w-5 h-5"></lucide-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-slate-300 flex justify-end bg-white -mx-8 -mb-8 p-6">
+        <button (click)="goToPlanimetriaManagement()"
+          class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all active:scale-95 cursor-pointer flex items-center gap-2">
+          <lucide-icon name="plus-circle" class="w-5 h-5"></lucide-icon>
+          Nuova planimetria
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Modifica SOLO Edificio (Vista TUTTI) -->
+<div *ngIf="showBuildingModal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all animate-in zoom-in duration-300">
+    <div
+      class="p-6 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl">
+      <div class="flex items-center gap-3">
+        <lucide-icon name="building-2" class="w-6 h-6 text-blue-600"></lucide-icon>
+        <h2 class="text-xl font-bold text-slate-900">Modifica Edificio</h2>
+      </div>
+      <button (click)="closeModal()" class="p-2 hover:bg-slate-100 rounded-full cursor-pointer">
+        <lucide-icon name="x" class="w-5 h-5 text-slate-400"></lucide-icon>
+      </button>
+    </div>
+
     <form [formGroup]="buildingForm" (ngSubmit)="saveBuilding()" class="p-6 space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Nome Edificio *</label>
-          <input type="text" formControlName="name" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">Nome Edificio *</label>
+          <input type="text" formControlName="name"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">N. Piani *</label>
-          <input type="number" formControlName="numFloors" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">N. Piani *</label>
+          <input type="number" formControlName="numFloors"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2 md:col-span-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Via / Indirizzo *</label>
-          <input type="text" formControlName="address" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">Via / Indirizzo *</label>
+          <input type="text" formControlName="address"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Coord X</label>
-          <input type="number" formControlName="coordX" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">Coord X</label>
+          <input type="number" formControlName="coordX"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Coord Y</label>
-          <input type="number" formControlName="coordY" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+          <label class="block text-sm font-black text-slate-900 uppercase tracking-widest">Coord Y</label>
+          <input type="number" formControlName="coordY"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
         </div>
       </div>
-      
-      <div class="flex gap-4 pt-4 border-t border-gray-100 dark:border-slate-700">
-        <button type="button" (click)="closeModal()" class="flex-1 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-white rounded-xl font-bold cursor-pointer">Annulla</button>
-        <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg cursor-pointer">Salva Edificio</button>
+
+      <div class="flex gap-4 pt-4 border-t border-slate-100">
+        <button type="button" (click)="closeModal()"
+          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-black rounded-xl transition-all cursor-pointer">Annulla</button>
+        <button type="submit"
+          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black shadow-lg shadow-blue-500/20 active:scale-95 transition-all cursor-pointer">Salva
+          Edificio</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Modal Nuova/Modifica SEDE (Vista SEDE) -->
-<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform transition-all animate-in zoom-in duration-300">
-    <div class="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 rounded-t-2xl sticky top-0 z-10">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ isEditing ? 'Modifica Sede' : 'Nuova Sede' }}</h2>
-      <button (click)="closeModal()" class="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors cursor-pointer">
-        <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
+<div *ngIf="showModal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform transition-all animate-in zoom-in duration-300">
+    <div
+      class="p-6 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl sticky top-0 z-10">
+      <h2 class="text-xl font-bold text-slate-900">{{ isEditing ? 'Modifica Sede' : 'Nuova Sede' }}</h2>
+      <button (click)="closeModal()"
+        class="p-2 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+        <lucide-icon name="x" class="w-5 h-5 text-slate-400"></lucide-icon>
       </button>
     </div>
-    
+
     <form [formGroup]="locationForm" (ngSubmit)="saveLocation()" class="p-6 space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Nome Sede *</label>
-          <input type="text" formControlName="name" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white" placeholder="es. Exprivia-bufalotta">
+          <label class="block text-sm font-black text-slate-900">Nome Sede *</label>
+          <input type="text" formControlName="name"
+            class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 font-bold"
+            placeholder="es. Exprivia-bufalotta">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Città *</label>
-          <select formControlName="city" 
-            class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white cursor-pointer">
+          <label class="block text-sm font-black text-slate-900">Città *</label>
+          <select formControlName="city"
+            class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 font-bold cursor-pointer">
             <option value="" disabled selected>Seleziona una città</option>
             <option *ngFor="let citta of predefinedCitta" [value]="citta">{{ citta }}</option>
           </select>
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">N. Telefonico</label>
-          <input type="text" formControlName="phoneNumber" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white" placeholder="+39 02 ...">
+          <label class="block text-sm font-black text-slate-900">N. Telefonico</label>
+          <input type="text" formControlName="phoneNumber"
+            class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 font-bold"
+            placeholder="+39 02 ...">
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">Email</label>
-          <input type="email" formControlName="email" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white" placeholder="sede@azienda.it">
+          <label class="block text-sm font-black text-slate-900">Email</label>
+          <input type="email" formControlName="email"
+            class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 font-bold"
+            placeholder="sede@azienda.it">
         </div>
       </div>
-      
-      <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+
+      <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-600 rounded-lg"><lucide-icon name="building-2" class="w-5 h-5 text-white"></lucide-icon></div>
+            <div class="p-2 bg-blue-600 rounded-lg"><lucide-icon name="building-2"
+                class="w-5 h-5 text-white"></lucide-icon></div>
             <div>
-              <h3 class="font-bold text-blue-900 dark:text-blue-300">Inserire edifici?</h3>
-              <p class="text-xs text-blue-700 dark:text-blue-400">Puoi aggiungere edifici ora o farlo in seguito</p>
+              <h3 class="font-black text-blue-900">Inserire edifici?</h3>
+              <p class="text-xs text-blue-700 font-bold">Puoi aggiungere edifici ora o farlo in seguito</p>
             </div>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" formControlName="addBuildings" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+            <div
+              class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+            </div>
           </label>
         </div>
-        
-        <div *ngIf="locationForm.get('addBuildings')?.value" class="mt-6 space-y-4 animate-in slide-in-from-top duration-300">
+
+        <div *ngIf="locationForm.get('addBuildings')?.value"
+          class="mt-6 space-y-4 animate-in slide-in-from-top duration-300">
           <div formArrayName="buildings" class="space-y-4">
-            <div *ngFor="let building of buildingsArray.controls; let i = index" [formGroupName]="i" class="p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 relative group animate-in zoom-in duration-200">
-              <button type="button" (click)="removeBuildingRow(i)" class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-lg z-10"><lucide-icon name="minus" class="w-4 h-4"></lucide-icon></button>
-              <h4 class="text-sm font-bold text-gray-500 mb-3">Edificio {{ i + 1 }}</h4>
+            <div *ngFor="let building of buildingsArray.controls; let i = index" [formGroupName]="i"
+              class="p-4 bg-white rounded-lg border border-slate-200 relative group animate-in zoom-in duration-200">
+              <button type="button" (click)="removeBuildingRow(i)"
+                class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-lg z-10"><lucide-icon
+                  name="minus" class="w-4 h-4"></lucide-icon></button>
+              <h4 class="text-sm font-black text-slate-900 mb-3 uppercase tracking-widest">Edificio {{ i + 1 }}</h4>
               <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold uppercase text-gray-400">Nome *</label>
-                  <input type="text" formControlName="name" class="w-full text-sm bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none pb-1 dark:text-white" placeholder="es. Ala A">
+                  <label class="text-[10px] font-black uppercase text-slate-500">Nome *</label>
+                  <input type="text" formControlName="name"
+                    class="w-full text-sm bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-1 text-slate-900 font-bold"
+                    placeholder="es. Ala A">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold uppercase text-gray-400">N. Piani</label>
-                  <input type="number" formControlName="numFloors" class="w-full text-sm bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none pb-1 dark:text-white">
+                  <label class="text-[10px] font-black uppercase text-slate-500">N. Piani</label>
+                  <input type="number" formControlName="numFloors"
+                    class="w-full text-sm bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-1 text-slate-900 font-bold">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold uppercase text-gray-400">Via</label>
-                  <input type="text" formControlName="address" class="w-full text-sm bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none pb-1 dark:text-white">
+                  <label class="text-[10px] font-black uppercase text-slate-500">Via</label>
+                  <input type="text" formControlName="address"
+                    class="w-full text-sm bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-1 text-slate-900 font-bold">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold uppercase text-gray-400">Coord X</label>
-                  <input type="number" formControlName="coordX" class="w-full text-sm bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none pb-1 dark:text-white">
+                  <label class="text-[10px] font-black uppercase text-slate-500">Coord X</label>
+                  <input type="number" formControlName="coordX"
+                    class="w-full text-sm bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-1 text-slate-900 font-bold">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold uppercase text-gray-400">Coord Y</label>
-                  <input type="number" formControlName="coordY" class="w-full text-sm bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none pb-1 dark:text-white">
+                  <label class="text-[10px] font-black uppercase text-slate-500">Coord Y</label>
+                  <input type="number" formControlName="coordY"
+                    class="w-full text-sm bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-1 text-slate-900 font-bold">
                 </div>
               </div>
             </div>
           </div>
-          <button type="button" (click)="addBuildingRow()" class="w-full py-3 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-2 font-semibold cursor-pointer"><lucide-icon name="plus-circle" class="w-5 h-5"></lucide-icon>Aggiungi edificio</button>
+          <button type="button" (click)="addBuildingRow()"
+            class="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 font-black cursor-pointer shadow-sm active:scale-95"><lucide-icon
+              name="plus-circle" class="w-5 h-5"></lucide-icon>Aggiungi edificio</button>
         </div>
       </div>
-      
-      <div class="flex gap-4 pt-4 border-t border-gray-100 dark:border-slate-700 sticky bottom-0 bg-white dark:bg-slate-800 pb-2 z-10">
-        <button type="button" (click)="closeModal()" class="flex-1 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-white rounded-xl font-bold transition-all cursor-pointer">Annulla</button>
-        <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30 cursor-pointer">Salva Modifiche</button>
+
+      <div
+        class="flex gap-4 pt-4 border-t border-slate-100 sticky bottom-0 bg-white pb-2 z-10">
+        <button type="button" (click)="closeModal()"
+          class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl transition-all cursor-pointer">Annulla</button>
+        <button type="submit"
+          class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30 cursor-pointer">Salva
+          Modifiche</button>
       </div>
     </form>
   </div>
