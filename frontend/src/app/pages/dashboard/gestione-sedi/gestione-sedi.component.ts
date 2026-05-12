@@ -8,7 +8,7 @@ import {
 } from 'lucide-angular';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { LocationService } from '../../../core/services';
+import { LocationService } from '../../../core/services/location.service';
 
 interface Edificio {
   id?: number;
