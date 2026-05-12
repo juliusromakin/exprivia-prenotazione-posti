@@ -114,7 +114,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   get isPlanimetriePage(): boolean {
-    return this.router.url === '/amministrazione-planimetrie';
+    return this.router.url.startsWith('/amministrazione-planimetrie');
   }
 
   tornaIndietro(): void {
