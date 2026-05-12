@@ -7,6 +7,8 @@ public class FloorPlanDTO {
     private Integer id;
     private Integer floorId;
     private String floorName;
+    private String name;
+    private Boolean isActive;
     private LocalDate validFrom;
     private LocalDate validTo;
     private String imagePath;
@@ -26,6 +28,12 @@ public class FloorPlanDTO {
 
     public String getFloorName() { return floorName; }
     public void setFloorName(String floorName) { this.floorName = floorName; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
     public LocalDate getValidFrom() { return validFrom; }
     public void setValidFrom(LocalDate validFrom) { this.validFrom = validFrom; }

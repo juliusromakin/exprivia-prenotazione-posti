@@ -2,7 +2,6 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AxiosService } from './axios.service';
 
 export interface RoomPosition {
@@ -25,6 +24,8 @@ export interface Planimetria {
     id?: number;
     floorId?: number;
     floorName?: string;
+    name?: string;
+    isActive?: boolean;
     validFrom?: string | null;
     validTo?: string | null;
     imagePath?: string;
@@ -48,6 +49,7 @@ export interface FloorDTO {
 })
 export class PlanimetriaService {
     private readonly baseUrl = '/api/admin/floors';
+    private readonly floorPlanUrl = '/api/admin/floor-plans';
 
     constructor(private axiosService: AxiosService) {}
 
@@ -63,37 +65,37 @@ export class PlanimetriaService {
 
     /** Recupera tutti i FloorPlan (planimetrie) di un edificio, tutti i piani. */
     getAllPlansByBuilding(buildingId: number): Observable<Planimetria[]> {
-        return from(this.axiosService.get<Planimetria[]>(`${this.baseUrl}/building/${buildingId}/planimetry/all`));
+        return from(this.axiosService.get<Planimetria[]>(`${this.floorPlanUrl}/building/${buildingId}/all`));
     }
 
     /** Recupera i dettagli completi di una planimetria (incluse stanze e postazioni). */
-    getPlanimetria(id: number, date?: string): Observable<Planimetria> {
-        return from(this.axiosService.get<Planimetria>(`${this.baseUrl}/${id}/planimetry`, { params: date ? { date } : {} }));
+    getPlanimetria(floorId: number, date?: string): Observable<Planimetria> {
+        return from(this.axiosService.get<Planimetria>(`${this.floorPlanUrl}/${floorId}/planimetry`, { params: date ? { date } : {} }));
     }
 
     /** Crea una nuova planimetria. */
     creaPlanimetria(planimetria: Planimetria): Observable<Planimetria> {
-        return from(this.axiosService.post<Planimetria>(this.baseUrl, planimetria));
+        return from(this.axiosService.post<Planimetria>(this.floorPlanUrl, planimetria));
     }
 
     /** Aggiorna una planimetria esistente. */
     aggiornaPlanimetria(id: number, planimetria: Planimetria): Observable<Planimetria> {
-        return from(this.axiosService.put<Planimetria>(`${this.baseUrl}/${id}`, planimetria));
+        return from(this.axiosService.put<Planimetria>(`${this.floorPlanUrl}/${id}`, planimetria));
     }
 
     /** Salva i dati di planimetria (stanze, postazioni, dimensioni canvas). */
     salvaDatiPlanimetria(planimetria: Planimetria): Observable<void> {
         return from(
-            this.axiosService.post<void>(`${this.baseUrl}/planimetry/save`, planimetria)
+            this.axiosService.post<void>(`${this.floorPlanUrl}/save`, planimetria)
         );
     }
 
     /** Upload dell'immagine PNG per una planimetria. */
-    caricaImmaginePlanimetria(id: number, file: File): Observable<string> {
+    caricaImmaginePlanimetria(floorId: number, file: File): Observable<string> {
         const formData = new FormData();
         formData.append('file', file);
         return from(
-            this.axiosService.post<string>(`${this.baseUrl}/${id}/upload-planimetry`, formData, {
+            this.axiosService.post<string>(`${this.floorPlanUrl}/${floorId}/upload-planimetry`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             } as any)
         );

@@ -23,6 +23,12 @@ public class FloorPlan {
     @JoinColumn(name = "id_floor")
     private Floor floor;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
     @Column(name = "valid_from")
     private LocalDate validFrom;
 
@@ -55,6 +61,14 @@ public class FloorPlan {
 
     public void setFloor(Floor floor) {
         this.floor = floor;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LocalDate getValidFrom() {
@@ -95,5 +109,13 @@ public class FloorPlan {
 
     public void setCanvasHeight(Double canvasHeight) {
         this.canvasHeight = canvasHeight;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }

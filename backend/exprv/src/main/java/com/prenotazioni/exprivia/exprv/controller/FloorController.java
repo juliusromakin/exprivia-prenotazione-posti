@@ -73,27 +73,4 @@ public class FloorController {
         return ResponseEntity.ok(floorService.getFloorOptionsByBuilding(buildingId));
     }
 
-    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
-    @GetMapping("/building/{buildingId}/planimetry/all")
-    public ResponseEntity<List<FloorPlanDTO>> getAllFloorPlanimetryByBuilding(@PathVariable Integer buildingId) {
-        return ResponseEntity.ok(floorService.getAllFloorPlansByBuildingId(buildingId));
-    }
-
-    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
-    @PostMapping("/planimetry/save")
-    public ResponseEntity<FloorPlanDTO> savePlanimetry(@RequestBody FloorPlanDTO floorPlanDTO) {
-        return ResponseEntity.ok(floorService.savePlanimetry(floorPlanDTO));
-    }
-
-    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
-    @GetMapping("/{id}/planimetry")
-    public ResponseEntity<FloorPlanDTO> getFloorPlanimetry(@PathVariable Integer id, @RequestParam(required = false) java.time.LocalDate date) {
-        return ResponseEntity.ok(floorService.getFloorPlanimetry(id, date));
-    }
-
-    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
-    @PostMapping(value = "/{id}/upload-planimetry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadPlanimetry(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(floorService.uploadPlanimetryImage(id, file));
-    }
 }
