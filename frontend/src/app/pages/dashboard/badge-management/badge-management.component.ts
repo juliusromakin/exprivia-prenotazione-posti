@@ -69,7 +69,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
   private hoveredNode: BadgeNode | null = null;
 
   // Gestione Visibilità e ViewMode
-  visibleBadgeIds: Set<number> = new Set();
+  hiddenBadgeIds: Set<number> = new Set();
   viewMode: 'full' | 'focus' = 'full';
   private isFirstLoad = true;
 
@@ -148,8 +148,15 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
           this.savedPositions.set(Number(id), parsed[id]);
         });
       }
+      const savedHidden = localStorage.getItem('badge-management-hidden-ids');
+      if (savedHidden) {
+        const parsedHidden = JSON.parse(savedHidden);
+        if (Array.isArray(parsedHidden)) {
+          this.hiddenBadgeIds = new Set(parsedHidden);
+        }
+      }
     } catch (e) {
-      console.warn('Errore nel caricamento delle posizioni dal LocalStorage', e);
+      console.warn('Errore nel caricamento dallo storage locale', e);
     }
   }
 
@@ -161,8 +168,9 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
         obj[id] = pos;
       });
       localStorage.setItem('badge-management-layout', JSON.stringify(obj));
+      localStorage.setItem('badge-management-hidden-ids', JSON.stringify(Array.from(this.hiddenBadgeIds)));
     } catch (e) {
-      console.error('Errore nel salvataggio delle posizioni nel LocalStorage', e);
+      console.error('Errore nel salvataggio nello storage locale', e);
     }
   }
 
@@ -178,13 +186,15 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
         this.roles = badges.filter(b => b.type === 'ROLE');
         this.actions = badges.filter(b => b.type === 'ACTION');
 
-        // Inizialmente mostriamo solo i badge che hanno relazioni (solo al primo avvio)
-        if (this.isFirstLoad && this.visibleBadgeIds.size === 0) {
-          badges.forEach(b => {
-            if (b.isActive && (b.parentIds?.length || this.hasChildren(b.id!, badges))) {
-              this.visibleBadgeIds.add(b.id!);
-            }
-          });
+        if (this.isFirstLoad) {
+          // Se non abbiamo ID nascosti caricati dallo storage locale, nascondiamo di default i nodi isolati
+          if (!localStorage.getItem('badge-management-hidden-ids')) {
+            badges.forEach(b => {
+              if (b.id && b.isActive && this.isIsolated(b.id)) {
+                this.hiddenBadgeIds.add(b.id);
+              }
+            });
+          }
           this.isFirstLoad = false;
         }
         
@@ -218,9 +228,10 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     if (this.selectedBadge?.id === badge.id) {
       this.closeSidePanel();
     } else {
-      // Se lo selezioniamo dalla lista e non è visibile, lo aggiungiamo automaticamente
-      if (badge.id && !this.visibleBadgeIds.has(badge.id)) {
-        this.visibleBadgeIds.add(badge.id);
+      // Se lo selezioniamo dalla lista e non è visibile, lo rendiamo visibile
+      if (badge.id && this.hiddenBadgeIds.has(badge.id)) {
+        this.hiddenBadgeIds.delete(badge.id);
+        this.savePositionsToStorage();
       }
       this.selectedBadge = { ...badge };
       this.workingBadge = JSON.parse(JSON.stringify(badge)); // Copia profonda
@@ -266,8 +277,8 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
     const node = this.findNodeAtPos(worldX, worldY);
 
-    // Gestione click su pulsanti speciali (Hide) in Hover
-    if (node && node === this.hoveredNode && this.isIsolated(node.badge.id!)) {
+    // Gestione click su pulsanti speciali (Hide) in Hover su qualsiasi nodo
+    if (node && node === this.hoveredNode) {
       const hx = node.x + node.width;
       const hy = node.y;
       
@@ -481,8 +492,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       // Controllo se siamo sopra il pulsante Hide (X)
       const hx = node.x + node.width;
       const hy = node.y;
-      const isOverHide = this.isIsolated(node.badge.id!) && 
-                         mx > hx - 25 && mx < hx - 5 && 
+      const isOverHide = mx > hx - 25 && mx < hx - 5 && 
                          my > hy + 5 && my < hy + 25;
       
       canvas.style.cursor = isOverHide ? 'pointer' : 'grab';
@@ -573,13 +583,29 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
 
   public clearCanvas(): void {
-    this.visibleBadgeIds.clear();
-    this.savedPositions.clear();
-    this.savePositionsToStorage();
-    this.selectedBadge = null;
-    this.workingBadge = null;
-    this.layoutAndDraw();
-    this.showToast('Schema e layout resettati', 'success');
+    if (this.viewMode === 'full') {
+      // Reset layout
+      this.savedPositions.clear();
+      this.hiddenBadgeIds.clear();
+      this.allBadges.forEach(b => {
+        if (b.id && b.isActive && this.isIsolated(b.id)) {
+          this.hiddenBadgeIds.add(b.id);
+        }
+      });
+      this.savePositionsToStorage();
+      this.layoutAndDraw();
+      this.showToast('Layout e visibilità di default resettati', 'success');
+    } else {
+      // Clear map (nascondi tutti)
+      this.allBadges.forEach(b => {
+        if (b.id) this.hiddenBadgeIds.add(b.id);
+      });
+      this.savePositionsToStorage();
+      this.selectedBadge = null;
+      this.workingBadge = null;
+      this.layoutAndDraw();
+      this.showToast('Tutti i badge sono stati nascosti', 'success');
+    }
   }
 
   async saveChanges(): Promise<void> {
@@ -660,11 +686,34 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
   // --- Gestione Visibilità e Deletion ---
 
+  toggleBadgeVisibility(badge: badgeDTO): void {
+    if (!badge.id) return;
+    if (this.hiddenBadgeIds.has(badge.id)) {
+      this.hiddenBadgeIds.delete(badge.id);
+      this.showToast(`${this.formatBadgeName(badge.name)} mostrato nello schema`, 'success');
+    } else {
+      this.hiddenBadgeIds.add(badge.id);
+      this.showToast(`${this.formatBadgeName(badge.name)} nascosto dallo schema`, 'success');
+    }
+    this.savePositionsToStorage();
+    this.layoutAndDraw();
+  }
+
+  isBadgeVisible(badge: badgeDTO): boolean {
+    if (!badge.id) return false;
+    if (!badge.isActive) return false;
+    if (this.viewMode === 'focus' && this.selectedBadge) {
+      return this.isInFocusHierarchy(badge.id);
+    }
+    return !this.hiddenBadgeIds.has(badge.id);
+  }
+
   hideFromGraph(badge: badgeDTO): void {
     if (!badge.id) return;
-    this.visibleBadgeIds.delete(badge.id);
+    this.hiddenBadgeIds.add(badge.id);
+    this.savePositionsToStorage();
     this.layoutAndDraw();
-    this.showToast(`${this.formatBadgeName(badge.name)} rimosso dalla vista`, 'success');
+    this.showToast(`${this.formatBadgeName(badge.name)} nascosto dalla vista`, 'success');
   }
 
   deleteBadge(badge: badgeDTO): void {
@@ -692,7 +741,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       
       const idToRemove = this.badgeToDelete.id;
       if (idToRemove) {
-        this.visibleBadgeIds.delete(idToRemove);
+        this.hiddenBadgeIds.delete(idToRemove);
         this.allBadges = this.allBadges.filter(b => b.id !== idToRemove);
         this.roles = this.allBadges.filter(b => b.type === 'ROLE');
         this.actions = this.allBadges.filter(b => b.type === 'ACTION');
@@ -725,10 +774,11 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
     const allBadges = this.allBadges.filter(b => {
       if (!b.isActive) return false;
+      // D. Forziamo la visibilità se in modalità focus fa parte della gerarchia
       if (this.viewMode === 'focus' && this.selectedBadge) {
         return this.isInFocusHierarchy(b.id!);
       }
-      return (b.parentIds && b.parentIds.length > 0) || this.hasChildren(b.id!, this.allBadges) || this.visibleBadgeIds.has(b.id!);
+      return !this.hiddenBadgeIds.has(b.id!);
     });
 
     if (!allBadges.length) {
@@ -1100,8 +1150,46 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       ctx.stroke();
     }
 
-    // Icone di Hover (Solo Hide per isolati)
-    if (node === this.hoveredNode && !this.isDragging && this.interactionMode !== 'connect' && this.isIsolated(badge.id!)) {
+    // Indicatore di archi/relazioni nascoste (Opzione 2)
+    const hiddenParentsCount = (badge.parentIds || []).filter(pId => 
+      this.allBadges.some(b => b.id === pId && b.isActive) && !this.nodes.some(n => n.badge.id === pId)
+    ).length;
+
+    const hiddenChildrenCount = this.allBadges.filter(b => 
+      b.isActive && b.parentIds?.includes(badge.id!) && !this.nodes.some(n => n.badge.id === b.id)
+    ).length;
+
+    const totalHidden = hiddenParentsCount + hiddenChildrenCount;
+    if (totalHidden > 0) {
+      ctx.save();
+      const pillW = 76;
+      const pillH = 18;
+      const pillX = x + w / 2 - pillW / 2;
+      const pillY = y - pillH / 2;
+
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        // @ts-ignore
+        ctx.roundRect(pillX, pillY, pillW, pillH, 9);
+      } else {
+        ctx.rect(pillX, pillY, pillW, pillH);
+      }
+      ctx.fillStyle = '#f8fafc';
+      ctx.fill();
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`🔗 +${totalHidden} nascosti`, pillX + pillW / 2, pillY + pillH / 2);
+      ctx.restore();
+    }
+
+    // Icone di Hover (Hide su qualsiasi nodo)
+    if (node === this.hoveredNode && !this.isDragging && this.interactionMode !== 'connect') {
       const hx = x + w;
       const hy = y;
 
@@ -1198,8 +1286,8 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     
     if (!badge) return;
 
-    if (this.visibleBadgeIds.has(badgeId)) {
-      this.showToast(`Il badge ${this.formatBadgeName(badge.name)} è già presente.`, 'success');
+    if (!this.hiddenBadgeIds.has(badgeId)) {
+      this.showToast(`Il badge ${this.formatBadgeName(badge.name)} è già visibile.`, 'success');
       this.selectBadge(badge);
       return;
     }
@@ -1213,12 +1301,12 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     const worldX = (mx - this.panX) / this.zoom;
     const worldY = (my - this.panY) / this.zoom;
 
-    // Aggiungi ai visibili e imposta la posizione
-    this.visibleBadgeIds.add(badgeId);
+    // Rendi visibile e imposta la posizione
+    this.hiddenBadgeIds.delete(badgeId);
     this.savedPositions.set(badgeId, { x: worldX - 90, y: worldY - 27 }); // Centro il nodo
     
+    this.savePositionsToStorage(); // Salva lo stato e le posizioni dopo il drop
     this.layoutAndDraw();
-    this.savePositionsToStorage(); // Salva dopo il drop
     this.showToast(`${this.formatBadgeName(badge.name)} aggiunto allo schema`, 'success');
   }
 
