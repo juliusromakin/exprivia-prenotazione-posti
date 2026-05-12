@@ -14,7 +14,7 @@ public interface FloorPlanRepository extends JpaRepository<FloorPlan, Integer> {
     @Query("SELECT fp FROM FloorPlan fp WHERE fp.floor.id = :floorId AND fp.isActive = true AND fp.validFrom <= :date AND (fp.validTo IS NULL OR fp.validTo >= :date)")
     Optional<FloorPlan> findActiveFloorPlan(@Param("floorId") Integer floorId, @Param("date") LocalDate date);
 
-    @Query("SELECT fp FROM FloorPlan fp WHERE fp.floor.id = :floorId AND fp.isActive = true ORDER BY fp.validFrom DESC")
+    @Query("SELECT fp FROM FloorPlan fp WHERE fp.floor.id = :floorId ORDER BY fp.validFrom DESC")
     java.util.List<FloorPlan> findAllByFloorIdOrderByValidFromDesc(@Param("floorId") Integer floorId);
 
     @Query("SELECT COUNT(fp) > 0 FROM FloorPlan fp WHERE fp.floor.id = :floorId AND fp.isActive = true AND (:excludeId IS NULL OR fp.id != :excludeId) AND " +

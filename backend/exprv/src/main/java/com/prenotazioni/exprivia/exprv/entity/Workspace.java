@@ -31,7 +31,7 @@ public class Workspace {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "name", unique = true)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "capacity")

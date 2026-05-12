@@ -35,7 +35,7 @@ public class FloorPlan {
     @Column(name = "valid_to")
     private LocalDate validTo;
 
-    @Column(name = "image_path")
+    @Column(name = "image_path", columnDefinition = "TEXT")
     private String imagePath;
 
     @Column(name = "canvas_width")

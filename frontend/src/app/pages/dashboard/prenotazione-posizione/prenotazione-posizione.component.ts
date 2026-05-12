@@ -205,7 +205,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (this.selectedLocation === 'Milano') buildingId = 2;
     else if (this.selectedLocation === 'Molfetta') buildingId = 3;
 
-    this.planimetriaService.getPlanimetrieByEdificio(buildingId, true).pipe(
+    this.planimetriaService.getFloorsByEdificio(buildingId, true).pipe(
       switchMap(floors => {
         if (!floors || floors.length === 0) return of({ rooms: [], workspaces: [] });
 
@@ -221,7 +221,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
             const allRooms: Room[] = [];
             const allWorkspaces: Workspace[] = [];
 
-            results.forEach(({ floor, plan }) => {
+            results.forEach(({ floor, plan }: { floor: any, plan: any }) => {
               // Copy to avoid mutating original list cache if any
               const floorRooms: Room[] = floor.rooms ? JSON.parse(JSON.stringify(floor.rooms)) : [];
               const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
@@ -230,7 +230,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
                 // Map room coordinates
                 if (plan.rooms) {
                   floorRooms.forEach(r => {
-                    const rPos = plan.rooms!.find(p => p.roomId === r.id);
+                    const rPos = plan.rooms!.find((p: any) => p.roomId === r.id);
                     if (rPos) {
                       r.mapX = rPos.mapX;
                       r.mapY = rPos.mapY;
@@ -243,7 +243,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
                 // Map workspace coordinates
                 if (plan.workspaces) {
                   floorWorkspaces.forEach(w => {
-                    const wPos = plan.workspaces!.find(p => p.workspaceId === w.id);
+                    const wPos = plan.workspaces!.find((p: any) => p.workspaceId === w.id);
                     if (wPos) {
                       w.mapX = wPos.mapX;
                       w.mapY = wPos.mapY;
@@ -262,7 +262,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.destroy$)
     ).subscribe({
-        next: ({ rooms, workspaces }) => {
+        next: ({ rooms, workspaces }: { rooms: any[], workspaces: any[] }) => {
           if (rooms.length === 0 && workspaces.length === 0) {
             this.state.errorMessage = "No data found. Please check backend connection.";
           }

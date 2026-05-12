@@ -31,7 +31,7 @@ public class Room {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "name", unique = true)
+    @Column(name = "name")
     private String name;
 
     @Enumerated(EnumType.STRING)

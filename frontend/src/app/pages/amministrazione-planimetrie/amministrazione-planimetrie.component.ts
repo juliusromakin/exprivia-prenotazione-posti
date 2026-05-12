@@ -130,12 +130,55 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 this.locationName = params['locationName'] || '';
                 this.buildingName = params['buildingName'] || '';
 
-                // Inizializza il canvas con l'immagine di default
-                this.imageUrl = 'Planimetria.png';
-                this.cdr.detectChanges();
-                setTimeout(() => this.initCanvas(this.imageUrl!), 0);
+                const planIdParam = params['planId'] ? +params['planId'] : null;
+
+                // Recupera tutti i piani dell'edificio per mappare il floorId reale
+                this.planimetriaService.getFloorsByEdificio(this.buildingId!).subscribe({
+                    next: (floors) => {
+                        // Cerca il piano per nome (es. "Piano 1") o per indice
+                        const targetFloor = floors.find(f => f.name?.trim().toLowerCase() === `piano ${this.selectedFloor}` || f.name?.trim().toLowerCase() === `piano ${this.selectedFloor}°`) 
+                                         || floors[this.selectedFloor! - 1];
+                        if (targetFloor && targetFloor.id) {
+                            this.selectedFloorId = targetFloor.id;
+                            console.log(`[Planimetria] Risolto floorId reale: ${this.selectedFloorId} per Piano ${this.selectedFloor}`);
+                        } else {
+                            // Fallback: proviamo a usare lo selectedFloor come ID se non troviamo corrispondenza
+                            this.selectedFloorId = this.selectedFloor;
+                            console.warn(`[Planimetria] Impossibile risolvere floorId reale, uso fallback: ${this.selectedFloorId}`);
+                        }
+
+                        // Se è stato passato un planId specifico da caricare, lo carichiamo
+                        if (planIdParam) {
+                            this.planimetriaService.getAllPlansByBuilding(this.buildingId!).subscribe({
+                                next: (lista) => {
+                                    const plan = lista.find(p => p.id === planIdParam);
+                                    if (plan) {
+                                        this.selezionaPlanimetria(plan);
+                                    } else {
+                                        this.inizializzaCanvasVuoto();
+                                    }
+                                },
+                                error: () => {
+                                    this.inizializzaCanvasVuoto();
+                                }
+                            });
+                        } else {
+                            this.inizializzaCanvasVuoto();
+                        }
+                    },
+                    error: () => {
+                        this.selectedFloorId = this.selectedFloor;
+                        this.inizializzaCanvasVuoto();
+                    }
+                });
             }
         });
+    }
+
+    private inizializzaCanvasVuoto(): void {
+        this.imageUrl = 'Planimetria.png';
+        this.cdr.detectChanges();
+        setTimeout(() => this.initCanvas(this.imageUrl!), 0);
     }
 
     // ── Utilità date ───────────────────────────────────────────────────────
@@ -315,31 +358,38 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         this.imageUrl = piano.imagePath || 'Planimetria.png';
         this.cdr.detectChanges();
 
-        // Recupera il FloorDTO del piano per avere i dati logici (nomi stanze, tipi ecc.)
-        this.planimetriaService.getPlanimetrieByEdificio(this.buildingId!).subscribe({
-            next: (floors) => {
-                const floor = floors.find((f: FloorDTO) => f.id === piano.floorId) ?? { id: piano.floorId, rooms: [], workspaces: [] };
-                setTimeout(() => {
-                    this.initCanvas(this.imageUrl!);
+        // Recupera il FloorDTO del piano per avere i dati logici (nomi stanze, tipi ecc.) solo se buildingId è disponibile
+        if (this.buildingId) {
+            this.planimetriaService.getFloorsByEdificio(this.buildingId).subscribe({
+                next: (floors: FloorDTO[]) => {
+                    const floor = floors.find((f: FloorDTO) => f.id === piano.floorId) ?? { id: piano.floorId, rooms: [], workspaces: [] };
                     setTimeout(() => {
-                        const hasPosizioni = (piano.rooms && piano.rooms.length > 0) || (piano.workspaces && piano.workspaces.length > 0);
-                        if (!hasPosizioni && floor.rooms && floor.rooms.length > 0) {
-                            console.warn('[Planimetria] Pianimetria vuota, uso fallback dal FloorDTO');
-                            this.caricaPlanimetriaSelezionata(floor, this.buildPianoDaFloorDTO(floor));
-                        } else {
-                            this.caricaPlanimetriaSelezionata(floor, piano);
-                        }
-                    }, 150);
-                }, 0);
-            },
-            error: () => {
-                // Nessun floor logico trovato: disegna comunque con i dati spaziali
-                setTimeout(() => {
-                    this.initCanvas(this.imageUrl!);
-                    setTimeout(() => this.caricaPlanimetriaSelezionata({}, piano), 150);
-                }, 0);
-            }
-        });
+                        this.initCanvas(this.imageUrl!);
+                        setTimeout(() => {
+                            const hasPosizioni = (piano.rooms && piano.rooms.length > 0) || (piano.workspaces && piano.workspaces.length > 0);
+                            if (!hasPosizioni && floor.rooms && floor.rooms.length > 0) {
+                                console.warn('[Planimetria] Pianimetria vuota, uso fallback dal FloorDTO');
+                                this.caricaPlanimetriaSelezionata(floor, this.buildPianoDaFloorDTO(floor));
+                            } else {
+                                this.caricaPlanimetriaSelezionata(floor, piano);
+                            }
+                        }, 150);
+                    }, 0);
+                },
+                error: () => {
+                    // Nessun floor logico trovato: disegna comunque con i dati spaziali
+                    setTimeout(() => {
+                        this.initCanvas(this.imageUrl!);
+                        setTimeout(() => this.caricaPlanimetriaSelezionata({}, piano), 150);
+                    }, 0);
+                }
+            });
+        } else {
+            setTimeout(() => {
+                this.initCanvas(this.imageUrl!);
+                setTimeout(() => this.caricaPlanimetriaSelezionata({}, piano), 150);
+            }, 0);
+        }
     }
 
     /** Costruisce un Planimetria "di default" usando le stanze logiche del FloorDTO */
@@ -1002,6 +1052,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             const planPayload: Planimetria = {
                 id: this.selectedFloorPlanId ?? undefined,
                 floorId: (this.selectedFloorId ?? this.selectedFloor)!,
+                name: `Layout Piano ${this.selectedFloor}`,
+                isActive: true,
                 validFrom: validFromStr,
                 validTo: validToStr,
                 canvasWidth: this.canvas.width,

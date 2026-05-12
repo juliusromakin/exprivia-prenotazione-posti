@@ -87,8 +87,7 @@ public class FloorPlanService {
                     plan.getValidTo(),
                     plan.getId());
             if (hasOverlap) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Impossibile attivare: Esiste già una planimetria attiva in questo periodo per questo piano.");
+                throw new AppException("Impossibile attivare: Esiste già una planimetria attiva in questo periodo per questo piano.", HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -147,10 +146,10 @@ public class FloorPlanService {
                     floor.getId(),
                     floorPlan.getValidFrom(),
                     floorPlan.getValidTo(),
-                    floorPlan.getId() != null ? floorPlan.getId() : -1);
+                    floorPlan.getId());
             if (hasOverlap) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Impossibile salvare: Esiste già una planimetria attiva in questo periodo per questo piano.");
+                // Come richiesto dall'utente, salviamo comunque la mappa ma la rendiamo inattiva
+                floorPlan.setIsActive(false);
             }
         }
 

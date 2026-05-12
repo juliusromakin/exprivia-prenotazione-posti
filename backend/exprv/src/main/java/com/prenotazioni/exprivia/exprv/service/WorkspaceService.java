@@ -11,8 +11,11 @@ import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.WorkspaceMapper;
+import com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository;
 import com.prenotazioni.exprivia.exprv.repository.RoomRepository;
+import com.prenotazioni.exprivia.exprv.repository.WorkspacePositionRepository;
 import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
+import java.util.Optional;
 
 @Service
 public class WorkspaceService {
@@ -20,13 +23,13 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMapper workspaceMapper;
     private final RoomRepository roomRepository;
-    private final com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository floorPlanRepository;
-    private final com.prenotazioni.exprivia.exprv.repository.WorkspacePositionRepository workspacePositionRepository;
+    private final FloorPlanRepository floorPlanRepository;
+    private final WorkspacePositionRepository workspacePositionRepository;
 
     public WorkspaceService(WorkspaceRepository workspaceRepository, WorkspaceMapper workspaceMapper,
             RoomRepository roomRepository,
-            com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository floorPlanRepository,
-            com.prenotazioni.exprivia.exprv.repository.WorkspacePositionRepository workspacePositionRepository) {
+            FloorPlanRepository floorPlanRepository,
+            WorkspacePositionRepository workspacePositionRepository) {
         this.workspaceRepository = workspaceRepository;
         this.workspaceMapper = workspaceMapper;
         this.roomRepository = roomRepository;
@@ -69,15 +72,29 @@ public class WorkspaceService {
     }
 
     public WorkspaceDTO createWorkspace(WorkspaceDTO workspaceDTO) {
-        Workspace workspace = workspaceMapper.toEntity(workspaceDTO);
-        workspace.setId(null);
+        Workspace workspace = null;
 
-        Room room = null;
         if (workspaceDTO.getRoomId() != null) {
-            room = roomRepository.findById(workspaceDTO.getRoomId())
+            Room room = roomRepository.findById(workspaceDTO.getRoomId())
                     .orElseThrow(() -> new AppException("Room with ID " + workspaceDTO.getRoomId() + " not found",
                             HttpStatus.NOT_FOUND));
-            workspace.setRoom(room);
+
+            // Check if workspace with same name exists in this room
+            Optional<Workspace> existingOpt = workspaceRepository.findByRoomId(room.getId()).stream()
+                    .filter(w -> w.getName() != null && w.getName().equalsIgnoreCase(workspaceDTO.getName()))
+                    .findFirst();
+
+            if (existingOpt.isPresent()) {
+                workspace = existingOpt.get();
+                workspace.setEnabled(true);
+            } else {
+                workspace = workspaceMapper.toEntity(workspaceDTO);
+                workspace.setId(null);
+                workspace.setRoom(room);
+            }
+        } else {
+            workspace = workspaceMapper.toEntity(workspaceDTO);
+            workspace.setId(null);
         }
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);

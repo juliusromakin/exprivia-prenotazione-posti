@@ -44,6 +44,14 @@ export interface FloorDTO {
     workspaces?: any[];
 }
 
+export interface FloorPlanSummaryDTO {
+    id?: number;
+    name?: string;
+    publishDate?: string | Date;
+    validTo?: string | Date;
+    isActive?: boolean;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -54,12 +62,19 @@ export class PlanimetriaService {
     constructor(private axiosService: AxiosService) {}
 
     /** Recupera tutti i piani di un edificio. */
-    getPlanimetrieByEdificio(buildingId: number, enabledOnly = false): Observable<FloorDTO[]> {
+    getFloorsByEdificio(buildingId: number, enabledOnly = false): Observable<FloorDTO[]> {
         return from(
             this.axiosService.get<FloorDTO[]>(
                 `${this.baseUrl}/building/${buildingId}`,
                 { params: { enabledOnly } }
             )
+        );
+    }
+
+    /** Recupera le planimetrie di uno specifico piano. */
+    getFloorPlans(floorId: number): Observable<FloorPlanSummaryDTO[]> {
+        return from(
+            this.axiosService.get<FloorPlanSummaryDTO[]>(`${this.floorPlanUrl}/floor/${floorId}`)
         );
     }
 
@@ -100,8 +115,9 @@ export class PlanimetriaService {
             } as any)
         );
     }
-    /** Attiva o disattiva un piano (planimetria). */
-    toggleFloorStatus(id: number, enabled: boolean): Observable<void> {
-        return from(this.axiosService.patch<void>(`${this.baseUrl}/${id}/status`, null, { params: { enabled } }));
+
+    /** Attiva o disattiva una planimetria (FloorPlan). */
+    toggleFloorPlanStatus(id: number): Observable<void> {
+        return from(this.axiosService.patch<void>(`${this.floorPlanUrl}/${id}/status`, null));
     }
 }

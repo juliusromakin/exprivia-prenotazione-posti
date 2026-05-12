@@ -93,7 +93,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // ROLE_ADMIN: Eredita HR + TUTTE le altre azioni (Superuser)
         addParentLink(roleAdmin, roleHr);
-        
+
         log.info("Elevating ROLE_ADMIN to Superuser (all actions)...");
         for (Badge b : badgeMap.values()) {
             if (b.getType() == BadgeType.ACTION) {
@@ -119,7 +119,7 @@ public class DataInitializer implements CommandLineRunner {
                 createRoom("Area A" + i, RoomType.OPEN_SPACE, 10, 4);
             }
         }
-        
+
         log.info("--- HRBAC DATA INITIALIZATION COMPLETED ---");
     }
 
@@ -132,7 +132,8 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void addParentLink(Badge child, Badge parent) {
-        if (child == null || parent == null) return;
+        if (child == null || parent == null)
+            return;
         if (child.getParentIds() == null) {
             child.setParentIds(new ArrayList<>());
         }

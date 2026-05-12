@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ import {
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { LocationService } from '../../../core/services/location.service';
-import { PlanimetriaService, FloorDTO } from '../../../core/services/planimetria.service';
+import { PlanimetriaService, FloorDTO, FloorPlanSummaryDTO } from '../../../core/services/planimetria.service';
 
 interface Edificio {
   id?: number;
@@ -21,7 +21,7 @@ interface Edificio {
   locationId?: number;
   enabled?: boolean;
   sedeName?: string;
-  planimetrie?: { id: number, name: string, publishDate: Date, enabled?: boolean }[];
+  planimetrie?: FloorPlanSummaryDTO[];
 }
 
 interface Sede {
@@ -79,11 +79,12 @@ export class GestioneSediComponent implements OnInit {
   }
 
   toggleFloorStatus(plan: any): void {
-    const newStatus = !plan.enabled;
-    this.planimetriaService.toggleFloorStatus(plan.id, newStatus).subscribe({
+    const newStatus = !plan.isActive;
+    this.planimetriaService.toggleFloorPlanStatus(plan.id).subscribe({
       next: () => {
-        plan.enabled = newStatus;
+        plan.isActive = newStatus;
         this.activeMenuIndex = null;
+        this.cdr.detectChanges();
         this.messageService.add({ 
           severity: 'success', 
           summary: 'Successo', 
@@ -100,8 +101,10 @@ export class GestioneSediComponent implements OnInit {
     });
   }
 
-  isFutureDate(date: Date): boolean {
-    return date > new Date();
+  isFutureDate(date: Date | string | undefined | null): boolean {
+    if (!date) return false;
+    const d = new Date(date);
+    return d > new Date();
   }
 
   constructor(
@@ -110,7 +113,8 @@ export class GestioneSediComponent implements OnInit {
     private router: Router,
     private translate: TranslateService,
     private locationService: LocationService,
-    private planimetriaService: PlanimetriaService
+    private planimetriaService: PlanimetriaService,
+    private cdr: ChangeDetectorRef
   ) {
     this.locationForm = this.fb.group({
       name: ['', Validators.required],
@@ -200,13 +204,29 @@ export class GestioneSediComponent implements OnInit {
     this.selectedBuilding = { ...building };
     this.selectedFloor = floor;
     this.showPlanimetriaModal = true;
+    this.cdr.detectChanges();
     
-    // Carica le planimetrie reali dal servizio
+    // Carica i piani dell'edificio per trovare il vero floorId
     if (building.id) {
-      this.planimetriaService.getPlanimetrieByEdificio(building.id).subscribe({
-        next: (plans: FloorDTO[]) => {
-          if (this.selectedBuilding) {
-            this.selectedBuilding.planimetrie = plans as any;
+      this.planimetriaService.getFloorsByEdificio(building.id).subscribe({
+        next: (floors: FloorDTO[]) => {
+          // Trova il piano corrispondente all'indice (es. 1° piano -> index 0 se creati in ordine, 
+          // o cerchiamo per nome "Piano 1")
+          const targetFloor = floors.find(f => f.name === `Piano ${floor}`) || floors[floor - 1];
+          if (targetFloor && targetFloor.id) {
+            this.planimetriaService.getFloorPlans(targetFloor.id).subscribe({
+              next: (plans: FloorPlanSummaryDTO[]) => {
+                if (this.selectedBuilding) {
+                  this.selectedBuilding.planimetrie = plans;
+                  this.cdr.detectChanges();
+                }
+              }
+            });
+          } else {
+             if (this.selectedBuilding) {
+                 this.selectedBuilding.planimetrie = [];
+                 this.cdr.detectChanges();
+             }
           }
         }
       });

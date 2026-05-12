@@ -302,7 +302,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600">{{ p.publishDate | date:'dd/MM/yyyy' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600 uppercase">INDETERMINATO</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <ng-container *ngIf="p.enabled !== false; else disabledBadge">
+                  <ng-container *ngIf="p.isActive !== false; else disabledBadge">
                     <span [class]="isFutureDate(p.publishDate) ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
                       class="px-3 py-1 text-[10px] font-black rounded-full uppercase">
                       {{ isFutureDate(p.publishDate) ? 'Programmato' : 'Attivo' }}
@@ -333,9 +333,9 @@
 
                       <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                         (click)="toggleFloorStatus(p)">
-                        <lucide-icon [name]="p.enabled === false ? 'check-circle' : 'slash'" 
-                          [class]="p.enabled === false ? 'w-4 h-4 text-green-500' : 'w-4 h-4 text-amber-500'"></lucide-icon>
-                        {{ p.enabled === false ? 'Abilita' : 'Disabilita' }}
+                        <lucide-icon [name]="p.isActive === false ? 'check-circle' : 'slash'" 
+                          [class]="p.isActive === false ? 'w-4 h-4 text-green-500' : 'w-4 h-4 text-amber-500'"></lucide-icon>
+                        {{ p.isActive === false ? 'Abilita' : 'Disabilita' }}
                       </button>
 
                       <div class="h-px bg-slate-100 my-1"></div>
