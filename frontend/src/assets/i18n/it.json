@@ -610,7 +610,7 @@
       "LOCATION": "Sede"
     },
     "TABLE": {
-      "ADDRESS": "Via",
+      "ADDRESS": "Via / Indirizzo",
       "LOCATION_NAME": "Nome Sede",
       "CITY": "Città",
       "FLOORS_COUNT": "N.Piani",
@@ -643,7 +643,7 @@
     },
     "BUILDING_MODAL": {
       "TITLE": "Modifica Edificio",
-      "BUILDING_NAME": "Nome Edificio *",
+      "BUILDING_NAME": "Nome Sede *",
       "FLOORS_COUNT": "N. Piani *",
       "ADDRESS": "Via / Indirizzo *",
       "COORD_X": "Coord X",
