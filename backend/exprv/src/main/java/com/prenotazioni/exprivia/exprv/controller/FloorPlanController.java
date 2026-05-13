@@ -31,8 +31,8 @@ public class FloorPlanController {
 
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_DELETE')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> softDeleteFloorPlan(@PathVariable Integer id) {
-        floorPlanService.softDeleteFloorPlan(id);
+    public ResponseEntity<Void> deleteFloorPlan(@PathVariable Integer id) {
+        floorPlanService.deleteFloorPlan(id);
         return ResponseEntity.noContent().build();
     }
 

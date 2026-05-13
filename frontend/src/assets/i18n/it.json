@@ -649,6 +649,13 @@
         "STATUS": "STATO",
         "ACTIONS": "AZIONI",
         "INDETERMINATE": "INDETERMINATO"
+      },
+      "MESSAGES": {
+        "CONFIRM_DELETE": "Sei sicuro di voler eliminare definitivamente la planimetria \"{{ name }}\"? Questa azione non può essere annullata.",
+        "SUCCESS_TITLE": "Successo",
+        "DELETE_SUCCESS": "Planimetria eliminata definitivamente",
+        "ERROR_TITLE": "Errore",
+        "DELETE_ERROR": "Impossibile eliminare la planimetria"
       }
     },
     "BUILDING_MODAL": {

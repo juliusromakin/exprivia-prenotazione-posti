@@ -120,4 +120,9 @@ export class PlanimetriaService {
     toggleFloorPlanStatus(id: number): Observable<void> {
         return from(this.axiosService.patch<void>(`${this.floorPlanUrl}/${id}/status`, null));
     }
+
+    /** Elimina definitivamente una planimetria. */
+    deleteFloorPlan(id: number): Observable<void> {
+        return from(this.axiosService.delete<void>(`${this.floorPlanUrl}/${id}`));
+    }
 }

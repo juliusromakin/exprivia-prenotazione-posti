@@ -101,6 +101,54 @@ export class GestioneSediComponent implements OnInit {
     });
   }
 
+  deleteFloorPlan(plan: any): void {
+    const confirmMessage = this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.CONFIRM_DELETE', { name: plan.name });
+    if (confirm(confirmMessage)) {
+      this.planimetriaService.deleteFloorPlan(plan.id).subscribe({
+        next: () => {
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.SUCCESS_TITLE'), 
+            detail: this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.DELETE_SUCCESS') 
+          });
+          this.activeMenuIndex = null;
+          
+          if (this.selectedBuilding && this.selectedFloor) {
+            if (this.selectedBuilding.id) {
+              this.planimetriaService.getFloorsByEdificio(this.selectedBuilding.id).subscribe({
+                next: (floors: FloorDTO[]) => {
+                  const targetFloor = floors.find(f => f.name === `Piano ${this.selectedFloor}`) || floors[this.selectedFloor! - 1];
+                  if (targetFloor && targetFloor.id) {
+                    this.planimetriaService.getFloorPlans(targetFloor.id).subscribe({
+                      next: (plans: FloorPlanSummaryDTO[]) => {
+                        if (this.selectedBuilding) {
+                          this.selectedBuilding.planimetrie = plans;
+                          this.cdr.detectChanges();
+                        }
+                      }
+                    });
+                  } else {
+                    if (this.selectedBuilding) {
+                      this.selectedBuilding.planimetrie = [];
+                      this.cdr.detectChanges();
+                    }
+                  }
+                }
+              });
+            }
+          }
+        },
+        error: () => {
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.ERROR_TITLE'), 
+            detail: this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.DELETE_ERROR') 
+          });
+        }
+      });
+    }
+  }
+
   isFutureDate(date: Date | string | undefined | null): boolean {
     if (!date) return false;
     const d = new Date(date);

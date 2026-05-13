@@ -642,12 +642,19 @@
       "NEW_PLAN": "New floor plan",
       "TABLE": {
         "INDEX": "#",
-        "NAME": "PlanName",
-        "DATE_IN": "startDate",
-        "DATE_FIN": "endDate",
+        "NAME": "Plan Name",
+        "DATE_IN": "start Date",
+        "DATE_FIN": "end Date",
         "STATUS": "status",
         "ACTIONS": "actions",
         "INDETERMINATE": "INDETERMINATE"
+      },
+      "MESSAGES": {
+        "CONFIRM_DELETE": "Are you sure you want to permanently delete the floor plan \"{{ name }}\"? This action cannot be undone.",
+        "SUCCESS_TITLE": "Success",
+        "DELETE_SUCCESS": "Floor plan deleted permanently",
+        "ERROR_TITLE": "Error",
+        "DELETE_ERROR": "Unable to delete floor plan"
       }
     },
     "BUILDING_MODAL": {

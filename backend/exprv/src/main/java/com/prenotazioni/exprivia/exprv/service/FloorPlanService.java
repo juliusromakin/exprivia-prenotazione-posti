@@ -67,12 +67,16 @@ public class FloorPlanService {
     }
 
     @Transactional
-    public void softDeleteFloorPlan(Integer id) {
+    public void deleteFloorPlan(Integer id) {
         FloorPlan plan = floorPlanRepository.findById(id)
                 .orElseThrow(() -> new AppException("FloorPlan not found", HttpStatus.NOT_FOUND));
-        plan.setIsActive(false);
-        plan.setValidTo(LocalDate.now());
-        floorPlanRepository.save(plan);
+        
+        // Delete dependent position mappings first to satisfy foreign key constraint
+        roomPositionRepository.deleteByFloorPlanId(id);
+        workspacePositionRepository.deleteByFloorPlanId(id);
+        
+        // Delete the floor plan itself
+        floorPlanRepository.delete(plan);
     }
 
     @Transactional
