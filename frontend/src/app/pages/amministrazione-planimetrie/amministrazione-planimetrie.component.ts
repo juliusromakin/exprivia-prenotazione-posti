@@ -93,6 +93,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     showDeskPromptModal = false;
     newDeskId = '1';
     pendingDeskParams: { x: number, y: number, tempRoomId: number } | null = null;
+    pendingDeskRoomType: 'MEETING_ROOM' | 'OFFICE' | string = 'OFFICE';
 
     // Custom Alert Modal
     alertModal = {
@@ -177,9 +178,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     }
 
     private inizializzaCanvasVuoto(): void {
-        this.imageUrl = 'Planimetria.png';
+        this.imageUrl = null;
         this.cdr.detectChanges();
-        setTimeout(() => this.initCanvas(this.imageUrl!), 0);
+        setTimeout(() => this.initCanvas(null), 0);
     }
 
     // ── Utilità date ───────────────────────────────────────────────────────
@@ -600,27 +601,30 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         }
     }
 
-    initCanvas(imageSrc: string) {
+    initCanvas(imageSrc: string | null) {
         if (this.canvas) this.canvas.dispose();
 
         this.canvas = new fabric.Canvas('planimetriaCanvas', {
             width: 800,
             height: 450,
-            selection: true
+            selection: true,
+            backgroundColor: '#1a2035'
         });
 
-        fabric.Image.fromURL(imageSrc).then((img) => {
-            if (!this.canvas) return;
-            img.set({
-                scaleX: this.canvas.width! / img.width!,
-                scaleY: this.canvas.height! / img.height!,
-                originX: 'left', originY: 'top',
-                left: 0, top: 0,
-                selectable: false, evented: false
+        if (imageSrc) {
+            fabric.Image.fromURL(imageSrc).then((img) => {
+                if (!this.canvas) return;
+                img.set({
+                    scaleX: this.canvas.width! / img.width!,
+                    scaleY: this.canvas.height! / img.height!,
+                    originX: 'left', originY: 'top',
+                    left: 0, top: 0,
+                    selectable: false, evented: false
+                });
+                this.canvas.backgroundImage = img;
+                this.canvas.renderAll();
             });
-            this.canvas.backgroundImage = img;
-            this.canvas.renderAll();
-        });
+        }
 
         this.canvas.on('mouse:wheel', (opt: any) => {
             const delta = opt.e.deltaY;
@@ -723,6 +727,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     this.isDragging = false;
                     this.isDrawing = false;
                     this.pendingDeskParams = { x, y, tempRoomId: (stanza as any).data?.tempId };
+                    this.pendingDeskRoomType = (stanza as any).data?.roomType ?? 'OFFICE';
                     this.newDeskId = this.getNextDeskId((stanza as any).data?.tempId);
                     this.showDeskPromptModal = true;
                     this.cdr.detectChanges();
@@ -826,6 +831,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         // Creazione automatica di una postazione base per le Meeting Room
         if (type === 'MEETING_ROOM') {
             this.pendingDeskParams = { x: centerX, y: centerY, tempRoomId: tempId };
+            this.pendingDeskRoomType = 'MEETING_ROOM';
             this.newDeskId = "1";
             this.showDeskPromptModal = true;
             this.cdr.detectChanges();
