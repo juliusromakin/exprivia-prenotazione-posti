@@ -42,6 +42,7 @@ export class PlanimetriaInlineComponent implements OnChanges {
   @Input() rooms: Room[] = [];
   @Input() availableWorkspaces: PlanimetriaWorkspace[] = [];
   @Input() selectedWorkspaceId: number | null = null;
+  @Input() backgroundImage: string = 'Planimetria.png';
   @Output() workspaceSelected = new EventEmitter<number>();
 
   @ViewChild("mapViewport") mapViewport!: ElementRef<HTMLDivElement>;

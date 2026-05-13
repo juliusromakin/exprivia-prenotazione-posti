@@ -17,6 +17,7 @@ import { PlanimetriaInlineComponent } from '../planimetria-inline/planimetria-in
 import { WorkspaceService } from "@core/services/workspace.service";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PlanimetriaService } from "@core/services/planimetria.service";
+import { LocationService, SedeDTO, EdificioDTO } from "@core/services/location.service";
 
 @Component({
   standalone: true,
@@ -42,6 +43,10 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     availableWorkspaces: [] as any[],
     selectedDates: [] as Date[],
     availableTimeSlots: [] as { startTime: string; endTime: string }[],
+    floors: [] as any[],
+    selectedFloorId: null as number | null,
+    filteredRooms: [] as Room[],
+    filteredWorkspaces: [] as any[],
     isLoading: false,
     errorMessage: ""
   };
@@ -67,8 +72,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   selectedUser: User | null = null;
 
   // Location selection properties
-  locations: string[] = ['Roma', 'Milano', 'Molfetta'];
-  selectedLocation: string = 'Roma';
+  availableBuildings: any[] = [];
+  selectedBuildingId: number | null = null;
 
   // Bulk selection properties
   selectedReservations: Set<number> = new Set();
@@ -96,6 +101,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private planimetriaService: PlanimetriaService,
+    private locationService: LocationService,
     public translate: TranslateService
   ) {
     this.bookingForm = this.fb.group({
@@ -187,7 +193,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkUserRole();
-    this.loadBookingInfo();
+    this.loadBuildings();
     this.setupFormSubscriptions();
     this.loadMyReservations();
   }
@@ -198,16 +204,25 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   private loadBookingInfo(): void {
+    if (this.selectedBuildingId === null) return;
+    
     this.state.isLoading = true;
     this.state.errorMessage = "";
 
-    let buildingId = 1;
-    if (this.selectedLocation === 'Milano') buildingId = 2;
-    else if (this.selectedLocation === 'Molfetta') buildingId = 3;
+    const buildingId = this.selectedBuildingId;
 
     this.planimetriaService.getFloorsByEdificio(buildingId, true).pipe(
       switchMap(floors => {
-        if (!floors || floors.length === 0) return of({ rooms: [], workspaces: [] });
+        if (!floors || floors.length === 0) {
+          this.state.floors = [];
+          return of([]);
+        }
+
+        this.state.floors = floors;
+        // Select first floor by default if none selected or if building changed
+        if (!this.state.selectedFloorId || !floors.find(f => f.id === this.state.selectedFloorId)) {
+          this.state.selectedFloorId = floors[0].id ?? null;
+        }
 
         const planimetryCalls = floors.map(floor =>
           this.planimetriaService.getPlanimetria(floor.id!).pipe(
@@ -216,77 +231,81 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           )
         );
 
-        return forkJoin(planimetryCalls).pipe(
-          map(results => {
-            const allRooms: Room[] = [];
-            const allWorkspaces: Workspace[] = [];
-
-            results.forEach(({ floor, plan }: { floor: any, plan: any }) => {
-              // Copy to avoid mutating original list cache if any
-              const floorRooms: Room[] = floor.rooms ? JSON.parse(JSON.stringify(floor.rooms)) : [];
-              const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
-
-              if (plan) {
-                // Map room coordinates
-                if (plan.rooms) {
-                  floorRooms.forEach(r => {
-                    const rPos = plan.rooms!.find((p: any) => p.roomId === r.id);
-                    if (rPos) {
-                      r.mapX = rPos.mapX;
-                      r.mapY = rPos.mapY;
-                      r.mapWidth = rPos.mapWidth;
-                      r.mapHeight = rPos.mapHeight;
-                    }
-                  });
-                }
-
-                // Map workspace coordinates
-                if (plan.workspaces) {
-                  floorWorkspaces.forEach(w => {
-                    const wPos = plan.workspaces!.find((p: any) => p.workspaceId === w.id);
-                    if (wPos) {
-                      w.mapX = wPos.mapX;
-                      w.mapY = wPos.mapY;
-                    }
-                  });
-                }
-              }
-
-              allRooms.push(...floorRooms);
-              allWorkspaces.push(...floorWorkspaces);
-            });
-
-            return { rooms: allRooms, workspaces: allWorkspaces };
-          })
-        );
+        return forkJoin(planimetryCalls);
       }),
       takeUntil(this.destroy$)
     ).subscribe({
-        next: ({ rooms, workspaces }: { rooms: any[], workspaces: any[] }) => {
-          if (rooms.length === 0 && workspaces.length === 0) {
+        next: (results: any[]) => {
+          if (results.length === 0) {
             this.state.errorMessage = "No data found. Please check backend connection.";
+            this.state.rooms = [];
+            this.state.availableWorkspaces = [];
+            this.state.isLoading = false;
+            return;
           }
 
-          // Merge workspaces into rooms
-          this.state.rooms = (rooms as Room[]).map(room => ({
-            ...room,
-            workspaces: (workspaces as Workspace[]).filter(w => w.roomId === room.id)
-          }));
+          const allRooms: Room[] = [];
+          const allWorkspaces: any[] = [];
 
-          // Initialize availableWorkspaces with all workspaces enriched with room info
-          // Filter out workspaces without coordinates (cannot be shown on map) or at (0,0) (phantom)
-          this.state.availableWorkspaces = this.state.rooms.flatMap(room => 
-            (room.workspaces || [])
-              .filter(w => w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0))
-              .map(w => ({
+          results.forEach(({ floor, plan }: { floor: any, plan: any }) => {
+            const floorRooms: Room[] = floor.rooms ? JSON.parse(JSON.stringify(floor.rooms)) : [];
+            const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
+            
+            // Store plan image on the floor object itself
+            floor.imagePath = plan?.imagePath || 'Planimetria.png';
+
+            if (plan) {
+              if (plan.rooms) {
+                floorRooms.forEach(r => {
+                  const rPos = plan.rooms!.find((p: any) => p.roomId === r.id);
+                  if (rPos) {
+                    r.mapX = rPos.mapX;
+                    r.mapY = rPos.mapY;
+                    r.mapWidth = rPos.mapWidth;
+                    r.mapHeight = rPos.mapHeight;
+                  }
+                });
+              }
+
+              if (plan.workspaces) {
+                floorWorkspaces.forEach(w => {
+                  const wPos = plan.workspaces!.find((p: any) => p.workspaceId === w.id);
+                  if (wPos) {
+                    w.mapX = wPos.mapX;
+                    w.mapY = wPos.mapY;
+                  }
+                });
+              }
+            }
+
+            // Enforce floorId and merge workspaces into rooms for filtering/display
+            floorRooms.forEach(r => {
+               r.workspaces = floorWorkspaces.filter(w => w.roomId === r.id);
+               (r as any).floorId = floor.id;
+               allRooms.push(r);
+            });
+            
+            floorWorkspaces.forEach(w => {
+              allWorkspaces.push({
                 ...w,
-                roomId: room.id!,
-                roomName: room.name!,
-                roomType: room.roomType!
-              }))
+                floorId: floor.id,
+                roomName: floorRooms.find(r => r.id === w.roomId)?.name || '',
+                roomType: floorRooms.find(r => r.id === w.roomId)?.roomType || '',
+                imagePath: plan?.imagePath || 'Planimetria.png'
+              });
+            });
+          });
+
+          this.state.rooms = allRooms;
+          
+          // Filter out workspaces without coordinates
+          this.state.availableWorkspaces = allWorkspaces.filter(w => 
+            w.mapX != null && w.mapY != null && (w.mapX > 0 || w.mapY > 0)
           );
 
+          this.updateFilteredData();
           this.state.isLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Error loading information:', err);
@@ -375,7 +394,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   get filteredRoomTypes(): string[] {
     const types = Object.values(RoomType) as string[];
-    if (this.selectedLocation === 'Roma') {
+    const selectedBuilding = this.availableBuildings.find(b => b.id === this.selectedBuildingId);
+    if (selectedBuilding && selectedBuilding.sedeName === 'Roma') {
       return types.filter(t => t !== 'OPEN_SPACE' && t !== RoomType.OPEN_SPACE);
     }
     return types;
@@ -504,6 +524,8 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           if (!a.isAvailable && b.isAvailable) return 1;
           return (a.name || '').localeCompare(b.name || '');
         });
+        
+        this.updateFilteredData();
 
         // Se la postazione selezionata non è più disponibile col nuovo orario, resetta la selezione
         const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
@@ -615,11 +637,46 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           roomId: room.id!,
           roomName: room.name!,
           roomType: room.roomType!,
-          isAvailable: undefined
+          isAvailable: undefined,
+          floorId: (room as any).floorId
         }))
     );
 
+    this.updateFilteredData();
+
     if (this.isAdmin) this.clearUserSearch();
+  }
+
+  updateFilteredData(): void {
+    if (!this.state.selectedFloorId) {
+      this.state.filteredRooms = [];
+      this.state.filteredWorkspaces = [];
+      return;
+    }
+    this.state.filteredRooms = this.state.rooms.filter(r => (r as any).floorId === this.state.selectedFloorId);
+    this.state.filteredWorkspaces = this.state.availableWorkspaces.filter(w => w.floorId === this.state.selectedFloorId);
+  }
+
+  get currentFloorRooms(): Room[] {
+    return this.state.filteredRooms;
+  }
+
+  get currentFloorWorkspaces(): any[] {
+    return this.state.filteredWorkspaces;
+  }
+
+  get currentFloorImage(): string {
+    if (!this.state.selectedFloorId) return 'Planimetria.png';
+    const floor = this.state.floors.find(f => f.id === this.state.selectedFloorId);
+    return floor?.imagePath || 'Planimetria.png';
+  }
+
+  onFloorChange(floorId: any): void {
+    if (!floorId) return;
+    this.state.selectedFloorId = Number(floorId);
+    this.updateFilteredData();
+    this.bookingForm.patchValue({ workspaceId: "", roomId: null });
+    this.cdr.detectChanges();
   }
 
   isFormValid(): boolean {
@@ -721,13 +778,47 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   onMonthChange(date: Date): void { console.log('Month changed:', date); }
 
-  onLocationChange(): void {
-    this.resetForm();
-    this.toastService.showInfo('Sede Cambiata', `Hai selezionato la sede di ${this.selectedLocation}`);
-  }
-
   private isSameDay(d1: Date, d2: Date): boolean {
     return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+  }
+
+  loadBuildings(): void {
+    this.locationService.getAllLocations(true).subscribe({
+      next: (locations: SedeDTO[]) => {
+        this.availableBuildings = [];
+        locations.forEach(loc => {
+          loc.edifici?.forEach(ed => {
+            this.availableBuildings.push({
+              ...ed,
+              sedeName: loc.name
+            });
+          });
+        });
+
+        if (this.availableBuildings.length > 0) {
+          // Mantieni la selezione se possibile, altrimenti prendi il primo
+          if (!this.selectedBuildingId || !this.availableBuildings.find(b => b.id === this.selectedBuildingId)) {
+            this.selectedBuildingId = this.availableBuildings[0].id;
+          }
+          this.loadBookingInfo();
+        }
+      },
+      error: (err) => {
+        console.error('Error loading locations:', err);
+      }
+    });
+  }
+
+  onBuildingChange(): void {
+    this.resetForm();
+    const selected = this.availableBuildings.find(b => b.id === Number(this.selectedBuildingId));
+    if (selected) {
+      this.toastService.showInfo(
+        this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'), 
+        `${selected.sedeName} - ${selected.address}`
+      );
+    }
+    this.loadBookingInfo();
   }
 
   private checkUserRole(): void {
