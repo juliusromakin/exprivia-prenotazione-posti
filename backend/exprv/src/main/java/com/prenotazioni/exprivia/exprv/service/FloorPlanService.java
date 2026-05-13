@@ -85,18 +85,16 @@ public class FloorPlanService {
                 .orElseThrow(() -> new AppException("FloorPlan not found", HttpStatus.NOT_FOUND));
 
         if (!plan.getIsActive()) {
-            boolean hasOverlap = floorPlanRepository.existsOverlappingActivePlan(
-                    plan.getFloor().getId(),
-                    plan.getValidFrom(),
-                    plan.getValidTo(),
-                    plan.getId());
-            if (hasOverlap) {
-                throw new AppException("Impossibile attivare: Esiste già una planimetria attiva in questo periodo per questo piano.", HttpStatus.BAD_REQUEST);
-            }
+            plan.setIsActive(true);
+            plan = floorPlanRepository.save(plan);
+            synchronizeActivePlansIntervals(plan.getFloor(), plan);
+            plan = floorPlanRepository.save(plan);
+        } else {
+            plan.setIsActive(false);
+            plan = floorPlanRepository.save(plan);
         }
 
-        plan.setIsActive(!plan.getIsActive());
-        return floorPlanMapper.toSummaryDto(floorPlanRepository.save(plan));
+        return floorPlanMapper.toSummaryDto(plan);
     }
 
     @Transactional
@@ -145,19 +143,12 @@ public class FloorPlanService {
             floorPlan.setImagePath(floorPlanDTO.getImagePath());
         }
 
-        if (floorPlan.getIsActive()) {
-            boolean hasOverlap = floorPlanRepository.existsOverlappingActivePlan(
-                    floor.getId(),
-                    floorPlan.getValidFrom(),
-                    floorPlan.getValidTo(),
-                    floorPlan.getId());
-            if (hasOverlap) {
-                // Come richiesto dall'utente, salviamo comunque la mappa ma la rendiamo inattiva
-                floorPlan.setIsActive(false);
-            }
-        }
-
         floorPlan = floorPlanRepository.save(floorPlan);
+
+        if (floorPlan.getIsActive()) {
+            synchronizeActivePlansIntervals(floor, floorPlan);
+            floorPlan = floorPlanRepository.save(floorPlan);
+        }
 
         if (floorPlanDTO.getRooms() != null) {
             for (RoomPositionDTO roomDto : floorPlanDTO.getRooms()) {
@@ -175,7 +166,8 @@ public class FloorPlanService {
     }
 
     private void updateRoomPosition(FloorPlan floorPlan, RoomPositionDTO roomDto) {
-        if (roomDto.getRoomId() == null) return;
+        if (roomDto.getRoomId() == null)
+            return;
         Optional<Room> roomOpt = roomRepository.findById(roomDto.getRoomId());
         if (roomOpt.isPresent()) {
             Room room = roomOpt.get();
@@ -195,7 +187,8 @@ public class FloorPlanService {
     }
 
     private void updateWorkspacePosition(FloorPlan floorPlan, WorkspacePositionDTO workspaceDto) {
-        if (workspaceDto.getWorkspaceId() == null) return;
+        if (workspaceDto.getWorkspaceId() == null)
+            return;
         Optional<Workspace> workspaceOpt = workspaceRepository.findById(workspaceDto.getWorkspaceId());
         if (workspaceOpt.isPresent()) {
             Workspace workspace = workspaceOpt.get();
@@ -214,7 +207,8 @@ public class FloorPlanService {
     }
 
     public FloorPlanDTO getFloorPlanimetry(Integer floorId, LocalDate date) {
-        if (date == null) date = LocalDate.now();
+        if (date == null)
+            date = LocalDate.now();
         Optional<FloorPlan> fpOpt = floorPlanRepository.findActiveFloorPlan(floorId, date);
         if (fpOpt.isEmpty()) {
             List<FloorPlan> allPlans = floorPlanRepository.findAllByFloorIdOrderByValidFromDesc(floorId);
@@ -302,5 +296,60 @@ public class FloorPlanService {
         floorPlanRepository.save(floorPlan);
 
         return fileName;
+    }
+
+    private void synchronizeActivePlansIntervals(Floor floor, FloorPlan targetPlan) {
+        // Recuperiamo tutte le planimetrie attive del piano
+        List<FloorPlan> activePlans = new ArrayList<>(floorPlanRepository.findAllByFloorIdOrderByValidFromDesc(floor.getId())
+                .stream()
+                .filter(FloorPlan::getIsActive)
+                .toList());
+
+        // Assicuriamoci che targetPlan sia presente nella lista
+        boolean contains = false;
+        for (FloorPlan fp : activePlans) {
+            if (fp.getId().equals(targetPlan.getId())) {
+                contains = true;
+                break;
+            }
+        }
+        if (!contains) {
+            activePlans.add(targetPlan);
+        }
+
+        // Disattiviamo eventuali altre mappe che hanno la stessa identica data di inizio del targetPlan
+        java.util.Iterator<FloorPlan> iterator = activePlans.iterator();
+        while (iterator.hasNext()) {
+            FloorPlan fp = iterator.next();
+            if (!fp.getId().equals(targetPlan.getId()) && fp.getValidFrom().isEqual(targetPlan.getValidFrom())) {
+                fp.setIsActive(false);
+                floorPlanRepository.save(fp);
+                iterator.remove();
+            }
+        }
+
+        // Ordiniamo le mappe attive rimaste in ordine cronologico crescente di data di inizio
+        activePlans.sort(java.util.Comparator.comparing(FloorPlan::getValidFrom));
+
+        // Regoliamo le date di fine in modo che ogni mappa termini esattamente il giorno prima della successiva
+        for (int i = 0; i < activePlans.size() - 1; i++) {
+            FloorPlan current = activePlans.get(i);
+            FloorPlan next = activePlans.get(i + 1);
+            LocalDate requiredValidTo = next.getValidFrom().minusDays(1);
+
+            current.setValidTo(requiredValidTo);
+            if (current.getId() != null) {
+                floorPlanRepository.save(current);
+            }
+        }
+
+        // Per l'ultima mappa della lista, se il suo validTo non ha senso o si vuole lasciare infinito
+        FloorPlan last = activePlans.get(activePlans.size() - 1);
+        if (last.getValidTo() != null && last.getValidTo().isBefore(last.getValidFrom())) {
+            last.setValidTo(null);
+            if (last.getId() != null) {
+                floorPlanRepository.save(last);
+            }
+        }
     }
 }

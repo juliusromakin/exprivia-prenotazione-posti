@@ -82,9 +82,14 @@ export class GestioneSediComponent implements OnInit {
     const newStatus = !plan.isActive;
     this.planimetriaService.toggleFloorPlanStatus(plan.id).subscribe({
       next: () => {
-        plan.isActive = newStatus;
         this.activeMenuIndex = null;
-        this.cdr.detectChanges();
+        if (this.selectedBuilding && this.selectedFloor) {
+          const buildingCopy = { ...this.selectedBuilding };
+          this.openPlanimetriaModal(buildingCopy, this.selectedFloor);
+        } else {
+          plan.isActive = newStatus;
+          this.cdr.detectChanges();
+        }
         this.messageService.add({ 
           severity: 'success', 
           summary: 'Successo', 

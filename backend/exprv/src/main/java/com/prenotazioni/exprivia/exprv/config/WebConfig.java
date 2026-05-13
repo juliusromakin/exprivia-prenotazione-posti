@@ -50,7 +50,9 @@ public class WebConfig implements WebMvcConfigurer {
                                 HttpMethod.GET.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.PUT.name(),
-                                HttpMethod.DELETE.name()));
+                                HttpMethod.DELETE.name(),
+                                HttpMethod.PATCH.name(),
+                                HttpMethod.OPTIONS.name()));
 
                 // Imposta la durata massima della cache delle risposte preflight
                 config.setMaxAge(3600L);

@@ -53,6 +53,8 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml",
                                 "/configuration/ui",
                                 "/configuration/security",
+                                "/error",
+                                "/error/**",
                                 "/webjars/**")
                         .permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
@@ -67,9 +69,9 @@ public class SecurityConfig {
                         .hasAuthority(AuthoritiesConstants.ADMIN)
 
                         // Endpoint per utenti Autenticati (Mappatura Italiano + Inglese)
-                        .requestMatchers("/api/user/**", "/api/utenti/**").authenticated()
-                        .requestMatchers("/api/room/**", "/api/rooms/**", "/api/stanze/**").authenticated()
-                        .requestMatchers("/api/workspace/**", "/api/workspaces/**", "/api/postazioni/**")
+                        .requestMatchers("/api/user", "/api/user/**", "/api/utenti", "/api/utenti/**").authenticated()
+                        .requestMatchers("/api/room", "/api/room/**", "/api/rooms", "/api/rooms/**", "/api/stanze", "/api/stanze/**").authenticated()
+                        .requestMatchers("/api/workspace", "/api/workspace/**", "/api/workspaces", "/api/workspaces/**", "/api/postazioni", "/api/postazioni/**")
                         .authenticated()
                         .requestMatchers("/api/reservation/**", "/api/reservations/**", "/api/prenotazioni/**")
                         .authenticated()
