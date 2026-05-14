@@ -697,9 +697,14 @@
     },
     "MESSAGES": {
       "LOCATION": "Sede",
-      "LOCATION_SAVED": "Modifiche salvate (Front-end)",
+      "LOCATION_SAVED": "Modifiche salvate",
       "BUILDING": "Edificio",
-      "BUILDING_SAVED": "Dati edificio aggiornati (Front-end)"
+      "BUILDING_SAVED": "Dati edificio aggiornati",
+      "CONFIRM_DELETE_TITLE": "Conferma Eliminazione",
+      "CONFIRM_DELETE_LOCATION": "Sei sicuro di voler eliminare definitivamente la sede \"{{ name }}\"? Questa azione non può essere annullata.",
+      "CONFIRM_DELETE_BUILDING": "Sei sicuro di voler eliminare definitivamente l'edificio \"{{ name }}\"? Questa azione non può essere annullata.",
+      "DELETE_SUCCESS": "Eliminazione completata con successo",
+      "DELETE_ERROR": "Si è verificato un errore durante l'eliminazione"
     }
   }
 }

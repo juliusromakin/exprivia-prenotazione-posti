@@ -18,6 +18,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ToastService } from '../../shared/services/toast.service';
 
 export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 
@@ -26,10 +29,13 @@ export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
     standalone: true,
     imports: [
         CommonModule, RouterModule, HeaderComponent, ButtonComponent, FormsModule, LucideAngularModule, TranslateModule,
-        MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatCheckboxModule
+        MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatCheckboxModule, ToastModule
+    ],
+    providers: [
+        MessageService
     ],
     templateUrl: './amministrazione-planimetrie.component.html',
-    styleUrl: './amministrazione-planimetrie.component.css',
+    styleUrls: ['./amministrazione-planimetrie.component.css', '../../shared/styles/toast.styles.css'],
     animations: [
         authAnimations.fadeIn,
         authAnimations.slideUp,
@@ -118,7 +124,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         private workspaceService: WorkspaceService,
         private planimetriaService: PlanimetriaService,
         private translate: TranslateService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private toastService: ToastService
     ) { }
 
     ngOnInit(): void {
@@ -1085,10 +1092,10 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             // 4. Salva l'intero schema spaziale su FloorPlan
             await lastValueFrom(this.planimetriaService.salvaDatiPlanimetria(planPayload));
 
-            this.showAlert('Salvataggio Completato', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
+            this.toastService.showSuccess('Salvataggio Completato', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
                 roomsCount: stanzeCanvas.length,
                 desksCount: postazioniCanvas.length
-            }), 'success');
+            }));
         } catch (error: any) {
             this.showAlert('Errore di Salvataggio', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', { error: error?.message ?? 'Unknown error' }));
         } finally {

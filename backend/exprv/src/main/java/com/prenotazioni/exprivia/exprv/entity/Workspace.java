@@ -56,7 +56,7 @@ public class Workspace {
     @JoinColumn(name = "id_room")
     private Room room;
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(mappedBy = "workspace", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
