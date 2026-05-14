@@ -224,8 +224,13 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           this.state.selectedFloorId = floors[0].id ?? null;
         }
 
+        // Fetch planimetries for each floor for the selected date
+        const selectedDateStr = this.state.selectedDates.length > 0 
+          ? this.formatDate(this.state.selectedDates[0], 'yyyy-MM-dd') 
+          : undefined;
+
         const planimetryCalls = floors.map(floor =>
-          this.planimetriaService.getPlanimetria(floor.id!).pipe(
+          this.planimetriaService.getPlanimetria(floor.id!, selectedDateStr).pipe(
             map(plan => ({ floor, plan })),
             catchError(() => of({ floor, plan: null }))
           )
@@ -252,7 +257,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
             const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
             
             // Store plan image on the floor object itself
-            floor.imagePath = plan?.imagePath || 'Planimetria.png';
+            floor.imagePath = plan?.imagePath && plan.imagePath !== 'Planimetria.png'
+              ? (plan.imagePath.startsWith('data:') || plan.imagePath.includes('/') ? plan.imagePath : `/api/images/${plan.imagePath}`) 
+              : 'Planimetria.png';
 
             if (plan) {
               if (plan.rooms) {
@@ -291,7 +298,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
                 floorId: floor.id,
                 roomName: floorRooms.find(r => r.id === w.roomId)?.name || '',
                 roomType: floorRooms.find(r => r.id === w.roomId)?.roomType || '',
-                imagePath: plan?.imagePath || 'Planimetria.png'
+                imagePath: floor.imagePath
               });
             });
           });
@@ -547,6 +554,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     this.state.selectedDates = [...selected];
     this.bookingForm.patchValue({ selectedDate: selected[0] });
     this.state.availableWorkspaces = this.state.availableWorkspaces.map(p => ({ ...p, isAvailable: undefined }));
+    
+    // Reload booking info to fetch the correct floor plan for the selected date
+    this.loadBookingInfo();
   }
 
   onWorkspaceSelectedFromPlanimetria(workspaceId: number): void {

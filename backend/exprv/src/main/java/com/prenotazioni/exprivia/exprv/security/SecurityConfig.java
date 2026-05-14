@@ -58,6 +58,7 @@ public class SecurityConfig {
                                 "/webjars/**")
                         .permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/images/**").permitAll()
 
                         // Endpoint di gestione Sedi/Planimetrie protetti internamente da @PreAuthorize su singole azioni
                         .requestMatchers("/api/admin/buildings/**", "/api/admin/locations/**", "/api/admin/floors/**", "/api/admin/floor-plans/**").authenticated()

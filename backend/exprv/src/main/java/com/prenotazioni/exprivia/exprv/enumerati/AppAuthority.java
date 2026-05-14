@@ -24,6 +24,7 @@ public enum AppAuthority {
     ACTION_USER_UPDATE_ANY,
     ACTION_USER_DELETE_OWN,
     ACTION_USER_DELETE_ANY,
+    ACTION_USER_APPROVE,
 
     // Planimetrie (Location, Building, Floor, Room, Workspace)
     ACTION_FLOORPLAN_CREATE,

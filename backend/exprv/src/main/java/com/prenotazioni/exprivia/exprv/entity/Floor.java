@@ -19,6 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "floor")
@@ -48,9 +49,13 @@ public class Floor {
 
 
 
-    @OneToMany(mappedBy = "floor")
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Room> rooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<FloorPlan> floorPlans = new ArrayList<>();
 
     public Floor() {
     }
@@ -100,5 +105,13 @@ public class Floor {
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    public List<FloorPlan> getFloorPlans() {
+        return floorPlans;
+    }
+
+    public void setFloorPlans(List<FloorPlan> floorPlans) {
+        this.floorPlans = floorPlans;
     }
 }

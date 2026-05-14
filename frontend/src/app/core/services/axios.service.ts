@@ -15,7 +15,6 @@ export class AxiosService {
     this.axiosInstance = axios.create({
       baseURL: environment.apiUrl || '',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json'
       }
     });
@@ -24,11 +23,18 @@ export class AxiosService {
       (config) => {
         const token = this.tokenService.getToken();
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          (config.headers as any).Authorization = `Bearer ${token}`;
         }
-        if (config.data && typeof config.data === 'object') {
-          config.headers['Content-Type'] = 'application/json';
+        
+        const isFormData = config.data instanceof FormData;
+        
+        if (isFormData) {
+          // Rimuoviamo il Content-Type per permettere al browser di impostare il multipart/form-data con boundary
+          delete (config.headers as any)['Content-Type'];
+        } else if (config.data && typeof config.data === 'object') {
+          (config.headers as any)['Content-Type'] = 'application/json';
         }
+        
         return config;
       },
       (error) => {
@@ -55,23 +61,25 @@ export class AxiosService {
   }
 
   async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const headers: any = { ...config?.headers };
+    if (!(data instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await this.axiosInstance.post<T>(url, data, {
       ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'application/json'
-      }
+      headers
     });
     return response.data;
   }
 
   async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const headers: any = { ...config?.headers };
+    if (!(data instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await this.axiosInstance.put<T>(url, data, {
       ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'application/json'
-      }
+      headers
     });
     return response.data;
   }
@@ -82,12 +90,13 @@ export class AxiosService {
   }
 
   async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const headers: any = { ...config?.headers };
+    if (!(data instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await this.axiosInstance.patch<T>(url, data, {
       ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'application/json'
-      }
+      headers
     });
     return response.data;
   }

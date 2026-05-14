@@ -2,14 +2,9 @@ package com.prenotazioni.exprivia.exprv.entity;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.util.List;
+import java.util.ArrayList;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "floor_plan")
@@ -43,6 +38,12 @@ public class FloorPlan {
 
     @Column(name = "canvas_height")
     private Double canvasHeight;
+
+    @OneToMany(mappedBy = "floorPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomPosition> roomPositions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "floorPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkspacePosition> workspacePositions = new ArrayList<>();
 
     public FloorPlan() {
     }
@@ -117,5 +118,21 @@ public class FloorPlan {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public List<RoomPosition> getRoomPositions() {
+        return roomPositions;
+    }
+
+    public void setRoomPositions(List<RoomPosition> roomPositions) {
+        this.roomPositions = roomPositions;
+    }
+
+    public List<WorkspacePosition> getWorkspacePositions() {
+        return workspacePositions;
+    }
+
+    public void setWorkspacePositions(List<WorkspacePosition> workspacePositions) {
+        this.workspacePositions = workspacePositions;
     }
 }

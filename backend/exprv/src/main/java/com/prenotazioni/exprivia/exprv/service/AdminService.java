@@ -14,10 +14,15 @@ import com.prenotazioni.exprivia.exprv.dto.AdminCreateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminDTO;
 import com.prenotazioni.exprivia.exprv.dto.AdminUpdateUserDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserDTO;
+import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.User;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.UserMapper;
+import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.HashSet;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final BadgeRepository badgeRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -90,5 +96,28 @@ public class AdminService {
         User updatedUser = userRepository.save(existingUser);
 
         return new AdminDTO(updatedUser);
+    }
+
+    @Transactional
+    public AdminDTO approveUser(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException("Utente con ID " + id + " non trovato", HttpStatus.NOT_FOUND));
+
+        Badge guestBadge = badgeRepository.findByName("ROLE_GUEST")
+                .orElseThrow(() -> new AppException("Badge ROLE_GUEST non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
+        
+        Badge userBadge = badgeRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new AppException("Badge ROLE_USER non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // Rimuoviamo il badge GUEST e aggiungiamo il badge USER
+        Set<Badge> badges = user.getBadges();
+        badges.removeIf(b -> b.getId().equals(guestBadge.getId()));
+        badges.add(userBadge);
+        
+        user.setBadges(badges);
+        user.setUpdatedDate(LocalDateTime.now());
+        
+        User savedUser = userRepository.save(user);
+        return new AdminDTO(savedUser);
     }
 }
