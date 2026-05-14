@@ -616,12 +616,13 @@
     "NEW_LOCATION": "New Location",
     "FILTER_BY": "Filter by:",
     "VIEWS": {
-      "ALL": "All",
+      "ALL": "Buildings",
       "LOCATION": "Location"
     },
     "TABLE": {
       "ADDRESS": "Street / Address",
       "LOCATION_NAME": "Location Name",
+      "BUILDING_NAME": "Building Name",
       "CITY": "City",
       "FLOORS_COUNT": "N. Floors",
       "ACTIVE": "Active",
@@ -663,13 +664,15 @@
         "CONFIRM_DELETE": "Are you sure you want to permanently delete the floor plan \"{{ name }}\"? This action cannot be undone.",
         "SUCCESS_TITLE": "Success",
         "DELETE_SUCCESS": "Floor plan deleted permanently",
+        "ENABLED": "Floor plan enabled successfully",
+        "DISABLED": "Floor plan disabled successfully",
         "ERROR_TITLE": "Error",
         "DELETE_ERROR": "Unable to delete floor plan"
       }
     },
     "BUILDING_MODAL": {
       "TITLE": "Edit Building",
-      "BUILDING_NAME": "Location Name *",
+      "BUILDING_NAME": "Building Name *",
       "FLOORS_COUNT": "N. Floors *",
       "ADDRESS": "Address / Location *",
       "COORD_X": "Coord X",
@@ -697,7 +700,8 @@
       "COORD_X": "Coord X",
       "COORD_Y": "Coord Y",
       "ADD_BUILDING_BTN": "Add building",
-      "SAVE": "Save Changes"
+      "SAVE": "Save Changes",
+      "FILL_REQUIRED": "Some fields are missing or contain errors. Please check the red boxes."
     },
     "ACTIONS": {
       "EDIT": "Edit",
@@ -706,9 +710,18 @@
     },
     "MESSAGES": {
       "LOCATION": "Location",
-      "LOCATION_SAVED": "Changes saved (Front-end)",
+      "LOCATION_SAVED": "Changes saved",
       "BUILDING": "Building",
-      "BUILDING_SAVED": "Building details updated (Front-end)"
+      "BUILDING_SAVED": "Building details updated"
     }
+  },
+  "COMMON": {
+    "ERROR": "Error",
+    "SUCCESS": "Success",
+    "ATTENTION": "Attention",
+    "REQUIRED_FIELD": "Required field",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "LOADING": "Loading..."
   }
 }

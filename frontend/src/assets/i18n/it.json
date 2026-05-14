@@ -619,11 +619,12 @@
     "NEW_LOCATION": "Nuova Sede",
     "FILTER_BY": "Filtra per:",
     "VIEWS": {
-      "ALL": "Tutti",
+      "ALL": "Edifici",
       "LOCATION": "Sede"
     },
     "TABLE": {
       "ADDRESS": "Via / Indirizzo",
+      "BUILDING_NAME": "Nome Edificio",
       "LOCATION_NAME": "Nome Sede",
       "CITY": "Città",
       "FLOORS_COUNT": "N.Piani",
@@ -666,13 +667,15 @@
         "CONFIRM_DELETE": "Sei sicuro di voler eliminare definitivamente la planimetria \"{{ name }}\"? Questa azione non può essere annullata.",
         "SUCCESS_TITLE": "Successo",
         "DELETE_SUCCESS": "Planimetria eliminata definitivamente",
+        "ENABLED": "Planimetria abilitata correttamente",
+        "DISABLED": "Planimetria disabilitata correttamente",
         "ERROR_TITLE": "Errore",
         "DELETE_ERROR": "Impossibile eliminare la planimetria"
       }
     },
     "BUILDING_MODAL": {
       "TITLE": "Modifica Edificio",
-      "BUILDING_NAME": "Nome Sede *",
+      "BUILDING_NAME": "Nome Edificio *",
       "FLOORS_COUNT": "N. Piani *",
       "ADDRESS": "Via / Indirizzo *",
       "COORD_X": "Coord X",
@@ -700,7 +703,8 @@
       "COORD_X": "Coord X",
       "COORD_Y": "Coord Y",
       "ADD_BUILDING_BTN": "Aggiungi edificio",
-      "SAVE": "Salva Modifiche"
+      "SAVE": "Salva Modifiche",
+      "FILL_REQUIRED": "Alcuni campi sono mancanti o contengono errori. Controlla i riquadri rossi."
     },
     "ACTIONS": {
       "EDIT": "Modifica",
@@ -718,5 +722,14 @@
       "DELETE_SUCCESS": "Eliminazione completata con successo",
       "DELETE_ERROR": "Si è verificato un errore durante l'eliminazione"
     }
+  },
+  "COMMON": {
+    "ERROR": "Errore",
+    "SUCCESS": "Successo",
+    "ATTENTION": "Attenzione",
+    "REQUIRED_FIELD": "Campo obbligatorio",
+    "SAVE": "Salva",
+    "CANCEL": "Annulla",
+    "LOADING": "Caricamento in corso..."
   }
 }

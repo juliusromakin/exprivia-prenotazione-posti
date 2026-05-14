@@ -83,7 +83,8 @@ public class BuildingService {
                 floor.setEnabled(true);
                 createdFloors.add(floorRepository.save(floor));
             }
-            savedBuilding.setFloors(createdFloors);
+            savedBuilding.getFloors().clear();
+            savedBuilding.getFloors().addAll(createdFloors);
         }
 
         return buildingMapper.toDto(savedBuilding);
@@ -109,9 +110,6 @@ public class BuildingService {
             long currentCount = savedBuilding.getFloors() != null ? 
                 savedBuilding.getFloors().stream().filter(f -> f.getEnabled() != null && f.getEnabled()).count() : 0;
             if (buildingDTO.getNumFloors() > currentCount) {
-                if (savedBuilding.getFloors() == null) {
-                    savedBuilding.setFloors(new java.util.ArrayList<>());
-                }
                 for (long i = currentCount + 1; i <= buildingDTO.getNumFloors(); i++) {
                     Floor floor = new Floor();
                     floor.setName("Piano " + i);

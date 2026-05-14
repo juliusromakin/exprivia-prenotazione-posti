@@ -61,7 +61,9 @@ public class LocationService {
                 bDto.setLocationId(savedLocation.getId());
                 buildingService.createBuilding(bDto);
             }
-            savedLocation.setBuildings(buildingRepository.findByLocationId(savedLocation.getId()));
+            List<Building> savedBuildings = buildingRepository.findByLocationId(savedLocation.getId());
+            savedLocation.getBuildings().clear();
+            savedLocation.getBuildings().addAll(savedBuildings);
         }
 
         return locationMapper.toDto(savedLocation);
@@ -83,7 +85,9 @@ public class LocationService {
                     buildingService.updateBuilding(bDto.getId(), bDto);
                 }
             }
-            savedLocation.setBuildings(buildingRepository.findByLocationId(savedLocation.getId()));
+            List<Building> savedBuildings = buildingRepository.findByLocationId(savedLocation.getId());
+            savedLocation.getBuildings().clear();
+            savedLocation.getBuildings().addAll(savedBuildings);
         }
 
         return locationMapper.toDto(savedLocation);

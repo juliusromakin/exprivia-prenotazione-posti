@@ -49,7 +49,6 @@ interface Sede {
     ConfirmationModalComponent
   ],
   providers: [
-    MessageService
   ],
   templateUrl: './gestione-sedi.component.html',
   styleUrls: ['./gestione-sedi.component.css', '../../../shared/styles/toast.styles.css']
@@ -105,10 +104,15 @@ export class GestioneSediComponent implements OnInit {
           plan.isActive = newStatus;
           this.cdr.detectChanges();
         }
-        this.toastService.showSuccess('Successo', `Planimetria ${newStatus ? 'abilitata' : 'disabilitata'} correttamente`);
+        
+        const statusKey = newStatus ? 'GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.ENABLED' : 'GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.DISABLED';
+        this.toastService.showSuccess(
+          this.translate.instant('COMMON.SUCCESS'),
+          this.translate.instant(statusKey)
+        );
       },
-      error: () => {
-        this.toastService.showError('Errore', 'Impossibile aggiornare lo stato della planimetria');
+      error: (err) => {
+        this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
       }
     });
   }
@@ -193,11 +197,7 @@ export class GestioneSediComponent implements OnInit {
           this.loadLocations();
         },
         error: (err) => {
-          console.error('Error deleting location:', err);
-          this.toastService.showError(
-            this.translate.instant('GESTIONE_SEDI.MESSAGES.LOCATION'),
-            err.error?.message || this.translate.instant('GESTIONE_SEDI.MESSAGES.DELETE_ERROR')
-          );
+          this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
           this.isDeleting = false;
         }
       });
@@ -213,11 +213,7 @@ export class GestioneSediComponent implements OnInit {
           this.loadLocations();
         },
         error: (err) => {
-          console.error('Error deleting building:', err);
-          this.toastService.showError(
-            this.translate.instant('GESTIONE_SEDI.MESSAGES.BUILDING'),
-            err.error?.message || this.translate.instant('GESTIONE_SEDI.MESSAGES.DELETE_ERROR')
-          );
+          this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
           this.isDeleting = false;
         }
       });
@@ -237,11 +233,7 @@ export class GestioneSediComponent implements OnInit {
           this.loadLocations();
         },
         error: (err) => {
-          console.error('Error deleting planimetria:', err);
-          this.toastService.showError(
-            this.translate.instant('COMMON.ERROR'),
-            err.error?.message || 'Errore durante l\'eliminazione della planimetria'
-          );
+          this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
           this.isDeleting = false;
         }
       });
@@ -304,8 +296,8 @@ export class GestioneSediComponent implements OnInit {
         }));
         this.loading = false;
       },
-      error: () => {
-        this.toastService.showError('Errore', 'Impossibile caricare le sedi dal server');
+      error: (err) => {
+        this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
         this.loading = false;
       }
     });
@@ -319,6 +311,7 @@ export class GestioneSediComponent implements OnInit {
           loc.edifici.forEach(ed => {
             rows.push({
               via: ed.address,
+              edificioName: ed.name,
               sedeName: loc.name,
               city: loc.city,
               nPiani: ed.numFloors,
@@ -326,17 +319,6 @@ export class GestioneSediComponent implements OnInit {
               originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name }, // Riferimento per edit edificio
               originalLoc: loc      // Riferimento per fallback
             });
-          });
-        } else {
-          // Aggiunge una riga per la sede anche se non ha edifici
-          rows.push({
-            via: '-', 
-            sedeName: loc.name,
-            city: loc.city,
-            nPiani: 0,
-            enabled: loc.enabled,
-            originalEdificio: null,
-            originalLoc: loc
           });
         }
       });
@@ -475,9 +457,9 @@ export class GestioneSediComponent implements OnInit {
     if (this.locationForm.invalid) {
       console.log('Save blocked: Location form is invalid', this.locationForm.value);
       this.locationForm.markAllAsTouched();
-      this.toastService.showError(
-        'Attenzione',
-        'Alcuni campi sono mancanti o contengono errori (es. email non valida). Controlla i riquadri rossi.'
+      this.toastService.showWarning(
+        this.translate.instant('COMMON.ATTENTION'),
+        this.translate.instant('GESTIONE_SEDI.LOCATION_MODAL.FILL_REQUIRED')
       );
       return;
     }
@@ -521,12 +503,7 @@ export class GestioneSediComponent implements OnInit {
           this.loadLocations();
         },
         error: (err) => {
-          console.error('Error updating location:', err);
-          alert('ERRORE SERVER (UPDATE): ' + (err.error?.message || err.message || 'Errore sconosciuto'));
-          this.toastService.showError(
-            this.translate.instant('COMMON.ERROR'),
-            err.error?.message || 'Errore durante il salvataggio della sede'
-          );
+          this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
           this.loading = false;
         }
       });
@@ -541,11 +518,7 @@ export class GestioneSediComponent implements OnInit {
           this.loadLocations();
         },
         error: (err) => {
-          console.error('Error creating location:', err);
-          this.toastService.showError(
-            this.translate.instant('COMMON.ERROR'),
-            err.error?.message || 'Errore durante la creazione della sede'
-          );
+          this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
           this.loading = false;
         }
       });
@@ -556,9 +529,9 @@ export class GestioneSediComponent implements OnInit {
     this.buildingFormSubmitted = true;
     if (this.buildingForm.invalid) {
       this.buildingForm.markAllAsTouched();
-      this.toastService.showError(
-        'Attenzione',
-        'Compila tutti i campi obbligatori per l\'edificio.'
+      this.toastService.showWarning(
+        this.translate.instant('COMMON.ATTENTION'),
+        this.translate.instant('GESTIONE_SEDI.LOCATION_MODAL.FILL_REQUIRED')
       );
       return;
     }
@@ -586,8 +559,8 @@ export class GestioneSediComponent implements OnInit {
         this.showBuildingModal = false;
         this.loadLocations();
       },
-      error: () => {
-        this.toastService.showError('Errore', 'Errore durante l\'aggiornamento dell\'edificio');
+      error: (err) => {
+        this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
         this.loading = false;
       }
     });
