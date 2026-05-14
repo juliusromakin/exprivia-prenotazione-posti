@@ -56,8 +56,10 @@
     "USER_MANAGEMENT_DESC": "Administer users, roles and system permissions",
     "STATISTICS": "Advanced Statistics",
     "STATISTICS_DESC": "View detailed reports and analysis of the booking system",
-    "PLANIMETRIA_MANAGEMENT": "Plan Management",
-    "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans"
+    "PLANIMETRIA_MANAGEMENT": "Floor Plan Management",
+    "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans",
+    "LOCATION_MANAGEMENT": "Location Management",
+    "LOCATION_MANAGEMENT_DESC": "Manage company locations and their buildings"
   },
   "ADMIN_HOME": {
     "HERO_TITLE": "Manage your workspace",
@@ -94,11 +96,16 @@
       "DRAG_HINT": "drag",
       "CLICK_HINT": "click"
     },
+    "CONTEXT": {
+      "EDITING": "You are editing",
+      "BUILDING_FLOOR": "{{buildingName}} - Floor {{floor}}"
+    },
     "ACTIONS": {
       "LABEL": "Actions",
       "SAVE": "Save",
       "SAVING": "Saving...",
-      "UPLOAD": "Upload Plan"
+      "UPLOAD": "Upload Plan",
+      "CHOOSE_EXISTING": "Choose existing plan"
     },
     "HINTS": {
       "ZOOM": "Scroll = Zoom",
@@ -113,6 +120,13 @@
       "SUPPORTED_FILES": "Supports .png files",
       "INITIAL_HINT": "Select and confirm a location to start"
     },
+    "SIDE_PANEL": {
+      "TITLE": "Room Details",
+      "NO_NAME_ROOM": "Unnamed Room",
+      "EQUIPMENT": "Equipment",
+      "NO_EQUIPMENT": "No equipment registered for this room.",
+      "SELECT_HINT": "Select a room in <b class=\"text-[var(--color-expriviaOrange)]\">Select</b> mode to see details."
+    },
     "MODAL": {
       "TITLE": "New Room",
       "ROOM_NAME": "Room Name",
@@ -123,16 +137,55 @@
       "CANCEL": "Cancel",
       "CREATE": "Create",
       "EQUIPMENT": "Equipment",
+      "EQUIPMENT_OTHER": "Other",
       "ADD_EQUIPMENT": "Add Equipment",
       "CUSTOM_EQUIPMENT_NAME": "Custom equipment name",
-      "QUANTITY": "Quantity"
+      "QUANTITY": "Quantity",
+      "PLAN_NAME": "Plan Name"
+    },
+    "VALIDITY_MODAL": {
+      "TITLE": "Plan Validity",
+      "SUBTITLE": "Specify the validity period before saving",
+      "START_DATE": "Start Date",
+      "START_DATE_REQ": "Start Date is required.",
+      "END_DATE": "End Date",
+      "ENDLESS": "Indeterminate end",
+      "CANCEL": "Cancel",
+      "SAVE": "Save Plan"
+    },
+    "EXISTING_MODAL": {
+      "TITLE": "Choose existing plan",
+      "LOADING": "Loading plans...",
+      "NO_PLANS": "No saved plans found.",
+      "DEFAULT_FLOOR": "Floor",
+      "ROOMS_COUNT": "{{count}} room{{suffix}} positioned"
+    },
+    "DESK_PROMPT": {
+      "TITLE_SINGLE": "Workstation Number",
+      "TITLE_MULTI": "Workstations Number",
+      "PLACEHOLDER_SINGLE": "e.g. 1, A, Leader...",
+      "PLACEHOLDER_MULTI": "e.g. 10, 20...",
+      "CANCEL": "Cancel",
+      "CONFIRM": "Confirm"
     },
     "ALERTS": {
       "DESK_ID_PROMPT": "Workstation ID:",
       "NO_ELEMENTS": "No elements to save on canvas.",
       "EMPTY_ROOMS_WARNING": " Attention: the following rooms have no workstations:\n{{rooms}}\n\nAdd at least one workstation for each room before saving.",
+      "EMPTY_ROOMS_TITLE": "Warning: Empty Rooms",
       "SAVE_SUCCESS": " Save completed!\n• {{roomsCount}} room(s) saved\n• {{desksCount}} workstation(s) saved",
-      "SAVE_ERROR": " Error during save:\n{{error}}"
+      "SAVE_SUCCESS_TITLE": "Save Completed",
+      "SAVE_ERROR": " Error during save:\n{{error}}",
+      "SAVE_ERROR_TITLE": "Save Error",
+      "INVALID_PERIOD_TITLE": "Invalid Period",
+      "INVALID_PERIOD_MSG": "End Date must be after or equal to Start Date.",
+      "INVALID_DATE_TITLE": "Invalid End Date",
+      "INVALID_DATE_MSG": "The End Date entered is invalid or empty. Select \"Indeterminate end\" if there is no end date.",
+      "MISSING_CONTEXT_TITLE": "Missing Context",
+      "MISSING_CONTEXT_MSG": "Unable to load plans: Building ID not available.",
+      "UPLOAD_ERROR_TITLE": "Upload Error",
+      "UPLOAD_ERROR_MSG": "Unable to upload image to server. Check connection or file size.",
+      "UNDERSTOOD": "I understand"
     }
   },
   "USER_MANAGEMENT": {
@@ -451,19 +504,20 @@
   },
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
-    "USERS": "Users",
+    "USERS": "User Management",
     "BOOKINGS": "Bookings",
     "BOOK_WORKSPACE": "Book Workspace",
     "STATISTICS": "Statistics",
     "BADGE_MANAGEMENT": "Badge Management",
+    "PLAN_MANAGEMENT": "Floor Plan Management",
+    "LOCATION_MANAGEMENT": "Location Management",
     "UPDATE_PROFILE": "Update Profile",
-    "PLANIMETRIA_MANAGEMENT": "Floor Plans Management",
+    "COLLAPSE": "Collapse Sidebar",
+    "EXPAND": "Expand Sidebar",
     "DISCONNECT": "Disconnect",
     "ROLE_ADMIN": "Administrator",
     "ROLE_USER": "Employee",
-    "UNKNOWN_ROLE": "Unknown role",
-    "EXPAND": "Expand sidebar",
-    "COLLAPSE": "Collapse sidebar"
+    "UNKNOWN_ROLE": "Unknown role"
   },
   "ACCOUNT": {
     "TITLE": "Update Profile",
@@ -616,6 +670,7 @@
     "TITLE": "Locations Management",
     "SUBTITLE": "Manage corporate locations and their buildings",
     "NEW_LOCATION": "New Location",
+    "SEARCH_PLACEHOLDER": "Search by location, building or city...",
     "FILTER_BY": "Filter by:",
     "VIEWS": {
       "ALL": "Buildings",
@@ -715,6 +770,103 @@
       "LOCATION_SAVED": "Changes saved",
       "BUILDING": "Building",
       "BUILDING_SAVED": "Building details updated"
+    }
+  },
+  "BADGE_MANAGEMENT": {
+    "TITLE": "Badge & Permissions Management",
+    "SUBTITLE": "Define roles, actions and their inheritance hierarchy.",
+    "STATS": {
+      "TOTAL_ROLES": "Total Roles",
+      "TOTAL_ACTIONS": "Total Actions",
+      "ACTIVE": "Active",
+      "RELATIONS": "Relations"
+    },
+    "ROLES": {
+      "TITLE": "Roles",
+      "NEW_ROLE": "New role",
+      "SEARCH_PLACEHOLDER": "Search roles...",
+      "NONE_FOUND": "No roles found"
+    },
+    "ACTIONS": {
+      "TITLE": "Actions",
+      "NEW_ACTION": "New action",
+      "SEARCH_PLACEHOLDER": "Search actions...",
+      "NONE_FOUND": "No actions found"
+    },
+    "CANVAS": {
+      "EMPTY_SCHEMA": "Empty Schema",
+      "DRAG_HINT": "Drag a badge from the left list to start",
+      "HINT_ROLES": "Roles",
+      "HINT_ACTIONS": "Actions",
+      "TOOLTIPS": {
+        "PAN": "Pan Map (Hand)",
+        "SELECT": "Selection Rectangle (Pointer)",
+        "CONNECT": "Create Connection (Link)",
+        "FULL_TREE": "Full Tree",
+        "FOCUS": "Focus",
+        "RESET_LAYOUT": "Reset Layout",
+        "CLEAR_MAP": "Clear Map"
+      }
+    },
+    "SIDE_PANEL": {
+      "STATUS": "Status:",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "PROTECTED_BADGE": "Protected role",
+      "SYSTEM_ROLE": "System Role:",
+      "SYSTEM_ROLE_DESC": "This badge is fundamental for administration and cannot be modified or removed for security.",
+      "INHERITS_FROM": "Inherits from:",
+      "SEARCH_PLACEHOLDER": "Search badges...",
+      "ROLES": "Roles",
+      "ACTIONS": "Actions",
+      "REDUNDANT_INHERITANCE": "Redundant inheritance (already covered by another role/path)",
+      "NONE_AVAILABLE": "No badges available for inheritance",
+      "SAVE_CHANGES": "Save Changes",
+      "CANCEL_CHANGES": "Cancel changes",
+      "SELF_INHERIT": "itself"
+    },
+    "CREATE_MODAL": {
+      "TITLE_ROLE": "New Role",
+      "TITLE_ACTION": "New Action",
+      "NAME": "Name *",
+      "DESCRIPTION": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Optional description...",
+      "PREFIX_HINT_ROLE": "The ROLE_ prefix will be added automatically.",
+      "PREFIX_HINT_ACTION": "The ACTION_ prefix will be added automatically.",
+      "CANCEL": "Cancel",
+      "CREATE_ROLE": "Create Role",
+      "CREATE_ACTION": "Create Action",
+      "CREATING": "Creating..."
+    },
+    "DELETE_MODAL": {
+      "TITLE": "Confirm Deactivation",
+      "MESSAGE": "You are about to deactivate the badge",
+      "PRESERVE_HIERARCHY": "Preserve Hierarchy (Recommended)",
+      "PRESERVE_HIERARCHY_DESC": "Badges that depend on this one will directly inherit its parents. Avoids accidental loss of permissions.",
+      "NOTE": "Note: The badge will not be physically deleted from the database, but will no longer be assignable to users.",
+      "CANCEL": "Cancel",
+      "CONFIRM": "Confirm"
+    },
+    "MESSAGES": {
+      "LOADING": "Loading...",
+      "REFRESH": "Refresh",
+      "SUCCESS_LOAD": "Badges loaded successfully",
+      "ERROR_LOAD": "Error loading badges",
+      "SUCCESS_CREATE": "Badge created successfully",
+      "ERROR_CREATE": "Error creating badge",
+      "SUCCESS_UPDATE": "Badge updated successfully",
+      "ERROR_UPDATE": "Error updating badge",
+      "SUCCESS_DELETE": "Badge deactivated successfully",
+      "ERROR_DELETE": "Error deactivating badge",
+      "ERROR_ALREADY_EXISTS": "A badge with this name already exists",
+      "ERROR_NAME_REQUIRED": "Name is required",
+      "SAVING": "Saving...",
+      "CYCLE_ERROR": "Cannot add: would create an infinite cycle!",
+      "DEFAULT_LAYOUT_RESET": "Default layout and visibility reset",
+      "ALL_HIDDEN": "All badges have been hidden",
+      "VISIBLE_ON_GRAPH": "{{name}} shown in schema",
+      "HIDDEN_FROM_GRAPH": "{{name}} hidden from schema",
+      "PROTECTED_ADMIN": "The ROLE_ADMIN role is protected and cannot be removed."
     }
   },
   "COMMON": {

@@ -57,7 +57,9 @@
     "STATISTICS": "Statistiche Avanzate",
     "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione",
     "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
-    "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici"
+    "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici",
+    "LOCATION_MANAGEMENT": "Gestione Sedi",
+    "LOCATION_MANAGEMENT_DESC": "Gestisci le sedi aziendali e i relativi edifici"
   },
   "ADMIN_HOME": {
     "HERO_TITLE": "Gestisci il tuo piano di lavoro",
@@ -94,11 +96,16 @@
       "DRAG_HINT": "trascina",
       "CLICK_HINT": "click"
     },
+    "CONTEXT": {
+      "EDITING": "Stai modificando",
+      "BUILDING_FLOOR": "{{buildingName}} - Piano {{floor}}"
+    },
     "ACTIONS": {
       "LABEL": "Azioni",
       "SAVE": "Salva",
       "SAVING": "Salvataggio...",
-      "UPLOAD": "Carica Planimetria"
+      "UPLOAD": "Carica Planimetria",
+      "CHOOSE_EXISTING": "Scegli planimetria esistente"
     },
     "HINTS": {
       "ZOOM": "Scroll = Zoom",
@@ -113,6 +120,13 @@
       "SUPPORTED_FILES": "Supporta file .png",
       "INITIAL_HINT": "Seleziona e conferma una sede per iniziare"
     },
+    "SIDE_PANEL": {
+      "TITLE": "Dettagli Stanza",
+      "NO_NAME_ROOM": "Stanza senza nome",
+      "EQUIPMENT": "Dotazioni",
+      "NO_EQUIPMENT": "Nessuna dotazione registrata per questa stanza.",
+      "SELECT_HINT": "Seleziona una stanza in modalità <b class=\"text-[var(--color-expriviaOrange)]\">Seleziona</b> per vederne i dettagli."
+    },
     "MODAL": {
       "TITLE": "Nuova Stanza",
       "ROOM_NAME": "Nome Stanza",
@@ -123,17 +137,55 @@
       "CANCEL": "Annulla",
       "CREATE": "Crea",
       "EQUIPMENT": "Attrezzatura",
+      "EQUIPMENT_OTHER": "Altro",
       "ADD_EQUIPMENT": "Aggiungi Attrezzatura",
       "CUSTOM_EQUIPMENT_NAME": "Nome attrezzatura personalizzata",
       "QUANTITY": "Quantità",
       "PLAN_NAME": "Nome Planimetria"
     },
+    "VALIDITY_MODAL": {
+      "TITLE": "Validità Planimetria",
+      "SUBTITLE": "Specifica il periodo di validità prima di salvare",
+      "START_DATE": "Data Inizio",
+      "START_DATE_REQ": "La Data Inizio è obbligatoria.",
+      "END_DATE": "Data Fine",
+      "ENDLESS": "Fine indeterminata",
+      "CANCEL": "Annulla",
+      "SAVE": "Salva Planimetria"
+    },
+    "EXISTING_MODAL": {
+      "TITLE": "Scegli planimetria esistente",
+      "LOADING": "Caricamento planimetrie...",
+      "NO_PLANS": "Nessuna planimetria salvata trovata.",
+      "DEFAULT_FLOOR": "Piano",
+      "ROOMS_COUNT": "{{count}} stanz{{suffix}} posizionat{{suffix}}"
+    },
+    "DESK_PROMPT": {
+      "TITLE_SINGLE": "Numero Postazione",
+      "TITLE_MULTI": "Numero Postazioni",
+      "PLACEHOLDER_SINGLE": "Es: 1, A, Leader...",
+      "PLACEHOLDER_MULTI": "Es: 10, 20...",
+      "CANCEL": "Annulla",
+      "CONFIRM": "Conferma"
+    },
     "ALERTS": {
       "DESK_ID_PROMPT": "Numero postazione:",
       "NO_ELEMENTS": "Nessun elemento da salvare sul canvas.",
       "EMPTY_ROOMS_WARNING": " Attenzione: le seguenti stanze non hanno postazioni:\n{{rooms}}\n\nAggiungi almeno una postazione per ogni stanza prima di salvare.",
+      "EMPTY_ROOMS_TITLE": "Attenzione: Stanze Vuote",
       "SAVE_SUCCESS": " Salvataggio completato!\n• {{roomsCount}} stanza/e salvata/e\n• {{desksCount}} postazione/i salvata/e",
-      "SAVE_ERROR": " Errore durante il salvataggio:\n{{error}}"
+      "SAVE_SUCCESS_TITLE": "Salvataggio Completato",
+      "SAVE_ERROR": " Errore durante il salvataggio:\n{{error}}",
+      "SAVE_ERROR_TITLE": "Errore di Salvataggio",
+      "INVALID_PERIOD_TITLE": "Periodo Non Valido",
+      "INVALID_PERIOD_MSG": "La Data Fine deve essere successiva o uguale alla Data Inizio.",
+      "INVALID_DATE_TITLE": "Data Fine Non Valida",
+      "INVALID_DATE_MSG": "La Data Fine inserita non è valida o è vuota. Seleziona \"Fine indeterminata\" se non c'è una data di fine.",
+      "MISSING_CONTEXT_TITLE": "Contesto Mancante",
+      "MISSING_CONTEXT_MSG": "Impossibile caricare le planimetrie: ID edificio non disponibile.",
+      "UPLOAD_ERROR_TITLE": "Errore Upload",
+      "UPLOAD_ERROR_MSG": "Impossibile caricare l'immagine sul server. Verifica la connessione o le dimensioni del file.",
+      "UNDERSTOOD": "Ho capito"
     }
   },
   "USER_MANAGEMENT": {
@@ -454,19 +506,20 @@
   },
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
-    "USERS": "Utenti",
+    "USERS": "Gestione Utenti",
     "BOOKINGS": "Prenotazioni",
-    "BOOK_WORKSPACE": "Prenota Postazione",
+    "BOOK_WORKSPACE": "Prenota Posto",
     "STATISTICS": "Statistiche",
     "BADGE_MANAGEMENT": "Gestione Badge",
+    "PLAN_MANAGEMENT": "Gestione Planimetrie",
+    "LOCATION_MANAGEMENT": "Gestione Sedi",
     "UPDATE_PROFILE": "Aggiorna Profilo",
-    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
+    "COLLAPSE": "Collassa Sidebar",
+    "EXPAND": "Espandi Sidebar",
     "DISCONNECT": "Disconnetti",
     "ROLE_ADMIN": "Amministratore",
     "ROLE_USER": "Dipendente",
-    "UNKNOWN_ROLE": "Ruolo sconosciuto",
-    "EXPAND": "Espandi sidebar",
-    "COLLAPSE": "Comprimi sidebar"
+    "UNKNOWN_ROLE": "Ruolo sconosciuto"
   },
   "ACCOUNT": {
     "TITLE": "Aggiorna Profilo",
@@ -619,6 +672,7 @@
     "TITLE": "Gestione Sedi",
     "SUBTITLE": "Gestisci le sedi aziendali e i relativi edifici",
     "NEW_LOCATION": "Nuova Sede",
+    "SEARCH_PLACEHOLDER": "Cerca per sede, edificio o città...",
     "FILTER_BY": "Filtra per:",
     "VIEWS": {
       "ALL": "Edifici",
@@ -723,6 +777,103 @@
       "CONFIRM_DELETE_BUILDING": "Sei sicuro di voler eliminare definitivamente l'edificio \"{{ name }}\"? Questa azione non può essere annullata.",
       "DELETE_SUCCESS": "Eliminazione completata con successo",
       "DELETE_ERROR": "Si è verificato un errore durante l'eliminazione"
+    }
+  },
+  "BADGE_MANAGEMENT": {
+    "TITLE": "Gestione Badge & Permessi",
+    "SUBTITLE": "Definisci ruoli, azioni e la loro gerarchia di ereditarietà.",
+    "STATS": {
+      "TOTAL_ROLES": "Ruoli Totali",
+      "TOTAL_ACTIONS": "Azioni Totali",
+      "ACTIVE": "Attivi",
+      "RELATIONS": "Relazioni"
+    },
+    "ROLES": {
+      "TITLE": "Ruoli",
+      "NEW_ROLE": "Nuovo ruolo",
+      "SEARCH_PLACEHOLDER": "Cerca ruoli...",
+      "NONE_FOUND": "Nessun ruolo trovato"
+    },
+    "ACTIONS": {
+      "TITLE": "Azioni",
+      "NEW_ACTION": "Nuova azione",
+      "SEARCH_PLACEHOLDER": "Cerca azioni...",
+      "NONE_FOUND": "Nessuna azione trovata"
+    },
+    "CANVAS": {
+      "EMPTY_SCHEMA": "Schema Vuoto",
+      "DRAG_HINT": "Trascina un badge dall'elenco di sinistra per iniziare",
+      "HINT_ROLES": "Ruoli",
+      "HINT_ACTIONS": "Azioni",
+      "TOOLTIPS": {
+        "PAN": "Sposta Mappa (Mano)",
+        "SELECT": "Selezione a Rettangolo (Puntatore)",
+        "CONNECT": "Crea Collegamento (Link)",
+        "FULL_TREE": "Full Tree",
+        "FOCUS": "Focus",
+        "RESET_LAYOUT": "Reset Layout",
+        "CLEAR_MAP": "Clear Map"
+      }
+    },
+    "SIDE_PANEL": {
+      "STATUS": "Stato:",
+      "ACTIVE": "Attivo",
+      "INACTIVE": "Disattivo",
+      "PROTECTED_BADGE": "Ruolo protetto",
+      "SYSTEM_ROLE": "Ruolo di Sistema:",
+      "SYSTEM_ROLE_DESC": "Questo badge è fondamentale per l'amministrazione e non può essere modificato o rimosso per sicurezza.",
+      "INHERITS_FROM": "Eredita da:",
+      "SEARCH_PLACEHOLDER": "Cerca badge...",
+      "ROLES": "Ruoli",
+      "ACTIONS": "Azioni",
+      "REDUNDANT_INHERITANCE": "Ereditarietà ridondante (già coperta da un altro ruolo/percorso)",
+      "NONE_AVAILABLE": "Nessun badge disponibile per l'ereditarietà",
+      "SAVE_CHANGES": "Salva Modifiche",
+      "CANCEL_CHANGES": "Annulla modifiche",
+      "SELF_INHERIT": "sé stesso"
+    },
+    "CREATE_MODAL": {
+      "TITLE_ROLE": "Nuovo Ruolo",
+      "TITLE_ACTION": "Nuova Azione",
+      "NAME": "Nome *",
+      "DESCRIPTION": "Descrizione",
+      "DESCRIPTION_PLACEHOLDER": "Descrizione opzionale...",
+      "PREFIX_HINT_ROLE": "Il prefisso ROLE_ verrà aggiunto automaticamente.",
+      "PREFIX_HINT_ACTION": "Il prefisso ACTION_ verrà aggiunto automaticamente.",
+      "CANCEL": "Annulla",
+      "CREATE_ROLE": "Crea Ruolo",
+      "CREATE_ACTION": "Crea Azione",
+      "CREATING": "Creazione..."
+    },
+    "DELETE_MODAL": {
+      "TITLE": "Conferma Disattivazione",
+      "MESSAGE": "Stai per disattivare il badge",
+      "PRESERVE_HIERARCHY": "Preserva Gerarchia (Consigliato)",
+      "PRESERVE_HIERARCHY_DESC": "I badge che dipendono da questo erediteranno direttamente i suoi genitori. Evita la perdita accidentale di permessi.",
+      "NOTE": "Nota: Il badge non verrà eliminato fisicamente dal database, ma non sarà più assegnabile agli utenti.",
+      "CANCEL": "Annulla",
+      "CONFIRM": "Conferma"
+    },
+    "MESSAGES": {
+      "LOADING": "Caricamento...",
+      "REFRESH": "Aggiorna",
+      "SUCCESS_LOAD": "Badge caricati correttamente",
+      "ERROR_LOAD": "Errore nel caricamento dei badge",
+      "SUCCESS_CREATE": "Badge creato correttamente",
+      "ERROR_CREATE": "Errore nella creazione del badge",
+      "SUCCESS_UPDATE": "Badge aggiornato correttamente",
+      "ERROR_UPDATE": "Errore nell'aggiornamento del badge",
+      "SUCCESS_DELETE": "Badge disattivato correttamente",
+      "ERROR_DELETE": "Errore nella disattivazione del badge",
+      "ERROR_ALREADY_EXISTS": "Un badge con questo nome esiste già",
+      "ERROR_NAME_REQUIRED": "Il nome è obbligatorio",
+      "SAVING": "Salvataggio...",
+      "CYCLE_ERROR": "Impossibile aggiungere: creerebbe un ciclo infinito!",
+      "DEFAULT_LAYOUT_RESET": "Layout e visibilità di default resettati",
+      "ALL_HIDDEN": "Tutti i badge sono stati nascosti",
+      "VISIBLE_ON_GRAPH": "{{name}} mostrato nello schema",
+      "HIDDEN_FROM_GRAPH": "{{name}} nascosto dallo schema",
+      "PROTECTED_ADMIN": "Il ruolo ROLE_ADMIN è protetto e non può essere rimosso."
     }
   },
   "COMMON": {

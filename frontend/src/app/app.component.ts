@@ -27,9 +27,12 @@ export class AppComponent implements OnInit {
     private router: Router,
     private authService: AuthService
   ) { 
-    // 3. HO AGGIUNTO L'INIZIALIZZAZIONE DELLA LINGUA:
+    // 3. Carica la lingua salvata o usa l'italiano come default
+    const savedLang = localStorage.getItem('userLanguage');
+    const langToUse = savedLang === 'en' || savedLang === 'it' ? savedLang : 'it';
+    
     this.translate.setDefaultLang('it');
-    this.translate.use('it');
+    this.translate.use(langToUse);
   }
 
   ngOnInit(): void {
