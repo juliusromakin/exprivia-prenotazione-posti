@@ -208,7 +208,7 @@
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-semibold text-gray-800">{{ 'BOOKING.MY_RESERVATIONS.TITLE' | translate }}</h3>
       <div class="flex items-center space-x-2">
-        <button *ngIf="getSelectedCount() > 0" type="button" (click)="bulkCancelReservations()"
+        <button *ngIf="getSelectedCount() > 0 && statusFilter !== 'scadute'" type="button" (click)="bulkCancelReservations()"
           class="px-3 py-1 bg-red-600 text-white text-sm rounded-md">
           {{ 'BOOKING.MY_RESERVATIONS.CANCEL_SELECTED' | translate }} ({{ getSelectedCount() }})
         </button>
@@ -218,8 +218,8 @@
             class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ALL' | translate }}</button>
           <button (click)="setStatusFilter('attive')" [class.bg-green-600]="statusFilter === 'attive'"
             class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ACTIVE' | translate }}</button>
-          <button (click)="setStatusFilter('annullate')" [class.bg-red-600]="statusFilter === 'annullate'"
-            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.CANCELLED' | translate }}</button>
+          <button (click)="setStatusFilter('scadute')" [class.bg-red-600]="statusFilter === 'scadute'" [class.text-white]="statusFilter === 'scadute'"
+            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.PASSATE' | translate }}</button>
         </div>
       </div>
     </div>
@@ -228,18 +228,18 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="p-2"><input type="checkbox" [checked]="isSelectAllChecked" (change)="toggleSelectAll()"></th>
+            <th *ngIf="statusFilter !== 'scadute'" class="p-2"><input type="checkbox" [checked]="isSelectAllChecked" (change)="toggleSelectAll()"></th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.DATE' | translate }}</th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.TIME' | translate }}</th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ROOM' | translate }}</th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.WORKSPACE' | translate }}</th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.STATUS' | translate }}</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
+            <th *ngIf="statusFilter !== 'scadute'" class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let reservation of sortedReservations">
-            <td class="p-2 text-center">
+            <td *ngIf="statusFilter !== 'scadute'" class="p-2 text-center">
               <input *ngIf="canShowCheckbox(reservation)" type="checkbox"
                 [checked]="isReservationSelected(reservation.id!)" (change)="toggleSelectReservation(reservation.id!)">
             </td>
@@ -257,8 +257,8 @@
                 ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
               </span>
             </td>
-            <td class="p-2">
-              <button (click)="cancelReservation(reservation)" [disabled]="!canCancelReservation(reservation)"
+            <td *ngIf="statusFilter !== 'scadute'" class="p-2">
+              <button *ngIf="statusFilter !== 'scadute'" (click)="cancelReservation(reservation)" [disabled]="!canCancelReservation(reservation)"
                 class="text-xs text-red-600 hover:underline">{{ 'BOOKING.TABLE.ACTION_CANCEL' | translate }}</button>
             </td>
           </tr>

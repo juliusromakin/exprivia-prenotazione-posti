@@ -61,7 +61,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   sortDirection: 'asc' | 'desc' = 'desc'; // Default to descending (latest first)
 
   // Filter properties
-  statusFilter: 'tutti' | 'attive' | 'scadute' | 'annullate' = 'attive'; // Default to active
+  statusFilter: string = 'attive'; // Default to active
 
   // Admin and user selection properties
   isAdmin = false;
