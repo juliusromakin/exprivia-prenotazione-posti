@@ -110,9 +110,7 @@ export class PlanimetriaService {
         const formData = new FormData();
         formData.append('file', file);
         return from(
-            this.axiosService.post<string>(`${this.floorPlanUrl}/${floorId}/upload-planimetry`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            } as any)
+            this.axiosService.post<string>(`${this.floorPlanUrl}/${floorId}/upload-planimetry`, formData)
         );
     }
 

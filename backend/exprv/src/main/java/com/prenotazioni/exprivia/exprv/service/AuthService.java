@@ -135,12 +135,12 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.setEnabled(true); 
 
-        Badge userBadge = badgeRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new AppException("Badge ROLE_USER non trovato nel sistema",
+        Badge guestBadge = badgeRepository.findByName("ROLE_GUEST")
+                .orElseThrow(() -> new AppException("Badge ROLE_GUEST non trovato nel sistema",
                         HttpStatus.INTERNAL_SERVER_ERROR));
 
         Set<Badge> badges = new HashSet<>();
-        badges.add(userBadge);
+        badges.add(guestBadge);
         user.setBadges(badges);
 
         User savedUser = userRepository.save(user);

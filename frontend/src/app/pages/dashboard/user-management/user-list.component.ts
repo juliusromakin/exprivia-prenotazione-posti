@@ -109,12 +109,14 @@ export class UserListComponent implements OnInit, OnDestroy {
     let filtered = [...this.users];
 
     // Apply role filter
-    if (this.currentFilter === 'admin') {
+    if (this.currentFilter === 'all') {
+      filtered = filtered.filter(user => !user.badges?.includes('ROLE_GUEST'));
+    } else if (this.currentFilter === 'admin') {
       filtered = filtered.filter(user => user.badges?.includes('ROLE_ADMIN'));
     } else if (this.currentFilter === 'user') {
-      filtered = filtered.filter(user => !user.badges?.includes('ROLE_ADMIN'));
+      filtered = filtered.filter(user => !user.badges?.includes('ROLE_ADMIN') && !user.badges?.includes('ROLE_GUEST'));
     } else if (this.currentFilter === 'inactive') {
-      filtered = filtered.filter(user => !user.enabled);
+      filtered = filtered.filter(user => !user.enabled || user.badges?.includes('ROLE_GUEST'));
     }
 
     // Apply search filter
@@ -222,7 +224,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   // User counting methods
   getTotalUsers(): number {
-    return this.users.length;
+    return this.users.filter(user => !user.badges?.includes('ROLE_GUEST')).length;
   }
 
   getAdminCount(): number {
@@ -233,12 +235,12 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   getUserCount(): number {
     return this.users.filter(user => 
-      !user.badges?.includes('ROLE_ADMIN')
+      !user.badges?.includes('ROLE_ADMIN') && !user.badges?.includes('ROLE_GUEST')
     ).length;
   }
 
   getInactiveCount(): number {
-  return this.users.filter(user => !user.enabled).length;
+    return this.users.filter(user => !user.enabled || user.badges?.includes('ROLE_GUEST')).length;
   }
   
   // Role filtering
@@ -385,18 +387,25 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   async activateUser(user: User): Promise<void> {
     try {
-      await this.userManagementService.updateUser(user.id!, {
-        name: user.name,
-        lastName: user.lastName,
-        email: user.email,
-        badges: user.badges,
-        enabled: true
-      });
-      
-      this.toastService.showSuccess(
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_TITLE'),
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_DESC', { name: user.name })
-      );
+      if (user.badges?.includes('ROLE_GUEST')) {
+        await this.userManagementService.approveUser(user.id!);
+        this.toastService.showSuccess(
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_TITLE'),
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_DESC', { name: user.name })
+        );
+      } else {
+        await this.userManagementService.updateUser(user.id!, {
+          name: user.name,
+          lastName: user.lastName,
+          email: user.email,
+          badges: user.badges,
+          enabled: true
+        });
+        this.toastService.showSuccess(
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_TITLE'),
+          this.translate.instant('USER_MANAGEMENT.MESSAGES.USER_ACTIVATED_DESC', { name: user.name })
+        );
+      }
     } catch (error) {
       this.toastService.showError(
         this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_TITLE'),
