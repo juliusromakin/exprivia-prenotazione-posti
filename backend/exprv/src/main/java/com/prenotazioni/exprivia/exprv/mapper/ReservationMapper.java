@@ -10,8 +10,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 import com.prenotazioni.exprivia.exprv.dto.ReservationDTO;
+import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
 import com.prenotazioni.exprivia.exprv.dto.UserSummaryDTO;
 import com.prenotazioni.exprivia.exprv.entity.Reservation;
+import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.entity.User;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -26,6 +28,7 @@ public interface ReservationMapper {
     @Mapping(source = "reservationDuration.name", target = "durationName")
     @Mapping(source = "user", target = "userSummary")
     @Mapping(source = "workspace", target = "workspaceSummary")
+    @Mapping(source = "workspace.room", target = "roomSummary")
     @Mapping(source = "workspace.room.floor.building.location.city", target = "cityName")
     @Mapping(source = "workspace.room.floor.building.location.name", target = "locationName")
     ReservationDTO toDto(Reservation reservation);
@@ -39,6 +42,22 @@ public interface ReservationMapper {
                 user.getName(),
                 user.getLastName(),
                 user.getEmail());
+    }
+
+    default RoomDTO toRoomDto(Room room) {
+        if (room == null) {
+            return null;
+        }
+        RoomDTO dto = new RoomDTO();
+        dto.setId(room.getId());
+        dto.setName(room.getName());
+        dto.setRoomType(room.getRoomType());
+        dto.setCapacity(room.getCapacity());
+        dto.setEnabled(room.getEnabled());
+        if (room.getFloor() != null) {
+            dto.setFloorId(room.getFloor().getId());
+        }
+        return dto;
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

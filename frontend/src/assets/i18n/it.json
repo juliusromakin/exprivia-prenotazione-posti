@@ -356,6 +356,8 @@
     "STEP": "Step",
     "STEPS": {
       "DATE": "1. Seleziona una data",
+      "CITY": "Città",
+      "LOCATION": "Sede",
       "ROOM_TYPE": "2. Seleziona tipo sala",
       "TIME": "3. Seleziona orario",
       "WORKSPACE": "4. Seleziona una postazione dalla mappa"

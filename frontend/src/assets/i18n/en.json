@@ -353,6 +353,8 @@
     "STEP": "Step",
     "STEPS": {
       "DATE": "1. Select a date",
+      "CITY": "City",
+      "LOCATION": "Location",
       "ROOM_TYPE": "2. Select Room Type",
       "TIME": "3. Select Time",
       "WORKSPACE": "4. Select a workspace from the map"
