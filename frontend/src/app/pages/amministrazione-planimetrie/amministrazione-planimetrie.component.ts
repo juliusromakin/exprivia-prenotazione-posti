@@ -359,7 +359,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             this.fineIndeterminata = true;
         }
 
-        this.imageUrl = piano.imagePath || 'Planimetria.png';
+        this.imageUrl = piano.imagePath && piano.imagePath !== 'Planimetria.png'
+            ? (piano.imagePath.startsWith('data:') || piano.imagePath.includes('/') ? piano.imagePath : `/api/images/${piano.imagePath}`) 
+            : 'Planimetria.png';
         this.cdr.detectChanges();
 
         // Recupera il FloorDTO del piano per avere i dati logici (nomi stanze, tipi ecc.) solo se buildingId è disponibile
@@ -591,13 +593,26 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     onFileSelected(event: any) {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.imageUrl = e.target.result;
-                this.cdr.detectChanges();
-                setTimeout(() => this.initCanvas(this.imageUrl!), 0);
-            };
-            reader.readAsDataURL(file);
+            if (!this.selectedFloorId) {
+                this.showAlert('Attenzione', 'Seleziona prima un piano per caricare l\'immagine.');
+                return;
+            }
+
+            this.isSaving = true;
+            this.planimetriaService.caricaImmaginePlanimetria(this.selectedFloorId, file).subscribe({
+                next: (fileName) => {
+                    // Costruiamo l'URL completo per visualizzarlo nel canvas
+                    this.imageUrl = `/api/images/${fileName}`;
+                    this.cdr.detectChanges();
+                    setTimeout(() => this.initCanvas(this.imageUrl!), 0);
+                    this.isSaving = false;
+                },
+                error: (err) => {
+                    console.error('Errore upload:', err);
+                    this.showAlert('Errore Upload', 'Impossibile caricare l\'immagine sul server. Verifica la connessione o le dimensioni del file.');
+                    this.isSaving = false;
+                }
+            });
         }
     }
 
@@ -1067,7 +1082,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 validTo: validToStr,
                 canvasWidth: this.canvas.width,
                 canvasHeight: this.canvas.height,
-                imagePath: this.imageUrl || 'Planimetria.png',
+                imagePath: this.imageUrl ? this.imageUrl.split('/').pop()! : 'Planimetria.png',
                 rooms: stanzeCanvas.map(stanza => {
                     const bbox = stanza.getBoundingRect();
                     return {

@@ -90,6 +90,7 @@ public class DataInitializer implements CommandLineRunner {
         addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_RESERVATION_READ_ANY.name()));
         addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_RESERVATION_DELETE_ANY.name()));
         addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_RESERVATION_EXPORT.name()));
+        addParentLink(roleHr, badgeMap.get(AppAuthority.ACTION_USER_APPROVE.name()));
 
         // ROLE_ADMIN: Eredita HR + TUTTE le altre azioni (Superuser)
         addParentLink(roleAdmin, roleHr);

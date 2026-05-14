@@ -39,6 +39,10 @@ export class AdminService {
         );
     }
 
+    approveUser(id: number): Observable<User> {
+        return from(this.axiosService.post<User>(`${this.baseUrl}/${id}/approve`, {}));
+    }
+
     getbadges(): Observable<badgeDTO[]> {
         return from(this.axiosService.get<badgeDTO[]>("/api/admin/badges"));
     }

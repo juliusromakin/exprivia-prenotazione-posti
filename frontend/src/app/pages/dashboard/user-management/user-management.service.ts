@@ -111,6 +111,21 @@ export class UserManagementService {
     }
   }
 
+  // Approva un utente (promozione da GUEST a USER)
+  async approveUser(userId: number): Promise<User> {
+    try {
+      this.loadingSubject.next(true);
+      const user = await firstValueFrom(this.adminService.approveUser(userId));
+      await this.loadUsers(); // Ricarica la lista dopo l'approvazione
+      return user;
+    } catch (error) {
+      console.error('Errore durante l\'approvazione dell\'utente:', error);
+      throw error;
+    } finally {
+      this.loadingSubject.next(false);
+    }
+  }
+
   // Ottieni un utente per ID
   async getUserById(userId: number): Promise<User> {
     try {

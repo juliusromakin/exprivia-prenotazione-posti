@@ -74,4 +74,11 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('ACTION_USER_APPROVE')")
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<AdminDTO> approveUser(@PathVariable Integer id) {
+        AdminDTO approvedUser = adminService.approveUser(id);
+        return ResponseEntity.ok(approvedUser);
+    }
+
 }
