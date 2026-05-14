@@ -203,6 +203,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   cambiaLingua(lingua: string): void {
     this.translate.use(lingua);
+    localStorage.setItem('userLanguage', lingua);
   }
 
   get currentLang(): string {

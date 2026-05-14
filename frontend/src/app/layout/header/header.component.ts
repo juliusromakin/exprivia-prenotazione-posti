@@ -100,9 +100,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.loginService.logout();
   }
 
-  // 3. Aggiunto il metodo per cambiare lingua richiamato dall'HTML
+  // 3. Cambia la lingua e la salva nel localStorage per persistenza al refresh
   cambiaLingua(lingua: string): void {
     this.translate.use(lingua);
+    localStorage.setItem('userLanguage', lingua);
   }
 
   get currentLang(): string {

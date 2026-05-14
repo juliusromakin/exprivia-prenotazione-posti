@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { badgeDTO } from '@core/models';
 import { BadgeManagementService } from './badge-management.service';
 
@@ -28,7 +29,8 @@ interface BadgeNode {
   imports: [
     CommonModule, 
     FormsModule, 
-    LucideAngularModule
+    LucideAngularModule,
+    TranslateModule
   ],
   templateUrl: './badge-management.component.html'
 })
@@ -114,7 +116,8 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
   constructor(
     public badgeService: BadgeManagementService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {
     this.boundOnMouseMove = this.onCanvasMouseMove.bind(this);
     this.boundOnMouseUp = this.onCanvasMouseUp.bind(this);
@@ -549,7 +552,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     } else {
       // Controllo cicli lato UI per feedback immediato
       if (this.isReachable(this.workingBadge.id!, candidate.id)) {
-        this.showToast('Impossibile aggiungere: creerebbe un ciclo infinito!', 'error');
+        this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.CYCLE_ERROR'), 'error');
         return;
       }
       currentParents.push(candidate.id);
@@ -594,7 +597,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       });
       this.savePositionsToStorage();
       this.layoutAndDraw();
-      this.showToast('Layout e visibilità di default resettati', 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.DEFAULT_LAYOUT_RESET'), 'success');
     } else {
       // Clear map (nascondi tutti)
       this.allBadges.forEach(b => {
@@ -604,7 +607,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       this.selectedBadge = null;
       this.workingBadge = null;
       this.layoutAndDraw();
-      this.showToast('Tutti i badge sono stati nascosti', 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ALL_HIDDEN'), 'success');
     }
   }
 
@@ -615,9 +618,9 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
       const updated = await this.badgeService.updateBadge(this.workingBadge.id!, this.workingBadge);
       this.selectedBadge = { ...updated };
       this.workingBadge = JSON.parse(JSON.stringify(updated));
-      this.showToast('Gerarchia salvata con successo', 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.SUCCESS_UPDATE'), 'success');
     } catch (err: any) {
-      this.showToast(err?.response?.data?.message ?? 'Errore nel salvataggio', 'error');
+      this.showToast(err?.response?.data?.message ?? this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ERROR_UPDATE'), 'error');
     }
   }
 
@@ -633,9 +636,9 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
   async toggleBadgeStatus(badge: badgeDTO): Promise<void> {
     try {
       await this.badgeService.updateBadge(badge.id!, { ...badge, isActive: !badge.isActive });
-      this.showToast(`Badge ${badge.isActive ? 'disattivato' : 'attivato'}`, 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.SUCCESS_UPDATE'), 'success');
     } catch {
-      this.showToast('Errore durante l\'aggiornamento dello stato', 'error');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ERROR_UPDATE'), 'error');
     }
   }
 
@@ -653,7 +656,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
   async submitCreate(): Promise<void> {
     if (!this.createForm.name?.trim()) {
-      this.createError = 'Il nome è obbligatorio.';
+      this.createError = this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ERROR_NAME_REQUIRED');
       return;
     }
     if (!this.createForm.type) {
@@ -678,9 +681,9 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
         parentIds: []
       });
       this.closeCreateModal();
-      this.showToast('Badge creato con successo!', 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.SUCCESS_CREATE'), 'success');
     } catch (err: any) {
-      this.createError = err?.response?.data?.message ?? 'Errore durante la creazione.';
+      this.createError = err?.response?.data?.message ?? this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ERROR_CREATE');
     }
   }
 
@@ -690,10 +693,10 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     if (!badge.id) return;
     if (this.hiddenBadgeIds.has(badge.id)) {
       this.hiddenBadgeIds.delete(badge.id);
-      this.showToast(`${this.formatBadgeName(badge.name)} mostrato nello schema`, 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.VISIBLE_ON_GRAPH', { name: this.formatBadgeName(badge.name) }), 'success');
     } else {
       this.hiddenBadgeIds.add(badge.id);
-      this.showToast(`${this.formatBadgeName(badge.name)} nascosto dallo schema`, 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.HIDDEN_FROM_GRAPH', { name: this.formatBadgeName(badge.name) }), 'success');
     }
     this.savePositionsToStorage();
     this.layoutAndDraw();
@@ -713,12 +716,12 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     this.hiddenBadgeIds.add(badge.id);
     this.savePositionsToStorage();
     this.layoutAndDraw();
-    this.showToast(`${this.formatBadgeName(badge.name)} nascosto dalla vista`, 'success');
+    this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.HIDDEN_FROM_GRAPH', { name: this.formatBadgeName(badge.name) }), 'success');
   }
 
   deleteBadge(badge: badgeDTO): void {
     if (this.isProtectedBadge(badge)) {
-      this.showToast('Il ruolo ROLE_ADMIN è protetto e non può essere rimosso.', 'error');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.PROTECTED_ADMIN'), 'error');
       return;
     }
     this.badgeToDelete = badge;
@@ -752,11 +755,11 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
         this.workingBadge = null;
       }
 
-      this.showToast('Badge eliminato correttamente', 'success');
+      this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.SUCCESS_DELETE'), 'success');
       this.closeDeleteModal();
       this.layoutAndDraw();
     } catch (err: any) {
-      this.showToast(err?.response?.data?.message ?? 'Errore durante l\'eliminazione', 'error');
+      this.showToast(err?.response?.data?.message ?? this.translate.instant('BADGE_MANAGEMENT.MESSAGES.ERROR_DELETE'), 'error');
     } finally {
       this.loading = false;
     }
@@ -1307,7 +1310,7 @@ export class BadgeManagementComponent implements OnInit, OnDestroy, AfterViewIni
     
     this.savePositionsToStorage(); // Salva lo stato e le posizioni dopo il drop
     this.layoutAndDraw();
-    this.showToast(`${this.formatBadgeName(badge.name)} aggiunto allo schema`, 'success');
+    this.showToast(this.translate.instant('BADGE_MANAGEMENT.MESSAGES.VISIBLE_ON_GRAPH', { name: this.formatBadgeName(badge.name) }), 'success');
   }
 
   // --- Getters filtrati per la ricerca ---

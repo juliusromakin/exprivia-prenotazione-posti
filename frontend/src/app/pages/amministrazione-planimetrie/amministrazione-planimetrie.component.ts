@@ -249,11 +249,11 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     }
 
     formattaPianimetria(p: Planimetria): string {
-        const piano = p.floorName || 'Piano';
+        const piano = p.floorName || (this.translate.instant('PLANIMETRIA_EDITOR.EXISTING_MODAL.DEFAULT_FLOOR') || 'Piano');
         const daObj = this.parseTypedDate(p.validFrom);
         const aObj = this.parseTypedDate(p.validTo);
-        const da = daObj ? daObj.toLocaleDateString('it-IT') : '?';
-        const a = aObj ? aObj.toLocaleDateString('it-IT') : 'Indeterminata';
+        const da = daObj ? daObj.toLocaleDateString(this.translate.currentLang === 'it' ? 'it-IT' : 'en-US') : '?';
+        const a = aObj ? aObj.toLocaleDateString(this.translate.currentLang === 'it' ? 'it-IT' : 'en-US') : (this.translate.instant('PLANIMETRIA_EDITOR.VALIDITY_MODAL.ENDLESS') || 'Indeterminata');
         return `${piano}  ·  ${da} → ${a}`;
     }
 
@@ -294,11 +294,11 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         if (!this.fineIndeterminata) {
             const toDate = this.parseTypedDate(this.validTo);
             if (!toDate) {
-                this.showAlert('Data Fine Non Valida', 'La Data Fine inserita non è valida o è vuota. Seleziona "Fine indeterminata" se non c\'è una data di fine.');
+                this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.INVALID_DATE_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.INVALID_DATE_MSG'));
                 return;
             }
             if (toDate < fromDate) {
-                this.showAlert('Periodo Non Valido', 'La Data Fine deve essere successiva o uguale alla Data Inizio.');
+                this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.INVALID_PERIOD_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.INVALID_PERIOD_MSG'));
                 return;
             }
             this.validTo = toDate;
@@ -315,7 +315,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     // ── Modale selezione planimetria ───────────────────────────────────────
     apriModalePlanimetria(): void {
         if (this.buildingId === null) {
-            this.showAlert('Contesto Mancante', 'Impossibile caricare le planimetrie: ID edificio non disponibile.');
+            this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.MISSING_CONTEXT_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.MISSING_CONTEXT_MSG'));
             return;
         }
 
@@ -601,7 +601,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const file = event.target.files[0];
         if (file) {
             if (!this.selectedFloorId) {
-                this.showAlert('Attenzione', 'Seleziona prima un piano per caricare l\'immagine.');
+                this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.INITIAL_HINT'));
                 return;
             }
 
@@ -616,7 +616,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Errore upload:', err);
-                    this.showAlert('Errore Upload', 'Impossibile caricare l\'immagine sul server. Verifica la connessione o le dimensioni del file.');
+                    this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_MSG'));
                     this.isSaving = false;
                 }
             });
@@ -984,7 +984,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const postazioniCanvas = allObjects.filter(o => o.data?.tipo === 'postazione');
 
         if (stanzeCanvas.length === 0 && postazioniCanvas.length === 0) {
-            this.showAlert('Planimetria Vuota', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.NO_ELEMENTS'));
+            this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.NO_ELEMENTS'));
             return;
         }
 
@@ -997,8 +997,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
 
         const stanzeVuote = stanzeCanvas.filter((s: any) => (capacityMap.get(s.data?.tempId) ?? 0) === 0);
         if (stanzeVuote.length > 0) {
-            const nomi = stanzeVuote.map((s: any) => `"${s.data?.label ?? 'Senza nome'}"`).join(', ');
-            this.showAlert('Attenzione: Stanze Vuote', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_WARNING', { rooms: nomi }));
+            const nomi = stanzeVuote.map((s: any) => `"${s.data?.label ?? this.translate.instant('PLANIMETRIA_EDITOR.SIDE_PANEL.NO_NAME_ROOM')}"`).join(', ');
+            this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.EMPTY_ROOMS_WARNING', { rooms: nomi }));
             return;
         }
 
@@ -1040,7 +1040,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 } else {
                     // Nuova stanza da creare logically
                     const payload = {
-                        name: stanza.data?.label ?? 'Stanza',
+                        name: stanza.data?.label ?? (this.translate.instant('PLANIMETRIA_EDITOR.SIDE_PANEL.NO_NAME_ROOM') || 'Stanza'),
                         roomType: stanza.data?.roomType ?? 'MEETING_ROOM',
                         capacity: capacityCalcolata,
                         floorId: (this.selectedFloorId ?? this.selectedFloor)!,
@@ -1113,12 +1113,12 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             // 4. Salva l'intero schema spaziale su FloorPlan
             await lastValueFrom(this.planimetriaService.salvaDatiPlanimetria(planPayload));
 
-            this.toastService.showSuccess('Salvataggio Completato', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
+            this.toastService.showSuccess(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_SUCCESS', {
                 roomsCount: stanzeCanvas.length,
                 desksCount: postazioniCanvas.length
             }));
         } catch (error: any) {
-            this.showAlert('Errore di Salvataggio', this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', { error: error?.message ?? 'Unknown error' }));
+            this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', { error: error?.message ?? 'Unknown error' }));
         } finally {
             this.isSaving = false;
             this.cdr.detectChanges();

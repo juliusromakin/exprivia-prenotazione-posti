@@ -5,15 +5,15 @@
   <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Gestione Badge & Permessi</h1>
-        <p class="text-gray-500 text-sm">Definisci ruoli, azioni e la loro gerarchia di ereditarietà.</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ 'BADGE_MANAGEMENT.TITLE' | translate }}</h1>
+        <p class="text-gray-500 text-sm">{{ 'BADGE_MANAGEMENT.SUBTITLE' | translate }}</p>
       </div>
       <button
         (click)="badgeService.loadBadges()"
         [disabled]="loading"
         class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 text-sm font-medium">
         <lucide-icon name="refresh-cw" class="w-4 h-4 mr-2" [class.animate-spin]="loading"></lucide-icon>
-        {{ loading ? 'Caricamento...' : 'Aggiorna' }}
+        {{ loading ? ('BADGE_MANAGEMENT.MESSAGES.LOADING' | translate) : ('BADGE_MANAGEMENT.MESSAGES.REFRESH' | translate) }}
       </button>
     </div>
   </div>
@@ -25,7 +25,7 @@
         <lucide-icon name="shield" class="w-5 h-5 text-blue-600"></lucide-icon>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Ruoli Totali</p>
+        <p class="text-sm text-gray-500">{{ 'BADGE_MANAGEMENT.STATS.TOTAL_ROLES' | translate }}</p>
         <p class="text-2xl font-bold text-gray-900">{{ roles.length }}</p>
       </div>
     </div>
@@ -34,7 +34,7 @@
         <lucide-icon name="zap" class="w-5 h-5 text-orange-500"></lucide-icon>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Azioni Totali</p>
+        <p class="text-sm text-gray-500">{{ 'BADGE_MANAGEMENT.STATS.TOTAL_ACTIONS' | translate }}</p>
         <p class="text-2xl font-bold text-gray-900">{{ actions.length }}</p>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <lucide-icon name="check-circle" class="w-5 h-5 text-green-600"></lucide-icon>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Attivi</p>
+        <p class="text-sm text-gray-500">{{ 'BADGE_MANAGEMENT.STATS.ACTIVE' | translate }}</p>
         <p class="text-2xl font-bold text-gray-900">{{ getActiveBadgeCount() }}</p>
       </div>
     </div>
@@ -52,7 +52,7 @@
         <lucide-icon name="git-branch" class="w-5 h-5 text-purple-600"></lucide-icon>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Relazioni</p>
+        <p class="text-sm text-gray-500">{{ 'BADGE_MANAGEMENT.STATS.RELATIONS' | translate }}</p>
         <p class="text-2xl font-bold text-gray-900">{{ getTotalRelations() }}</p>
       </div>
     </div>
@@ -70,12 +70,12 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
-              <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Ruoli</h2>
+              <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ 'BADGE_MANAGEMENT.ROLES.TITLE' | translate }}</h2>
             </div>
             <button
               (click)="openCreateModal('ROLE')"
               class="w-6 h-6 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors cursor-pointer"
-              title="Nuovo ruolo">
+              [title]="'BADGE_MANAGEMENT.ROLES.NEW_ROLE' | translate">
               <lucide-icon name="plus" class="w-3.5 h-3.5"></lucide-icon>
             </button>
           </div>
@@ -85,7 +85,7 @@
             <input 
               type="text" 
               [(ngModel)]="roleSearchQuery"
-              placeholder="Cerca ruoli..."
+              [placeholder]="'BADGE_MANAGEMENT.ROLES.SEARCH_PLACEHOLDER' | translate"
               class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:bg-white transition-all">
           </div>
         </div>
@@ -99,7 +99,7 @@
           <!-- Empty state -->
           <div *ngIf="!loading && filteredRoles.length === 0" class="text-center py-6 text-gray-400">
             <lucide-icon name="shield-off" class="w-8 h-8 mx-auto mb-2 opacity-40"></lucide-icon>
-            <p class="text-xs">Nessun ruolo trovato</p>
+            <p class="text-xs">{{ 'BADGE_MANAGEMENT.ROLES.NONE_FOUND' | translate }}</p>
           </div>
 
           <!-- Badge items -->
@@ -131,7 +131,7 @@
                   [class.text-gray-300]="!isBadgeVisible(role)"
                   [class.hover:bg-blue-100]="isBadgeVisible(role)"
                   [class.hover:bg-gray-100]="!isBadgeVisible(role)"
-                  [title]="isBadgeVisible(role) ? 'Nascondi dallo schema' : 'Mostra nello schema'">
+                  [title]="isBadgeVisible(role) ? ('BADGE_MANAGEMENT.SIDE_PANEL.CANCEL_CHANGES' | translate) : ('BADGE_MANAGEMENT.CANVAS.TOOLTIPS.CLEAR_MAP' | translate)">
                   <lucide-icon [name]="isBadgeVisible(role) ? 'eye' : 'eye-off'" class="w-3.5 h-3.5"></lucide-icon>
                 </button>
                 <!-- Delete Button (Sidebar) -->
@@ -139,7 +139,7 @@
                   *ngIf="!isProtectedBadge(role)"
                   (click)="$event.stopPropagation(); deleteBadge(role)"
                   class="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
-                  title="Elimina dal database">
+                  [title]="'BADGE_MANAGEMENT.DELETE_MODAL.CONFIRM' | translate">
                   <lucide-icon name="trash-2" class="w-3.5 h-3.5"></lucide-icon>
                 </button>
               </div>
@@ -155,12 +155,12 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div>
-              <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Azioni</h2>
+              <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ 'BADGE_MANAGEMENT.ACTIONS.TITLE' | translate }}</h2>
             </div>
             <button
               (click)="openCreateModal('ACTION')"
               class="w-6 h-6 flex items-center justify-center rounded-full bg-orange-50 hover:bg-orange-100 text-orange-500 transition-colors cursor-pointer"
-              title="Nuova azione">
+              [title]="'BADGE_MANAGEMENT.ACTIONS.NEW_ACTION' | translate">
               <lucide-icon name="plus" class="w-3.5 h-3.5"></lucide-icon>
             </button>
           </div>
@@ -170,7 +170,7 @@
             <input 
               type="text" 
               [(ngModel)]="actionSearchQuery"
-              placeholder="Cerca azioni..."
+              [placeholder]="'BADGE_MANAGEMENT.ACTIONS.SEARCH_PLACEHOLDER' | translate"
               class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-orange-400 focus:bg-white transition-all">
           </div>
         </div>
@@ -182,7 +182,7 @@
 
           <div *ngIf="!loading && filteredActions.length === 0" class="text-center py-6 text-gray-400">
             <lucide-icon name="zap-off" class="w-8 h-8 mx-auto mb-2 opacity-40"></lucide-icon>
-            <p class="text-xs">Nessuna azione trovata</p>
+            <p class="text-xs">{{ 'BADGE_MANAGEMENT.ACTIONS.NONE_FOUND' | translate }}</p>
           </div>
 
           <div
@@ -213,7 +213,7 @@
                   [class.text-gray-300]="!isBadgeVisible(action)"
                   [class.hover:bg-orange-100]="isBadgeVisible(action)"
                   [class.hover:bg-gray-100]="!isBadgeVisible(action)"
-                  [title]="isBadgeVisible(action) ? 'Nascondi dallo schema' : 'Mostra nello schema'">
+                  [title]="isBadgeVisible(action) ? ('BADGE_MANAGEMENT.SIDE_PANEL.CANCEL_CHANGES' | translate) : ('BADGE_MANAGEMENT.CANVAS.TOOLTIPS.CLEAR_MAP' | translate)">
                   <lucide-icon [name]="isBadgeVisible(action) ? 'eye' : 'eye-off'" class="w-3.5 h-3.5"></lucide-icon>
                 </button>
                 <!-- Delete Button (Sidebar) -->
@@ -221,7 +221,7 @@
                   *ngIf="!isProtectedBadge(action)"
                   (click)="$event.stopPropagation(); deleteBadge(action)"
                   class="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
-                  title="Elimina dal database">
+                  [title]="'BADGE_MANAGEMENT.DELETE_MODAL.CONFIRM' | translate">
                   <lucide-icon name="trash-2" class="w-3.5 h-3.5"></lucide-icon>
                 </button>
               </div>
@@ -241,8 +241,8 @@
         <div *ngIf="allBadges.length === 0 && !loading"
           class="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
           <lucide-icon name="git-branch" class="w-16 h-16 mb-3 opacity-30"></lucide-icon>
-          <p class="text-sm font-medium">Nessun badge da visualizzare</p>
-          <p class="text-xs mt-1">Crea un ruolo o un'azione per iniziare</p>
+          <p class="text-sm font-medium">{{ 'BADGE_MANAGEMENT.CANVAS.EMPTY_SCHEMA' | translate }}</p>
+          <p class="text-xs mt-1">{{ 'BADGE_MANAGEMENT.CANVAS.DRAG_HINT' | translate }}</p>
         </div>
 
         <div *ngIf="allBadges.length > 0" 
@@ -256,7 +256,7 @@
               [class.text-white]="interactionMode === 'pan'"
               [class.bg-white]="interactionMode !== 'pan'"
               [class.text-gray-500]="interactionMode !== 'pan'"
-              title="Sposta Mappa (Mano)"
+              [title]="'BADGE_MANAGEMENT.CANVAS.TOOLTIPS.PAN' | translate"
               class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
               <lucide-icon name="hand" class="w-5 h-5"></lucide-icon>
             </button>
@@ -268,7 +268,7 @@
               [class.text-white]="interactionMode === 'select'"
               [class.bg-white]="interactionMode !== 'select'"
               [class.text-gray-500]="interactionMode !== 'select'"
-              title="Selezione a Rettangolo (Puntatore)"
+              [title]="'BADGE_MANAGEMENT.CANVAS.TOOLTIPS.SELECT' | translate"
               class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
               <lucide-icon name="mouse-pointer" class="w-5 h-5"></lucide-icon>
             </button>
@@ -280,7 +280,7 @@
               [class.text-white]="interactionMode === 'connect'"
               [class.bg-white]="interactionMode !== 'connect'"
               [class.text-gray-500]="interactionMode !== 'connect'"
-              title="Crea Collegamento (Link)"
+              [title]="'BADGE_MANAGEMENT.CANVAS.TOOLTIPS.CONNECT' | translate"
               class="w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-gray-200 transition-all cursor-pointer hover:shadow-md active:scale-95">
               <lucide-icon name="link" class="w-5 h-5"></lucide-icon>
             </button>
@@ -292,7 +292,7 @@
               [class.bg-blue-50]="viewMode === 'full'"
               [class.text-blue-600]="viewMode === 'full'"
               class="px-4 py-1.5 text-[10px] font-bold rounded-full transition-all cursor-pointer">
-              Full Tree
+              {{ 'BADGE_MANAGEMENT.CANVAS.TOOLTIPS.FULL_TREE' | translate }}
             </button>
             <button
               (click)="viewMode = 'focus'; layoutAndDraw()"
@@ -300,7 +300,7 @@
               [class.text-blue-600]="viewMode === 'focus'"
               [disabled]="!selectedBadge"
               class="px-4 py-1.5 text-[10px] font-bold rounded-full transition-all cursor-pointer disabled:opacity-50">
-              Focus
+              {{ 'BADGE_MANAGEMENT.CANVAS.TOOLTIPS.FOCUS' | translate }}
             </button>
           </div>
           
@@ -312,17 +312,17 @@
             [class.hover:bg-blue-600]="viewMode === 'full'"
             [class.hover:bg-red-600]="viewMode !== 'full'">
             <lucide-icon [name]="viewMode === 'full' ? 'refresh-cw' : 'trash-2'" class="w-3 h-3"></lucide-icon>
-            {{ viewMode === 'full' ? 'Reset Layout' : 'Clear Map' }}
+            {{ viewMode === 'full' ? ('BADGE_MANAGEMENT.CANVAS.TOOLTIPS.RESET_LAYOUT' | translate) : ('BADGE_MANAGEMENT.CANVAS.TOOLTIPS.CLEAR_MAP' | translate) }}
           </button>
         </div>
 
         <div *ngIf="nodes.length === 0 && !loading" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none bg-white bg-opacity-50">
           <lucide-icon name="mouse-pointer" class="w-12 h-12 mb-4 text-blue-500 opacity-40"></lucide-icon>
-          <p class="text-lg font-bold text-gray-800">Schema Vuoto</p>
-          <p class="text-sm text-gray-500 mt-1">Trascina un badge dall'elenco di sinistra per iniziare</p>
+          <p class="text-lg font-bold text-gray-800">{{ 'BADGE_MANAGEMENT.CANVAS.EMPTY_SCHEMA' | translate }}</p>
+          <p class="text-sm text-gray-500 mt-1">{{ 'BADGE_MANAGEMENT.CANVAS.DRAG_HINT' | translate }}</p>
           <div class="mt-6 flex gap-3 text-[10px] text-gray-400">
-            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-[3px] bg-blue-400"></div> Ruoli</span>
-            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-orange-400"></div> Azioni</span>
+            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-[3px] bg-blue-400"></div> {{ 'BADGE_MANAGEMENT.CANVAS.HINT_ROLES' | translate }}</span>
+            <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-orange-400"></div> {{ 'BADGE_MANAGEMENT.CANVAS.HINT_ACTIONS' | translate }}</span>
           </div>
         </div>
 
@@ -368,10 +368,10 @@
         <!-- Stato + Elimina -->
         <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-500 font-medium">Stato:</span>
+            <span class="text-sm text-gray-500 font-medium">{{ 'BADGE_MANAGEMENT.SIDE_PANEL.STATUS' | translate }}</span>
             <span [class.text-green-600]="selectedBadge.isActive" [class.text-red-500]="!selectedBadge.isActive"
               class="text-sm font-bold">
-              {{ selectedBadge.isActive ? 'Attivo' : 'Disattivo' }}
+              {{ selectedBadge.isActive ? ('BADGE_MANAGEMENT.SIDE_PANEL.ACTIVE' | translate) : ('BADGE_MANAGEMENT.SIDE_PANEL.INACTIVE' | translate) }}
             </span>
           </div>
           <div class="flex items-center gap-2">
@@ -390,10 +390,10 @@
             <!-- Elimina (Nascosto se protetto) -->
             <button *ngIf="!isProtectedBadge(selectedBadge)" (click)="deleteBadge(selectedBadge!)"
               class="p-1 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors cursor-pointer"
-              title="Disattiva badge">
+              [title]="'BADGE_MANAGEMENT.SIDE_PANEL.INACTIVE' | translate">
               <lucide-icon name="trash-2" class="w-3.5 h-3.5"></lucide-icon>
             </button>
-            <lucide-icon *ngIf="isProtectedBadge(selectedBadge)" name="lock" class="w-3.5 h-3.5 text-gray-400" title="Ruolo protetto"></lucide-icon>
+            <lucide-icon *ngIf="isProtectedBadge(selectedBadge)" name="lock" class="w-3.5 h-3.5 text-gray-400" [title]="'BADGE_MANAGEMENT.SIDE_PANEL.PROTECTED_BADGE' | translate"></lucide-icon>
           </div>
         </div>
 
@@ -401,14 +401,14 @@
         <div *ngIf="isProtectedBadge(selectedBadge)" class="mx-3 mt-3 p-3 bg-amber-50 border border-amber-100 rounded-lg flex gap-2">
           <lucide-icon name="alert-triangle" class="w-5 h-5 text-amber-500 flex-shrink-0"></lucide-icon>
           <p class="text-xs text-amber-700 leading-tight">
-            <strong>Ruolo di Sistema:</strong> Questo badge è fondamentale per l'amministrazione e non può essere modificato o rimosso per sicurezza.
+            <strong>{{ 'BADGE_MANAGEMENT.SIDE_PANEL.SYSTEM_ROLE' | translate }}</strong> {{ 'BADGE_MANAGEMENT.SIDE_PANEL.SYSTEM_ROLE_DESC' | translate }}
           </p>
         </div>
 
         <!-- Sezione ereditarietà con toggles -->
         <div class="flex-1 overflow-y-auto p-3 space-y-5">
           <div class="space-y-3">
-            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Eredita da:</p>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">{{ 'BADGE_MANAGEMENT.SIDE_PANEL.INHERITS_FROM' | translate }}</p>
             
             <!-- Search Inheritance -->
             <div class="relative">
@@ -416,7 +416,7 @@
               <input 
                 type="text" 
                 [(ngModel)]="inheritanceSearchQuery"
-                placeholder="Cerca badge..."
+                [placeholder]="'BADGE_MANAGEMENT.SIDE_PANEL.SEARCH_PLACEHOLDER' | translate"
                 class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-[11px] focus:outline-none focus:ring-1 focus:ring-gray-300 focus:bg-white transition-all">
             </div>
           </div>
@@ -424,11 +424,11 @@
           <!-- Ruoli ereditabili -->
           <div *ngIf="roles.length > 0">
             <p class="text-xs text-blue-500 font-bold uppercase tracking-wider mb-3 flex items-center gap-1">
-              <lucide-icon name="shield" class="w-4 h-4"></lucide-icon> Ruoli
+              <lucide-icon name="shield" class="w-4 h-4"></lucide-icon> {{ 'BADGE_MANAGEMENT.SIDE_PANEL.ROLES' | translate }}
             </p>
             <div class="space-y-2">
               <div *ngIf="filteredInheritanceRoles.length === 0" class="text-center py-2">
-                <p class="text-[10px] text-gray-400 italic">Nessun ruolo trovato</p>
+                <p class="text-[10px] text-gray-400 italic">{{ 'BADGE_MANAGEMENT.ROLES.NONE_FOUND' | translate }}</p>
               </div>
               <div *ngFor="let role of filteredInheritanceRoles"
                 class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
@@ -443,7 +443,7 @@
                     *ngIf="isInheriting(role) && isRedundantInheritance(role.id!)"
                     name="link-2-off"
                     class="w-3.5 h-3.5 text-amber-500"
-                    title="Ereditarietà ridondante (già coperta da un altro ruolo)">
+                    [title]="'BADGE_MANAGEMENT.SIDE_PANEL.REDUNDANT_INHERITANCE' | translate">
                   </lucide-icon>
                   <button
                     *ngIf="canInheritFrom(role)"
@@ -459,7 +459,7 @@
                     </span>
                   </button>
                 </div>
-                <span *ngIf="!canInheritFrom(role)" class="text-[10px] text-gray-400 italic">sé stesso</span>
+                <span *ngIf="!canInheritFrom(role)" class="text-[10px] text-gray-400 italic">{{ 'BADGE_MANAGEMENT.SIDE_PANEL.SELF_INHERIT' | translate }}</span>
               </div>
             </div>
           </div>
@@ -467,11 +467,11 @@
           <!-- Azioni ereditabili -->
           <div *ngIf="actions.length > 0">
             <p class="text-xs text-orange-500 font-bold uppercase tracking-wider mb-3 flex items-center gap-1">
-              <lucide-icon name="zap" class="w-4 h-4"></lucide-icon> Azioni
+              <lucide-icon name="zap" class="w-4 h-4"></lucide-icon> {{ 'BADGE_MANAGEMENT.SIDE_PANEL.ACTIONS' | translate }}
             </p>
             <div class="space-y-2">
               <div *ngIf="filteredInheritanceActions.length === 0" class="text-center py-2">
-                <p class="text-[10px] text-gray-400 italic">Nessuna azione trovata</p>
+                <p class="text-[10px] text-gray-400 italic">{{ 'BADGE_MANAGEMENT.ACTIONS.NONE_FOUND' | translate }}</p>
               </div>
               <div *ngFor="let action of filteredInheritanceActions"
                 class="flex items-center justify-between px-3 py-2.5 rounded-full hover:bg-gray-50 transition-all duration-150"
@@ -485,7 +485,7 @@
                     *ngIf="isInheriting(action) && isRedundantInheritance(action.id!)"
                     name="link-2-off"
                     class="w-3.5 h-3.5 text-amber-500"
-                    title="Ereditarietà ridondante (già coperta da un altro percorso)">
+                    [title]="'BADGE_MANAGEMENT.SIDE_PANEL.REDUNDANT_INHERITANCE' | translate">
                   </lucide-icon>
                   <button
                     *ngIf="canInheritFrom(action)"
@@ -501,13 +501,13 @@
                     </span>
                   </button>
                 </div>
-                <span *ngIf="!canInheritFrom(action)" class="text-[10px] text-gray-400 italic">sé stesso</span>
+                <span *ngIf="!canInheritFrom(action)" class="text-[10px] text-gray-400 italic">{{ 'BADGE_MANAGEMENT.SIDE_PANEL.SELF_INHERIT' | translate }}</span>
               </div>
             </div>
           </div>
 
           <div *ngIf="roles.length === 0 && actions.length === 0" class="text-center py-8 text-gray-400">
-            <p class="text-xs">Nessun badge disponibile per l'ereditarietà</p>
+            <p class="text-xs">{{ 'BADGE_MANAGEMENT.SIDE_PANEL.NONE_AVAILABLE' | translate }}</p>
           </div>
         </div>
 
@@ -518,13 +518,13 @@
             [disabled]="loading"
             class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm font-bold shadow-md shadow-blue-200 transition-all cursor-pointer">
             <lucide-icon name="check-circle" class="w-4 h-4"></lucide-icon>
-            {{ loading ? 'Salvataggio...' : 'Salva Modifiche' }}
+            {{ loading ? ('BADGE_MANAGEMENT.MESSAGES.SAVING' | translate) : ('BADGE_MANAGEMENT.SIDE_PANEL.SAVE_CHANGES' | translate) }}
           </button>
           <button
             (click)="resetChanges()"
             [disabled]="loading"
             class="w-full py-2 text-gray-500 hover:text-gray-700 text-xs font-medium transition-colors cursor-pointer">
-            Annulla modifiche
+            {{ 'BADGE_MANAGEMENT.SIDE_PANEL.CANCEL_CHANGES' | translate }}
           </button>
         </div>
       </div>
@@ -550,7 +550,7 @@
           </lucide-icon>
         </div>
         <h3 class="text-lg font-bold text-gray-900">
-          Nuovo {{ createForm.type === 'ROLE' ? 'Ruolo' : 'Azione' }}
+          {{ createForm.type === 'ROLE' ? ('BADGE_MANAGEMENT.CREATE_MODAL.TITLE_ROLE' | translate) : ('BADGE_MANAGEMENT.CREATE_MODAL.TITLE_ACTION' | translate) }}
         </h3>
       </div>
       <button (click)="closeCreateModal()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
@@ -561,24 +561,24 @@
     <div class="space-y-4">
       <!-- Nome -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'BADGE_MANAGEMENT.CREATE_MODAL.NAME' | translate }}</label>
         <input
           type="text"
           [(ngModel)]="createForm.name"
           [placeholder]="createForm.type === 'ROLE' ? 'Es: MANAGER' : 'Es: MANAGE_REPORTS'"
           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
         <p class="text-xs text-gray-400 mt-1">
-          Il prefisso {{ createForm.type === 'ROLE' ? 'ROLE_' : 'ACTION_' }} verrà aggiunto automaticamente.
+          {{ createForm.type === 'ROLE' ? ('BADGE_MANAGEMENT.CREATE_MODAL.PREFIX_HINT_ROLE' | translate) : ('BADGE_MANAGEMENT.CREATE_MODAL.PREFIX_HINT_ACTION' | translate) }}
         </p>
       </div>
 
       <!-- Descrizione -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Descrizione</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'BADGE_MANAGEMENT.CREATE_MODAL.DESCRIPTION' | translate }}</label>
         <textarea
           [(ngModel)]="createForm.description"
           rows="2"
-          placeholder="Descrizione opzionale..."
+          [placeholder]="'BADGE_MANAGEMENT.CREATE_MODAL.DESCRIPTION_PLACEHOLDER' | translate"
           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none">
         </textarea>
       </div>
@@ -594,7 +594,7 @@
       <button
         (click)="closeCreateModal()"
         class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium cursor-pointer">
-        Annulla
+        {{ 'BADGE_MANAGEMENT.CREATE_MODAL.CANCEL' | translate }}
       </button>
       <button
         (click)="submitCreate()"
@@ -604,10 +604,10 @@
         [class.hover:bg-blue-700]="createForm.type === 'ROLE'"
         [class.bg-orange-500]="createForm.type === 'ACTION'"
         [class.hover:bg-orange-600]="createForm.type === 'ACTION'">
-        <span *ngIf="!loading">Crea {{ createForm.type === 'ROLE' ? 'Ruolo' : 'Azione' }}</span>
+        <span *ngIf="!loading">{{ createForm.type === 'ROLE' ? ('BADGE_MANAGEMENT.CREATE_MODAL.CREATE_ROLE' | translate) : ('BADGE_MANAGEMENT.CREATE_MODAL.CREATE_ACTION' | translate) }}</span>
         <span *ngIf="loading" class="flex items-center justify-center gap-2">
           <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          Creazione...
+          {{ 'BADGE_MANAGEMENT.CREATE_MODAL.CREATING' | translate }}
         </span>
       </button>
     </div>
@@ -623,12 +623,12 @@
       <div class="p-2 bg-red-50 rounded-lg">
         <lucide-icon name="alert-triangle" class="w-6 h-6"></lucide-icon>
       </div>
-      <h3 class="text-xl font-bold">Conferma Disattivazione</h3>
+      <h3 class="text-xl font-bold">{{ 'BADGE_MANAGEMENT.DELETE_MODAL.TITLE' | translate }}</h3>
     </div>
 
     <div class="space-y-4 mb-6">
       <p class="text-gray-600 text-sm leading-relaxed">
-        Stai per disattivare il badge <strong class="text-gray-900">{{ formatBadgeName(badgeToDelete?.name || '') }}</strong>.
+        {{ 'BADGE_MANAGEMENT.DELETE_MODAL.MESSAGE' | translate }} <strong class="text-gray-900">{{ formatBadgeName(badgeToDelete?.name || '') }}</strong>.
       </p>
 
       <!-- Opzione Bypass Transitivo -->
@@ -639,16 +639,16 @@
             [(ngModel)]="preserveHierarchyOnDelete"
             class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
           <div>
-            <p class="text-sm font-bold text-gray-800">Preserva Gerarchia (Consigliato)</p>
+            <p class="text-sm font-bold text-gray-800">{{ 'BADGE_MANAGEMENT.DELETE_MODAL.PRESERVE_HIERARCHY' | translate }}</p>
             <p class="text-xs text-gray-500 leading-tight mt-0.5">
-              I badge che dipendono da questo erediteranno direttamente i suoi genitori. Evita la perdita accidentale di permessi.
+              {{ 'BADGE_MANAGEMENT.DELETE_MODAL.PRESERVE_HIERARCHY_DESC' | translate }}
             </p>
           </div>
         </label>
       </div>
       
       <p class="text-[11px] text-gray-400 italic font-medium">
-        Nota: Il badge non verrà eliminato fisicamente dal database, ma non sarà più assegnabile agli utenti.
+        {{ 'BADGE_MANAGEMENT.DELETE_MODAL.NOTE' | translate }}
       </p>
     </div>
 
@@ -656,13 +656,13 @@
       <button
         (click)="closeDeleteModal()"
         class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium cursor-pointer">
-        Annulla
+        {{ 'BADGE_MANAGEMENT.DELETE_MODAL.CANCEL' | translate }}
       </button>
       <button
         (click)="confirmDelete()"
         [disabled]="loading"
         class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-bold shadow-md shadow-red-100 disabled:opacity-50 cursor-pointer">
-        {{ loading ? 'Elaborazione...' : 'Conferma' }}
+        {{ loading ? ('BADGE_MANAGEMENT.CREATE_MODAL.CREATING' | translate) : ('BADGE_MANAGEMENT.DELETE_MODAL.CONFIRM' | translate) }}
       </button>
     </div>
   </div>

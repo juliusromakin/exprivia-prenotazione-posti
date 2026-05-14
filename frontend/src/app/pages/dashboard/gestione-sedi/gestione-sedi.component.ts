@@ -73,6 +73,7 @@ export class GestioneSediComponent implements OnInit {
   buildingFormSubmitted = false;
 
   currentView: 'tutti' | 'sede' = 'tutti';
+  searchTerm = '';
   predefinedCitta = ['Roma', 'Molfetta', 'Milano'];
   expandedRowIndex: number | null = null;
   activeMenuIndex: number | null = null;
@@ -322,15 +323,35 @@ export class GestioneSediComponent implements OnInit {
           });
         }
       });
-      return rows;
+      const filteredRows = rows.filter(row => {
+        if (!this.searchTerm.trim()) return true;
+        const searchLower = this.searchTerm.toLowerCase();
+        return (
+          row.via?.toLowerCase().includes(searchLower) ||
+          row.edificioName?.toLowerCase().includes(searchLower) ||
+          row.sedeName?.toLowerCase().includes(searchLower) ||
+          row.city?.toLowerCase().includes(searchLower)
+        );
+      });
+      return filteredRows;
     } else {
-      return this.locations.map(loc => ({
+      const rows = this.locations.map(loc => ({
         sedeName: loc.name,
         city: loc.city,
         edificiCount: loc.edifici ? loc.edifici.length : 0,
         enabled: loc.enabled,
         originalLoc: loc
       }));
+
+      const filteredRows = rows.filter(row => {
+        if (!this.searchTerm.trim()) return true;
+        const searchLower = this.searchTerm.toLowerCase();
+        return (
+          row.sedeName?.toLowerCase().includes(searchLower) ||
+          row.city?.toLowerCase().includes(searchLower)
+        );
+      });
+      return filteredRows;
     }
   }
 
