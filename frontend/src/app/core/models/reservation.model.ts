@@ -30,6 +30,8 @@ export interface Reservation {
     userSummary?: UserSummary;
     workspaceSummary?: WorkspaceSummary;
     roomSummary?: RoomSummary;
+    cityName?: string;
+    locationName?: string;
 }
 
 // Modello per la creazione di una nuova prenotazione (POST)

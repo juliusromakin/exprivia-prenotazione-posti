@@ -277,7 +277,7 @@ public class ReservationService {
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "User", "Room", "Workspace", "Start", "End", "Status"};
+            String[] columns = {"ID", "User", "City", "Location", "Room", "Workspace", "Start", "End", "Status"};
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -290,11 +290,13 @@ public class ReservationService {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(r.getId());
                 row.createCell(1).setCellValue(r.getUser().getEmail());
-                row.createCell(2).setCellValue(r.getWorkspace().getRoom().getName());
-                row.createCell(3).setCellValue(r.getWorkspace().getName());
-                row.createCell(4).setCellValue(r.getStartDate().format(dtf));
-                row.createCell(5).setCellValue(r.getEndDate().format(dtf));
-                row.createCell(6).setCellValue(r.getStatus().toString());
+                row.createCell(2).setCellValue(r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getCity().toString());
+                row.createCell(3).setCellValue(r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getName());
+                row.createCell(4).setCellValue(r.getWorkspace().getRoom().getName());
+                row.createCell(5).setCellValue(r.getWorkspace().getName());
+                row.createCell(6).setCellValue(r.getStartDate().format(dtf));
+                row.createCell(7).setCellValue(r.getEndDate().format(dtf));
+                row.createCell(8).setCellValue(r.getStatus().toString());
             }
 
             for (int i = 0; i < columns.length; i++) {

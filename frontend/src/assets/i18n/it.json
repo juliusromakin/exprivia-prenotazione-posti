@@ -10,6 +10,12 @@
     "PROFILE": "Profilo",
     "WELCOME": "Benvenuto,"
   },
+  "COMMON": {
+    "OFFICE_LOCATION": "Sede",
+    "CITY": "Città",
+    "SELECT_CITY": "Seleziona città",
+    "INFO": "Informazione"
+  },
   "HOME": {
     "WELCOME": "Semplifica la prenotazione del tuo spazio di lavoro",
     "SUBTITLE1": "Prenota scrivanie e sale riunioni in pochi clic.",
@@ -239,6 +245,8 @@
       "DATE": "Data",
       "TIME": "Orario",
       "USER": "Utente",
+      "CITY": "Città",
+      "LOCATION": "Sede",
       "ROOM": "Sala",
       "WORKSPACE": "Postazione",
       "STATUS": "Stato",
@@ -396,6 +404,8 @@
     "TABLE": {
       "DATE": "Data",
       "TIME": "Orario",
+      "CITY": "Città",
+      "LOCATION": "Sede",
       "ROOM": "Sala",
       "WORKSPACE": "Postazione",
       "STATUS": "Stato",

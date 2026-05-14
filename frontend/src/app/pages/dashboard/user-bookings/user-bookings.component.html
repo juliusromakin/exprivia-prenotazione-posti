@@ -63,6 +63,8 @@
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('startDate')">{{ 'RESERVATIONS.TABLE.DATE' | translate }} <i [class]="getSortIcon('startDate')"></i></th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.TIME' | translate }}</th>
             <th *ngIf="isAdmin" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('user')">{{ 'RESERVATIONS.TABLE.USER' | translate }} <i [class]="getSortIcon('user')"></i></th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('city')">{{ 'RESERVATIONS.TABLE.CITY' | translate }} <i [class]="getSortIcon('city')"></i></th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer" (click)="sortTable('location')">{{ 'RESERVATIONS.TABLE.LOCATION' | translate }} <i [class]="getSortIcon('location')"></i></th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'RESERVATIONS.TABLE.STATUS' | translate }}</th>
@@ -77,6 +79,8 @@
               <div class="font-medium">{{ reservation.userSummary?.name }} {{ reservation.userSummary?.lastName }}</div>
               <div class="text-xs text-gray-500">{{ reservation.userSummary?.email }}</div>
             </td>
+            <td class="px-4 py-4 text-sm">{{ reservation.cityName }}</td>
+            <td class="px-4 py-4 text-sm">{{ reservation.locationName }}</td>
             <td class="px-4 py-4 text-sm">
               <div class="font-medium">{{ reservation.roomSummary?.name }}</div>
               <div class="text-xs text-gray-500">{{ reservation.roomSummary?.roomType }}</div>
@@ -99,7 +103,7 @@
             </td>
           </tr>
           <tr *ngIf="!paginatedReservations.length && !isLoading">
-            <td [attr.colspan]="isAdmin ? 7 : 6" class="px-4 py-12 text-center text-gray-500">
+            <td [attr.colspan]="isAdmin ? 9 : 8" class="px-4 py-12 text-center text-gray-500">
               {{ 'RESERVATIONS.TABLE.NO_RESERVATIONS' | translate }}
             </td>
           </tr>

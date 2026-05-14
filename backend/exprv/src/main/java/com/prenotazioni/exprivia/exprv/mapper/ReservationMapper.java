@@ -26,7 +26,8 @@ public interface ReservationMapper {
     @Mapping(source = "reservationDuration.name", target = "durationName")
     @Mapping(source = "user", target = "userSummary")
     @Mapping(source = "workspace", target = "workspaceSummary")
-    @Mapping(source = "workspace.room", target = "roomSummary")
+    @Mapping(source = "workspace.room.floor.building.location.city", target = "cityName")
+    @Mapping(source = "workspace.room.floor.building.location.name", target = "locationName")
     ReservationDTO toDto(Reservation reservation);
 
     default UserSummaryDTO toUserSummaryDto(User user) {

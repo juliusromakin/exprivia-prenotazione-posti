@@ -10,6 +10,12 @@
     "PROFILE": "Profile",
     "WELCOME": "Welcome,"
   },
+  "COMMON": {
+    "OFFICE_LOCATION": "Office Location",
+    "CITY": "City",
+    "SELECT_CITY": "Select City",
+    "INFO": "Information"
+  },
   "HOME": {
     "WELCOME": "Simplify your workspace booking",
     "SUBTITLE1": "Book desks and meeting rooms in just a few clicks.",
@@ -236,6 +242,8 @@
       "DATE": "Date",
       "TIME": "Time",
       "USER": "User",
+      "CITY": "City",
+      "LOCATION": "Location",
       "ROOM": "Room",
       "WORKSPACE": "Workspace",
       "STATUS": "Status",
@@ -393,6 +401,8 @@
     "TABLE": {
       "DATE": "Date",
       "TIME": "Time",
+      "CITY": "City",
+      "LOCATION": "Location",
       "ROOM": "Room",
       "WORKSPACE": "Workspace",
       "STATUS": "Status",

@@ -216,7 +216,9 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
         r.userSummary?.name?.toLowerCase().includes(term) ||
         r.userSummary?.lastName?.toLowerCase().includes(term) ||
         r.roomSummary?.name?.toLowerCase().includes(term) ||
-        r.workspaceSummary?.name?.toLowerCase().includes(term)
+        r.workspaceSummary?.name?.toLowerCase().includes(term) ||
+        r.cityName?.toLowerCase().includes(term) ||
+        r.locationName?.toLowerCase().includes(term)
       );
     }
 
@@ -248,6 +250,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
       let vA: any, vB: any;
       if (this.sortColumn === 'startDate') { vA = new Date(a.startDate).getTime(); vB = new Date(b.startDate).getTime(); }
       else if (this.sortColumn === 'user') { vA = `${a.userSummary?.name} ${a.userSummary?.lastName}`; vB = `${b.userSummary?.name} ${b.userSummary?.lastName}`; }
+      else if (this.sortColumn === 'city') { vA = a.cityName || ''; vB = b.cityName || ''; }
+      else if (this.sortColumn === 'location') { vA = a.locationName || ''; vB = b.locationName || ''; }
       else { vA = (a as any)[this.sortColumn]; vB = (b as any)[this.sortColumn]; }
       
       if (vA < vB) return this.sortDirection === 'asc' ? -1 : 1;
@@ -359,6 +363,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
       'Time': this.getFormattedTimeRange(r.startDate, r.endDate),
       'User': `${r.userSummary?.name} ${r.userSummary?.lastName}`,
       'Email': r.userSummary?.email,
+      'City': r.cityName,
+      'Location': r.locationName,
       'Room': r.roomSummary?.name,
       'Workspace': r.workspaceSummary?.name,
       'Status': r.status

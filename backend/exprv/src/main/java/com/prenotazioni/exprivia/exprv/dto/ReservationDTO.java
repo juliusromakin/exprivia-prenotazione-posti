@@ -19,13 +19,16 @@ public class ReservationDTO {
     private UserSummaryDTO userSummary;
     private WorkspaceDTO workspaceSummary;
     private RoomDTO roomSummary;
+    private String cityName;
+    private String locationName;
 
     public ReservationDTO() {
     }
 
     public ReservationDTO(Integer id, LocalDateTime startDate, LocalDateTime endDate,
             ReservationStatus status, Integer workspaceId, Integer userId, String durationName,
-            UserSummaryDTO userSummary, WorkspaceDTO workspaceSummary, RoomDTO roomSummary) {
+            UserSummaryDTO userSummary, WorkspaceDTO workspaceSummary, RoomDTO roomSummary,
+            String cityName, String locationName) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -36,6 +39,8 @@ public class ReservationDTO {
         this.userSummary = userSummary;
         this.workspaceSummary = workspaceSummary;
         this.roomSummary = roomSummary;
+        this.cityName = cityName;
+        this.locationName = locationName;
     }
 
     public Integer getId() {
@@ -116,5 +121,21 @@ public class ReservationDTO {
 
     public void setRoomSummary(RoomDTO roomSummary) {
         this.roomSummary = roomSummary;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }
