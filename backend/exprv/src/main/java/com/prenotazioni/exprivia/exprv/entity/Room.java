@@ -10,17 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "room")
@@ -52,11 +42,15 @@ public class Room {
     @Column(name = "enabled")
     private Boolean enabled = true;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Workspace> workspaces = new ArrayList<>();
 
-    @OneToMany(mappedBy = "room", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<RoomPosition> roomPositions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Equipment> equipment = new ArrayList<>();
 
     @ManyToOne
@@ -141,6 +135,14 @@ public class Room {
 
     public void setWorkspaces(List<Workspace> workspaces) {
         this.workspaces = workspaces;
+    }
+
+    public List<RoomPosition> getRoomPositions() {
+        return roomPositions;
+    }
+
+    public void setRoomPositions(List<RoomPosition> roomPositions) {
+        this.roomPositions = roomPositions;
     }
 
     public Floor getFloor() {

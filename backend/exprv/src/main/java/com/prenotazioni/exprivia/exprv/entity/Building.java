@@ -47,7 +47,7 @@ public class Building {
     @Column(name = "enabled")
     private Boolean enabled = true;
 
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Floor> floors = new ArrayList<>();
 

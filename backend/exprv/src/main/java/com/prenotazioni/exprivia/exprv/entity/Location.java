@@ -3,15 +3,7 @@ package com.prenotazioni.exprivia.exprv.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.Cities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -51,7 +43,7 @@ public class Location {
     @Column(name = "email")
     private String email;
 
-    @OneToMany(mappedBy = "location")
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Building> buildings = new ArrayList<>();
 

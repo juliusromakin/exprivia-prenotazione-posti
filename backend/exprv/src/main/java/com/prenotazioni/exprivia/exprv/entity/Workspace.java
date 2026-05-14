@@ -10,17 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prenotazioni.exprivia.exprv.enumerati.WorkspaceStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "workspace")
@@ -56,9 +46,13 @@ public class Workspace {
     @JoinColumn(name = "id_room")
     private Room room;
 
-    @OneToMany(mappedBy = "workspace", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<WorkspacePosition> workspacePositions = new ArrayList<>();
 
 
 
@@ -146,6 +140,14 @@ public class Workspace {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    public List<WorkspacePosition> getWorkspacePositions() {
+        return workspacePositions;
+    }
+
+    public void setWorkspacePositions(List<WorkspacePosition> workspacePositions) {
+        this.workspacePositions = workspacePositions;
     }
 
 
