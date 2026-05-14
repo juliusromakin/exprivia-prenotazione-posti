@@ -10,8 +10,8 @@ export class ToastService {
 
   /**
    * Show a success toast message
-   * @param summary - Brief title for the message
-   * @param detail - Detailed message content
+   * @param summary - Brief title for the message (can be a translation key)
+   * @param detail - Detailed message content (can be a translation key)
    * @param life - Auto-dismiss time in milliseconds (default: 5000ms)
    */
   showSuccess(summary: string, detail: string, life: number = 5000): void {
@@ -36,6 +36,27 @@ export class ToastService {
       detail,
       life
     });
+  }
+
+  /**
+   * Automatically handles API errors and shows an error toast.
+   * @param err - The error object from the API
+   * @param defaultSummary - The summary to show if not provided (default: 'Errore')
+   */
+  handleError(err: any, defaultSummary: string = 'Errore'): void {
+    console.error('API Error details:', err);
+    
+    let detail = 'Si è verificato un errore imprevisto';
+    
+    if (err.error && typeof err.error === 'object') {
+      detail = err.error.message || err.error.error || detail;
+    } else if (typeof err.error === 'string') {
+      detail = err.error;
+    } else if (err.message) {
+      detail = err.message;
+    }
+
+    this.showError(defaultSummary, detail);
   }
 
   /**

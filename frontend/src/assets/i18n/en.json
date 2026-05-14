@@ -654,6 +654,8 @@
         "CONFIRM_DELETE": "Are you sure you want to permanently delete the floor plan \"{{ name }}\"? This action cannot be undone.",
         "SUCCESS_TITLE": "Success",
         "DELETE_SUCCESS": "Floor plan deleted permanently",
+        "ENABLED": "Floor plan enabled successfully",
+        "DISABLED": "Floor plan disabled successfully",
         "ERROR_TITLE": "Error",
         "DELETE_ERROR": "Unable to delete floor plan"
       }
@@ -688,7 +690,8 @@
       "COORD_X": "Coord X",
       "COORD_Y": "Coord Y",
       "ADD_BUILDING_BTN": "Add building",
-      "SAVE": "Save Changes"
+      "SAVE": "Save Changes",
+      "FILL_REQUIRED": "Some fields are missing or contain errors. Please check the red boxes."
     },
     "ACTIONS": {
       "EDIT": "Edit",
@@ -697,9 +700,18 @@
     },
     "MESSAGES": {
       "LOCATION": "Location",
-      "LOCATION_SAVED": "Changes saved (Front-end)",
+      "LOCATION_SAVED": "Changes saved",
       "BUILDING": "Building",
-      "BUILDING_SAVED": "Building details updated (Front-end)"
+      "BUILDING_SAVED": "Building details updated"
     }
+  },
+  "COMMON": {
+    "ERROR": "Error",
+    "SUCCESS": "Success",
+    "ATTENTION": "Attention",
+    "REQUIRED_FIELD": "Required field",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "LOADING": "Loading..."
   }
 }
