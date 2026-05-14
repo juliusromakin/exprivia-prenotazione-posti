@@ -25,7 +25,7 @@
         <button (click)="setView('tutti')"
           [class]="currentView === 'tutti' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'"
           class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
-          <lucide-icon name="layers" class="w-4 h-4"></lucide-icon>
+          <lucide-icon name="building" class="w-4 h-4"></lucide-icon>
           {{ 'GESTIONE_SEDI.VIEWS.ALL' | translate }}
         </button>
         <button (click)="setView('sede')"
@@ -52,6 +52,9 @@
             <th
               class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.ADDRESS' | translate }}</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
+              {{ 'GESTIONE_SEDI.TABLE.BUILDING_NAME' | translate }}</th>
             <th
               class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-widest">
               {{ 'GESTIONE_SEDI.TABLE.LOCATION_NAME' | translate }}</th>
@@ -108,6 +111,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ item.via }}
                 </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-bold">{{ item.edificioName }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ item.sedeName
                   }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ item.city }}</td>

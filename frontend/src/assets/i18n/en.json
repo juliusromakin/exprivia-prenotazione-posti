@@ -606,12 +606,13 @@
     "NEW_LOCATION": "New Location",
     "FILTER_BY": "Filter by:",
     "VIEWS": {
-      "ALL": "All",
+      "ALL": "Buildings",
       "LOCATION": "Location"
     },
     "TABLE": {
       "ADDRESS": "Street / Address",
       "LOCATION_NAME": "Location Name",
+      "BUILDING_NAME": "Building Name",
       "CITY": "City",
       "FLOORS_COUNT": "N. Floors",
       "ACTIVE": "Active",
@@ -659,7 +660,7 @@
     },
     "BUILDING_MODAL": {
       "TITLE": "Edit Building",
-      "BUILDING_NAME": "Location Name *",
+      "BUILDING_NAME": "Building Name *",
       "FLOORS_COUNT": "N. Floors *",
       "ADDRESS": "Address / Location *",
       "COORD_X": "Coord X",

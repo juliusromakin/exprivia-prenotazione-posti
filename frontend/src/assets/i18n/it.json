@@ -609,11 +609,12 @@
     "NEW_LOCATION": "Nuova Sede",
     "FILTER_BY": "Filtra per:",
     "VIEWS": {
-      "ALL": "Tutti",
+      "ALL": "Edifici",
       "LOCATION": "Sede"
     },
     "TABLE": {
       "ADDRESS": "Via / Indirizzo",
+      "BUILDING_NAME": "Nome Edificio",
       "LOCATION_NAME": "Nome Sede",
       "CITY": "Città",
       "FLOORS_COUNT": "N.Piani",
@@ -662,7 +663,7 @@
     },
     "BUILDING_MODAL": {
       "TITLE": "Modifica Edificio",
-      "BUILDING_NAME": "Nome Sede *",
+      "BUILDING_NAME": "Nome Edificio *",
       "FLOORS_COUNT": "N. Piani *",
       "ADDRESS": "Via / Indirizzo *",
       "COORD_X": "Coord X",

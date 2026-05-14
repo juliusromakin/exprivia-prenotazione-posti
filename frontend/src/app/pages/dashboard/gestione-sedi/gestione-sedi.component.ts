@@ -319,6 +319,7 @@ export class GestioneSediComponent implements OnInit {
           loc.edifici.forEach(ed => {
             rows.push({
               via: ed.address,
+              edificioName: ed.name,
               sedeName: loc.name,
               city: loc.city,
               nPiani: ed.numFloors,
@@ -326,17 +327,6 @@ export class GestioneSediComponent implements OnInit {
               originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name }, // Riferimento per edit edificio
               originalLoc: loc      // Riferimento per fallback
             });
-          });
-        } else {
-          // Aggiunge una riga per la sede anche se non ha edifici
-          rows.push({
-            via: '-', 
-            sedeName: loc.name,
-            city: loc.city,
-            nPiani: 0,
-            enabled: loc.enabled,
-            originalEdificio: null,
-            originalLoc: loc
           });
         }
       });
