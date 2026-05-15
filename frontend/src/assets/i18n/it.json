@@ -56,9 +56,9 @@
     "USER_MANAGEMENT_DESC": "Gestisci gli utenti, i ruoli e i permessi del sistema",
     "STATISTICS": "Statistiche Avanzate",
     "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione",
-    "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
+    "PLANIMETRIA_MANAGEMENT": "Mappe",
     "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici",
-    "LOCATION_MANAGEMENT": "Gestione Sedi/Planimetrie",
+    "LOCATION_MANAGEMENT": "Sedi e Mappe",
     "LOCATION_MANAGEMENT_DESC": "Gestisci le sedi aziendali, i relativi edifici e le planimetrie"
   },
   "ADMIN_HOME": {
@@ -73,9 +73,9 @@
       "BOOKINGS_DESC": "Visualizza, modifica e gestisci tutte le prenotazioni degli utenti in modo centralizzato.",
       "BOOKINGS_FEAT_1": "Vista completa prenotazioni",
       "BOOKINGS_FEAT_2": "Approvazioni e cancellazioni",
-      "PLANS_TITLE": "Gestione Planimetrie",
+      "PLANS_TITLE": "Mappe",
       "PLANS_DESC": "Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.",
-      "PLANS_FEAT_1": "Editor planimetria interattivo",
+      "PLANS_FEAT_1": "Editor mappe interattivo",
       "PLANS_FEAT_2": "Gestione postazioni"
     }
   },
@@ -511,8 +511,8 @@
     "BOOK_WORKSPACE": "Prenota Posto",
     "STATISTICS": "Statistiche",
     "BADGE_MANAGEMENT": "Gestione Badge",
-    "PLAN_MANAGEMENT": "Gestione Planimetrie",
-    "LOCATION_MANAGEMENT": "Gestione Sedi/Planimetrie",
+    "PLAN_MANAGEMENT": "Mappe",
+    "LOCATION_MANAGEMENT": "Sedi e Mappe",
     "UPDATE_PROFILE": "Aggiorna Profilo",
     "COLLAPSE": "Collassa Sidebar",
     "EXPAND": "Espandi Sidebar",
