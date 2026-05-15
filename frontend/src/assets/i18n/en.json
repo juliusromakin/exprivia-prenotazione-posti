@@ -415,6 +415,7 @@
       "LOCATION": "Location",
       "ROOM_TYPE": "2. Select Room Type",
       "TIME": "3. Select Time",
+      "ROOM": "Room",
       "WORKSPACE": "4. Select a workspace from the map"
     },
     "CALENDAR": {

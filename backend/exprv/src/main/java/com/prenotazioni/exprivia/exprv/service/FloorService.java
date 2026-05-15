@@ -70,6 +70,11 @@ public class FloorService {
                 workspaceRepository.findByRoomFloorIdAndEnabledTrue(dto.getId()) :
                 workspaceRepository.findByRoomFloorId(dto.getId());
             dto.setWorkspaces(workspaceMapper.toDtoList(workspaces));
+            
+            List<Room> rooms = enabledOnly ?
+                roomRepository.findByFloorIdAndEnabledTrue(dto.getId()) :
+                roomRepository.findByFloorId(dto.getId());
+            dto.setRooms(roomMapper.toDtoList(rooms));
         }
         return dtos;
     }
@@ -86,6 +91,11 @@ public class FloorService {
                 workspaceRepository.findByRoomFloorIdAndEnabledTrue(dto.getId()) :
                 workspaceRepository.findByRoomFloorId(dto.getId());
             dto.setWorkspaces(workspaceMapper.toDtoList(workspaces));
+            
+            List<Room> rooms = enabledOnly ?
+                roomRepository.findByFloorIdAndEnabledTrue(dto.getId()) :
+                roomRepository.findByFloorId(dto.getId());
+            dto.setRooms(roomMapper.toDtoList(rooms));
         }
         return dtos;
     }
@@ -99,6 +109,10 @@ public class FloorService {
                 .orElseThrow(() -> new AppException("Floor with ID " + id + " not found", HttpStatus.NOT_FOUND)));
         List<Workspace> workspaces = workspaceRepository.findByRoomFloorId(id);
         dto.setWorkspaces(workspaceMapper.toDtoList(workspaces));
+        
+        List<Room> rooms = roomRepository.findByFloorId(id);
+        dto.setRooms(roomMapper.toDtoList(rooms));
+        
         return dto;
     }
 
@@ -118,6 +132,10 @@ public class FloorService {
         FloorDTO result = floorMapper.toDto(savedFloor);
         List<Workspace> workspaces = workspaceRepository.findByRoomFloorId(savedFloor.getId());
         result.setWorkspaces(workspaceMapper.toDtoList(workspaces));
+        
+        List<Room> rooms = roomRepository.findByFloorId(savedFloor.getId());
+        result.setRooms(roomMapper.toDtoList(rooms));
+        
         return result;
     }
 
@@ -139,6 +157,10 @@ public class FloorService {
         FloorDTO result = floorMapper.toDto(existingFloor);
         List<Workspace> workspaces = workspaceRepository.findByRoomFloorId(existingFloor.getId());
         result.setWorkspaces(workspaceMapper.toDtoList(workspaces));
+        
+        List<Room> rooms = roomRepository.findByFloorId(existingFloor.getId());
+        result.setRooms(roomMapper.toDtoList(rooms));
+        
         return result;
     }
 

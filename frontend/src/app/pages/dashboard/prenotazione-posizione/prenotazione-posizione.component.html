@@ -195,6 +195,34 @@
                 {{ room.name }}
               </option>
             </select>
+
+            <!-- Equipment Section -->
+            <div *ngIf="isMeetingRoomSelected()" class="mt-4 animate-in fade-in slide-in-from-top duration-300">
+              <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
+                <i class="fas fa-tools mr-2 text-blue-500"></i>
+                {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.EQUIPMENT' | translate }}
+              </h5>
+              
+              <div *ngIf="selectedRoom?.equipment && selectedRoom!.equipment!.length > 0" class="flex flex-wrap gap-2">
+                <div *ngFor="let eq of selectedRoom!.equipment" 
+                  class="flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm text-gray-700">
+                  <i class="fas" [ngClass]="{
+                    'fa-video': eq.name === 'Proiettore' || eq.name === 'Monitor',
+                    'fa-keyboard': eq.name === 'Tastiera',
+                    'fa-mouse': eq.name === 'Mouse',
+                    'fa-box': eq.name !== 'Proiettore' && eq.name !== 'Monitor' && eq.name !== 'Tastiera' && eq.name !== 'Mouse'
+                  }" class="mr-2 text-blue-600"></i>
+                  <span class="font-medium mr-1">{{ eq.quantity }}x</span>
+                  <span>{{ eq.name }}</span>
+                </div>
+              </div>
+              
+              <div *ngIf="!selectedRoom?.equipment || selectedRoom!.equipment!.length === 0" 
+                class="flex items-center gap-2 p-3 bg-white border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 italic">
+                <i class="fas fa-info-circle text-gray-400"></i>
+                {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.NO_EQUIPMENT' | translate }}
+              </div>
+            </div>
           </div>
 
           <div class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">

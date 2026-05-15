@@ -415,6 +415,7 @@
       "LOCATION": "Sede",
       "ROOM_TYPE": "2. Seleziona tipo sala",
       "TIME": "3. Seleziona orario",
+      "ROOM": "Sala",
       "WORKSPACE": "4. Seleziona una postazione dalla mappa"
     },
     "CALENDAR": {

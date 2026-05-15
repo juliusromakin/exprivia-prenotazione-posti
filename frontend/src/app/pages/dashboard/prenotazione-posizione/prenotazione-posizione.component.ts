@@ -443,6 +443,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     return workspaces;
   }
 
+  get selectedRoom(): Room | undefined {
+    const roomId = this.bookingForm.get('roomId')?.value;
+    if (!roomId) return undefined;
+    return this.state.rooms.find(r => r.id === Number(roomId));
+  }
+
+  isMeetingRoomSelected(): boolean {
+    const room = this.selectedRoom;
+    if (!room) return false;
+    const type = room.roomType;
+    return type === RoomType.MEETING_ROOM || type === 'MeetingRoom' || type === 'MEETINGROOM';
+  }
+
   private generateTimeSlotsForDuration(duration: string, date: Date): void {
     const slots: { startTime: string; endTime: string }[] = [];
     const startHour = 8;
