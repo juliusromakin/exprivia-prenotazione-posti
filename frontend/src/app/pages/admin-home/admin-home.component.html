@@ -60,7 +60,7 @@
                     {{ 'ADMIN_HOME.TOOLS_DESC' | translate }}</p>
             </div>
 
-            <div class="grid gap-4 sm:gap-6 max-w-xl mx-auto items-stretch">
+            <div class="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto items-stretch">
                 <app-feature-card *ngFor="let card of featureCards" [config]="card"></app-feature-card>
             </div>
         </div>

@@ -76,8 +76,16 @@
       "BOOKINGS_FEAT_2": "Approvals and cancellations",
       "PLANS_TITLE": "Plan Management",
       "PLANS_DESC": "Intuitively configure and update office floor plans, managing workstations and meeting rooms.",
-      "PLANS_FEAT_1": "Interactive plan editor",
-      "PLANS_FEAT_2": "Workstation management"
+      "PLANS_FEAT_1": "Interactive floor plan editor",
+      "PLANS_FEAT_2": "Workspace management",
+      "BADGE_TITLE": "Badge Management",
+      "BADGE_DESC": "Configure roles, permissions and visualize corporate badge hierarchy.",
+      "BADGE_FEAT_1": "Interactive badge hierarchy",
+      "BADGE_FEAT_2": "Permission assignment",
+      "LOCATION_TITLE": "Location Management",
+      "LOCATION_DESC": "Inventory and management of all company locations, buildings and floors.",
+      "LOCATION_FEAT_1": "Locations and buildings master data",
+      "LOCATION_FEAT_2": "Floor configuration"
     }
   },
   "PLANIMETRIA_EDITOR": {

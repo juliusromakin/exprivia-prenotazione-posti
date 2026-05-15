@@ -77,7 +77,15 @@
       "PLANS_TITLE": "Gestione Planimetrie",
       "PLANS_DESC": "Configura e aggiorna in modo intuitivo le planimetrie degli uffici, gestendo al meglio postazioni e sale riunioni.",
       "PLANS_FEAT_1": "Editor planimetria interattivo",
-      "PLANS_FEAT_2": "Gestione postazioni"
+      "PLANS_FEAT_2": "Gestione postazioni",
+      "BADGE_TITLE": "Gestione Badges",
+      "BADGE_DESC": "Configura i ruoli, i permessi e visualizza la gerarchia dei badges aziendali.",
+      "BADGE_FEAT_1": "Gerarchia badges interattiva",
+      "BADGE_FEAT_2": "Assegnazione permessi",
+      "LOCATION_TITLE": "Gestione Sedi",
+      "LOCATION_DESC": "Censimento e gestione di tutte le sedi aziendali, edifici e relativi piani.",
+      "LOCATION_FEAT_1": "Anagrafica sedi e edifici",
+      "LOCATION_FEAT_2": "Configurazione piani"
     }
   },
   "PLANIMETRIA_EDITOR": {

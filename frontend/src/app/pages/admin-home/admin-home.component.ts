@@ -55,8 +55,34 @@ export class AdminHomeComponent implements OnInit, OnDestroy {
             features: [
                 'ADMIN_HOME.CARDS.BOOKINGS_FEAT_1',
                 'ADMIN_HOME.CARDS.BOOKINGS_FEAT_2'
-            ],
-            linkUrl: '/dashboard'
+            ]
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.PLANS_TITLE',
+            description: 'ADMIN_HOME.CARDS.PLANS_DESC',
+            icon: 'map',
+            features: [
+                'ADMIN_HOME.CARDS.PLANS_FEAT_1',
+                'ADMIN_HOME.CARDS.PLANS_FEAT_2'
+            ]
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.BADGE_TITLE',
+            description: 'ADMIN_HOME.CARDS.BADGE_DESC',
+            icon: 'admin_panel_settings',
+            features: [
+                'ADMIN_HOME.CARDS.BADGE_FEAT_1',
+                'ADMIN_HOME.CARDS.BADGE_FEAT_2'
+            ]
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.LOCATION_TITLE',
+            description: 'ADMIN_HOME.CARDS.LOCATION_DESC',
+            icon: 'corporate_fare',
+            features: [
+                'ADMIN_HOME.CARDS.LOCATION_FEAT_1',
+                'ADMIN_HOME.CARDS.LOCATION_FEAT_2'
+            ]
         }
     ];
 }

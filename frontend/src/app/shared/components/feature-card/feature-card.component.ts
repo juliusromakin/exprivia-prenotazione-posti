@@ -31,8 +31,8 @@ export interface FeatureCardConfig {
         TranslateModule,
     ],
     template: `
-       <div
-            class="group relative flex flex-col items-center text-center p-8 rounded-[var(--radius-2xl)] bg-white border border-gray-200 transition-[var(--transition-all)] hover:shadow-lg hover:border-expriviaOrange/40"
+        <div
+            class="group relative h-full flex flex-col items-center text-center p-8 rounded-[var(--radius-2xl)] bg-white border border-gray-200 transition-[var(--transition-all)] hover:shadow-lg hover:border-expriviaOrange/40"
             [@scaleIn]
         >
             <!-- Glassmorphism Effect -->
