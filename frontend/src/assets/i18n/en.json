@@ -58,8 +58,8 @@
     "STATISTICS_DESC": "View detailed reports and analysis of the booking system",
     "PLANIMETRIA_MANAGEMENT": "Floor Plan Management",
     "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans",
-    "LOCATION_MANAGEMENT": "Location Management",
-    "LOCATION_MANAGEMENT_DESC": "Manage company locations and their buildings"
+    "LOCATION_MANAGEMENT": "Location / Floor Plan Management",
+    "LOCATION_MANAGEMENT_DESC": "Manage company locations, their buildings and floor plans"
   },
   "ADMIN_HOME": {
     "HERO_TITLE": "Manage your workspace",
@@ -510,7 +510,7 @@
     "STATISTICS": "Statistics",
     "BADGE_MANAGEMENT": "Badge Management",
     "PLAN_MANAGEMENT": "Floor Plan Management",
-    "LOCATION_MANAGEMENT": "Location Management",
+    "LOCATION_MANAGEMENT": "Location / Floor Plan Management",
     "UPDATE_PROFILE": "Update Profile",
     "COLLAPSE": "Collapse Sidebar",
     "EXPAND": "Expand Sidebar",

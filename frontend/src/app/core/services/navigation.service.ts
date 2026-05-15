@@ -62,13 +62,6 @@ export class NavigationService {
       badges: [UserRole.ADMIN],
     },
     {
-      label: "SIDEBAR.PLAN_MANAGEMENT",
-      icon: "map",
-      route: "/amministrazione-planimetrie",
-      adminOnly: true,
-      badges: [UserRole.ADMIN],
-    },
-    {
       label: "SIDEBAR.LOCATION_MANAGEMENT",
       icon: "building",
       route: "/dashboard/gestione-sedi",

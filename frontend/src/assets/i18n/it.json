@@ -58,8 +58,8 @@
     "STATISTICS_DESC": "Visualizza report dettagliati e analisi del sistema di prenotazione",
     "PLANIMETRIA_MANAGEMENT": "Gestione Planimetrie",
     "PLANIMETRIA_MANAGEMENT_DESC": "Disegna e gestisci le planimetrie degli uffici",
-    "LOCATION_MANAGEMENT": "Gestione Sedi",
-    "LOCATION_MANAGEMENT_DESC": "Gestisci le sedi aziendali e i relativi edifici"
+    "LOCATION_MANAGEMENT": "Gestione Sedi/Planimetrie",
+    "LOCATION_MANAGEMENT_DESC": "Gestisci le sedi aziendali, i relativi edifici e le planimetrie"
   },
   "ADMIN_HOME": {
     "HERO_TITLE": "Gestisci il tuo piano di lavoro",
@@ -512,7 +512,7 @@
     "STATISTICS": "Statistiche",
     "BADGE_MANAGEMENT": "Gestione Badge",
     "PLAN_MANAGEMENT": "Gestione Planimetrie",
-    "LOCATION_MANAGEMENT": "Gestione Sedi",
+    "LOCATION_MANAGEMENT": "Gestione Sedi/Planimetrie",
     "UPDATE_PROFILE": "Aggiorna Profilo",
     "COLLAPSE": "Collassa Sidebar",
     "EXPAND": "Espandi Sidebar",
