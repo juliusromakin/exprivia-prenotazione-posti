@@ -36,12 +36,7 @@ public interface UserMapper {
     /**
      * Converte un'entità User in AdminDTO.
      */
-    default AdminDTO toAdminDto(User user) {
-        if (user == null) {
-            return null;
-        }
-        return new AdminDTO(user);
-    }
+    AdminDTO toAdminDto(User user);
 
     /**
      * Converte un UserDTO in entità User.
@@ -91,16 +86,7 @@ public interface UserMapper {
 
     List<UserDTO> toDtoList(List<User> users);
 
-    default List<AdminDTO> toAdminDtoList(List<User> users) {
-        if (users == null) {
-            return null;
-        }
-        List<AdminDTO> list = new ArrayList<>(users.size());
-        for (User user : users) {
-            list.add(toAdminDto(user));
-        }
-        return list;
-    }
+    List<AdminDTO> toAdminDtoList(List<User> users);
 
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "createdDate", ignore = true)

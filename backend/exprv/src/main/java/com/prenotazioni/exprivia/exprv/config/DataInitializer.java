@@ -2,15 +2,10 @@ package com.prenotazioni.exprivia.exprv.config;
 
 import com.prenotazioni.exprivia.exprv.entity.Badge;
 import com.prenotazioni.exprivia.exprv.entity.ReservationDuration;
-import com.prenotazioni.exprivia.exprv.entity.Room;
-import com.prenotazioni.exprivia.exprv.entity.Workspace;
 import com.prenotazioni.exprivia.exprv.enumerati.AppAuthority;
 import com.prenotazioni.exprivia.exprv.enumerati.BadgeType;
-import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 import com.prenotazioni.exprivia.exprv.repository.ReservationDurationRepository;
-import com.prenotazioni.exprivia.exprv.repository.RoomRepository;
-import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +22,6 @@ import java.util.stream.Collectors;
 public class DataInitializer implements CommandLineRunner {
 
     private final BadgeRepository badgeRepository;
-    private final RoomRepository roomRepository;
-    private final WorkspaceRepository workspaceRepository;
     private final ReservationDurationRepository reservationDurationRepository;
 
     @Value("${app.init-data:false}")
@@ -48,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
         for (AppAuthority auth : AppAuthority.values()) {
             String name = auth.name();
             BadgeType type = name.startsWith("ROLE_") ? BadgeType.ROLE : BadgeType.ACTION;
-            badgeMap.put(name, initBadge(name, type));
+            badgeMap.put(name, initBadge(name, type, auth.getDescription()));
         }
 
         // 2. Costruzione Gerarchia Azioni: ANY eredita OWN
@@ -105,28 +98,27 @@ public class DataInitializer implements CommandLineRunner {
         // Salva le modifiche alla gerarchia
         badgeRepository.saveAll(badgeMap.values());
 
-        // 4. Inizializzazione Durate e Stanze (Legacy)
+        // Inizializzazione Durate
         initDuration("Full Day", 540);
         initDuration("4 Hours", 240);
         initDuration("2 Hours", 120);
         initDuration("1 Hour", 60);
         initDuration("30 Minutes", 30);
 
-        if (roomRepository.count() == 0) {
-            createRoom("Meeting Room R1", RoomType.MEETING_ROOM, 10, 1);
-            createRoom("Meeting Room R2", RoomType.MEETING_ROOM, 8, 1);
-
-            for (int i = 1; i <= 5; i++) {
-                createRoom("Area A" + i, RoomType.OPEN_SPACE, 10, 4);
-            }
-        }
-
         log.info("--- HRBAC DATA INITIALIZATION COMPLETED ---");
     }
 
-    private Badge initBadge(String name, BadgeType type) {
-        return badgeRepository.findByName(name).orElseGet(() -> {
+    private Badge initBadge(String name, BadgeType type, String description) {
+        return badgeRepository.findByName(name).map(b -> {
+            // Aggiorna la descrizione se è cambiata nell'Enum
+            if (description != null && !description.equals(b.getDescription())) {
+                b.setDescription(description);
+                return badgeRepository.save(b);
+            }
+            return b;
+        }).orElseGet(() -> {
             Badge b = new Badge(name, type, true);
+            b.setDescription(description);
             b.setParentIds(new ArrayList<>());
             return badgeRepository.save(b);
         });
@@ -147,23 +139,6 @@ public class DataInitializer implements CommandLineRunner {
     private void initDuration(String name, Integer minutes) {
         if (!reservationDurationRepository.existsByName(name)) {
             reservationDurationRepository.save(new ReservationDuration(name, minutes, true));
-        }
-    }
-
-    private void createRoom(String name, RoomType type, int capacity, int workspacesCount) {
-        Room room = new Room();
-        room.setName(name);
-        room.setRoomType(type);
-        room.setCapacity(capacity);
-        room.setEnabled(true);
-        room = roomRepository.save(room);
-
-        for (int j = 1; j <= workspacesCount; j++) {
-            Workspace w = new Workspace();
-            w.setName("Workspace " + j + " (" + name + ")");
-            w.setRoom(room);
-            w.setEnabled(true);
-            workspaceRepository.save(w);
         }
     }
 }

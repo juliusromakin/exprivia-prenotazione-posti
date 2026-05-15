@@ -13,6 +13,7 @@ import { Router } from "@angular/router";
 import { RegisterComponent } from "./account/register/register.component";
 import { UpdateUserComponent } from "./account/update-user/update-user.component";
 import { AmministrazionePlanimetrieComponent } from "./pages/amministrazione-planimetrie/amministrazione-planimetrie.component";
+import { map, catchError, of } from "rxjs";
 
 // Guard to redirect authenticated users to workspace-booking
 const redirectAuthenticatedToWorkspaceBooking = () => {
@@ -30,13 +31,18 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
       return true;
     }
 
-    // Reindirizza in base al ruolo
+    // Reindirizza in base al ruolo e permessi
     if (authService.hasAnybadge(['ROLE_ADMIN'])) {
       return router.createUrlTree(["/admin/homepage"]);
     }
 
-    // Altrimenti reindirizza alla dashboard
-    return router.createUrlTree(["/dashboard/workspace-booking"]);
+    // Se ha il permesso di prenotare, vai alla pagina di prenotazione
+    if (authService.hasAnybadge(['ACTION_RESERVATION_CREATE_OWN'])) {
+      return router.createUrlTree(["/dashboard/workspace-booking"]);
+    }
+
+    // Altrimenti (Guest), resta sulla home
+    return router.createUrlTree(["/"]);
   }
   return true;
 };
@@ -80,7 +86,20 @@ export const routes: Routes = [
       import("./pages/dashboard/dashboard.routes").then(
         (m) => m.DASHBOARD_ROUTES
       ),
-    canActivate: [AuthGuard],
+    canActivate: [() => {
+      const authService = inject(AuthService);
+      const router = inject(Router);
+      
+      return authService.identity(true).pipe(
+        map(() => {
+          if (authService.hasAnybadge(['ROLE_USER', 'ROLE_ADMIN'])) {
+            return true;
+          }
+          return router.createUrlTree(['/'], { queryParams: { unauthorized: true } });
+        }),
+        catchError(() => of(router.createUrlTree(['/login'])))
+      );
+    }],
   },
   {
     path: "forgot-password",

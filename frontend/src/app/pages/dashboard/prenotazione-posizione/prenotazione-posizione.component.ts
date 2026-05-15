@@ -51,7 +51,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     errorMessage: ""
   };
 
-  roomTypes: string[] = [];
+  roomTypes: { value: string; label: string }[] = [];
   reservations: Reservation[] = [];
   sortedReservations: Reservation[] = [];
   private destroy$ = new Subject<void>();
@@ -91,7 +91,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   // Add new properties for confirmation modal
   showBulkCancelConfirmation = false;
+  showGuestModal = false;
   reservationsToCancel: Reservation[] = [];
+  canCreateReservation = false;
 
   constructor(
     private fb: FormBuilder,
@@ -225,6 +227,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         // Select first floor by default if none selected or if building changed
         if (!this.state.selectedFloorId || !floors.find(f => f.id === this.state.selectedFloorId)) {
           this.state.selectedFloorId = floors[0].id ?? null;
+          if (this.state.selectedFloorId) {
+            this.loadRoomTypesByFloor(this.state.selectedFloorId);
+          }
         }
 
         // Fetch planimetries for each floor for the selected date
@@ -402,14 +407,6 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       });
   }
 
-  get filteredRoomTypes(): string[] {
-    const types = Object.values(RoomType) as string[];
-    const selectedBuilding = this.availableBuildings.find(b => b.id === this.selectedBuildingId);
-    if (selectedBuilding && selectedBuilding.sedeName === 'Roma') {
-      return types.filter(t => t !== 'OPEN_SPACE' && t !== RoomType.OPEN_SPACE);
-    }
-    return types;
-  }
 
   get roomsForSelectedType(): Room[] {
     const type = this.bookingForm.get('roomType')?.value;
@@ -586,6 +583,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    if (!this.canCreateReservation && !this.isAdmin) {
+      this.showGuestModal = true;
+      return;
+    }
+
     if (this.bookingForm.valid) {
       const formData = this.bookingForm.value;
       this.state.isLoading = true;
@@ -688,8 +690,24 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (!floorId) return;
     this.state.selectedFloorId = Number(floorId);
     this.updateFilteredData();
-    this.bookingForm.patchValue({ workspaceId: "", roomId: null });
+    this.bookingForm.patchValue({ workspaceId: "", roomId: null, roomType: "" });
+    this.loadRoomTypesByFloor(this.state.selectedFloorId);
     this.cdr.detectChanges();
+  }
+
+  private loadRoomTypesByFloor(floorId: number): void {
+    this.roomService.getRoomTypesByFloor(floorId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (types) => {
+        this.roomTypes = types;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading room types:', err);
+        this.roomTypes = [];
+      }
+    });
   }
 
   isFormValid(): boolean {
@@ -873,8 +891,13 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   private checkUserRole(): void {
     this.authService.getIdentity().pipe(takeUntil(this.destroy$)).subscribe(user => {
       this.isAdmin = user?.badges?.includes('ROLE_ADMIN') || false;
+      this.canCreateReservation = user?.badges?.includes('ACTION_RESERVATION_CREATE_OWN') || this.isAdmin;
       if (this.isAdmin) this.loadUsers();
     });
+  }
+
+  closeGuestModal(): void {
+    this.showGuestModal = false;
   }
 
   private loadUsers(): void {

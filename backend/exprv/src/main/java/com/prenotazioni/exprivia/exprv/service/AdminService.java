@@ -95,7 +95,7 @@ public class AdminService {
         existingUser.setUpdatedDate(LocalDateTime.now());
         User updatedUser = userRepository.save(existingUser);
 
-        return new AdminDTO(updatedUser);
+        return userMapper.toAdminDto(updatedUser);
     }
 
     @Transactional
@@ -118,6 +118,6 @@ public class AdminService {
         user.setUpdatedDate(LocalDateTime.now());
         
         User savedUser = userRepository.save(user);
-        return new AdminDTO(savedUser);
+        return userMapper.toAdminDto(savedUser);
     }
 }

@@ -79,7 +79,10 @@ import {
   Link,
   Link2,
   MoreVertical,
-  Slash
+  Slash,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-angular";
 import { routes } from "./app/app.routes";
 import { provideHttpClient } from "@angular/common/http";
@@ -181,7 +184,10 @@ bootstrapApplication(AppComponent, {
         Link,
         Link2,
         MoreVertical,
-        Slash
+        Slash,
+        ChevronLeft,
+        ChevronsLeft,
+        ChevronsRight
       })
     ),
     AxiosService,

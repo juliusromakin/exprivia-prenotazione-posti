@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.prenotazioni.exprivia.exprv.entity.Badge;
-import com.prenotazioni.exprivia.exprv.entity.User;
-
 public class AdminDTO {
     private Integer id;
     private String name;
@@ -17,18 +14,7 @@ public class AdminDTO {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    public AdminDTO(User user) {
-        this.id = user.getId();
-        this.name = user.getName();
-        this.lastName = user.getLastName();
-        this.email = user.getEmail();
-        this.enabled = user.getEnabled();
-        this.createdDate = user.getCreatedDate();
-        this.updatedDate = user.getUpdatedDate();
-        this.badges = user.getBadges()
-                .stream()
-                .map(Badge::getName)
-                .collect(Collectors.toSet());
+    public AdminDTO() {
     }
 
     public Integer getId() {

@@ -32,7 +32,6 @@ export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
         MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatCheckboxModule, ToastModule
     ],
     providers: [
-        MessageService
     ],
     templateUrl: './amministrazione-planimetrie.component.html',
     styleUrls: ['./amministrazione-planimetrie.component.css', '../../shared/styles/toast.styles.css'],
@@ -636,10 +635,17 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                     this.cdr.detectChanges();
                     setTimeout(() => this.initCanvas(this.imageUrl!), 0);
                     this.isSaving = false;
+                    this.toastService.showSuccess(
+                        this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_SUCCESS_TITLE') || 'Successo',
+                        this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_SUCCESS_MSG') || 'Immagine caricata correttamente'
+                    );
                 },
                 error: (err) => {
                     console.error('Errore upload:', err);
-                    this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_MSG'));
+                    this.toastService.showError(
+                        this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_TITLE'),
+                        this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.UPLOAD_ERROR_MSG')
+                    );
                     this.isSaving = false;
                 }
             });
@@ -1153,7 +1159,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                 desksCount: postazioniCanvas.length
             }));
         } catch (error: any) {
-            this.showAlert(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', { error: error?.message ?? 'Unknown error' }));
+            this.toastService.showError(this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR_TITLE'), this.translate.instant('PLANIMETRIA_EDITOR.ALERTS.SAVE_ERROR', { error: error?.message ?? 'Unknown error' }));
         } finally {
             this.isSaving = false;
             this.cdr.detectChanges();

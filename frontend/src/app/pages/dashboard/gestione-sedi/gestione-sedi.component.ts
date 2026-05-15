@@ -78,6 +78,8 @@ export class GestioneSediComponent implements OnInit {
   expandedRowIndex: number | null = null;
   activeMenuIndex: number | null = null;
 
+  isDeleting = false;
+
   // Deletion Modal Properties
   showDeleteConfirmation = false;
   deleteConfirmationData: ConfirmationModalData = {
@@ -86,7 +88,16 @@ export class GestioneSediComponent implements OnInit {
     confirmButtonText: ''
   };
   itemToDelete: { type: 'location' | 'building' | 'planimetria', data: any } | null = null;
-  isDeleting = false;
+  
+  // Pagination properties
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+  pageOptions = [10, 25, 50, 100];
+  pageNumbers: number[] = [];
+  paginatedRows: any[] = [];
+  private filteredRows: any[] = [];
 
   toggleActionMenu(index: number, event: Event): void {
     event.stopPropagation();
@@ -296,6 +307,7 @@ export class GestioneSediComponent implements OnInit {
           edifici: item.edifici || []
         }));
         this.loading = false;
+        this.applyFilters();
       },
       error: (err) => {
         this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
@@ -304,9 +316,9 @@ export class GestioneSediComponent implements OnInit {
     });
   }
 
-  get displayRows(): any[] {
+  applyFilters(): void {
+    let rows: any[] = [];
     if (this.currentView === 'tutti') {
-      const rows: any[] = [];
       this.locations.forEach(loc => {
         if (loc.edifici && loc.edifici.length > 0) {
           loc.edifici.forEach(ed => {
@@ -317,13 +329,13 @@ export class GestioneSediComponent implements OnInit {
               city: loc.city,
               nPiani: ed.numFloors,
               enabled: loc.enabled,
-              originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name }, // Riferimento per edit edificio
-              originalLoc: loc      // Riferimento per fallback
+              originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name },
+              originalLoc: loc
             });
           });
         }
       });
-      const filteredRows = rows.filter(row => {
+      rows = rows.filter(row => {
         if (!this.searchTerm.trim()) return true;
         const searchLower = this.searchTerm.toLowerCase();
         return (
@@ -333,17 +345,15 @@ export class GestioneSediComponent implements OnInit {
           row.city?.toLowerCase().includes(searchLower)
         );
       });
-      return filteredRows;
     } else {
-      const rows = this.locations.map(loc => ({
+      rows = this.locations.map(loc => ({
         sedeName: loc.name,
         city: loc.city,
         edificiCount: loc.edifici ? loc.edifici.length : 0,
         enabled: loc.enabled,
         originalLoc: loc
       }));
-
-      const filteredRows = rows.filter(row => {
+      rows = rows.filter(row => {
         if (!this.searchTerm.trim()) return true;
         const searchLower = this.searchTerm.toLowerCase();
         return (
@@ -351,13 +361,80 @@ export class GestioneSediComponent implements OnInit {
           row.city?.toLowerCase().includes(searchLower)
         );
       });
-      return filteredRows;
+    }
+    this.filteredRows = rows;
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    this.totalItems = this.filteredRows.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = Math.max(1, this.totalPages);
+    }
+    
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    
+    this.paginatedRows = this.filteredRows.slice(startIndex, endIndex);
+    this.generatePageNumbers();
+    this.cdr.detectChanges();
+  }
+
+  generatePageNumbers(): void {
+    const maxVisiblePages = 5;
+    this.pageNumbers = [];
+    
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      this.pageNumbers.push(i);
     }
   }
+
+  onPageChange(page: number): void {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  onItemsPerPageChange(newSize: number): void {
+    this.itemsPerPage = Number(newSize);
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  goToFirstPage(): void { this.onPageChange(1); }
+  goToLastPage(): void { this.onPageChange(this.totalPages); }
+  goToPreviousPage(): void { this.onPageChange(this.currentPage - 1); }
+  goToNextPage(): void { this.onPageChange(this.currentPage + 1); }
+
+  getStartIndex(): number {
+    return this.totalItems === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+
+  getEndIndex(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
 
   setView(view: 'tutti' | 'sede'): void {
     this.currentView = view;
     this.expandedRowIndex = null;
+    this.currentPage = 1;
+    this.applyFilters();
   }
 
   toggleRow(index: number): void {

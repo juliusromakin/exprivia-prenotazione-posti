@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
+import com.prenotazioni.exprivia.exprv.dto.RoomTypeDTO;
 import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
+import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 import com.prenotazioni.exprivia.exprv.entity.Room;
 import com.prenotazioni.exprivia.exprv.entity.Workspace;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
@@ -23,6 +25,7 @@ import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -65,6 +68,12 @@ public class RoomService {
 
     public List<SelectOptionDTO> getRoomOptionsByFloor(Integer floorId) {
         return roomMapper.toSelectOptionDTOList(roomRepository.findByFloorIdAndEnabledTrue(floorId));
+    }
+
+    public List<RoomTypeDTO> findDistinctRoomTypesByFloorId(Integer floorId) {
+        return roomRepository.findDistinctRoomTypesByFloorId(floorId).stream()
+                .map(type -> new RoomTypeDTO(type.name(), type.getLabel()))
+                .collect(Collectors.toList());
     }
 
     public RoomDTO findRoomById(Integer id) {

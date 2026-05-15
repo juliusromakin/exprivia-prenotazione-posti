@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { authAnimations } from '../../shared/animations/auth.animations';
@@ -29,9 +29,16 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class HomeComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
+    isAdmin = false;
+    isUser = false;
+    showUnauthorizedWarning = false;
     private destroy$ = new Subject<void>();
 
-    constructor(private authService: AuthService) {}
+    constructor(
+        private authService: AuthService, 
+        private router: Router,
+        private route: ActivatedRoute
+    ) {}
 
     ngOnInit(): void {
         this.authService
@@ -39,7 +46,48 @@ export class HomeComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe((isAuthenticated) => {
                 this.isAuthenticated = isAuthenticated;
+                if (isAuthenticated) {
+                    this.loadUserIdentity();
+                }
             });
+
+        // Controlla se l'utente è stato reindirizzato qui perché non autorizzato
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+            if (params['unauthorized']) {
+                this.onBookClick();
+                // Pulisci l'URL per non mostrare il parametro all'infinito
+                this.router.navigate([], {
+                    relativeTo: this.route,
+                    queryParams: { unauthorized: null },
+                    queryParamsHandling: 'merge',
+                    replaceUrl: true
+                });
+            }
+        });
+    }
+
+    private loadUserIdentity(): void {
+        this.authService.getIdentity().subscribe(user => {
+            if (user) {
+                this.isAdmin = user.badges?.includes('ROLE_ADMIN') ?? false;
+                this.isUser = user.badges?.includes('ROLE_USER') ?? false;
+            }
+        });
+    }
+
+    onBookClick(): void {
+        if (this.isAuthenticated) {
+            if (this.isAdmin || this.isUser) {
+                this.router.navigate(['/dashboard']);
+            } else {
+                // È un Guest
+                this.showUnauthorizedWarning = true;
+                // Nascondi l'avviso dopo 5 secondi
+                setTimeout(() => this.showUnauthorizedWarning = false, 5000);
+            }
+        } else {
+            this.router.navigate(['/login']);
+        }
     }
 
     ngOnDestroy(): void {

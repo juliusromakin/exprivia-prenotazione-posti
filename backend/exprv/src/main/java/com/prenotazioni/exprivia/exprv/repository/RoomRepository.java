@@ -3,6 +3,8 @@ package com.prenotazioni.exprivia.exprv.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.prenotazioni.exprivia.exprv.entity.Room;
@@ -21,4 +23,7 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findByRoomTypeAndEnabledTrue(RoomType roomType);
 
     Optional<Room> findByName(String name);
+
+    @Query("SELECT DISTINCT r.roomType FROM Room r WHERE r.floor.id = :floorId AND r.enabled = true")
+    List<RoomType> findDistinctRoomTypesByFloorId(@Param("floorId") Integer floorId);
 }

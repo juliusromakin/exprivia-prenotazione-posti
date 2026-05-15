@@ -61,7 +61,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/images/**").permitAll()
 
                         // Endpoint di gestione Sedi/Planimetrie protetti internamente da @PreAuthorize su singole azioni
-                        .requestMatchers("/api/admin/buildings/**", "/api/admin/locations/**", "/api/admin/floors/**", "/api/admin/floor-plans/**").authenticated()
+                        .requestMatchers(
+                                "/api/admin/buildings", "/api/admin/buildings/**", 
+                                "/api/admin/locations", "/api/admin/locations/**", 
+                                "/api/admin/floors", "/api/admin/floors/**", 
+                                "/api/admin/floor-plans", "/api/admin/floor-plans/**"
+                        ).authenticated()
                         // Gestione Utenti e Ruoli riservata agli amministratori
                         .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
                         .requestMatchers("/api/prenotazioni/admin/**", "/api/reservation/admin/**")

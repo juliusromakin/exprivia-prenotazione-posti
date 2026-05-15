@@ -13,6 +13,7 @@ export enum RoomType {
 export enum UserRole {
   ADMIN = "ROLE_ADMIN",
   USER = "ROLE_USER",
+  GUEST = "ROLE_GUEST",
 }
 
 export enum ReservationStatus {

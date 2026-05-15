@@ -1,7 +1,9 @@
 package com.prenotazioni.exprivia.exprv.controller;
 
 import com.prenotazioni.exprivia.exprv.dto.RoomDTO;
+import com.prenotazioni.exprivia.exprv.dto.RoomTypeDTO;
 import com.prenotazioni.exprivia.exprv.dto.SelectOptionDTO;
+import com.prenotazioni.exprivia.exprv.enumerati.RoomType;
 import com.prenotazioni.exprivia.exprv.service.RoomService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,12 @@ public class RoomController {
     @GetMapping("/floor/{floorId}/options")
     public ResponseEntity<List<SelectOptionDTO>> getRoomOptionsByFloor(@PathVariable Integer floorId) {
         return ResponseEntity.ok(roomService.getRoomOptionsByFloor(floorId));
+    }
+
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
+    @GetMapping("/floor/{floorId}/types")
+    public ResponseEntity<List<RoomTypeDTO>> getDistinctRoomTypesByFloorId(@PathVariable Integer floorId) {
+        return ResponseEntity.ok(roomService.findDistinctRoomTypesByFloorId(floorId));
     }
 
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
