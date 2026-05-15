@@ -2,14 +2,14 @@
 <div class="flex flex-col min-h-screen bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
   <!-- Header per utenti non admin -->
   <ng-container *ngIf="!isAdmin">
-    <app-header></app-header>
+    <app-header (guestAccessAttempt)="showGuestModal = true"></app-header>
   </ng-container>
 
   <!-- Main Content Area -->
   <div class="flex flex-1 pt-14 sm:pt-16 md:pt-0">
     <!-- Sidebar per admin -->
-    <app-sidebar *ngIf="isAdmin"></app-sidebar>
-
+    <app-sidebar *ngIf="isAdmin" (guestAccessAttempt)="showGuestModal = true"></app-sidebar>
+    
     <!-- Main Content with margin for fixed sidebar -->
     <main class="flex-1 flex flex-col bg-white transition-all duration-200" [ngClass]="{
             'ml-sidebar-expanded': isAdmin && !isSidebarCollapsed,
@@ -79,7 +79,7 @@
           <!-- Main Actions Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             <!-- New Booking -->
-            <button routerLink="workspace-booking"
+            <button *ngIf="hasAuthority('ACTION_RESERVATION_CREATE_OWN')" (click)="openNewBookingModal()"
               class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
@@ -92,7 +92,7 @@
             </button>
 
             <!-- Manage Bookings -->
-            <button routerLink="bookings"
+            <button *ngIf="hasAuthority('ACTION_RESERVATION_READ_ANY')" routerLink="bookings"
               class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
@@ -106,7 +106,7 @@
             </button>
 
             <!-- User Management -->
-            <button routerLink="user-management"
+            <button *ngIf="hasAuthority('ACTION_USER_READ')" routerLink="user-management"
               class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
@@ -123,7 +123,7 @@
           <div class="grid grid-cols-1 gap-8">
 
             <!-- Gestione Sedi -->
-            <button routerLink="gestione-sedi"
+            <button *ngIf="hasAuthority('ACTION_FLOORPLAN_READ')" routerLink="gestione-sedi"
               class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
@@ -137,7 +137,7 @@
             </button>
 
             <!-- Statistics -->
-            <button routerLink="statistics"
+            <button *ngIf="hasAuthority('ACTION_RESERVATION_EXPORT')" routerLink="statistics"
               class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-orange-50 rounded-lg group-hover:bg-orange-100 transition-colors">
@@ -171,3 +171,11 @@
     <span class="font-medium text-gray-700">EN</span>
   </button>
 </mat-menu>
+
+<!-- Guest Block Modal -->
+<app-confirmation-modal [show]="showGuestModal" [type]="'warning'" [data]="{
+    title: 'BOOKING.GUEST.MODAL_TITLE' | translate,
+    message: 'BOOKING.GUEST.MODAL_MSG' | translate,
+    confirmButtonText: 'BOOKING.GUEST.MODAL_CONFIRM' | translate,
+    cancelButtonText: ''
+  }" (confirm)="closeGuestModal()" (cancel)="closeGuestModal()"></app-confirmation-modal>

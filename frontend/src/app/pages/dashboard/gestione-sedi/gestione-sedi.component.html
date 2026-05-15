@@ -22,6 +22,17 @@
     <!-- Table Header Area (Filtri + Bottone Nuova Sede) -->
     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white">
       <div class="flex items-center gap-4 flex-1 max-w-2xl">
+        <!-- Search Field -->
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="onSearchChange()"
+            [placeholder]="'GESTIONE_SEDI.SEARCH_PLACEHOLDER' | translate" 
+            class="w-full border border-slate-200 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm" />
+          <lucide-icon name="search" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 transform -translate-y-1/2"></lucide-icon>
+        </div>
+
         <div class="flex items-center gap-2">
           <button (click)="setView('tutti')"
             [class]="currentView === 'tutti' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'"
@@ -36,25 +47,17 @@
             {{ 'GESTIONE_SEDI.VIEWS.LOCATION' | translate }}
           </button>
         </div>
-
-        <!-- Search Field -->
-        <div class="relative flex-1">
-          <input 
-            type="text" 
-            [(ngModel)]="searchTerm" 
-            [placeholder]="'GESTIONE_SEDI.SEARCH_PLACEHOLDER' | translate" 
-            class="w-full border border-slate-200 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm" />
-          <lucide-icon name="search" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 transform -translate-y-1/2"></lucide-icon>
-        </div>
       </div>
 
       <button (click)="openNewLocationModal()"
-        class="inline-flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer font-bold">
+        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer text-sm font-medium">
         <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
         {{ 'GESTIONE_SEDI.NEW_LOCATION' | translate }}
       </button>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Table Container with fixed minimum height -->
+    <div class="min-h-[500px] flex flex-col">
+      <div class="overflow-x-auto flex-grow">
       <table class="min-w-full divide-y divide-slate-100">
         <thead class="bg-slate-50/50">
           <tr *ngIf="currentView === 'tutti'">
@@ -108,7 +111,7 @@
         <tbody class="divide-y divide-slate-100">
           <!-- Body TUTTI -->
           <ng-container *ngIf="currentView === 'tutti'">
-            <ng-container *ngFor="let item of displayRows; let i = index">
+            <ng-container *ngFor="let item of paginatedRows; let i = index">
               <tr (click)="toggleRow(i)" 
                 [class.bg-blue-50]="expandedRowIndex === i"
                 [class.border-l-4]="expandedRowIndex === i"
@@ -118,7 +121,7 @@
                   <div class="flex items-center gap-2">
                     <lucide-icon [name]="expandedRowIndex === i ? 'chevron-down' : 'chevron-right'"
                       class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors"></lucide-icon>
-                    {{ i + 1 }}
+                    {{ (currentPage - 1) * itemsPerPage + i + 1 }}
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ item.via }}
@@ -242,9 +245,9 @@
 
           <!-- Body SEDE -->
           <ng-container *ngIf="currentView === 'sede'">
-            <tr *ngFor="let item of displayRows; let i = index"
+            <tr *ngFor="let item of paginatedRows; let i = index"
               class="hover:bg-slate-50 transition-all duration-200 cursor-pointer border-l-4 border-transparent hover:border-blue-200">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ i + 1 }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ item.sedeName
                 }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ item.city }}</td>
@@ -274,6 +277,76 @@
           </ng-container>
         </tbody>
       </table>
+    </div>
+  </div>
+
+    <!-- Pagination Footer -->
+    <div *ngIf="!loading && totalItems > 0" class="bg-white px-4 py-3 border-t border-slate-100 sm:px-6 rounded-b-xl">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <!-- Items per page selector -->
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-slate-700">{{ 'GESTIONE_SEDI.PAGINATION.SHOW' | translate }}</label>
+          <select 
+            [(ngModel)]="itemsPerPage" 
+            (ngModelChange)="onItemsPerPageChange($event)"
+            class="border border-slate-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+            <option *ngFor="let option of pageOptions" [value]="option">{{ option }}</option>
+          </select>
+          <span class="text-sm text-slate-500">{{ 'GESTIONE_SEDI.PAGINATION.ITEMS_PER_PAGE' | translate }}</span>
+        </div>
+
+        <!-- Page info -->
+        <div class="text-sm text-slate-700">
+          {{ 'GESTIONE_SEDI.PAGINATION.SHOWING_START' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'GESTIONE_SEDI.PAGINATION.SHOWING_OF' | translate }} {{ totalItems }} {{ 'GESTIONE_SEDI.PAGINATION.SHOWING_RESULTS' | translate }}
+        </div>
+
+        <!-- Page navigation -->
+        <div class="flex items-center gap-1">
+          <!-- First page -->
+          <button 
+            (click)="goToFirstPage()"
+            [disabled]="currentPage === 1"
+            class="p-2 text-slate-500 hover:text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            <lucide-icon name="chevrons-left" class="w-4 h-4"></lucide-icon>
+          </button>
+
+          <!-- Previous page -->
+          <button 
+            (click)="goToPreviousPage()"
+            [disabled]="currentPage === 1"
+            class="p-2 text-slate-500 hover:text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            <lucide-icon name="chevron-left" class="w-4 h-4"></lucide-icon>
+          </button>
+
+          <!-- Page numbers -->
+          <button 
+            *ngFor="let page of pageNumbers"
+            (click)="onPageChange(page)"
+            [class.bg-blue-600]="page === currentPage"
+            [class.text-white]="page === currentPage"
+            [class.text-slate-700]="page !== currentPage"
+            [class.hover:bg-slate-100]="page !== currentPage"
+            class="px-3 py-1 mx-1 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer">
+            {{ page }}
+          </button>
+
+          <!-- Next page -->
+          <button 
+            (click)="goToNextPage()"
+            [disabled]="currentPage === totalPages"
+            class="p-2 text-slate-500 hover:text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            <lucide-icon name="chevron-right" class="w-4 h-4"></lucide-icon>
+          </button>
+
+          <!-- Last page -->
+          <button 
+            (click)="goToLastPage()"
+            [disabled]="currentPage === totalPages"
+            class="p-2 text-slate-500 hover:text-blue-600 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            <lucide-icon name="chevrons-right" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

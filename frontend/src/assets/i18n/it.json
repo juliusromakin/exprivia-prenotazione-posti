@@ -183,8 +183,10 @@
       "INVALID_DATE_MSG": "La Data Fine inserita non è valida o è vuota. Seleziona \"Fine indeterminata\" se non c'è una data di fine.",
       "MISSING_CONTEXT_TITLE": "Contesto Mancante",
       "MISSING_CONTEXT_MSG": "Impossibile caricare le planimetrie: ID edificio non disponibile.",
-      "UPLOAD_ERROR_TITLE": "Errore Upload",
-      "UPLOAD_ERROR_MSG": "Impossibile caricare l'immagine sul server. Verifica la connessione o le dimensioni del file.",
+      "UPLOAD_ERROR_TITLE": "Errore Caricamento",
+      "UPLOAD_ERROR_MSG": "Impossibile caricare l'immagine sul server. Verifica la connessione o il formato del file.",
+      "UPLOAD_SUCCESS_TITLE": "Immagine Caricata",
+      "UPLOAD_SUCCESS_MSG": "L'immagine della planimetria è stata aggiornata con successo nel sistema.",
       "UNDERSTOOD": "Ho capito"
     }
   },
@@ -483,6 +485,12 @@
       "CONFIRM": "Conferma",
       "BACK": "Indietro"
     },
+    "GUEST": {
+      "BANNER_MSG": "Account in attesa di autorizzazione: puoi visualizzare le postazioni ma non prenotare.",
+      "MODAL_TITLE": "Accesso Limitato",
+      "MODAL_MSG": "Il tuo profilo è attualmente in stato 'Guest'. Contatta un amministratore per abilitare le funzionalità di prenotazione.",
+      "MODAL_CONFIRM": "Ho capito"
+    },
     "PLANIMETRIA": {
       "LEGEND": {
         "AVAILABLE": "Disponibile",
@@ -777,6 +785,13 @@
       "CONFIRM_DELETE_BUILDING": "Sei sicuro di voler eliminare definitivamente l'edificio \"{{ name }}\"? Questa azione non può essere annullata.",
       "DELETE_SUCCESS": "Eliminazione completata con successo",
       "DELETE_ERROR": "Si è verificato un errore durante l'eliminazione"
+    },
+    "PAGINATION": {
+      "SHOW": "Mostra:",
+      "ITEMS_PER_PAGE": "elementi per pagina",
+      "SHOWING_START": "Visualizzati",
+      "SHOWING_OF": "su",
+      "SHOWING_RESULTS": "risultati"
     }
   },
   "BADGE_MANAGEMENT": {

@@ -71,6 +71,13 @@ export class RoomService {
     }
 
     /**
+     * Recupera i tipi di stanza distinti presenti in un piano specifico
+     */
+    getRoomTypesByFloor(floorId: number): Observable<any[]> {
+        return from(this.axiosService.get<any[]>(`${this.baseUrl}/floor/${floorId}/types`));
+    }
+
+    /**
      * Hard delete (rimuove definitivamente dal DB)
      */
     hardDeleteRoom(id: number): Observable<void> {

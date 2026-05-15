@@ -29,6 +29,7 @@ import { PrenotazionePosizioneComponent } from "./prenotazione-posizione/prenota
 import { UpdateUserComponent } from "../../account/update-user/update-user.component";
 import { SidebarService } from "../../shared/services/sidebar.service";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { ConfirmationModalComponent } from "../../shared/components/confirmation-modal/confirmation-modal.component";
 
 
 @Component({
@@ -42,6 +43,7 @@ import { TranslateModule, TranslateService } from "@ngx-translate/core";
     SidebarComponent,
     PrenotazionePosizioneComponent,
     HeaderComponent,
+    ConfirmationModalComponent,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
@@ -80,6 +82,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   
   // Sidebar state
   isSidebarCollapsed = false;
+  showGuestModal = false;
 
   constructor(
     private authService: AuthService,
@@ -110,8 +113,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (isAuthenticated) {
           this.authService.getIdentity().subscribe((user) => {
             this.currentUser = user;
-            this.isAdmin = user?.badges?.includes("ROLE_ADMIN") ?? false;
-            this.isUser = user?.badges?.includes("ROLE_USER") ?? false;
+            // Un utente è "Management" se ha ROLE_ADMIN o ROLE_HR
+            this.isAdmin = this.authService.hasAnybadge(["ROLE_ADMIN", "ROLE_HR", "ROLE_MANAGER"]);
+            this.isUser = this.authService.hasAnybadge(["ROLE_USER"]);
           });
         } else {
           this.currentUser = null;
@@ -149,14 +153,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.isAuthenticated) {
       this.authService.getIdentity().subscribe((user) => {
         this.currentUser = user;
-        this.isAdmin = user?.badges?.includes("ROLE_ADMIN") ?? false;
-        this.isUser = user?.badges?.includes("ROLE_USER") ?? false;
+        this.isAdmin = this.authService.hasAnybadge(["ROLE_ADMIN", "ROLE_HR", "ROLE_MANAGER"]);
+        this.isUser = this.authService.hasAnybadge(["ROLE_USER"]);
       });
     }
   }
 
   logout() {
     this.loginService.logout();
+  }
+
+  hasAuthority(authority: string): boolean {
+    return this.authService.hasAnybadge([authority]);
   }
 
   isRouteActive(route: string): boolean {
@@ -198,7 +206,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openNewBookingModal(): void {
+    if (!this.isAdmin && !this.isUser) {
+      this.showGuestModal = true;
+      return;
+    }
     this.router.navigate(['/dashboard/workspace-booking']);
+  }
+
+  closeGuestModal(): void {
+    this.showGuestModal = false;
   }
 
   cambiaLingua(lingua: string): void {

@@ -184,7 +184,9 @@
       "MISSING_CONTEXT_TITLE": "Missing Context",
       "MISSING_CONTEXT_MSG": "Unable to load plans: Building ID not available.",
       "UPLOAD_ERROR_TITLE": "Upload Error",
-      "UPLOAD_ERROR_MSG": "Unable to upload image to server. Check connection or file size.",
+      "UPLOAD_ERROR_MSG": "Unable to upload the image to the server. Please check your connection or file format.",
+      "UPLOAD_SUCCESS_TITLE": "Image Uploaded",
+      "UPLOAD_SUCCESS_MSG": "The office floor plan image has been successfully updated in the system.",
       "UNDERSTOOD": "I understand"
     }
   },
@@ -481,6 +483,12 @@
       "CONFIRM": "Confirm",
       "BACK": "Back"
     },
+    "GUEST": {
+      "BANNER_MSG": "Account pending authorization: you can view locations but cannot book.",
+      "MODAL_TITLE": "Limited Access",
+      "MODAL_MSG": "Your profile is currently in 'Guest' state. Please contact an administrator to enable booking features.",
+      "MODAL_CONFIRM": "I understand"
+    },
     "PLANIMETRIA": {
       "LEGEND": {
         "AVAILABLE": "Available",
@@ -770,6 +778,13 @@
       "LOCATION_SAVED": "Changes saved",
       "BUILDING": "Building",
       "BUILDING_SAVED": "Building details updated"
+    },
+    "PAGINATION": {
+      "SHOW": "Show:",
+      "ITEMS_PER_PAGE": "items per page",
+      "SHOWING_START": "Showing",
+      "SHOWING_OF": "of",
+      "SHOWING_RESULTS": "results"
     }
   },
   "BADGE_MANAGEMENT": {

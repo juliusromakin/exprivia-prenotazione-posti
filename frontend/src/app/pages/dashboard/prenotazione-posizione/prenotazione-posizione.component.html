@@ -1,5 +1,16 @@
 <!-- Main Container -->
 <div class="max-w-7xl mx-auto p-4 sm:p-6">
+  <!-- Guest Mode Banner -->
+  <div *ngIf="!canCreateReservation && !isAdmin" class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl shadow-sm flex items-center gap-4 animate-in fade-in slide-in-from-top duration-500">
+    <div class="p-2 bg-amber-100 rounded-lg">
+      <i class="fas fa-user-clock text-amber-600 text-xl"></i>
+    </div>
+    <div class="flex-1">
+      <h4 class="text-sm font-semibold text-amber-800">{{ 'BOOKING.GUEST.MODAL_TITLE' | translate }}</h4>
+      <p class="text-xs text-amber-700">{{ 'BOOKING.GUEST.BANNER_MSG' | translate }}</p>
+    </div>
+  </div>
+
   <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6">
     <div class="flex items-center justify-between mb-6">
       <h3 class="text-xl font-semibold text-gray-800">{{ 'BOOKING.TITLE' | translate }}</h3>
@@ -169,8 +180,8 @@
             <select formControlName="roomType" [attr.disabled]="isStepDisabled('roomType') ? true : null"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
               <option value="">{{ 'BOOKING.ROOM_TYPE.SELECT_HINT' | translate }}</option>
-              <option *ngFor="let type of filteredRoomTypes" [value]="type">
-                {{ type }}
+              <option *ngFor="let type of roomTypes" [value]="type.value">
+                {{ type.label }}
               </option>
             </select>
           </div>
@@ -306,3 +317,11 @@
     confirmButtonText: 'BOOKING.MESSAGES.CONFIRM' | translate,
     cancelButtonText: 'BOOKING.MESSAGES.BACK' | translate
   }" (confirm)="confirmBulkCancel()" (cancel)="closeBulkCancelConfirmation()"></app-confirmation-modal>
+
+<!-- Guest Block Modal -->
+<app-confirmation-modal [show]="showGuestModal" [type]="'warning'" [data]="{
+    title: 'BOOKING.GUEST.MODAL_TITLE' | translate,
+    message: 'BOOKING.GUEST.MODAL_MSG' | translate,
+    confirmButtonText: 'BOOKING.GUEST.MODAL_CONFIRM' | translate,
+    cancelButtonText: ''
+  }" (confirm)="closeGuestModal()" (cancel)="closeGuestModal()"></app-confirmation-modal>

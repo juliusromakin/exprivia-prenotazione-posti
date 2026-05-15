@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, HostListener } from "@angular/core";
+import { Component, OnDestroy, OnInit, HostListener, EventEmitter, Output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { MatExpansionModule } from "@angular/material/expansion";
@@ -55,6 +55,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   // Subject per la gestione della pulizia delle sottoscrizioni
   private destroy$ = new Subject<void>();
+
+  @Output() guestAccessAttempt = new EventEmitter<void>();
+
+  onNavItemClick(event: Event, item: NavItem): void {
+    if (item.route === '/dashboard/workspace-booking' && !this.isAdmin && !this.currentUser?.badges?.includes('ROLE_USER')) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.guestAccessAttempt.emit();
+      return;
+    }
+  }
 
   // Screen width threshold for automatic collapse (in pixels)
   private readonly COLLAPSE_WIDTH = 768;

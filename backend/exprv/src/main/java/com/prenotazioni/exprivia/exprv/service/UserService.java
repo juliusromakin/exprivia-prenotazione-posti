@@ -1,6 +1,7 @@
 package com.prenotazioni.exprivia.exprv.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final BadgeService badgeService;
 
     private void verifyOwnershipOrAny(String targetEmail, String anyAuthority) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +70,7 @@ public class UserService {
     public AdminDTO findUserById(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
-        return new AdminDTO(user);
+        return userMapper.toAdminDto(user);
     }
 
     /**
@@ -78,7 +80,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(
                         () -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
-        return new AdminDTO(user);
+        return userMapper.toAdminDto(user);
     }
 
     public Badge getBadgeByName(String name) {
@@ -159,12 +161,19 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
 
-        return userMapper.toDto(user);
+        UserDTO dto = userMapper.toDto(user);
+        // Appiattisce i badge per il frontend
+        dto.setBadges(badgeService.flattenBadges(user.getBadges()));
+        return dto;
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
-        return userMapper.toDto(user);
+        
+        UserDTO dto = userMapper.toDto(user);
+        // Appiattisce i badge per il frontend
+        dto.setBadges(badgeService.flattenBadges(user.getBadges()));
+        return dto;
     }
 }

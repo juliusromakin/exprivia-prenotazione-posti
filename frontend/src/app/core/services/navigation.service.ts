@@ -45,7 +45,7 @@ export class NavigationService {
       label: "SIDEBAR.BOOK_WORKSPACE",
       icon: "layout-dashboard",
       route: "/dashboard/workspace-booking",
-      badges: [UserRole.USER, UserRole.ADMIN],
+      badges: [UserRole.USER, UserRole.ADMIN, UserRole.GUEST],
     },
     {
       label: "SIDEBAR.STATISTICS",

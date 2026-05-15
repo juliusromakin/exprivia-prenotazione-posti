@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, EventEmitter, Output } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule, Location } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
@@ -34,6 +34,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   navItems: NavItem[] = [];
   private destroy$ = new Subject<void>();
+
+  @Output() guestAccessAttempt = new EventEmitter<void>();
+
+  onNavItemClick(event: Event, item: NavItem): void {
+    if (item.route === '/dashboard/workspace-booking' && !this.isAdmin && !this.currentUser?.badges?.includes('ROLE_USER')) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.guestAccessAttempt.emit();
+      return;
+    }
+  }
 
   constructor(
     private authService: AuthService,
