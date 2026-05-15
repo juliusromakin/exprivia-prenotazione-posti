@@ -172,6 +172,15 @@
   pointer-events: none;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  /* Prevent label from expanding the room box */
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+  white-space: normal;
+  padding: 0 4px;
+  box-sizing: border-box;
+  line-height: 1.2;
 }
 
 .room-count {

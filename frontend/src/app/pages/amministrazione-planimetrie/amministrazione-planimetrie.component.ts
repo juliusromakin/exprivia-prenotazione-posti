@@ -470,8 +470,9 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                         strokeWidth: 2,
                         originX: 'center', originY: 'center'
                     });
+                    const roomFontSize = this.calcRoomFontSize(name, width, height);
                     const text = new fabric.Text(name, {
-                        fontSize: 14, fill: '#fff',
+                        fontSize: roomFontSize, fill: '#fff',
                         backgroundColor: 'rgba(0,0,0,0.6)',
                         originX: 'center', originY: 'center',
                         opacity: 0
@@ -489,7 +490,8 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
                         roomType: type,
                         tempId: roomId,
                         id: roomId,
-                        equipment
+                        equipment,
+                        fontSize: roomFontSize
                     };
 
                     this.canvas!.add(group);
@@ -570,6 +572,27 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
     // ── Canvas ─────────────────────────────────────────────────────────────
     private snap(value: number): number {
         return Math.round(value / this.GRID) * this.GRID;
+    }
+
+    /**
+     * Calcola il fontSize massimo affinché il testo stia dentro la larghezza
+     * del rettangolo della stanza, senza allargare il gruppo.
+     * Usa un'approssimazione: larghezzaCarattere ≈ fontSize * 0.6
+     */
+    private calcRoomFontSize(name: string, rectWidth: number, rectHeight: number, maxFont = 14, minFont = 6): number {
+        const padding = 8; // margine interno minimo (4px per lato)
+        const availableWidth = rectWidth - padding;
+        const availableHeight = rectHeight - padding;
+        let fontSize = maxFont;
+        while (fontSize > minFont) {
+            const estimatedTextWidth = name.length * fontSize * 0.6;
+            const estimatedTextHeight = fontSize * 1.2;
+            if (estimatedTextWidth <= availableWidth && estimatedTextHeight <= availableHeight) {
+                break;
+            }
+            fontSize--;
+        }
+        return fontSize;
     }
 
     setMode(mode: EditorMode): void {
@@ -839,14 +862,15 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         const centerY = top + height / 2;
 
         const rect = new fabric.Rect({ width, height, fill: 'rgba(255, 165, 0, 0.35)', stroke: 'rgba(255, 140, 0, 0.9)', strokeWidth: 2, originX: 'center', originY: 'center' });
-        const text = new fabric.Text(name, { fontSize: 14, fill: '#fff', backgroundColor: 'rgba(0,0,0,0.6)', originX: 'center', originY: 'center', opacity: 0 });
+        const roomFontSize = this.calcRoomFontSize(name, width, height);
+        const text = new fabric.Text(name, { fontSize: roomFontSize, fill: '#fff', backgroundColor: 'rgba(0,0,0,0.6)', originX: 'center', originY: 'center', opacity: 0 });
         const tempId = Date.now();
         const group = new fabric.Group([rect, text], {
             left: centerX, top: centerY,
             originX: 'center', originY: 'center',
             selectable: this.currentMode === 'SELECT'
         });
-        (group as any).data = { tipo: 'stanza', label: name, roomType: type, tempId, equipment };
+        (group as any).data = { tipo: 'stanza', label: name, roomType: type, tempId, equipment, fontSize: roomFontSize };
         this.canvas.add(group);
         group.setCoords();
 
@@ -964,12 +988,23 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         stanze.forEach((room) => {
             const children = room.getObjects();
             const labelText = children[1] as fabric.Text | undefined;
+            const rectObj = children[0] as fabric.Rect | undefined;
             if (!labelText) return;
             if (isZoomedOut) {
                 const count = postazioni.filter((desk) => room.containsPoint(desk.getCenterPoint())).length;
-                labelText.set({ text: String(count), fill: '#22c55e', fontSize: 24, fontWeight: 'bold', backgroundColor: 'rgba(0,0,0,0.6)', opacity: 1 });
+                // Calcola fontSize del conteggio in base alle dimensioni reali del rettangolo
+                const rw = (rectObj?.width ?? 60);
+                const rh = (rectObj?.height ?? 40);
+                const countFontSize = this.calcRoomFontSize(String(count), rw, rh, 36, 10);
+                labelText.set({ text: String(count), fill: '#22c55e', fontSize: countFontSize, fontWeight: 'bold', backgroundColor: 'rgba(0,0,0,0.6)', opacity: 1 });
             } else {
-                labelText.set({ text: (room as any).data?.label ?? '', fill: '#ffffff', fontSize: 14, fontWeight: 'normal', backgroundColor: 'rgba(0,0,0,0.6)', opacity: 0 });
+                // Ripristina il fontSize originale calcolato alla creazione
+                const originalFontSize = (room as any).data?.fontSize ?? this.calcRoomFontSize(
+                    (room as any).data?.label ?? '',
+                    rectObj?.width ?? 100,
+                    rectObj?.height ?? 60
+                );
+                labelText.set({ text: (room as any).data?.label ?? '', fill: '#ffffff', fontSize: originalFontSize, fontWeight: 'normal', backgroundColor: 'rgba(0,0,0,0.6)', opacity: 0 });
             }
         });
         this.canvas.renderAll();

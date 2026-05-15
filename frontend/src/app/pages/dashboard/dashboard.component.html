@@ -1,7 +1,5 @@
 <!-- Dashboard Layout -->
-<div
-  class="flex flex-col min-h-screen bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
->
+<div class="flex flex-col min-h-screen bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
   <!-- Header per utenti non admin -->
   <ng-container *ngIf="!isAdmin">
     <app-header></app-header>
@@ -11,18 +9,14 @@
   <div class="flex flex-1 pt-14 sm:pt-16 md:pt-0">
     <!-- Sidebar per admin -->
     <app-sidebar *ngIf="isAdmin"></app-sidebar>
-    
+
     <!-- Main Content with margin for fixed sidebar -->
-    <main class="flex-1 flex flex-col bg-white transition-all duration-200"
-          [ngClass]="{
+    <main class="flex-1 flex flex-col bg-white transition-all duration-200" [ngClass]="{
             'ml-sidebar-expanded': isAdmin && !isSidebarCollapsed,
             'ml-sidebar-collapsed': isAdmin && isSidebarCollapsed
           }">
       <!-- Header Section per admin -->
-      <div
-        *ngIf="isAdmin"
-        class="px-8 py-6 bg-cover bg-center border-b border-gray-200"
-      >
+      <div *ngIf="isAdmin" class="px-8 py-6 bg-cover bg-center border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="space-y-1">
             <h1 class="text-2xl font-semibold text-gray-900">
@@ -36,20 +30,17 @@
           <!-- Notifications -->
           <div class="flex items-center gap-4">
             <!-- Language Selector -->
-            <button [matMenuTriggerFor]="langMenuDashboard" class="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)] border border-gray-200">
-                <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
-                <span>{{ currentLang | uppercase }}</span>
-                <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+            <button [matMenuTriggerFor]="langMenuDashboard"
+              class="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-[var(--radius-lg)] transition-[var(--transition-colors)] border border-gray-200">
+              <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+              <span>{{ currentLang | uppercase }}</span>
+              <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
             </button>
 
-            <button
-              class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-            >
+            <button class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full">
               <lucide-icon name="bell" class="w-6 h-6" />
-              <span
-                *ngIf="notificationCount > 0"
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-              >
+              <span *ngIf="notificationCount > 0"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {{ notificationCount }}
               </span>
             </button>
@@ -58,9 +49,8 @@
       </div>
 
       <!-- Content for non-admin users -->
-      <div
-      *ngIf="!isAdmin" class="flex-1 px-8 py-6 space-y-6 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
-      >
+      <div *ngIf="!isAdmin"
+        class="flex-1 px-8 py-6 space-y-6 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
         <ng-container *ngIf="isHomeRoute()">
           <app-prenotazione-posizione></app-prenotazione-posizione>
         </ng-container>
@@ -72,9 +62,8 @@
       </div>
 
       <!-- Dashboard Content for admin -->
-      <div
-        *ngIf="isAdmin" class="flex-1 px-8 py-6 space-y-8 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70"
-      >
+      <div *ngIf="isAdmin"
+        class="flex-1 px-8 py-6 space-y-8 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
         <!-- Dashboard Overview -->
         <ng-container *ngIf="isHomeRoute()">
           <!-- Welcome Header -->
@@ -90,7 +79,8 @@
           <!-- Main Actions Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             <!-- New Booking -->
-            <button routerLink="workspace-booking" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+            <button routerLink="workspace-booking"
+              class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
                   <lucide-icon name="plus" class="w-7 h-7 text-blue-600" />
@@ -102,19 +92,22 @@
             </button>
 
             <!-- Manage Bookings -->
-            <button routerLink="bookings" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+            <button routerLink="bookings"
+              class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
                   <lucide-icon name="calendar" class="w-7 h-7 text-green-600" />
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.MANAGE_RESERVATIONS' | translate }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.MANAGE_RESERVATIONS' | translate }}
+              </h3>
               <p class="text-sm text-gray-500">{{ 'DASHBOARD.MANAGE_RESERVATIONS_DESC' | translate }}</p>
             </button>
 
             <!-- User Management -->
-            <button routerLink="user-management" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+            <button routerLink="user-management"
+              class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
                   <lucide-icon name="users" class="w-7 h-7 text-purple-600" />
@@ -128,32 +121,26 @@
 
           <!-- Statistics Section -->
           <div class="grid grid-cols-1 gap-8">
-            <!-- Gestione Planimetrie -->
-            <button routerLink="/amministrazione-planimetrie" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
-              <div class="flex items-center justify-between mb-6">
-                <div class="p-4 bg-teal-50 rounded-lg group-hover:bg-teal-100 transition-colors">
-                  <lucide-icon name="map" class="w-7 h-7 text-teal-600" />
-                </div>
-                <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.PLANIMETRIA_MANAGEMENT' | translate }}</h3>
-              <p class="text-sm text-gray-500">{{ 'DASHBOARD.PLANIMETRIA_MANAGEMENT_DESC' | translate }}</p>
-            </button>
 
             <!-- Gestione Sedi -->
-            <button routerLink="gestione-sedi" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+            <button routerLink="gestione-sedi"
+              class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
                   <lucide-icon name="building" class="w-7 h-7 text-indigo-600" />
                 </div>
                 <lucide-icon name="arrow-right" class="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.LOCATION_MANAGEMENT' | translate }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ 'DASHBOARD.LOCATION_MANAGEMENT' | translate }}
+              </h3>
               <p class="text-sm text-gray-500">{{ 'DASHBOARD.LOCATION_MANAGEMENT_DESC' | translate }}</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Gestione Sedi/Planimetrie</h3>
+              <p class="text-sm text-gray-500">Gestisci le sedi aziendali, i relativi edifici e le planimetrie</p>
             </button>
 
             <!-- Statistics -->
-            <button routerLink="statistics" class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
+            <button routerLink="statistics"
+              class="bg-white rounded-xl shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all text-left group cursor-pointer">
               <div class="flex items-center justify-between mb-6">
                 <div class="p-4 bg-orange-50 rounded-lg group-hover:bg-orange-100 transition-colors">
                   <i class="fas fa-chart-bar text-orange-600 text-2xl"></i>
@@ -165,7 +152,7 @@
             </button>
           </div>
         </ng-container>
-        
+
         <!-- Router outlet per i componenti child -->
         <div class="w-full">
           <router-outlet></router-outlet>
@@ -175,12 +162,14 @@
   </div>
 </div>
 <mat-menu #langMenuDashboard="matMenu" class="rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] mt-1">
-    <button mat-menu-item (click)="cambiaLingua('it')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
-        <img src="https://flagcdn.com/w40/it.png" alt="IT" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
-        <span class="font-medium text-gray-700">IT</span>
-    </button>
-    <button mat-menu-item (click)="cambiaLingua('en')" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
-        <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
-        <span class="font-medium text-gray-700">EN</span>
-    </button>
+  <button mat-menu-item (click)="cambiaLingua('it')"
+    class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+    <img src="https://flagcdn.com/w40/it.png" alt="IT" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+    <span class="font-medium text-gray-700">IT</span>
+  </button>
+  <button mat-menu-item (click)="cambiaLingua('en')"
+    class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
+    <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
+    <span class="font-medium text-gray-700">EN</span>
+  </button>
 </mat-menu>
