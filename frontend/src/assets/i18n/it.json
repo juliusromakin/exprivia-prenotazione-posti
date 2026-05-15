@@ -98,7 +98,7 @@
     },
     "CONTEXT": {
       "EDITING": "Stai modificando",
-      "BUILDING_FLOOR": "{{buildingName}} - Piano {{floor}}"
+      "BUILDING_FLOOR": "Piano {{floor}}"
     },
     "ACTIONS": {
       "LABEL": "Azioni",
