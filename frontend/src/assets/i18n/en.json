@@ -56,10 +56,10 @@
     "USER_MANAGEMENT_DESC": "Administer users, roles and system permissions",
     "STATISTICS": "Advanced Statistics",
     "STATISTICS_DESC": "View detailed reports and analysis of the booking system",
-    "PLANIMETRIA_MANAGEMENT": "Maps",
+    "PLANIMETRIA_MANAGEMENT": "Floor Plan Management",
     "PLANIMETRIA_MANAGEMENT_DESC": "Design and manage office floor plans",
-    "LOCATION_MANAGEMENT": "Locations & Maps",
-    "LOCATION_MANAGEMENT_DESC": "Manage company locations, their buildings and floor plans"
+    "LOCATION_MANAGEMENT": "Location Management",
+    "LOCATION_MANAGEMENT_DESC": "Manage company locations and their buildings"
   },
   "ADMIN_HOME": {
     "HERO_TITLE": "Manage your workspace",
@@ -73,9 +73,9 @@
       "BOOKINGS_DESC": "View, edit and manage all user bookings centrally.",
       "BOOKINGS_FEAT_1": "Full booking view",
       "BOOKINGS_FEAT_2": "Approvals and cancellations",
-      "PLANS_TITLE": "Maps",
+      "PLANS_TITLE": "Plan Management",
       "PLANS_DESC": "Intuitively configure and update office floor plans, managing workstations and meeting rooms.",
-      "PLANS_FEAT_1": "Interactive map editor",
+      "PLANS_FEAT_1": "Interactive plan editor",
       "PLANS_FEAT_2": "Workstation management"
     }
   },
@@ -98,7 +98,7 @@
     },
     "CONTEXT": {
       "EDITING": "You are editing",
-      "BUILDING_FLOOR": "Floor {{floor}}"
+      "BUILDING_FLOOR": "{{buildingName}} - Floor {{floor}}"
     },
     "ACTIONS": {
       "LABEL": "Actions",
@@ -509,8 +509,8 @@
     "BOOK_WORKSPACE": "Book Workspace",
     "STATISTICS": "Statistics",
     "BADGE_MANAGEMENT": "Badge Management",
-    "PLAN_MANAGEMENT": "Maps",
-    "LOCATION_MANAGEMENT": "Locations & Maps",
+    "PLAN_MANAGEMENT": "Floor Plan Management",
+    "LOCATION_MANAGEMENT": "Location Management",
     "UPDATE_PROFILE": "Update Profile",
     "COLLAPSE": "Collapse Sidebar",
     "EXPAND": "Expand Sidebar",
