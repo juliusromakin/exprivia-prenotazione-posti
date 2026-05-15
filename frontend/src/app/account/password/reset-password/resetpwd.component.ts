@@ -107,7 +107,7 @@ export class ResetpwdComponent implements OnInit {
   }
 
   private showSuccess(message: string): void {
-    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
+    this.snackBar.open(message, this.translate.instant('COMMON.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
@@ -116,7 +116,7 @@ export class ResetpwdComponent implements OnInit {
   }
 
   private showError(message: string): void {
-    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
+    this.snackBar.open(message, this.translate.instant('COMMON.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',

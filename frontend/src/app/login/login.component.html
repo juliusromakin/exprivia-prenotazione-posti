@@ -86,7 +86,7 @@
           <button type="button" 
                   (click)="dismissError()" 
                   class="text-red-400 hover:text-red-600 transition-[var(--transition-colors)] cursor-pointer"
-                  [attr.aria-label]="'Chiudi messaggio di errore'"
+                  [attr.aria-label]="'AUTH.LOGIN.CLOSE_ERROR_ARIA' | translate"
                   [disabled]="isLoading">
             <mat-icon class="w-5 h-5" aria-hidden="true">close</mat-icon>
           </button>

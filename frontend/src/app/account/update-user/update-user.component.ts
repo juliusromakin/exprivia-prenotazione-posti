@@ -111,13 +111,13 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
             })
             console.log('User loaded successfully:', user.name, user.lastName)
           } else {
-            this.errorMessage = 'Error loading user data'
+            this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.LOAD_DATA_ERROR')
             console.warn('User not found')
           }
         },
         error: (error) => {
           console.error('Error loading user data:', error)
-          this.errorMessage = 'Error loading user data'
+          this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.LOAD_DATA_ERROR')
           this.isLoading = false // Backup safety
         }
       })
@@ -276,7 +276,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
       return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH')
     }
     if (control?.hasError("pattern")) {
-      return this.translate.instant('ACCOUNT.ERRORS.MIN_LENGTH') + " (1 upper, 1 lower, 1 number)"
+      return this.translate.instant('ACCOUNT.ERRORS.PWD_PATTERN')
     }
     return ""
   }
@@ -316,7 +316,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
 
     // Use current user ID for the update
     if (!this.currentUser?.id) {
-      this.errorMessage = "Error: user data not available"
+      this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.USER_DATA_UNAVAILABLE')
       this.isLoading = false
       return
     }
@@ -328,13 +328,13 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
         catchError((error) => {
           console.error("Update error:", error)
           if (error.status === 400) {
-            this.errorMessage = "Invalid data. Please check the entered fields."
+            this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.INVALID_DATA')
           } else if (error.status === 401) {
-            this.errorMessage = "Current password is incorrect."
+            this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.WRONG_PASSWORD')
           } else if (error.status === 409) {
-            this.errorMessage = "The entered email is already in use."
+            this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.EMAIL_IN_USE')
           } else {
-            this.errorMessage = "Error during profile update. Please try again later."
+            this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.UPDATE_ERROR')
           }
           return throwError(() => error)
         }),
@@ -417,12 +417,12 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
           sessionStorage.clear();
           this.authService.logout();
           setTimeout(() => {
-            this.router.navigate(['/accedi']);
+            this.router.navigate(['/login']);
           }, 100);
         },
         error: (error: unknown) => {
           console.error('Error during account deletion:', error);
-          this.errorMessage = 'An error occurred during account deletion. Please try again later.';
+          this.errorMessage = this.translate.instant('ACCOUNT.ERRORS.DELETE_ERROR');
         }
       });
   }

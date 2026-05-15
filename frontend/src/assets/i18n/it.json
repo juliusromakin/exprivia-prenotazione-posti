@@ -20,6 +20,7 @@
     "WELCOME": "Semplifica la prenotazione del tuo spazio di lavoro",
     "SUBTITLE1": "Prenota scrivanie e sale riunioni in pochi clic.",
     "SUBTITLE2": "",
+    "HERO_IMAGE_ALT": "Spazio di lavoro moderno con postazioni e sale riunioni",
     "START_NOW": "Inizia ora",
     "LOGIN": "Accedi",
     "GO_DASHBOARD": "Prenota ora",
@@ -588,7 +589,15 @@
       "EMAIL_INVALID": "Inserisci un indirizzo email valido",
       "MIN_LENGTH": "Deve essere di almeno 6 caratteri",
       "PWD_MISMATCH": "Le password non corrispondono",
-      "CURRENT_PWD_REQ": "La password attuale è richiesta per impostarne una nuova"
+      "CURRENT_PWD_REQ": "La password attuale è richiesta per impostarne una nuova",
+      "PWD_PATTERN": "La password deve contenere una maiuscola, una minuscola e un numero.",
+      "LOAD_DATA_ERROR": "Errore durante il caricamento dei dati utente",
+      "USER_DATA_UNAVAILABLE": "Errore: dati utente non disponibili",
+      "INVALID_DATA": "Dati non validi. Controlla i campi inseriti.",
+      "WRONG_PASSWORD": "La password attuale non è corretta.",
+      "EMAIL_IN_USE": "L'email inserita è già in uso.",
+      "UPDATE_ERROR": "Errore durante l'aggiornamento del profilo. Riprova più tardi.",
+      "DELETE_ERROR": "Errore durante l'eliminazione dell'account. Riprova più tardi."
     }
   },
   "AUTH": {
@@ -603,10 +612,18 @@
       "NO_ACCOUNT": "Non hai un account?",
       "REGISTER_LINK": "Registrati",
       "ERROR_TITLE": "Errore di accesso",
+      "CLOSE_ERROR_ARIA": "Chiudi messaggio di errore",
       "ERRORS": {
         "EMAIL_REQUIRED": "L'email è obbligatoria.",
         "EMAIL_INVALID": "Inserisci un'email valida.",
-        "PWD_REQUIRED": "La password è obbligatoria."
+        "PWD_REQUIRED": "La password è obbligatoria.",
+        "INVALID_CREDENTIALS": "Email o password non corretti. Riprova.",
+        "SESSION_EXPIRED": "Sessione scaduta. Effettua nuovamente il login.",
+        "UNAUTHORIZED": "Accesso non autorizzato. Contatta l'amministratore.",
+        "SERVICE_UNAVAILABLE": "Servizio non disponibile. Riprova più tardi.",
+        "CONNECTION_ERROR": "Impossibile connettersi al server. Verifica la tua connessione.",
+        "TIMEOUT_ERROR": "Timeout della connessione. Riprova più tardi.",
+        "GENERIC_ERROR": "Si è verificato un errore durante il login. Riprova più tardi."
       }
     },
     "REGISTER": {
@@ -824,10 +841,10 @@
         "PAN": "Sposta Mappa (Mano)",
         "SELECT": "Selezione a Rettangolo (Puntatore)",
         "CONNECT": "Crea Collegamento (Link)",
-        "FULL_TREE": "Full Tree",
-        "FOCUS": "Focus",
-        "RESET_LAYOUT": "Reset Layout",
-        "CLEAR_MAP": "Clear Map"
+        "FULL_TREE": "Albero Completo",
+        "FOCUS": "Focalizza",
+        "RESET_LAYOUT": "Ripristina Layout",
+        "CLEAR_MAP": "Pulisci Mappa"
       }
     },
     "SIDE_PANEL": {
@@ -898,6 +915,12 @@
     "REQUIRED_FIELD": "Campo obbligatorio",
     "SAVE": "Salva",
     "CANCEL": "Annulla",
+    "CLOSE": "Chiudi",
     "LOADING": "Caricamento in corso..."
+  },
+  "FORBIDDEN": {
+    "TITLE": "Accesso Negato",
+    "DESC": "Non hai i permessi necessari per accedere a questa pagina.",
+    "BACK_HOME": "Torna alla Home"
   }
 }

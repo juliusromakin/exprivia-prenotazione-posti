@@ -20,6 +20,7 @@
     "WELCOME": "Simplify your workspace booking",
     "SUBTITLE1": "Book desks and meeting rooms in just a few clicks.",
     "SUBTITLE2": "",
+    "HERO_IMAGE_ALT": "Modern workspace with desks and meeting rooms",
     "START_NOW": "Get started",
     "LOGIN": "Login",
     "GO_DASHBOARD": "Book now",
@@ -211,8 +212,10 @@
       "ACTIONS": "Actions",
       "STATUS_ACTIVE": "Active",
       "STATUS_INACTIVE": "Inactive",
+      "STATUS_PENDING": "Pending",
       "ROLE_ADMIN": "Administrator",
       "ROLE_EMPLOYEE": "Employee",
+      "ROLE_GUEST": "Guest",
       "ACTIVATE_USER_TITLE": "Activate User",
       "ACTION_EDIT": "Edit",
       "ACTION_DELETE": "Delete",
@@ -586,7 +589,15 @@
       "EMAIL_INVALID": "Please enter a valid email address",
       "MIN_LENGTH": "Must be at least 6 characters",
       "PWD_MISMATCH": "Passwords do not match",
-      "CURRENT_PWD_REQ": "Current password is required to set a new one"
+      "CURRENT_PWD_REQ": "Current password is required to set a new one",
+      "PWD_PATTERN": "Password must contain uppercase, lowercase and a number.",
+      "LOAD_DATA_ERROR": "Error loading user data",
+      "USER_DATA_UNAVAILABLE": "Error: user data not available",
+      "INVALID_DATA": "Invalid data. Please check the entered fields.",
+      "WRONG_PASSWORD": "Current password is incorrect.",
+      "EMAIL_IN_USE": "The entered email is already in use.",
+      "UPDATE_ERROR": "Error during profile update. Please try again later.",
+      "DELETE_ERROR": "An error occurred during account deletion. Please try again later."
     }
   },
   "AUTH": {
@@ -601,10 +612,18 @@
       "NO_ACCOUNT": "Don't have an account?",
       "REGISTER_LINK": "Register",
       "ERROR_TITLE": "Login Error",
+      "CLOSE_ERROR_ARIA": "Close error message",
       "ERRORS": {
         "EMAIL_REQUIRED": "Email is required.",
         "EMAIL_INVALID": "Enter a valid email.",
-        "PWD_REQUIRED": "Password is required."
+        "PWD_REQUIRED": "Password is required.",
+        "INVALID_CREDENTIALS": "Incorrect email or password. Please try again.",
+        "SESSION_EXPIRED": "Session expired. Please log in again.",
+        "UNAUTHORIZED": "Unauthorized access. Contact the administrator.",
+        "SERVICE_UNAVAILABLE": "Service unavailable. Please try again later.",
+        "CONNECTION_ERROR": "Unable to connect to server. Check your connection.",
+        "TIMEOUT_ERROR": "Connection timeout. Please try again later.",
+        "GENERIC_ERROR": "An error occurred during login. Please try again later."
       }
     },
     "REGISTER": {
@@ -777,7 +796,12 @@
       "LOCATION": "Location",
       "LOCATION_SAVED": "Changes saved",
       "BUILDING": "Building",
-      "BUILDING_SAVED": "Building details updated"
+      "BUILDING_SAVED": "Building details updated",
+      "CONFIRM_DELETE_TITLE": "Confirm Deletion",
+      "CONFIRM_DELETE_LOCATION": "Are you sure you want to permanently delete the location \"{{ name }}\"? This action cannot be undone.",
+      "CONFIRM_DELETE_BUILDING": "Are you sure you want to permanently delete the building \"{{ name }}\"? This action cannot be undone.",
+      "DELETE_SUCCESS": "Deletion completed successfully",
+      "DELETE_ERROR": "An error occurred during deletion"
     },
     "PAGINATION": {
       "SHOW": "Show:",
@@ -891,6 +915,12 @@
     "REQUIRED_FIELD": "Required field",
     "SAVE": "Save",
     "CANCEL": "Cancel",
+    "CLOSE": "Close",
     "LOADING": "Loading..."
+  },
+  "FORBIDDEN": {
+    "TITLE": "Access Denied",
+    "DESC": "You do not have the necessary permissions to access this page.",
+    "BACK_HOME": "Back to Home"
   }
 }

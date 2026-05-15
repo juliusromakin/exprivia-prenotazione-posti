@@ -16,6 +16,7 @@ import { Login } from "./login.model";
 import { Router } from "@angular/router";
 import { AxiosService } from "@core/services/axios.service";
 import { NavigationService } from "@core/services/navigation.service";
+import { TranslateService } from "@ngx-translate/core";
 
 @Injectable({ providedIn: "root" })
 export class LoginService {
@@ -24,6 +25,7 @@ export class LoginService {
     private router = inject(Router);
     private axiosService = inject(AxiosService);
     private navigationService = inject(NavigationService);
+    private translate = inject(TranslateService);
 
     login(credentials: Login): Observable<User | null> {
         return this.authJwtService.login(credentials).pipe(
@@ -52,28 +54,25 @@ export class LoginService {
                 let errorMessage: string;
                 switch (error.response?.status) {
                     case 400:
-                        errorMessage = "Email o password non corretti. Riprova.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.INVALID_CREDENTIALS');
                         break;
                     case 401:
-                        errorMessage = "Sessione scaduta. Effettua nuovamente il login.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.SESSION_EXPIRED');
                         break;
                     case 403:
-                        errorMessage =
-                            "Accesso non autorizzato. Contatta l'amministratore.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.UNAUTHORIZED');
                         break;
                     case 404:
-                        errorMessage = "Servizio non disponibile. Riprova più tardi.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.SERVICE_UNAVAILABLE');
                         break;
                     case 0:
-                        errorMessage =
-                            "Impossibile connettersi al server. Verifica la tua connessione.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.CONNECTION_ERROR');
                         break;
                     case 504:
-                        errorMessage = "Timeout della connessione. Riprova più tardi.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.TIMEOUT_ERROR');
                         break;
                     default:
-                        errorMessage =
-                            "Si è verificato un errore durante il login. Riprova più tardi.";
+                        errorMessage = this.translate.instant('AUTH.LOGIN.ERRORS.GENERIC_ERROR');
                 }
 
                 return throwError(() => ({
@@ -112,7 +111,7 @@ export class LoginService {
             finalize(() => {
                 console.log('LoginService: Logout process completed, navigating to login page...');
                 // Navigate to login page after everything is done
-                this.router.navigate(['/accedi']).then(() => {
+                this.router.navigate(['/login']).then(() => {
                     console.log('LoginService: Navigation completed, reloading page...');
                     // Force reload the page to clear any cached state
                     window.location.reload();
@@ -126,7 +125,7 @@ export class LoginService {
             error: (error) => {
                 console.error('LoginService: Logout subscription error:', error);
                 // Ensure we still navigate to login even if there's an error
-                this.router.navigate(['/accedi']).then(() => {
+                this.router.navigate(['/login']).then(() => {
                     window.location.reload();
                 });
             }

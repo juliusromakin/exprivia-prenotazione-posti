@@ -73,7 +73,7 @@ export class ForgotpwdComponent {
         await this.forgotPasswordService.forgotPassword(email);
         
         this.showSuccess(this.translate.instant('AUTH.FORGOT_PASSWORD.SUCCESS_MSG'));
-        await this.router.navigate(['/accedi']);
+        await this.router.navigate(['/login']);
       } catch (error) {
         const msg = error instanceof Error ? error.message : this.translate.instant('AUTH.FORGOT_PASSWORD.ERRORS.GENERIC_ERROR');
         this.errorMessage = msg;
@@ -85,7 +85,7 @@ export class ForgotpwdComponent {
   }
 
   private showSuccess(message: string): void {
-    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
+    this.snackBar.open(message, this.translate.instant('COMMON.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
@@ -94,7 +94,7 @@ export class ForgotpwdComponent {
   }
 
   private showError(message: string): void {
-    this.snackBar.open(message, this.translate.instant('ERRORS.CLOSE'), {
+    this.snackBar.open(message, this.translate.instant('COMMON.CLOSE'), {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
