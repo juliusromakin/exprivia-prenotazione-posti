@@ -36,7 +36,7 @@
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-white font-bold">{{ locationName }}</span>
-                                <span class="text-white/60 text-xs">{{ buildingName }} - {{ 'PLANIMETRIA_EDITOR.CONTEXT.BUILDING_FLOOR' | translate: { floor: selectedFloor } }}</span>
+                                <span class="text-white/60 text-xs">{{ 'PLANIMETRIA_EDITOR.CONTEXT.BUILDING_FLOOR' | translate: { floor: selectedFloor, buildingName: buildingName } }}</span>
                             </div>
                         </div>
                     </div>
