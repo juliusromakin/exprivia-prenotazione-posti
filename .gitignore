@@ -45,3 +45,7 @@ src/main/resources/application-secrets.properties
 
 # App Uploads
 backend/uploads/
+
+# Docker Environment Variables
+.env
+

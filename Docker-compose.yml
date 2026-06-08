@@ -4,17 +4,17 @@ services:
     restart: always
     container_name: PrenotazioniDB
     environment:
-      POSTGRES_DB: prenotazioni
-      POSTGRES_USER: prenotazioni
-      POSTGRES_PASSWORD: prenotazioni
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "10020:5432"
+      - "${DB_PORT}:5432"
     networks:
       - prenotazioni-net
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U prenotazioni -d prenotazioni" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,12 +24,13 @@ services:
       context: ./backend/exprv
     container_name: PrenotazioniBackend
     ports:
-      - "10010:10010"
+      - "${BACKEND_PORT}:10010"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/prenotazioni
-      - SPRING_DATASOURCE_USERNAME=prenotazioni
-      - SPRING_DATASOURCE_PASSWORD=prenotazioni
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - APP_CORS_ALLOWED_ORIGINS=http://localhost:4200,http://${SERVER_HOST}:${FRONTEND_PORT},http://${SERVER_HOST},https://${SERVER_HOST}
     depends_on:
       db:
         condition: service_healthy
@@ -45,7 +46,7 @@ services:
       context: ./frontend
     container_name: PrenotazioniFrontEnd
     ports:
-      - "10000:80"
+      - "${FRONTEND_PORT}:80"
     depends_on:
       - backend
     networks:
@@ -55,8 +56,8 @@ services:
     image: axllent/mailpit:latest
     container_name: PrenotazioniMailHog
     ports:
-      - "1025:1025"
-      - "10030:8025"
+      - "${MAILPIT_SMTP_PORT}:1025"
+      - "${MAILPIT_UI_PORT}:8025"
     networks:
       - prenotazioni-net
 

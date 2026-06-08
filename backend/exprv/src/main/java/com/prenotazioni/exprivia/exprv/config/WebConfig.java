@@ -22,6 +22,9 @@ public class WebConfig implements WebMvcConfigurer {
         @Value("${file.upload-dir:uploads}")
         private String uploadDir;
 
+        @Value("${app.cors.allowed-origins:http://localhost:4200,http://localhost:10000,http://localhost:14010}")
+        private String[] allowedOrigins;
+
         @Bean
         public FilterRegistrationBean<CorsFilter> corsFilter() {
                 // Crea una nuova sorgente di configurazione CORS basata su URL
@@ -33,11 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
                 // Permette l'invio delle credenziali (cookie, autenticazione HTTP)
                 config.setAllowCredentials(true);
 
-                // Permette le richieste solo dall'origine specificata (Aggiunto porta 10000 per
-                // Docker)
-                config.setAllowedOrigins(Arrays.asList(
-                                "http://localhost:4200",
-                                "http://localhost:10000"));
+                // Permette le richieste solo dall'origine specificata
+                config.setAllowedOrigins(Arrays.asList(allowedOrigins));
 
                 // Autorizza gli header specificati nelle richieste
                 config.setAllowedHeaders(Arrays.asList(
