@@ -21,6 +21,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../shared/services/toast.service';
+import { environment } from '@/environments/environment';
 
 export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 
@@ -43,6 +44,8 @@ export type EditorMode = 'SELECT' | 'ROOM' | 'DESK';
 })
 export class AmministrazionePlanimetrieComponent implements OnInit {
     imageUrl: string | null = null;
+    private readonly apiBase = environment.apiUrl || '';
+
     canvas: fabric.Canvas | null = null;
 
     currentMode: EditorMode = 'SELECT';
@@ -366,7 +369,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         }
 
         this.imageUrl = piano.imagePath && piano.imagePath !== 'Planimetria.png'
-            ? (piano.imagePath.startsWith('data:') || piano.imagePath.includes('/') ? piano.imagePath : `/api/images/${piano.imagePath}`) 
+            ? (piano.imagePath.startsWith('data:') || piano.imagePath.includes('/') ? piano.imagePath : `${this.apiBase}/api/images/${piano.imagePath}`) 
             : 'Planimetria.png';
         this.cdr.detectChanges();
 
@@ -631,7 +634,7 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
             this.planimetriaService.caricaImmaginePlanimetria(this.selectedFloorId, file).subscribe({
                 next: (fileName) => {
                     // Costruiamo l'URL completo per visualizzarlo nel canvas
-                    this.imageUrl = `/api/images/${fileName}`;
+                    this.imageUrl = `${this.apiBase}/api/images/${fileName}`;
                     this.cdr.detectChanges();
                     setTimeout(() => this.initCanvas(this.imageUrl!), 0);
                     this.isSaving = false;

@@ -18,6 +18,7 @@ import { WorkspaceService } from "@core/services/workspace.service";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PlanimetriaService } from "@core/services/planimetria.service";
 import { LocationService, SedeDTO, EdificioDTO } from "@core/services/location.service";
+import { environment } from "@/environments/environment";
 
 @Component({
   standalone: true,
@@ -264,10 +265,13 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           const floorRooms: Room[] = floor.rooms ? JSON.parse(JSON.stringify(floor.rooms)) : [];
           const floorWorkspaces: Workspace[] = floor.workspaces ? JSON.parse(JSON.stringify(floor.workspaces)) : [];
 
+          const apiBase = environment.apiUrl || '';
           // Store plan image on the floor object itself
-          floor.imagePath = plan?.imagePath && plan.imagePath !== 'Planimetria.png'
-            ? (plan.imagePath.startsWith('data:') || plan.imagePath.includes('/') ? plan.imagePath : `/api/images/${plan.imagePath}`)
-            : 'Planimetria.png';
+          floor.imagePath = plan?.imagePath
+            ? (plan.imagePath === 'Planimetria.png' 
+                ? 'Planimetria.png' 
+                : (plan.imagePath.startsWith('data:') || plan.imagePath.includes('/') ? plan.imagePath : `${apiBase}/api/images/${plan.imagePath}`))
+            : '';
 
           if (plan) {
             if (plan.rooms) {
@@ -319,6 +323,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         );
 
         this.updateFilteredData();
+
+        const currentTimeSlot = this.bookingForm.get('timeSlot')?.value;
+        if (currentTimeSlot) {
+          this.updateWorkspacesAvailability();
+        }
+
         this.state.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -394,11 +404,18 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(roomId => {
         if (roomId) {
-          const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
-          if (currentWorkspaceId) {
-            const workspace = this.state.availableWorkspaces.find(p => p.id === Number(currentWorkspaceId));
-            if (workspace && workspace.roomId !== Number(roomId)) {
-              this.bookingForm.patchValue({ workspaceId: "" });
+          if (this.isMeetingRoom()) {
+            const workspace = this.state.availableWorkspaces.find(w => w.roomId === Number(roomId));
+            if (workspace) {
+              this.bookingForm.patchValue({ workspaceId: String(workspace.id) });
+            }
+          } else {
+            const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
+            if (currentWorkspaceId) {
+              const workspace = this.state.availableWorkspaces.find(p => p.id === Number(currentWorkspaceId));
+              if (workspace && workspace.roomId !== Number(roomId)) {
+                this.bookingForm.patchValue({ workspaceId: "" });
+              }
             }
           }
         } else {
@@ -551,7 +568,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
         const currentWorkspaceId = this.bookingForm.get('workspaceId')?.value;
         if (currentWorkspaceId) {
           const selected = workspaces.find(w => w.id === Number(currentWorkspaceId));
-          if (selected && !selected.isAvailable) {
+          if (!selected || selected.isAvailable === false) {
             this.bookingForm.patchValue({ workspaceId: "", roomId: null });
             this.toastService.showInfo(
               this.translate.instant('COMMON.INFO'),
@@ -694,9 +711,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   get currentFloorImage(): string {
-    if (!this.state.selectedFloorId) return 'Planimetria.png';
+    if (!this.state.selectedFloorId) return '';
     const floor = this.state.floors.find(f => f.id === this.state.selectedFloorId);
-    return floor?.imagePath || 'Planimetria.png';
+    return floor?.imagePath || '';
   }
 
   onFloorChange(floorId: any): void {
@@ -896,7 +913,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       case 'roomType':
       case 'room':
       case 'workspace': return !this.bookingForm.get('timeSlot')?.value;
-      case 'submit': return !this.isFormValid();
+      case 'submit':
+        if(this.isAdmin && this.userSearchTerm.trim() !== '' && !this.selectedUser){
+          return true;
+        }
+        return !this.isFormValid();
+
       default: return false;
     }
   }
@@ -924,7 +946,15 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   filterUsers(): void {
-    if (!this.userSearchTerm) { this.filteredUsers = this.users; this.selectedUser = null; this.bookingForm.patchValue({ userId: null }); return; }
+    this.selectedUser = null;
+    this.bookingForm.patchValue({ userId: null});
+
+    if (!this.userSearchTerm) { 
+      this.filteredUsers = this.users; 
+      this.selectedUser = null; 
+      this.bookingForm.patchValue({ userId: null }); 
+      return; 
+    }
     const term = this.userSearchTerm.toLowerCase();
     this.filteredUsers = this.users.filter(u => `${u.name} ${u.lastName} ${u.email}`.toLowerCase().includes(term));
   }

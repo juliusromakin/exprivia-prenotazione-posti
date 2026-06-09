@@ -28,6 +28,7 @@ export interface Reservation {
     workspaceId: number;
     durationName?: string;
     userSummary?: UserSummary;
+    bookedBySummary?: UserSummary;
     workspaceSummary?: WorkspaceSummary;
     roomSummary?: RoomSummary;
     cityName?: string;

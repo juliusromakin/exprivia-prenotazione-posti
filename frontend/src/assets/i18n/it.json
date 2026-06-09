@@ -450,11 +450,14 @@
       "MAP_INFO": "Completa i passaggi precedenti per vedere le postazioni disponibili.",
       "SELECTED_INFO": "Postazione selezionata:",
       "SELECT_FROM_MAP": "Clicca sulla mappa per scegliere una postazione",
-      "SELECTED": "Postazione Selezionata"
+      "SELECTED": "Postazione Selezionata",
+      "SELECT_LOCATION_HINT": "Seleziona una sede per visualizzare la planimetria"
     },
     "ADMIN": {
       "SELECT_USER": "Seleziona Utente (opzionale)",
-      "SEARCH_USER": "Cerca utente..."
+      "SEARCH_USER": "Cerca utente...",
+      "USER_NOT_FOUND": "Utente non trovato",
+      "PLEASE_SELECT_USER": "Seleziona un utente dalla lista"
     },
     "SUBMIT": {
       "PROCESSING": "Elaborazione...",
@@ -479,7 +482,9 @@
       "STATUS_CONFIRMED": "Confermata",
       "STATUS_PENDING": "In Attesa",
       "STATUS_DENIED": "Rifiutata",
-      "ACTION_CANCEL": "Annulla"
+      "ACTION_CANCEL": "Annulla",
+      "BENEFICIARY": "Beneficiario",
+      "BOOKED_BY": "Prenotato da"
     },
     "MESSAGES": {
       "LOADING_ERROR_TITLE": "Errore di Caricamento",
@@ -502,6 +507,8 @@
       "MODAL_CONFIRM": "Ho capito"
     },
     "PLANIMETRIA": {
+      "NOT_AVAILABLE": "Planimetria non disponibile",
+      "NOT_AVAILABLE_DESC": "Non è stata ancora caricata una piantina per questo piano dell'edificio.",
       "LEGEND": {
         "AVAILABLE": "Disponibile",
         "UNAVAILABLE": "Non Disponibile",

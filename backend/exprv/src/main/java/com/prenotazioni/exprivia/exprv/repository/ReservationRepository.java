@@ -19,7 +19,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
                         "LEFT JOIN FETCH r.workspace w " +
                         "LEFT JOIN FETCH w.room room " +
                         "LEFT JOIN FETCH r.reservationDuration " +
-                        "WHERE u.email = :email " +
+                        "LEFT JOIN FETCH r.bookedBy b " +
+                        "WHERE u.email = :email OR b.email = :email " +
                         "ORDER BY r.startDate DESC")
         List<Reservation> findByUserEmail(@Param("email") String email);
 

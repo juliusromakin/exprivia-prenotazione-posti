@@ -450,11 +450,14 @@
       "MAP_INFO": "Complete previous steps to see available workspaces.",
       "SELECTED_INFO": "Selected workspace:",
       "SELECT_FROM_MAP": "Click on the map to choose a workspace",
-      "SELECTED": "Selected Workspace"
+      "SELECTED": "Selected Workspace",
+      "SELECT_LOCATION_HINT": "Select a location to view the floor plan"
     },
     "ADMIN": {
       "SELECT_USER": "Select User (optional)",
-      "SEARCH_USER": "Search user..."
+      "SEARCH_USER": "Search user...",
+      "USER_NOT_FOUND": "User not found",
+      "PLEASE_SELECT_USER": "Select a user from the list"
     },
     "SUBMIT": {
       "PROCESSING": "Processing...",
@@ -479,7 +482,9 @@
       "STATUS_CONFIRMED": "Confirmed",
       "STATUS_PENDING": "Pending",
       "STATUS_DENIED": "Denied",
-      "ACTION_CANCEL": "Cancel"
+      "ACTION_CANCEL": "Cancel",
+      "BENEFICIARY": "Beneficiary",
+      "BOOKED_BY": "Booked by"
     },
     "MESSAGES": {
       "LOADING_ERROR_TITLE": "Loading Error",
@@ -502,6 +507,8 @@
       "MODAL_CONFIRM": "I understand"
     },
     "PLANIMETRIA": {
+      "NOT_AVAILABLE": "Floor plan not available",
+      "NOT_AVAILABLE_DESC": "A floor plan has not been uploaded for this floor yet.",
       "LEGEND": {
         "AVAILABLE": "Available",
         "UNAVAILABLE": "Unavailable",
