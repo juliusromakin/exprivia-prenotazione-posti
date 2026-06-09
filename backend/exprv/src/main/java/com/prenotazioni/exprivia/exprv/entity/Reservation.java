@@ -16,9 +16,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "reservation")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Reservation {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,86 +59,10 @@ public class Reservation {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "booked_by_user_id")
+    private User bookedBy;
+
+    @ManyToOne
     @JoinColumn(name = "duration_name")
     private ReservationDuration reservationDuration;
-
-    public Reservation() {
-    }
-
-    public Reservation(Integer id, LocalDateTime startDate, LocalDateTime endDate,
-            ReservationStatus status, Workspace workspace, User user,
-            ReservationDuration reservationDuration) {
-        this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-        this.workspace = workspace;
-        this.user = user;
-        this.reservationDuration = reservationDuration;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
-    }
-
-    public ReservationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public ReservationDuration getReservationDuration() {
-        return reservationDuration;
-    }
-
-    public void setReservationDuration(ReservationDuration reservationDuration) {
-        this.reservationDuration = reservationDuration;
-    }
-
 }

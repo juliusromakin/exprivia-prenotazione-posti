@@ -67,7 +67,7 @@ public class ReservationService {
         }
     }
 
-    public void validateReservationDTO(ReservationDTO reservationDTO) {
+    public void validateReservationDTO(ReservationDTO reservationDTO, Integer excludeReservationId) {
         if (reservationDTO.getWorkspaceId() == null) {
             throw new AppException("Workspace is required", HttpStatus.BAD_REQUEST);
         }
@@ -91,7 +91,19 @@ public class ReservationService {
                 .findOverlappingBookings(
                         reservationDTO.getStartDate(),
                         reservationDTO.getEndDate(),
-                        reservationDTO.getWorkspaceId());
+                        reservationDTO.getWorkspaceId(),
+                        excludeReservationId);
+
+        List<Reservation> overlappingByUser = reservationRepository
+                .findOverlappingBookingsByUser(
+                        reservationDTO.getStartDate(),
+                        reservationDTO.getEndDate(),
+                        reservationDTO.getUserId(),
+                        excludeReservationId);
+
+        if (!overlappingByUser.isEmpty()) {
+            throw new AppException("User has already made a reservation at this time", HttpStatus.CONFLICT);
+        }
 
         if (!overlapping.isEmpty()) {
             throw new AppException("The workspace is already occupied at this time", HttpStatus.CONFLICT);
@@ -106,9 +118,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(
                         () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
-        
+
         verifyOwnershipOrAny(reservation.getUser().getEmail(), "ACTION_RESERVATION_READ_ANY");
-        
+
         return reservationMapper.toDto(reservation);
     }
 
@@ -126,7 +138,12 @@ public class ReservationService {
     }
 
     public ReservationDTO createReservation(ReservationDTO reservationDTO) {
-        validateReservationDTO(reservationDTO);
+        validateReservationDTO(reservationDTO, null);
+
+        String loggedInUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User loggedInUser = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         User user = userRepository.findById(reservationDTO.getUserId())
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
@@ -147,10 +164,11 @@ public class ReservationService {
         reservation.setUser(user);
         reservation.setWorkspace(workspace);
         reservation.setReservationDuration(duration);
-        reservation.setStatus(ReservationStatus.CONFIRMED); // Default status
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservation.setBookedBy(loggedInUser);
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        
+
         // Invio email di conferma
         sendStatusEmail(savedReservation, null);
 
@@ -163,7 +181,7 @@ public class ReservationService {
                         () -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
 
         reservationMapper.updateReservationFromDto(reservationDTO, existingReservation);
-        
+
         verifyOwnershipOrAny(existingReservation.getUser().getEmail(), "ACTION_RESERVATION_UPDATE_ANY");
 
         if (reservationDTO.getUserId() != null) {
@@ -183,11 +201,11 @@ public class ReservationService {
             existingReservation.setReservationDuration(duration);
         }
 
-        validateReservationDTO(reservationDTO);
+        validateReservationDTO(reservationDTO, id);
 
         ReservationStatus oldStatus = existingReservation.getStatus();
         Reservation savedReservation = reservationRepository.save(existingReservation);
-        
+
         // Se lo stato è cambiato in DENIED, invia email
         if (oldStatus != ReservationStatus.DENIED && savedReservation.getStatus() == ReservationStatus.DENIED) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -201,22 +219,22 @@ public class ReservationService {
     public void deleteReservation(Integer id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new AppException("Reservation with ID " + id + " not found", HttpStatus.NOT_FOUND));
-        
+
         verifyOwnershipOrAny(reservation.getUser().getEmail(), "ACTION_RESERVATION_DELETE_ANY");
-        
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdminAction = !reservation.getUser().getEmail().equals(auth.getName());
-        
+
         // Notifica cancellazione via email prima di eliminare
         sendStatusEmail(reservation, isAdminAction); // Considerata azione admin se fatta da questo service generico
-        
+
         reservationRepository.deleteById(id);
     }
 
     public List<String> getAvailableTimes(Integer workspaceId, LocalDate data) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new AppException("Workspace not found", HttpStatus.NOT_FOUND));
-        
+
         if (!Boolean.TRUE.equals(workspace.getEnabled())) {
             return List.of(); // Nessun orario disponibile se disabilitato
         }
@@ -254,11 +272,14 @@ public class ReservationService {
         String workspaceName = reservation.getWorkspace().getName();
 
         if (reservation.getStatus() == ReservationStatus.CONFIRMED && isAdminAction == null) {
-            emailService.sendBookingConfirmationEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+            emailService.sendBookingConfirmationEmail(reservation.getUser().getEmail(), userName, roomName,
+                    workspaceName, startStr, endStr);
         } else if (reservation.getStatus() == ReservationStatus.DENIED) {
-            emailService.sendBookingCancelledByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+            emailService.sendBookingCancelledByAdminEmail(reservation.getUser().getEmail(), userName, roomName,
+                    workspaceName, startStr, endStr);
         } else if (isAdminAction != null && isAdminAction) {
-            emailService.sendBookingDeletedByAdminEmail(reservation.getUser().getEmail(), userName, roomName, workspaceName, startStr, endStr);
+            emailService.sendBookingDeletedByAdminEmail(reservation.getUser().getEmail(), userName, roomName,
+                    workspaceName, startStr, endStr);
         }
     }
 
@@ -277,7 +298,7 @@ public class ReservationService {
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "User", "City", "Location", "Room", "Workspace", "Start", "End", "Status"};
+            String[] columns = { "ID", "User", "City", "Location", "Room", "Workspace", "Start", "End", "Status" };
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -290,8 +311,10 @@ public class ReservationService {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(r.getId());
                 row.createCell(1).setCellValue(r.getUser().getEmail());
-                row.createCell(2).setCellValue(r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getCity().toString());
-                row.createCell(3).setCellValue(r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getName());
+                row.createCell(2).setCellValue(
+                        r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getCity().toString());
+                row.createCell(3)
+                        .setCellValue(r.getWorkspace().getRoom().getFloor().getBuilding().getLocation().getName());
                 row.createCell(4).setCellValue(r.getWorkspace().getRoom().getName());
                 row.createCell(5).setCellValue(r.getWorkspace().getName());
                 row.createCell(6).setCellValue(r.getStartDate().format(dtf));
@@ -307,7 +330,8 @@ public class ReservationService {
             workbook.write(out);
             return out.toByteArray();
         } catch (Exception e) {
-            throw new AppException("Error while generating Excel file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new AppException("Error while generating Excel file: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
