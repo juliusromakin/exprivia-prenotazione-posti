@@ -311,6 +311,13 @@
                   {{ 'ACCOUNT.PASSWORD.REQ_NUMBER' | translate }}
                 </span>
               </li>
+              <li class="flex items-center transition-colors duration-200">
+                <i class="fas mr-2 w-3"
+                  [class]="passwordRequirements.hasSymbol ? 'fa-check-circle text-green-500' : 'fa-circle text-gray-300'"></i>
+                <span [class]="passwordRequirements.hasSymbol ? 'text-green-700' : 'text-gray-500'">
+                  {{ 'ACCOUNT.PASSWORD.REQ_SYMBOL' | translate }}
+                </span>
+              </li>
             </ul>
           </div>
         </div>

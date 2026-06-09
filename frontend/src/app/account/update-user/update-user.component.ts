@@ -47,7 +47,8 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
     minLength: false,
     hasUppercase: false,
     hasLowercase: false,
-    hasNumber: false
+    hasNumber: false,
+    hasSymbol: false
   }
 
   constructor(
@@ -64,7 +65,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
       currentPassword: [""],
       newPassword: [
         "",
-        [Validators.minLength(6), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/)],
+        [Validators.minLength(6), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{6,}$/)],
       ],
       confirmPassword: [""],
     })
@@ -129,6 +130,7 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
     this.passwordRequirements.hasUppercase = /[A-Z]/.test(password)
     this.passwordRequirements.hasLowercase = /[a-z]/.test(password)
     this.passwordRequirements.hasNumber = /\d/.test(password)
+    this.passwordRequirements.hasSymbol = /[@$!%*?&.]/.test(password)
   }
 
   // Get overall password strength
@@ -374,7 +376,8 @@ export class UpdateUserComponent implements OnInit, OnDestroy {
       minLength: false,
       hasUppercase: false,
       hasLowercase: false,
-      hasNumber: false
+      hasNumber: false,
+      hasSymbol: false
     }
     this.errorMessage = null
     this.updateSuccess = false
