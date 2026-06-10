@@ -27,7 +27,7 @@
             </p>
           </div>
 
-          <!-- Notifications -->
+          <!-- Notifications & Profile -->
           <div class="flex items-center gap-4">
             <!-- Language Selector -->
             <button [matMenuTriggerFor]="langMenuDashboard"
@@ -37,12 +37,19 @@
               <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
             </button>
 
+            <!-- Notifications Bell -->
             <button class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full">
               <lucide-icon name="bell" class="w-6 h-6" />
               <span *ngIf="notificationCount > 0"
                 class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {{ notificationCount }}
               </span>
+            </button>
+
+            <!-- Clickable Profile Bubble -->
+            <button [matMenuTriggerFor]="profileMenuDashboard"
+              class="flex items-center justify-center w-10 h-10 rounded-full bg-expriviaBlue hover:bg-expriviaBlue/80 border-2 border-white shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-expriviaBlue/30">
+              <lucide-icon name="user" class="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
@@ -169,6 +176,21 @@
     class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[120px]">
     <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-6 h-4.5 object-cover rounded-sm shadow-sm">
     <span class="font-medium text-gray-700">EN</span>
+  </button>
+</mat-menu>
+
+<mat-menu #profileMenuDashboard="matMenu" class="rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] mt-1">
+  <div class="px-4 py-2.5 border-b border-gray-100 text-sm">
+    <p class="font-semibold text-gray-900">{{ currentUser?.name }} {{ currentUser?.lastName }}</p>
+    <p class="text-xs text-gray-500 truncate">{{ currentUser?.email }}</p>
+  </div>
+  <button mat-menu-item [routerLink]="['/dashboard/update-user']" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[180px]">
+    <lucide-icon name="user" class="w-4 h-4 text-gray-500"></lucide-icon>
+    <span class="font-medium text-gray-700">{{ 'HEADER.PROFILE' | translate }}</span>
+  </button>
+  <button mat-menu-item (click)="logout()" class="flex items-center gap-3 hover:bg-gray-50 w-full min-w-[180px] text-red-600">
+    <lucide-icon name="log-out" class="w-4 h-4 text-red-500"></lucide-icon>
+    <span class="font-medium text-red-600">{{ 'SIDEBAR.DISCONNECT' | translate }}</span>
   </button>
 </mat-menu>
 

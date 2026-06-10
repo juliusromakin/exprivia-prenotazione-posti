@@ -68,12 +68,7 @@ export class NavigationService {
       adminOnly: true,
       badges: [UserRole.ADMIN],
     },
-    {
-      label: "SIDEBAR.UPDATE_PROFILE",
-      icon: "user",
-      route: "/dashboard/update-user",
-      badges: [UserRole.USER, UserRole.ADMIN],
-    },
+
   ];
 
   private navigationSubject = new BehaviorSubject<NavItem[]>(

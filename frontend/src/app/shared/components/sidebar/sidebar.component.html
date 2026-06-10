@@ -77,23 +77,4 @@
     </ng-container>
   </mat-accordion>
 
-  <!-- Sezione profilo utente e logout -->
-  <div *ngIf="isAuthenticated" class="p-4 flex flex-col items-center justify-center gap-2 border-t border-slate-200"
-    [class.py-3]="isCollapsed">
-    <div *ngIf="!isCollapsed" class="flex flex-col items-center gap-2 text-gray-700">
-      <div class="flex items-center gap-2">
-        <lucide-icon name="user" class="w-5 h-5 text-gray-600 flex-shrink-0"></lucide-icon>
-        <span class="font-medium whitespace-nowrap">{{ currentUser?.name }} {{ currentUser?.lastName }}</span>
-      </div>
-      <span class="text-sm text-gray-500 whitespace-nowrap">{{
-        getRoleDisplayName(currentUser?.badges)
-        }}</span>
-    </div>
-    <button (click)="logout()" [class.w-full]="!isCollapsed"
-      class="px-3 py-2 flex items-center justify-center gap-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer"
-      [matTooltip]="isCollapsed ? ('SIDEBAR.DISCONNECT' | translate) : ''" [matTooltipPosition]="'right'" [attr.aria-label]="'SIDEBAR.DISCONNECT' | translate">
-      <lucide-icon name="log-out" class="w-5 h-5 flex-shrink-0" />
-      <span [class.hidden]="isCollapsed" class="whitespace-nowrap">{{ 'SIDEBAR.DISCONNECT' | translate }}</span>
-    </button>
-  </div>
 </div>
