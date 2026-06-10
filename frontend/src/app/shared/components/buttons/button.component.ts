@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 
 export type ButtonType = 'primary' | 'secondary' | 'danger' | 'ghost' | 'link';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 export type IconPosition = 'left' | 'right';
 
 @Component({
@@ -36,9 +36,10 @@ export class ButtonComponent {
   getButtonClasses(): string {
     const baseClasses = 'group cursor-pointer inline-flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg';
     const sizeClasses = {
-      sm: 'px-3 py-1.5 text-sm',
+      sm: 'px-4 py-2 text-sm',
       md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg'
+      lg: 'px-6 py-3 text-lg',
+      xl: 'px-5 py-2.5 text-base'
     };
     const typeClasses = {
       primary: 'bg-expriviaOrange text-white hover:bg-expriviaOrange600 focus:ring-expriviaOrange shadow-lg hover:shadow-xl',
@@ -57,13 +58,16 @@ export class ButtonComponent {
     const sizeClasses = {
       sm: 'w-4 h-4',
       md: 'w-5 h-5',
-      lg: 'w-6 h-6'
+      lg: 'w-6 h-6',
+      xl: 'w-7 h-7'
     };
     return `fas ${sizeClasses[this.size]} transition-transform duration-300 group-hover:translate-x-1`;
   }
 
   getTextClasses(): string {
-    return this.size === 'sm' ? 'text-sm' : 'text-base font-medium';
+    if (this.size === 'sm') return 'text-sm';
+    if (this.size === 'xl') return 'text-base font-normal';
+    return 'text-base font-medium';
   }
 
   getRippleColor(): string {

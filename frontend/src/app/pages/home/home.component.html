@@ -31,27 +31,27 @@
                             <ng-container *ngIf="!(isAuthenticated && isAdmin)">{{ 'HOME.SUBTITLE2' | translate }}</ng-container>
                         </p>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4" @scaleIn>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 pt-4" @scaleIn>
                         <ng-container *ngIf="!isAuthenticated">
                             <app-button
-                                [label]="'HOME.START_NOW' | translate"
+                                [label]="'HOME.LOGIN' | translate"
                                 type="primary"
-                                size="lg"
-                                icon="fas fa-arrow-right"
+                                size="xl"
+                                icon="fas fa-sign-in-alt"
                                 iconPosition="right"
-                                routerLink="/register"
+                                routerLink="/login"
                                 class="w-full sm:w-auto shadow-xl"
-                                [attr.aria-label]="'HOME.START_NOW' | translate"
+                                [attr.aria-label]="'HOME.LOGIN' | translate"
                             ></app-button>
                             
                             <app-button
-                                [label]="'HOME.LOGIN' | translate"
+                                [label]="'HOME.REGISTER' | translate"
                                 type="ghost"
-                                size="lg"
-                                icon="fas fa-sign-in-alt"
-                                routerLink="/login"
+                                size="sm"
+                                icon="fas fa-user-plus"
+                                routerLink="/register"
                                 class="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
-                                [attr.aria-label]="'HOME.LOGIN' | translate"
+                                [attr.aria-label]="'HOME.REGISTER' | translate"
                             ></app-button>
                         </ng-container>
 
