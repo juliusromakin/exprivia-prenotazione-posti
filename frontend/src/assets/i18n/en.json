@@ -62,6 +62,10 @@
     "LOCATION_MANAGEMENT": "Location Management",
     "LOCATION_MANAGEMENT_DESC": "Manage company locations and their buildings"
   },
+  "ROOM_TYPES": {
+    "OFFICE": "Office",
+    "MEETING_ROOM": "Meeting Room"
+  },
   "ADMIN_HOME": {
     "HERO_TITLE": "Manage your workspace",
     "HERO_DESC": "Administrative control panel to manage bookings and office plans centrally.",
@@ -310,6 +314,7 @@
       "USER": "User",
       "CITY": "City",
       "LOCATION": "Location",
+      "LOCATION_CITY": "Location / City",
       "ROOM": "Room",
       "WORKSPACE": "Workspace",
       "STATUS": "Status",
@@ -475,6 +480,7 @@
       "TIME": "Time",
       "CITY": "City",
       "LOCATION": "Location",
+      "LOCATION_CITY": "Location / City",
       "ROOM": "Room",
       "WORKSPACE": "Workspace",
       "STATUS": "Status",

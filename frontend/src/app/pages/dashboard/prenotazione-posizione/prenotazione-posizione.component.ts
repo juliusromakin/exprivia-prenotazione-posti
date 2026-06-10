@@ -55,10 +55,19 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   roomTypes: { value: string; label: string }[] = [];
   reservations: Reservation[] = [];
   sortedReservations: Reservation[] = [];
+  paginatedReservations: Reservation[] = [];
   private destroy$ = new Subject<void>();
 
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+  pageOptions = [10, 25, 50, 100];
+  pageNumbers: number[] = [];
+
   // Sorting properties
-  sortColumn: string = 'startDate'; // Default sort by date
+  sortColumn: string = 'id'; // Default sort by id
   sortDirection: 'asc' | 'desc' = 'desc'; // Default to descending (latest first)
 
   // Filter properties
@@ -782,6 +791,17 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     return `${this.formatDate(start, 'HH:mm')} - ${this.formatDate(end, 'HH:mm')}`;
   }
 
+  getTranslatedRoomType(type?: string): string {
+    if (!type) return '';
+    const upperType = type.toUpperCase();
+    if (upperType === 'MEETINGROOM' || upperType === 'MEETING_ROOM') {
+      return this.translate.instant('ROOM_TYPES.MEETING_ROOM');
+    } else if (upperType === 'OFFICE') {
+      return this.translate.instant('ROOM_TYPES.OFFICE');
+    }
+    return type;
+  }
+
   sortTable(column: string): void {
     if (this.sortColumn === column) this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     else { this.sortColumn = column; this.sortDirection = 'asc'; }
@@ -797,7 +817,34 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       if (vA > vB) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
+    this.totalItems = this.sortedReservations.length;
+    this.updatePagination();
   }
+
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) this.currentPage = Math.max(1, this.totalPages);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    this.paginatedReservations = this.sortedReservations.slice(start, start + this.itemsPerPage);
+    this.generatePageNumbers();
+  }
+
+  generatePageNumbers(): void {
+    this.pageNumbers = Array.from({ length: Math.min(5, this.totalPages) }, (_, i) => {
+      let start = Math.max(1, this.currentPage - 2);
+      if (start + 4 > this.totalPages) start = Math.max(1, this.totalPages - 4);
+      return start + i;
+    }).filter(p => p <= this.totalPages);
+  }
+
+  onPageChange(page: number): void { this.currentPage = page; this.updatePagination(); }
+  onItemsPerPageChange(size: number): void { this.itemsPerPage = size; this.currentPage = 1; this.updatePagination(); }
+  goToFirstPage(): void { this.onPageChange(1); }
+  goToLastPage(): void { this.onPageChange(this.totalPages); }
+  goToPreviousPage(): void { if (this.currentPage > 1) this.onPageChange(this.currentPage - 1); }
+  goToNextPage(): void { if (this.currentPage < this.totalPages) this.onPageChange(this.currentPage + 1); }
+  getStartIndex(): number { return (this.currentPage - 1) * this.itemsPerPage + 1; }
+  getEndIndex(): number { return Math.min(this.currentPage * this.itemsPerPage, this.totalItems); }
 
   getSortIcon(column: string): string {
     if (this.sortColumn !== column) return 'fas fa-sort text-gray-400';

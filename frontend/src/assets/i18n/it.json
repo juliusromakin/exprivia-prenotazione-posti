@@ -62,6 +62,10 @@
     "LOCATION_MANAGEMENT": "Gestione Sedi",
     "LOCATION_MANAGEMENT_DESC": "Gestisci le sedi aziendali e i relativi edifici"
   },
+  "ROOM_TYPES": {
+    "OFFICE": "Ufficio",
+    "MEETING_ROOM": "Sala Riunioni"
+  },
   "ADMIN_HOME": {
     "HERO_TITLE": "Gestisci il tuo piano di lavoro",
     "HERO_DESC": "Pannello di controllo amministrativo per gestire prenotazioni e planimetrie aziendali in modo centralizzato.",
@@ -310,8 +314,10 @@
       "USER": "Utente",
       "CITY": "Città",
       "LOCATION": "Sede",
+      "LOCATION_CITY": "Sede / Città",
       "ROOM": "Sala",
       "WORKSPACE": "Postazione",
+      "ROOM_WORKSPACE": "Sala / Postazione",
       "STATUS": "Stato",
       "ACTIONS": "Azioni",
       "STATUS_CONFIRMED": "Confermata",
@@ -475,15 +481,17 @@
       "TIME": "Orario",
       "CITY": "Città",
       "LOCATION": "Sede",
+      "LOCATION_CITY": "Sede / Città",
       "ROOM": "Sala",
       "WORKSPACE": "Postazione",
+      "ROOM_WORKSPACE": "Sala/Postazione",
       "STATUS": "Stato",
       "ACTIONS": "Azioni",
       "STATUS_CONFIRMED": "Confermata",
       "STATUS_PENDING": "In Attesa",
       "STATUS_DENIED": "Rifiutata",
       "ACTION_CANCEL": "Annulla",
-      "BENEFICIARY": "Beneficiario",
+      "BENEFICIARY": "Utente",
       "BOOKED_BY": "Prenotato da"
     },
     "MESSAGES": {

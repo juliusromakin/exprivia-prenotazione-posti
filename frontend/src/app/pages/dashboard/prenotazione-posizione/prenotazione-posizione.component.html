@@ -339,12 +339,8 @@
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">
               {{ 'BOOKING.TABLE.BENEFICIARY' | translate }}
             </th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.CITY' | translate }}</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.LOCATION' | translate }}</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ROOM' | translate }}
-            </th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.WORKSPACE' |
-              translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.LOCATION_CITY' | translate }}</th>
+            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ROOM_WORKSPACE' | translate }}</th>
             <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.STATUS' | translate
               }}</th>
             <th *ngIf="statusFilter !== 'scadute'" class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{
@@ -352,7 +348,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let reservation of sortedReservations">
+          <tr *ngFor="let reservation of paginatedReservations">
             <td *ngIf="statusFilter !== 'scadute'" class="p-2 text-center">
               <input *ngIf="canShowCheckbox(reservation)" type="checkbox"
                 [checked]="isReservationSelected(reservation.id!)" (change)="toggleSelectReservation(reservation.id!)">
@@ -369,16 +365,27 @@
                 </div>
               </div>
               <ng-template #noUser>-</ng-template>
-              <div *ngIf="reservation.bookedBySummary && reservation.bookedBySummary.id !== reservation.userSummary?.id" 
+              <div *ngIf="$any(reservation).bookedBySummary && $any(reservation).bookedBySummary.id !== reservation.userSummary?.id" 
                    class="text-[10px] text-amber-600 mt-1 flex items-center gap-1 font-medium bg-amber-50 rounded px-1.5 py-0.5 w-max">
                 <i class="fas fa-user-edit"></i>
-                <span>{{ 'BOOKING.TABLE.BOOKED_BY' | translate }}: {{ reservation.bookedBySummary.name }}</span>
+                <span>{{ 'BOOKING.TABLE.BOOKED_BY' | translate }}: {{ $any(reservation).bookedBySummary?.name }}</span>
               </div>
             </td>
-            <td class="p-2 text-sm">{{ reservation.cityName }}</td>
-            <td class="p-2 text-sm">{{ reservation.locationName }}</td>
-            <td class="p-2 text-sm">{{ reservation.roomSummary?.name }}</td>
-            <td class="p-2 text-sm">{{ reservation.workspaceSummary?.name }}</td>
+            <td class="p-2 text-sm">
+              <div class="font-medium">{{ reservation.locationName }}</div>
+              <div class="text-xs text-gray-500">{{ reservation.cityName }}</div>
+            </td>
+            <td class="p-2 text-sm">
+              <div class="font-medium">
+                {{ reservation.roomSummary?.name }}
+                <ng-container *ngIf="reservation.roomSummary?.roomType !== 'MeetingRoom' && reservation.roomSummary?.roomType !== 'MEETING_ROOM' && reservation.roomSummary?.roomType !== 'MEETINGROOM'">
+                   / {{ reservation.workspaceSummary?.name }}
+                </ng-container>
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
+              </div>
+            </td>
             <td class="p-2">
               <span class="px-2 py-1 text-xs rounded-full" [ngClass]="{
                   'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
@@ -398,6 +405,22 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalItems > 0" class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+      <div class="flex items-center gap-2 text-sm text-gray-700">
+        {{ 'RESERVATIONS.PAGINATION.SHOW' | translate }}
+        <select [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange($event)" class="border rounded px-2 py-1">
+          <option *ngFor="let opt of pageOptions" [value]="opt">{{ opt }}</option>
+        </select>
+        {{ 'RESERVATIONS.PAGINATION.ENTRIES_SHOWING' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'RESERVATIONS.PAGINATION.OF' | translate }} {{ totalItems }})
+      </div>
+      <div class="flex items-center gap-1">
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.PREV' | translate }}</button>
+        <button *ngFor="let p of pageNumbers" (click)="onPageChange(p)" [class.bg-blue-600]="p === currentPage" [class.text-white]="p === currentPage" class="px-3 py-1 border rounded">{{ p }}</button>
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.NEXT' | translate }}</button>
+      </div>
     </div>
   </div>
 </div>

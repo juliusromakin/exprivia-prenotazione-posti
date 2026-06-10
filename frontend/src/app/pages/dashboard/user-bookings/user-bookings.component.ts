@@ -39,7 +39,7 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Sorting properties
-  sortColumn: string = 'startDate';
+  sortColumn: string = 'id';
   sortDirection: 'asc' | 'desc' = 'desc';
 
   // Search and Filter
@@ -199,6 +199,17 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
       if (status === 'cancelled') return r.status === ReservationStatus.DENIED;
       return true;
     }).length;
+  }
+
+  getTranslatedRoomType(type?: string): string {
+    if (!type) return '';
+    const upperType = type.toUpperCase();
+    if (upperType === 'MEETINGROOM' || upperType === 'MEETING_ROOM') {
+      return this.translate.instant('ROOM_TYPES.MEETING_ROOM');
+    } else if (upperType === 'OFFICE') {
+      return this.translate.instant('ROOM_TYPES.OFFICE');
+    }
+    return type;
   }
 
   applySearchFilter(): void {
