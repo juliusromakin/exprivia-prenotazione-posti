@@ -17,6 +17,7 @@ import com.prenotazioni.exprivia.exprv.mapper.BuildingMapper;
 import com.prenotazioni.exprivia.exprv.repository.BuildingRepository;
 import com.prenotazioni.exprivia.exprv.repository.FloorRepository;
 import com.prenotazioni.exprivia.exprv.repository.LocationRepository;
+import java.util.Map;
 
 @Service
 public class BuildingService {
@@ -57,7 +58,11 @@ public class BuildingService {
 
     public BuildingDTO findBuildingById(Integer id) {
         return buildingMapper.toDto(buildingRepository.findById(id)
-                .orElseThrow(() -> new AppException("Building with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "BUILDING_NOT_FOUND",
+                        "Building with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND)));
     }
 
     @Transactional
@@ -67,7 +72,10 @@ public class BuildingService {
 
         if (buildingDTO.getLocationId() != null) {
             Location location = locationRepository.findById(buildingDTO.getLocationId())
-                    .orElseThrow(() -> new AppException("Location with ID " + buildingDTO.getLocationId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "LOCATION_NOT_FOUND",
+                            "Location with ID " + buildingDTO.getLocationId() + " not found",
+                            Map.of("id", buildingDTO.getLocationId()),
                             HttpStatus.NOT_FOUND));
             building.setLocation(location);
         }
@@ -93,13 +101,20 @@ public class BuildingService {
     @Transactional
     public BuildingDTO updateBuilding(Integer id, BuildingDTO buildingDTO) {
         Building existingBuilding = buildingRepository.findById(id)
-                .orElseThrow(() -> new AppException("Building with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "BUILDING_NOT_FOUND",
+                        "Building with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         buildingMapper.updateBuildingFromDto(buildingDTO, existingBuilding);
 
         if (buildingDTO.getLocationId() != null) {
             Location location = locationRepository.findById(buildingDTO.getLocationId())
-                    .orElseThrow(() -> new AppException("Location with ID " + buildingDTO.getLocationId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "LOCATION_NOT_FOUND",
+                            "Location with ID " + buildingDTO.getLocationId() + " not found",
+                            Map.of("id", buildingDTO.getLocationId()),
                             HttpStatus.NOT_FOUND));
             existingBuilding.setLocation(location);
         }
@@ -126,7 +141,11 @@ public class BuildingService {
     @Transactional
     public void softDeleteBuilding(Integer id) {
         Building existingBuilding = buildingRepository.findById(id)
-                .orElseThrow(() -> new AppException("Building with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "BUILDING_NOT_FOUND",
+                        "Building with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         
         // Disabilita l'edificio
         existingBuilding.setEnabled(false);
@@ -140,7 +159,11 @@ public class BuildingService {
     @Transactional
     public void hardDeleteBuilding(Integer id) {
         if (!buildingRepository.existsById(id)) {
-            throw new AppException("Building with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "BUILDING_NOT_FOUND",
+                    "Building with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         buildingRepository.deleteById(id);
     }

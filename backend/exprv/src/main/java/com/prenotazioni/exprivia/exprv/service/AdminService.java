@@ -1,6 +1,7 @@
 package com.prenotazioni.exprivia.exprv.service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -37,13 +38,13 @@ public class AdminService {
 
     private void validateUserData(AdminCreateUserDTO adminCreateUserDTO) {
         if (adminCreateUserDTO.getName() == null || adminCreateUserDTO.getName().isEmpty()) {
-            throw new AppException("Name cannot be null!", HttpStatus.BAD_REQUEST);
+            throw new AppException("NAME_REQUIRED", "Name cannot be null!", HttpStatus.BAD_REQUEST);
         }
         if (adminCreateUserDTO.getLastName() == null || adminCreateUserDTO.getLastName().isEmpty()) {
-            throw new AppException("Last name cannot be null!", HttpStatus.BAD_REQUEST);
+            throw new AppException("LAST_NAME_REQUIRED", "Last name cannot be null!", HttpStatus.BAD_REQUEST);
         }
         if (adminCreateUserDTO.getEmail() == null || adminCreateUserDTO.getEmail().isEmpty()) {
-            throw new AppException("Email cannot be null!", HttpStatus.BAD_REQUEST);
+            throw new AppException("EMAIL_REQUIRED", "Email cannot be null!", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -51,11 +52,15 @@ public class AdminService {
         validateUserData(adminCreateUserDTO);
 
         if (userRepository.findByEmail(adminCreateUserDTO.getEmail()).isPresent()) {
-            throw new AppException("A user with this email already exists!", HttpStatus.BAD_REQUEST);
+            throw new AppException(
+                    "EMAIL_ALREADY_IN_USE",
+                    "A user with this email already exists!",
+                    Map.of("email", adminCreateUserDTO.getEmail()),
+                    HttpStatus.BAD_REQUEST);
         }
 
         if (adminCreateUserDTO.getBadges() == null || adminCreateUserDTO.getBadges().isEmpty()) {
-            throw new AppException("At least one role must be specified for the user", HttpStatus.BAD_REQUEST);
+            throw new AppException("ROLE_REQUIRED", "At least one role must be specified for the user", HttpStatus.BAD_REQUEST);
         }
 
         // Il Mapper fa quasi tutto al posto nostro!
@@ -77,16 +82,24 @@ public class AdminService {
 
     public AdminDTO updateUserByAdmin(Integer id, AdminUpdateUserDTO adminUpdateDTO) {
         if (!BadgeService.isAdmin()) {
-            throw new AppException("Access denied: only an administrator can update a user", HttpStatus.FORBIDDEN);
+            throw new AppException("ADMIN_ROLE_REQUIRED", "Access denied: only an administrator can update a user", HttpStatus.FORBIDDEN);
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "User with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         if (adminUpdateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(adminUpdateDTO.getEmail());
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
-                throw new AppException("Email already in use", HttpStatus.BAD_REQUEST);
+                throw new AppException(
+                        "EMAIL_ALREADY_IN_USE",
+                        "Email already in use",
+                        Map.of("email", adminUpdateDTO.getEmail()),
+                        HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -101,13 +114,17 @@ public class AdminService {
     @Transactional
     public AdminDTO approveUser(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppException("Utente con ID " + id + " non trovato", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "Utente con ID " + id + " non trovato",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         Badge guestBadge = badgeRepository.findByName("ROLE_GUEST")
-                .orElseThrow(() -> new AppException("Badge ROLE_GUEST non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new AppException("ROLE_GUEST_NOT_FOUND", "Badge ROLE_GUEST non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
         
         Badge userBadge = badgeRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new AppException("Badge ROLE_USER non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new AppException("ROLE_USER_NOT_FOUND", "Badge ROLE_USER non trovato", HttpStatus.INTERNAL_SERVER_ERROR));
 
         // Rimuoviamo il badge GUEST e aggiungiamo il badge USER
         Set<Badge> badges = user.getBadges();

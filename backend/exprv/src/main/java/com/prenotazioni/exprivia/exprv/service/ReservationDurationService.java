@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 import com.prenotazioni.exprivia.exprv.dto.ReservationDurationDTO;
 import com.prenotazioni.exprivia.exprv.entity.ReservationDuration;
 import com.prenotazioni.exprivia.exprv.exceptions.AppException;
@@ -29,14 +31,21 @@ public class ReservationDurationService {
 
     public ReservationDurationDTO findDurationByName(String name) {
         return reservationDurationMapper.toDto(reservationDurationRepository.findByName(name)
-                .orElseThrow(() -> new AppException("Durata '" + name + "' non trovata", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "DURATION_NOT_FOUND",
+                        "Durata '" + name + "' non trovata",
+                        Map.of("name", name),
+                        HttpStatus.NOT_FOUND)));
     }
 
     public ReservationDurationDTO createDuration(ReservationDurationDTO durationDTO) {
         // Verifica che non esista già una durata con lo stesso nome (è la chiave
         // primaria)
         if (reservationDurationRepository.existsByName(durationDTO.getName())) {
-            throw new AppException("Esiste già una durata con il nome '" + durationDTO.getName() + "'",
+            throw new AppException(
+                    "DURATION_ALREADY_EXISTS",
+                    "Esiste già una durata con il nome '" + durationDTO.getName() + "'",
+                    Map.of("name", durationDTO.getName()),
                     HttpStatus.CONFLICT);
         }
 
@@ -47,7 +56,11 @@ public class ReservationDurationService {
 
     public ReservationDurationDTO updateDuration(String name, ReservationDurationDTO durationDTO) {
         ReservationDuration existingDuration = reservationDurationRepository.findByName(name)
-                .orElseThrow(() -> new AppException("Durata '" + name + "' non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "DURATION_NOT_FOUND",
+                        "Durata '" + name + "' non trovata",
+                        Map.of("name", name),
+                        HttpStatus.NOT_FOUND));
 
         reservationDurationMapper.updateReservationDurationFromDto(durationDTO, existingDuration);
         reservationDurationRepository.save(existingDuration);
@@ -56,14 +69,22 @@ public class ReservationDurationService {
 
     public void softDeleteDuration(String name) {
         ReservationDuration existingDuration = reservationDurationRepository.findByName(name)
-                .orElseThrow(() -> new AppException("Durata '" + name + "' non trovata", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "DURATION_NOT_FOUND",
+                        "Durata '" + name + "' non trovata",
+                        Map.of("name", name),
+                        HttpStatus.NOT_FOUND));
         existingDuration.setIsActive(false);
         reservationDurationRepository.save(existingDuration);
     }
 
     public void hardDeleteDuration(String name) {
         if (!reservationDurationRepository.existsByName(name)) {
-            throw new AppException("Durata '" + name + "' non trovata", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "DURATION_NOT_FOUND",
+                    "Durata '" + name + "' non trovata",
+                    Map.of("name", name),
+                    HttpStatus.NOT_FOUND);
         }
         reservationDurationRepository.deleteById(name);
     }

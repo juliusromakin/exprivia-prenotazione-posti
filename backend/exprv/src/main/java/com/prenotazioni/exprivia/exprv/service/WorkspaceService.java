@@ -15,6 +15,7 @@ import com.prenotazioni.exprivia.exprv.repository.FloorPlanRepository;
 import com.prenotazioni.exprivia.exprv.repository.RoomRepository;
 import com.prenotazioni.exprivia.exprv.repository.WorkspacePositionRepository;
 import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -46,7 +47,11 @@ public class WorkspaceService {
 
     public WorkspaceDTO findWorkspaceById(Integer id) {
         return workspaceMapper.toDto(workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "WORKSPACE_NOT_FOUND",
+                        "Workspace with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND)));
     }
 
     public List<WorkspaceDTO> findWorkspacesByRoomId(Integer roomId, boolean enabledOnly) {
@@ -76,7 +81,10 @@ public class WorkspaceService {
 
         if (workspaceDTO.getRoomId() != null) {
             Room room = roomRepository.findById(workspaceDTO.getRoomId())
-                    .orElseThrow(() -> new AppException("Room with ID " + workspaceDTO.getRoomId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "ROOM_NOT_FOUND",
+                            "Room with ID " + workspaceDTO.getRoomId() + " not found",
+                            Map.of("id", workspaceDTO.getRoomId()),
                             HttpStatus.NOT_FOUND));
 
             // Check if workspace with same name exists in this room
@@ -104,14 +112,21 @@ public class WorkspaceService {
 
     public WorkspaceDTO updateWorkspace(Integer id, WorkspaceDTO workspaceDTO) {
         Workspace existingWorkspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "WORKSPACE_NOT_FOUND",
+                        "Workspace with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         workspaceMapper.updateWorkspaceFromDto(workspaceDTO, existingWorkspace);
 
         Room room = null;
         if (workspaceDTO.getRoomId() != null) {
             room = roomRepository.findById(workspaceDTO.getRoomId())
-                    .orElseThrow(() -> new AppException("Room with ID " + workspaceDTO.getRoomId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "ROOM_NOT_FOUND",
+                            "Room with ID " + workspaceDTO.getRoomId() + " not found",
+                            Map.of("id", workspaceDTO.getRoomId()),
                             HttpStatus.NOT_FOUND));
             existingWorkspace.setRoom(room);
         }
@@ -123,14 +138,22 @@ public class WorkspaceService {
 
     public void softDeleteWorkspace(Integer id) {
         Workspace existingWorkspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "WORKSPACE_NOT_FOUND",
+                        "Workspace with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         existingWorkspace.setEnabled(false);
         workspaceRepository.save(existingWorkspace);
     }
 
     public void hardDeleteWorkspace(Integer id) {
         if (!workspaceRepository.existsById(id)) {
-            throw new AppException("Workspace with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "WORKSPACE_NOT_FOUND",
+                    "Workspace with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         workspaceRepository.deleteById(id);
     }

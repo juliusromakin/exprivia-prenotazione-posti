@@ -15,6 +15,7 @@ import com.prenotazioni.exprivia.exprv.exceptions.AppException;
 import com.prenotazioni.exprivia.exprv.mapper.LocationMapper;
 import com.prenotazioni.exprivia.exprv.repository.BuildingRepository;
 import com.prenotazioni.exprivia.exprv.repository.LocationRepository;
+import java.util.Map;
 
 @Service
 public class LocationService {
@@ -47,7 +48,11 @@ public class LocationService {
 
     public LocationDTO findLocationById(Integer id) {
         return locationMapper.toDto(locationRepository.findById(id)
-                .orElseThrow(() -> new AppException("Location with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "LOCATION_NOT_FOUND",
+                        "Location with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND)));
     }
 
     @Transactional
@@ -72,7 +77,11 @@ public class LocationService {
     @Transactional
     public LocationDTO updateLocation(Integer id, LocationDTO locationDTO) {
         Location existingLocation = locationRepository.findById(id)
-                .orElseThrow(() -> new AppException("Location with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "LOCATION_NOT_FOUND",
+                        "Location with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         locationMapper.updateLocationFromDto(locationDTO, existingLocation);
         Location savedLocation = locationRepository.save(existingLocation);
 
@@ -96,7 +105,11 @@ public class LocationService {
     @Transactional
     public void softDeleteLocation(Integer id) {
         Location existingLocation = locationRepository.findById(id)
-                .orElseThrow(() -> new AppException("Location with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "LOCATION_NOT_FOUND",
+                        "Location with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         
         // Disabilita la sede
         existingLocation.setEnabled(false);
@@ -110,7 +123,11 @@ public class LocationService {
     @Transactional
     public void hardDeleteLocation(Integer id) {
         if (!locationRepository.existsById(id)) {
-            throw new AppException("Location with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "LOCATION_NOT_FOUND",
+                    "Location with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         locationRepository.deleteById(id);
     }

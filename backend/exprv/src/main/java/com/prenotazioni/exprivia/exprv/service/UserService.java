@@ -1,8 +1,8 @@
 package com.prenotazioni.exprivia.exprv.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,6 @@ import com.prenotazioni.exprivia.exprv.repository.BadgeRepository;
 import com.prenotazioni.exprivia.exprv.repository.UserRepository;
 import com.prenotazioni.exprivia.exprv.security.jwt.JwtTokenProvider;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +68,10 @@ public class UserService {
      */
     public AdminDTO findUserById(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("USER_NOT_FOUND",
+                        "User with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         return userMapper.toAdminDto(user);
     }
 
@@ -79,13 +81,21 @@ public class UserService {
     public AdminDTO findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(
-                        () -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
+                        () -> new AppException(
+                                "USER_BY_EMAIL_NOT_FOUND",
+                                "User with email " + email + " not found",
+                                Map.of("email", email),
+                                HttpStatus.NOT_FOUND));
         return userMapper.toAdminDto(user);
     }
 
     public Badge getBadgeByName(String name) {
         return badgeRepository.findByName(name)
-                .orElseThrow(() -> new AppException("Badge not found with name: " + name, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "BADGE_NOT_FOUND",
+                        "Badge not found with name: " + name,
+                        Map.of("name", name),
+                        HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -93,14 +103,22 @@ public class UserService {
      */
     public UserDTO updateUser(Integer id, UserUpdateDTO updateDTO) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "User with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         verifyOwnershipOrAny(existingUser.getEmail(), "ACTION_USER_UPDATE_ANY");
 
         if (updateDTO.getEmail() != null) {
             Optional<User> userWithSameEmail = userRepository.findByEmail(updateDTO.getEmail());
             if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
-                throw new AppException("Email already in use", HttpStatus.BAD_REQUEST);
+                throw new AppException(
+                        "EMAIL_ALREADY_IN_USE",
+                        "Email already in use",
+                        Map.of("email", updateDTO.getEmail()),
+                        HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -108,11 +126,17 @@ public class UserService {
             String currentPassword = updateDTO.getCurrentPassword();
 
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
-                throw new AppException("Current password is required to change password", HttpStatus.BAD_REQUEST);
+                throw new AppException(
+                        "CURRENT_PASSWORD_REQUIRED",
+                        "Current password is required to change password",
+                        HttpStatus.BAD_REQUEST);
             }
 
             if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
-                throw new AppException("Incorrect current password", HttpStatus.BAD_REQUEST);
+                throw new AppException(
+                        "INCORRECT_CURRENT_PASSWORD",
+                        "Incorrect current password",
+                        HttpStatus.BAD_REQUEST);
             }
 
             existingUser.setPassword(passwordEncoder.encode(updateDTO.getNewPassword()));
@@ -130,7 +154,11 @@ public class UserService {
      */
     public void deleteUser(Integer id) {
         if (!userRepository.existsById(id)) {
-            throw new AppException("User with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "USER_NOT_FOUND",
+                    "User with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         userRepository.deleteById(id);
     }
@@ -140,11 +168,18 @@ public class UserService {
      */
     public void deletePersonalAccount(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "User not found",
+                        Map.of("email", email),
+                        HttpStatus.NOT_FOUND));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!email.equals(authentication.getName())) {
-            throw new AppException("You do not have permission to delete this account", HttpStatus.FORBIDDEN);
+            throw new AppException(
+                    "FORBIDDEN_DELETE_ACCOUNT",
+                    "You do not have permission to delete this account",
+                    HttpStatus.FORBIDDEN);
         }
 
         userRepository.delete(user);
@@ -159,7 +194,11 @@ public class UserService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "User with email " + email + " not found",
+                        Map.of("email", email),
+                        HttpStatus.NOT_FOUND));
 
         UserDTO dto = userMapper.toDto(user);
         // Appiattisce i badge per il frontend
@@ -169,8 +208,12 @@ public class UserService {
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("User with email " + email + " not found", HttpStatus.NOT_FOUND));
-        
+                .orElseThrow(() -> new AppException(
+                        "USER_NOT_FOUND",
+                        "User with email " + email + " not found",
+                        Map.of("email", email),
+                        HttpStatus.NOT_FOUND));
+
         UserDTO dto = userMapper.toDto(user);
         // Appiattisce i badge per il frontend
         dto.setBadges(badgeService.flattenBadges(user.getBadges()));

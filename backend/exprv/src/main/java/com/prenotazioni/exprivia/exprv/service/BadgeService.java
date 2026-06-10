@@ -51,7 +51,11 @@ public class BadgeService {
      */
     public Badge getBadgeByName(String name) {
         return badgeRepository.findByName(name)
-                .orElseThrow(() -> new AppException("Badge non trovato: " + name, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "BADGE_NOT_FOUND",
+                        "Badge non trovato: " + name,
+                        Map.of("name", name),
+                        HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -63,7 +67,11 @@ public class BadgeService {
         String formattedName = formatBadgeName(badgeDto.getName(), badgeDto.getType());
 
         if (badgeRepository.findByName(formattedName).isPresent()) {
-            throw new AppException("Il badge " + formattedName + " esiste già.", HttpStatus.CONFLICT);
+            throw new AppException(
+                    "BADGE_ALREADY_EXISTS",
+                    "Il badge " + formattedName + " esiste già.",
+                    Map.of("name", formattedName),
+                    HttpStatus.CONFLICT);
         }
 
         Badge newBadge = new Badge();
@@ -83,13 +91,21 @@ public class BadgeService {
     @Transactional
     public Badge updateBadge(Integer id, BadgeDTO badgeDto) {
         Badge badge = badgeRepository.findById(id)
-                .orElseThrow(() -> new AppException("Badge non trovato con ID: " + id, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "BADGE_NOT_FOUND",
+                        "Badge non trovato con ID: " + id,
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         String formattedName = formatBadgeName(badgeDto.getName(), badgeDto.getType());
 
         if (!badge.getName().equals(formattedName)) {
             if (badgeRepository.findByName(formattedName).isPresent()) {
-                throw new AppException("Il badge " + formattedName + " esiste già.", HttpStatus.CONFLICT);
+                throw new AppException(
+                        "BADGE_ALREADY_EXISTS",
+                        "Il badge " + formattedName + " esiste già.",
+                        Map.of("name", formattedName),
+                        HttpStatus.CONFLICT);
             }
             badge.setName(formattedName);
         }
@@ -106,7 +122,10 @@ public class BadgeService {
                 if (isReachable(pId, id, badgeMap)) {
                     Badge parent = badgeMap.get(pId);
                     String parentName = (parent != null) ? parent.getName() : pId.toString();
-                    throw new AppException("Ciclo rilevato! Il badge " + parentName + " eredita gia da questo badge.",
+                    throw new AppException(
+                            "BADGE_CYCLE_DETECTED",
+                            "Ciclo rilevato! Il badge " + parentName + " eredita gia da questo badge.",
+                            Map.of("badgeName", parentName),
                             HttpStatus.BAD_REQUEST);
                 }
             }
@@ -266,7 +285,10 @@ public class BadgeService {
         }
 
         if (isReachable(inherited.getId(), badge.getId(), badgeMap)) {
-            throw new AppException("Ciclo infinito rilevato! Impossibile collegare i badge.", HttpStatus.BAD_REQUEST);
+            throw new AppException(
+                    "BADGE_CYCLE_DETECTED",
+                    "Ciclo infinito rilevato! Impossibile collegare i badge.",
+                    HttpStatus.BAD_REQUEST);
         }
 
         if (badge.getParentIds() == null) {

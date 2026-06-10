@@ -23,6 +23,7 @@ import com.prenotazioni.exprivia.exprv.repository.RoomPositionRepository;
 import com.prenotazioni.exprivia.exprv.repository.RoomRepository;
 import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,7 +79,11 @@ public class RoomService {
 
     public RoomDTO findRoomById(Integer id) {
         return roomMapper.toDto(roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "ROOM_NOT_FOUND",
+                        "Room with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND)));
     }
 
     @Transactional
@@ -87,7 +92,10 @@ public class RoomService {
 
         if (roomDTO.getFloorId() != null) {
             Floor floor = floorRepository.findById(roomDTO.getFloorId())
-                    .orElseThrow(() -> new AppException("Floor with ID " + roomDTO.getFloorId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "FLOOR_NOT_FOUND",
+                            "Floor with ID " + roomDTO.getFloorId() + " not found",
+                            Map.of("id", roomDTO.getFloorId()),
                             HttpStatus.NOT_FOUND));
 
             // Check if room with same name exists on this floor
@@ -117,12 +125,19 @@ public class RoomService {
     @Transactional
     public RoomDTO updateRoom(Integer id, RoomDTO roomDTO) {
         Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "ROOM_NOT_FOUND",
+                        "Room with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         roomMapper.updateRoomFromDto(roomDTO, existingRoom);
 
         if (roomDTO.getFloorId() != null) {
             Floor floor = floorRepository.findById(roomDTO.getFloorId())
-                    .orElseThrow(() -> new AppException("Floor with ID " + roomDTO.getFloorId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "FLOOR_NOT_FOUND",
+                            "Floor with ID " + roomDTO.getFloorId() + " not found",
+                            Map.of("id", roomDTO.getFloorId()),
                             HttpStatus.NOT_FOUND));
             existingRoom.setFloor(floor);
         }
@@ -139,7 +154,11 @@ public class RoomService {
             for (Equipment e : entity.getEquipment()) {
                 String name = e.getName().toLowerCase().trim();
                 if (!names.add(name)) {
-                    throw new AppException("Attrezzatura duplicata rilevata: " + e.getName(), HttpStatus.BAD_REQUEST);
+                    throw new AppException(
+                            "DUPLICATE_EQUIPMENT",
+                            "Attrezzatura duplicata rilevata: " + e.getName(),
+                            Map.of("name", e.getName()),
+                            HttpStatus.BAD_REQUEST);
                 }
             }
         }
@@ -148,7 +167,11 @@ public class RoomService {
     @Transactional
     public void softDeleteRoom(Integer id) {
         Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "ROOM_NOT_FOUND",
+                        "Room with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         // Disabilita la stanza
         existingRoom.setEnabled(false);
@@ -162,7 +185,11 @@ public class RoomService {
     @Transactional
     public void hardDeleteRoom(Integer id) {
         if (!roomRepository.existsById(id)) {
-            throw new AppException("Room with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "ROOM_NOT_FOUND",
+                    "Room with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         roomRepository.deleteById(id);
     }

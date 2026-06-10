@@ -3,6 +3,7 @@ package com.prenotazioni.exprivia.exprv.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -60,7 +61,7 @@ public class FloorPlanService {
     @Transactional(readOnly = true)
     public List<FloorPlanSummaryDTO> getFloorPlansByFloorId(Integer floorId) {
         if (!floorRepository.existsById(floorId)) {
-            throw new AppException("Floor not found", HttpStatus.NOT_FOUND);
+            throw new AppException("FLOOR_NOT_FOUND", "Floor not found", Map.of("id", floorId), HttpStatus.NOT_FOUND);
         }
         List<FloorPlan> plans = floorPlanRepository.findAllByFloorIdOrderByValidFromDesc(floorId);
         return floorPlanMapper.toSummaryDtoList(plans);
@@ -69,7 +70,7 @@ public class FloorPlanService {
     @Transactional
     public void deleteFloorPlan(Integer id) {
         FloorPlan plan = floorPlanRepository.findById(id)
-                .orElseThrow(() -> new AppException("FloorPlan not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("FLOOR_PLAN_NOT_FOUND", "FloorPlan not found", Map.of("id", id), HttpStatus.NOT_FOUND));
         
         // Delete dependent position mappings first to satisfy foreign key constraint
         roomPositionRepository.deleteByFloorPlanId(id);
@@ -82,7 +83,7 @@ public class FloorPlanService {
     @Transactional
     public FloorPlanSummaryDTO toggleFloorPlanStatus(Integer id) {
         FloorPlan plan = floorPlanRepository.findById(id)
-                .orElseThrow(() -> new AppException("FloorPlan not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("FLOOR_PLAN_NOT_FOUND", "FloorPlan not found", Map.of("id", id), HttpStatus.NOT_FOUND));
 
         if (!plan.getIsActive()) {
             plan.setIsActive(true);
@@ -100,7 +101,7 @@ public class FloorPlanService {
     @Transactional
     public FloorPlanDTO savePlanimetry(FloorPlanDTO floorPlanDTO) {
         Floor floor = floorRepository.findById(floorPlanDTO.getFloorId())
-                .orElseThrow(() -> new AppException("Floor not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("FLOOR_NOT_FOUND", "Floor not found", Map.of("id", floorPlanDTO.getFloorId()), HttpStatus.NOT_FOUND));
 
         LocalDate newValidFrom = floorPlanDTO.getValidFrom() != null ? floorPlanDTO.getValidFrom() : LocalDate.now();
 
@@ -217,7 +218,11 @@ public class FloorPlanService {
             }
         }
         if (fpOpt.isEmpty()) {
-            throw new AppException("Planimetria non trovata per la data richiesta", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "FLOOR_PLAN_NOT_FOUND_FOR_DATE",
+                    "Planimetria non trovata per la data richiesta",
+                    Map.of("floorId", floorId, "date", date),
+                    HttpStatus.NOT_FOUND);
         }
         return getFloorPlanDto(fpOpt.get());
     }
@@ -279,7 +284,7 @@ public class FloorPlanService {
     @Transactional
     public String uploadPlanimetryImage(Integer floorId, MultipartFile file) {
         Floor floor = floorRepository.findById(floorId)
-                .orElseThrow(() -> new AppException("Floor not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("FLOOR_NOT_FOUND", "Floor not found", Map.of("id", floorId), HttpStatus.NOT_FOUND));
 
         LocalDate now = LocalDate.now();
         FloorPlan floorPlan = floorPlanRepository.findActiveFloorPlan(floor.getId(), now)

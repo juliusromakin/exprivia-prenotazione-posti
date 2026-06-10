@@ -28,6 +28,7 @@ import com.prenotazioni.exprivia.exprv.repository.WorkspaceRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -106,7 +107,11 @@ public class FloorService {
 
     public FloorDTO findFloorById(Integer id) {
         FloorDTO dto = floorMapper.toDto(floorRepository.findById(id)
-                .orElseThrow(() -> new AppException("Floor with ID " + id + " not found", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new AppException(
+                        "FLOOR_NOT_FOUND",
+                        "Floor with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND)));
         List<Workspace> workspaces = workspaceRepository.findByRoomFloorId(id);
         dto.setWorkspaces(workspaceMapper.toDtoList(workspaces));
         
@@ -123,7 +128,10 @@ public class FloorService {
 
         if (floorDTO.getBuildingId() != null) {
             Building building = buildingRepository.findById(floorDTO.getBuildingId())
-                    .orElseThrow(() -> new AppException("Building with ID " + floorDTO.getBuildingId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "BUILDING_NOT_FOUND",
+                            "Building with ID " + floorDTO.getBuildingId() + " not found",
+                            Map.of("id", floorDTO.getBuildingId()),
                             HttpStatus.NOT_FOUND));
             floor.setBuilding(building);
         }
@@ -142,13 +150,20 @@ public class FloorService {
     @Transactional
     public FloorDTO updateFloor(Integer id, FloorDTO floorDTO) {
         Floor existingFloor = floorRepository.findById(id)
-                .orElseThrow(() -> new AppException("Floor with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "FLOOR_NOT_FOUND",
+                        "Floor with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
 
         floorMapper.updateFloorFromDto(floorDTO, existingFloor);
 
         if (floorDTO.getBuildingId() != null) {
             Building building = buildingRepository.findById(floorDTO.getBuildingId())
-                    .orElseThrow(() -> new AppException("Building with ID " + floorDTO.getBuildingId() + " not found",
+                    .orElseThrow(() -> new AppException(
+                            "BUILDING_NOT_FOUND",
+                            "Building with ID " + floorDTO.getBuildingId() + " not found",
+                            Map.of("id", floorDTO.getBuildingId()),
                             HttpStatus.NOT_FOUND));
             existingFloor.setBuilding(building);
         }
@@ -167,7 +182,11 @@ public class FloorService {
     @Transactional
     public void softDeleteFloor(Integer id) {
         Floor existingFloor = floorRepository.findById(id)
-                .orElseThrow(() -> new AppException("Floor with ID " + id + " not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(
+                        "FLOOR_NOT_FOUND",
+                        "Floor with ID " + id + " not found",
+                        Map.of("id", id),
+                        HttpStatus.NOT_FOUND));
         
         // Disabilita il piano
         existingFloor.setEnabled(false);
@@ -181,7 +200,11 @@ public class FloorService {
     @Transactional
     public void hardDeleteFloor(Integer id) {
         if (!floorRepository.existsById(id)) {
-            throw new AppException("Floor with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            throw new AppException(
+                    "FLOOR_NOT_FOUND",
+                    "Floor with ID " + id + " not found",
+                    Map.of("id", id),
+                    HttpStatus.NOT_FOUND);
         }
         floorRepository.deleteById(id);
     }

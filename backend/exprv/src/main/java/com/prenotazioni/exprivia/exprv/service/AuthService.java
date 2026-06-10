@@ -2,6 +2,7 @@ package com.prenotazioni.exprivia.exprv.service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,7 +55,11 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userRepository.findByEmail(credentialsDto.email())
-                    .orElseThrow(() -> new AppException("Utente non trovato", HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new AppException(
+                            "USER_NOT_FOUND",
+                            "Utente non trovato",
+                            Map.of("email", credentialsDto.email()),
+                            HttpStatus.NOT_FOUND));
 
             String jwt = jwtTokenProvider.generateToken(authentication);
 
@@ -69,11 +74,13 @@ public class AuthService {
                 return AuthResponseDTO.forUser(jwt, userDTO);
             }
         } catch (BadCredentialsException e) {
-            throw new AppException("Credenziali non valide", HttpStatus.BAD_REQUEST);
+            throw new AppException("INVALID_CREDENTIALS", "Credenziali non valide", HttpStatus.BAD_REQUEST);
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
-            throw new AppException("Errore durante l'autenticazione: " + e.getMessage(),
+            throw new AppException(
+                    "AUTHENTICATION_ERROR",
+                    "Errore durante l'autenticazione: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -128,7 +135,11 @@ public class AuthService {
         validateRegistrationData(registrationDTO);
 
         if (userRepository.findByEmail(registrationDTO.getEmail()).isPresent()) {
-            throw new AppException("Esiste già un utente con questa email!", HttpStatus.BAD_REQUEST);
+            throw new AppException(
+                    "EMAIL_ALREADY_IN_USE",
+                    "Esiste già un utente con questa email!",
+                    Map.of("email", registrationDTO.getEmail()),
+                    HttpStatus.BAD_REQUEST);
         }
 
         User user = userMapper.toEntity(registrationDTO);
@@ -136,7 +147,9 @@ public class AuthService {
         user.setEnabled(true); 
 
         Badge guestBadge = badgeRepository.findByName("ROLE_GUEST")
-                .orElseThrow(() -> new AppException("Badge ROLE_GUEST non trovato nel sistema",
+                .orElseThrow(() -> new AppException(
+                        "ROLE_GUEST_NOT_FOUND",
+                        "Badge ROLE_GUEST non trovato nel sistema",
                         HttpStatus.INTERNAL_SERVER_ERROR));
 
         Set<Badge> badges = new HashSet<>();
@@ -149,13 +162,17 @@ public class AuthService {
 
     private void validateRegistrationData(UserSignupDTO registrationDTO) {
         if (registrationDTO.getName() == null || registrationDTO.getName().isBlank())
-            throw new AppException("Il nome non può essere vuoto", HttpStatus.BAD_REQUEST);
+            throw new AppException("NAME_REQUIRED", "Il nome non può essere vuoto", HttpStatus.BAD_REQUEST);
         if (registrationDTO.getLastName() == null || registrationDTO.getLastName().isBlank())
-            throw new AppException("Il cognome non può essere vuoto", HttpStatus.BAD_REQUEST);
+            throw new AppException("LAST_NAME_REQUIRED", "Il cognome non può essere vuoto", HttpStatus.BAD_REQUEST);
         if (registrationDTO.getEmail() == null || registrationDTO.getEmail().isBlank())
-            throw new AppException("La mail non può essere vuota", HttpStatus.BAD_REQUEST);
+            throw new AppException("EMAIL_REQUIRED", "La mail non può essere vuota", HttpStatus.BAD_REQUEST);
         if (registrationDTO.getPassword() == null || registrationDTO.getPassword().length() < 6)
-            throw new AppException("La password deve contenere almeno 6 caratteri", HttpStatus.BAD_REQUEST);
+            throw new AppException(
+                    "PASSWORD_TOO_SHORT",
+                    "La password deve contenere almeno 6 caratteri",
+                    Map.of("minLength", 6),
+                    HttpStatus.BAD_REQUEST);
     }
 
 }

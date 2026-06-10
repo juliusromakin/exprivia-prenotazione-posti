@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
 
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    private translateService: TranslateService
+  ) {}
 
   /**
    * Show a success toast message
@@ -46,9 +50,18 @@ export class ToastService {
   handleError(err: any, defaultSummary: string = 'Errore'): void {
     console.error('API Error details:', err);
     
+    let errorKey = 'GENERIC_ERROR';
+    let parameters: any = null;
     let detail = 'Si è verificato un errore imprevisto';
     
-    if (err.error && typeof err.error === 'object') {
+    const serverError = err.response?.data;
+    if (serverError && typeof serverError === 'object') {
+      if (serverError.errorKey) {
+        errorKey = serverError.errorKey;
+        parameters = serverError.parameters;
+      }
+      detail = serverError.message || detail;
+    } else if (err.error && typeof err.error === 'object') {
       detail = err.error.message || err.error.error || detail;
     } else if (typeof err.error === 'string') {
       detail = err.error;
@@ -56,7 +69,16 @@ export class ToastService {
       detail = err.message;
     }
 
-    this.showError(defaultSummary, detail);
+    // Traduciamo la chiave usando ngx-translate
+    this.translateService.get('ERRORS.' + errorKey, parameters).subscribe((translatedMsg: string) => {
+      // Se non trova la chiave (ngx-translate restituisce la chiave stessa), usa il detail come fallback
+      const finalMsg = translatedMsg !== 'ERRORS.' + errorKey ? translatedMsg : detail;
+      
+      // Traduciamo anche il titolo (es. "Errore") se presente nelle traduzioni
+      this.translateService.get(defaultSummary).subscribe((translatedSummary: string) => {
+        this.showError(translatedSummary, finalMsg);
+      });
+    });
   }
 
   /**
