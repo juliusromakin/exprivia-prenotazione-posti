@@ -169,3 +169,18 @@ body {
 .ml-sidebar-collapsed {
   margin-left: 72px !important;
 }
+
+/* Custom Language Menu */
+.lang-menu-panel {
+  min-width: 84px !important;
+  max-width: 100px !important;
+}
+
+.lang-menu-panel .mat-mdc-menu-content {
+  padding: 4px !important;
+}
+
+.lang-menu-panel .mat-mdc-menu-item {
+  min-height: 36px !important;
+  padding: 0 8px !important;
+}

@@ -1,6 +1,6 @@
 <app-header (guestAccessAttempt)="onBookClick()"></app-header>
 
-<main class="flex-1 w-full bg-gradient-to-b from-[var(--color-expriviaBlue)] to-[var(--color-expriviaBlue)]/90" role="main">
+<main class="flex-1 w-full bg-[var(--color-expriviaBlue)]" role="main">
     <!-- Unauthorized Guest Warning -->
     <div *ngIf="showUnauthorizedWarning" 
          class="sticky top-16 z-50 bg-amber-500 text-white px-4 py-2 text-center font-medium shadow-lg animate-in fade-in slide-in-from-top duration-300">
@@ -8,24 +8,30 @@
         Non sei ancora autorizzato. Attendi che un amministratore approvi il tuo account.
     </div>
 
-    <section class="relative py-6 sm:py-8 md:py-12 lg:py-16 overflow-hidden" aria-labelledby="hero-title">
-        <div class="absolute inset-0 opacity-10" aria-hidden="true">
-            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0cy00LTEuNzkxLTQtNCAxLjc5MS00IDQtNCA0IDEuNzkxIDQgNHoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+')]"></div>
+    <!-- Hero Section con sfondo Exprivia -->
+    <section class="relative min-h-[calc(100vh-64px)] flex items-center overflow-hidden" aria-labelledby="hero-title">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="assets/images/exprivia-sede.jpg" alt="Exprivia Headquarters" class="w-full h-full object-cover object-center" />
+            <!-- Overlay scuro per garantire la leggibilità del testo -->
+            <div class="absolute inset-0 bg-[var(--color-expriviaBlue)]/70 mix-blend-multiply"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-expriviaBlue)] via-transparent to-transparent opacity-100"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[var(--color-expriviaBlue)]/80 via-[var(--color-expriviaBlue)]/40 to-transparent"></div>
         </div>
 
-        <div class="container px-4 sm:px-6 mx-auto relative">
-            <div class="grid gap-6 lg:grid-cols-2 lg:gap-8 items-center">
-                <div class="flex flex-col justify-center space-y-4 sm:space-y-6" @fadeIn>
-                    <div class="space-y-3 sm:space-y-4">
-                        <h1 id="hero-title" class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight" @slideUp>
+        <div class="container px-4 sm:px-6 mx-auto relative z-10 py-12 lg:py-20">
+            <div class="max-w-3xl">
+                <div class="flex flex-col justify-center space-y-6 sm:space-y-8" @fadeIn>
+                    <div class="space-y-4 sm:space-y-6">
+                        <h1 id="hero-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-lg" @slideUp>
                             {{ 'HOME.WELCOME' | translate }}
                         </h1>
-                        <p class="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed max-w-[600px]" @slideUp>
+                        <p class="text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed max-w-2xl drop-shadow-md" @slideUp>
                             {{ 'HOME.SUBTITLE1' | translate }}
                             {{ 'HOME.SUBTITLE2' | translate }}
                         </p>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4" @scaleIn>
+                    <div class="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4" @scaleIn>
                         <ng-container *ngIf="!isAuthenticated">
                             <app-button
                                 [label]="'HOME.START_NOW' | translate"
@@ -34,7 +40,7 @@
                                 icon="fas fa-arrow-right"
                                 iconPosition="right"
                                 routerLink="/register"
-                                class="w-full sm:w-auto"
+                                class="w-full sm:w-auto shadow-xl"
                                 [attr.aria-label]="'HOME.START_NOW' | translate"
                             ></app-button>
                             
@@ -44,7 +50,7 @@
                                 size="lg"
                                 icon="fas fa-sign-in-alt"
                                 routerLink="/login"
-                                class="w-full sm:w-auto"
+                                class="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
                                 [attr.aria-label]="'HOME.LOGIN' | translate"
                             ></app-button>
                         </ng-container>
@@ -57,42 +63,39 @@
                             icon="fas fa-tachometer-alt"
                             iconPosition="right"
                             (click)="onBookClick()"
-                            class="w-full sm:w-auto"
+                            class="w-full sm:w-auto shadow-xl"
                             [attr.aria-label]="'HOME.GO_DASHBOARD' | translate"
                         ></app-button>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="relative flex items-center justify-center mt-6 lg:mt-0" @fadeIn>
-                    <div class="relative w-full max-w-2xl">
-                        <div class="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-[var(--color-expriviaOrange)] to-[var(--color-expriviaOrange400)] rounded-[var(--radius-2xl)] blur-xl sm:blur-2xl opacity-20" aria-hidden="true"></div>
-                        <img 
-                            [alt]="'HOME.HERO_IMAGE_ALT' | translate"
-                            class="relative aspect-video overflow-hidden rounded-[var(--radius-xl)] object-cover object-center shadow-[var(--shadow-xl)] transform transition-[var(--transition-transform)] hover:scale-[1.02]"
-                            height="550"
-                            src="assets/images/workspace.jpg"
-                            width="800"
-                            loading="eager"
-                            fetchpriority="high"
-                        />
-                    </div>
-                </div>
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center cursor-pointer opacity-80 hover:opacity-100 transition-all duration-300" 
+             (click)="toggleScroll()">
+            <span *ngIf="!isScrolledDown" class="text-white text-sm sm:text-base font-medium mb-2 drop-shadow-md">Scopri le funzionalità</span>
+            <span *ngIf="isScrolledDown" class="text-white text-sm sm:text-base font-medium mb-2 drop-shadow-md">Accedi ora</span>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center border shadow-lg transition-colors"
+                 [ngClass]="isScrolledDown ? 'bg-[var(--color-expriviaOrange)] border-transparent' : 'bg-white/10 backdrop-blur-sm border-white/20'">
+                <i class="fas text-white" [ngClass]="isScrolledDown ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </div>
         </div>
     </section>
 
-    <section class="py-8 sm:py-12 md:py-16 bg-[var(--color-expriviaBlue)]/50" aria-labelledby="features-title">
+    <!-- Sezione Funzionalità -->
+    <section id="features" class="py-12 sm:py-16 md:py-24 bg-[var(--color-expriviaBlue)]" aria-labelledby="features-title">
         <div class="container px-4 sm:px-6 mx-auto">
-            <div class="text-center mb-8 sm:mb-12" @fadeIn>
-                <h2 id="features-title" class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
+            <div class="text-center mb-10 sm:mb-16">
+                <h2 id="features-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
                     {{ 'HOME.FEATURES_TITLE' | translate }}
                 </h2>
-                <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
+                <p class="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto px-4 sm:px-0">
                     {{ 'HOME.FEATURES_SUBTITLE' | translate }}
                 </p>
             </div>
 
-            <div class="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <app-feature-card *ngFor="let card of featureCards" [config]="card"></app-feature-card>
             </div>
         </div>

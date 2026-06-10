@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -32,6 +32,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     isAdmin = false;
     isUser = false;
     showUnauthorizedWarning = false;
+    isScrolledDown = false;
     private destroy$ = new Subject<void>();
 
     constructor(
@@ -88,6 +89,31 @@ export class HomeComponent implements OnInit, OnDestroy {
         } else {
             this.router.navigate(['/login']);
         }
+    }
+
+    scrollToFeatures(): void {
+        const element = document.getElementById('features');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    scrollToTop(): void {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    toggleScroll(): void {
+        if (this.isScrolledDown) {
+            this.scrollToTop();
+        } else {
+            this.scrollToFeatures();
+        }
+    }
+
+    @HostListener('window:scroll', [])
+    onWindowScroll() {
+        // Se lo scroll supera i 300px, mostriamo la freccia "torna sopra"
+        this.isScrolledDown = window.scrollY > 300;
     }
 
     ngOnDestroy(): void {
