@@ -121,7 +121,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    featureCards: FeatureCardConfig[] = [
+    get currentFeatureCards(): FeatureCardConfig[] {
+        if (this.isAuthenticated && this.isAdmin) {
+            return this.adminFeatureCards;
+        }
+        return this.userFeatureCards;
+    }
+
+    userFeatureCards: FeatureCardConfig[] = [
         {
             title: 'HOME.FEATURE_1.TITLE',
             description: 'HOME.FEATURE_1.DESC',
@@ -130,7 +137,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                 'HOME.FEATURE_1.BULLET_1',
                 'HOME.FEATURE_1.BULLET_2'
             ],
-            linkUrl: '/prenotazioni'
+            linkUrl: '/dashboard/workspace-booking'
         },
         {
             title: 'HOME.FEATURE_2.TITLE',
@@ -140,7 +147,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                 'HOME.FEATURE_2.BULLET_1',
                 'HOME.FEATURE_2.BULLET_2'
             ],
-            linkUrl: '/gestione'
+            linkUrl: '/dashboard/bookings'
         },
         {
             title: 'HOME.FEATURE_3.TITLE',
@@ -150,7 +157,50 @@ export class HomeComponent implements OnInit, OnDestroy {
                 'HOME.FEATURE_3.BULLET_1',
                 'HOME.FEATURE_3.BULLET_2'
             ],
-            linkUrl: '/team'
+            linkUrl: '/dashboard/update-user'
+        }
+    ];
+
+    adminFeatureCards: FeatureCardConfig[] = [
+        {
+            title: 'ADMIN_HOME.CARDS.BOOKINGS_TITLE',
+            description: 'ADMIN_HOME.CARDS.BOOKINGS_DESC',
+            icon: 'event_note',
+            features: [
+                'ADMIN_HOME.CARDS.BOOKINGS_FEAT_1',
+                'ADMIN_HOME.CARDS.BOOKINGS_FEAT_2'
+            ],
+            linkUrl: '/dashboard/bookings'
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.PLANS_TITLE',
+            description: 'ADMIN_HOME.CARDS.PLANS_DESC',
+            icon: 'map',
+            features: [
+                'ADMIN_HOME.CARDS.PLANS_FEAT_1',
+                'ADMIN_HOME.CARDS.PLANS_FEAT_2'
+            ],
+            linkUrl: '/amministrazione-planimetrie'
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.BADGE_TITLE',
+            description: 'ADMIN_HOME.CARDS.BADGE_DESC',
+            icon: 'admin_panel_settings',
+            features: [
+                'ADMIN_HOME.CARDS.BADGE_FEAT_1',
+                'ADMIN_HOME.CARDS.BADGE_FEAT_2'
+            ],
+            linkUrl: '/dashboard/badge-management'
+        },
+        {
+            title: 'ADMIN_HOME.CARDS.LOCATION_TITLE',
+            description: 'ADMIN_HOME.CARDS.LOCATION_DESC',
+            icon: 'corporate_fare',
+            features: [
+                'ADMIN_HOME.CARDS.LOCATION_FEAT_1',
+                'ADMIN_HOME.CARDS.LOCATION_FEAT_2'
+            ],
+            linkUrl: '/dashboard/gestione-sedi'
         }
     ];
 }

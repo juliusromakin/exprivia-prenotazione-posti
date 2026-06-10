@@ -104,12 +104,7 @@ export class LoginComponent implements OnInit, OnDestroy {
               let returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'];
               
               if (!returnUrl) {
-                // Se è un admin, reindirizza alla home admin, altrimenti alla home base (che poi manderà alla dashboard)
-                if (user.badges?.includes('ROLE_ADMIN')) {
-                  returnUrl = '/admin/homepage';
-                } else {
-                  returnUrl = '/';
-                }
+                returnUrl = '/';
               }
               
               this.router.navigateByUrl(returnUrl);

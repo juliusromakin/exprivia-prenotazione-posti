@@ -24,11 +24,11 @@
                 <div class="flex flex-col justify-center space-y-6 sm:space-y-8" @fadeIn>
                     <div class="space-y-4 sm:space-y-6">
                         <h1 id="hero-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-lg" @slideUp>
-                            {{ 'HOME.WELCOME' | translate }}
+                            {{ ((isAuthenticated && isAdmin) ? 'ADMIN_HOME.HERO_TITLE' : 'HOME.WELCOME') | translate }}
                         </h1>
                         <p class="text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed max-w-2xl drop-shadow-md" @slideUp>
-                            {{ 'HOME.SUBTITLE1' | translate }}
-                            {{ 'HOME.SUBTITLE2' | translate }}
+                            {{ ((isAuthenticated && isAdmin) ? 'ADMIN_HOME.HERO_DESC' : 'HOME.SUBTITLE1') | translate }}
+                            <ng-container *ngIf="!(isAuthenticated && isAdmin)">{{ 'HOME.SUBTITLE2' | translate }}</ng-container>
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4" @scaleIn>
@@ -57,14 +57,14 @@
 
                         <app-button
                             *ngIf="isAuthenticated"
-                            [label]="'HOME.GO_DASHBOARD' | translate"
+                            [label]="(isAdmin ? 'HOME.GO_DASHBOARD_ADMIN' : 'HOME.GO_DASHBOARD') | translate"
                             type="primary"
                             size="lg"
                             icon="fas fa-tachometer-alt"
                             iconPosition="right"
                             (click)="onBookClick()"
                             class="w-full sm:w-auto shadow-xl"
-                            [attr.aria-label]="'HOME.GO_DASHBOARD' | translate"
+                            [attr.aria-label]="(isAdmin ? 'HOME.GO_DASHBOARD_ADMIN' : 'HOME.GO_DASHBOARD') | translate"
                         ></app-button>
                     </div>
                 </div>
@@ -88,15 +88,15 @@
         <div class="container px-4 sm:px-6 mx-auto">
             <div class="text-center mb-10 sm:mb-16">
                 <h2 id="features-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
-                    {{ 'HOME.FEATURES_TITLE' | translate }}
+                    {{ ((isAuthenticated && isAdmin) ? 'ADMIN_HOME.TOOLS_TITLE' : 'HOME.FEATURES_TITLE') | translate }}
                 </h2>
                 <p class="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto px-4 sm:px-0">
-                    {{ 'HOME.FEATURES_SUBTITLE' | translate }}
+                    {{ ((isAuthenticated && isAdmin) ? 'ADMIN_HOME.TOOLS_DESC' : 'HOME.FEATURES_SUBTITLE') | translate }}
                 </p>
             </div>
 
-            <div class="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <app-feature-card *ngFor="let card of featureCards" [config]="card"></app-feature-card>
+            <div class="grid gap-6 sm:gap-8 md:grid-cols-2" [ngClass]="(isAuthenticated && isAdmin) ? 'lg:grid-cols-4' : 'lg:grid-cols-3'">
+                <app-feature-card *ngFor="let card of currentFeatureCards" [config]="card"></app-feature-card>
             </div>
         </div>
     </section>

@@ -1,6 +1,5 @@
 import { Routes } from "@angular/router";
 import { HomeComponent } from "./pages/home/home.component";
-import { AdminHomeComponent } from "./pages/admin-home/admin-home.component";
 import { LoginComponent } from "./login/login.component";
 import { ForgotpwdComponent } from "./account/password/forgot-password/forgotpwd.component";
 import { ResetpwdComponent } from "./account/password/reset-password/resetpwd.component";
@@ -33,7 +32,7 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
 
     // Reindirizza in base al ruolo e permessi
     if (authService.hasAnybadge(['ROLE_ADMIN'])) {
-      return router.createUrlTree(["/admin/homepage"]);
+      return router.createUrlTree(["/"]);
     }
 
     // Se ha il permesso di prenotare, vai alla pagina di prenotazione
@@ -67,12 +66,6 @@ export const routes: Routes = [
     path: "update-user",
     component: UpdateUserComponent,
     canActivate: [() => redirectAuthenticatedToWorkspaceBooking()],
-  },
-
-  {
-    path: "admin/homepage",
-    component: AdminHomeComponent,
-    canActivate: [AuthGuard],
   },
   {
     path: "amministrazione-planimetrie",
