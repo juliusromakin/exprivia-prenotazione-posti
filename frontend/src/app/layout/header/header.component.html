@@ -18,6 +18,16 @@
             <div class="flex items-center gap-4">
                 <div class="hidden md:flex items-center gap-6">
                     <div class="flex items-center gap-4">
+                        <!-- Language Menu first -->
+                        <div class="flex items-center">
+                            <button [matMenuTriggerFor]="langMenu" class="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[84px] text-sm font-semibold text-gray-700 bg-gray-100/80 border border-gray-200 hover:bg-gray-200/80 rounded transition-all shadow-sm">
+                                <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
+                                <span>{{ currentLang | uppercase }}</span>
+                                <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
+                            </button>
+                        </div>
+
+                        <!-- User Profile furthest to the right -->
                         <div class="relative group">
                             <div class="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] cursor-pointer">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-expriviaBlue)] text-white font-medium">
@@ -29,28 +39,20 @@
                                 </div>
                             </div>
 
-                            <div class="absolute right-0 mt-1 w-48 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[var(--transition-all)] z-50">
+                            <div class="absolute right-0 mt-1 w-48 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[var(--transition-all)] z-50">
                                 <div class="py-1">
                                     <a [routerLink]="['/dashboard/update-user']" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-[var(--transition-colors)]">
                                         <lucide-icon name="user" class="w-4 h-4 mr-3 text-gray-500" />
                                         <span>{{ 'HEADER.PROFILE' | translate }}</span>
                                     </a>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    <button (click)="logout()" class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-[var(--transition-colors)] cursor-pointer text-left">
+                                        <lucide-icon name="log-out" class="w-4 h-4 mr-3" />
+                                        <span class="font-medium">{{ 'HEADER.LOGOUT' | translate }}</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="flex items-center border-r border-gray-200 pr-4">
-                            <button [matMenuTriggerFor]="langMenu" class="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[84px] text-sm font-semibold text-gray-700 bg-gray-100/80 border border-gray-200 hover:bg-gray-200/80 rounded transition-all shadow-sm">
-                                <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
-                                <span>{{ currentLang | uppercase }}</span>
-                                <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
-                            </button>
-                        </div>
-
-                        <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-lg)] text-red-600 hover:bg-red-50 transition-[var(--transition-all)] cursor-pointer">
-                            <lucide-icon name="log-out" class="w-5 h-5" />
-                            <span class="font-medium">{{ 'HEADER.LOGOUT' | translate }}</span>
-                        </button>
                     </div>
                 </div>
 
@@ -63,19 +65,13 @@
         </ng-container>
 
         <div *ngIf="!isAuthenticated" class="flex items-center gap-3">
-            <div class="flex items-center border-r border-gray-200 pr-4 mr-2">
+            <div class="flex items-center">
                 <button [matMenuTriggerFor]="langMenu" class="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[84px] text-sm font-semibold text-gray-700 bg-gray-100/80 border border-gray-200 hover:bg-gray-200/80 rounded transition-all shadow-sm">
                     <img [src]="currentFlag" alt="flag" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
                     <span>{{ currentLang | uppercase }}</span>
                     <lucide-icon name="chevron-down" class="w-4 h-4 text-gray-500"></lucide-icon>
                 </button>
             </div>
-            <a [routerLink]="['/login']" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-expriviaOrange)] rounded-[var(--radius-lg)] hover:bg-[var(--color-expriviaOrange400)] transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
-                {{ 'HEADER.LOGIN' | translate }}
-            </a>
-            <a [routerLink]="['/register']" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[var(--radius-lg)] hover:bg-gray-50 transition-[var(--transition-all)] shadow-[var(--shadow-sm)]">
-                {{ 'HEADER.SIGNUP' | translate }}
-            </a>
         </div>
     </div>
 
