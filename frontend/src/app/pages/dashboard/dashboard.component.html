@@ -1,12 +1,10 @@
 <!-- Dashboard Layout -->
 <div class="flex flex-col min-h-screen bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
-  <!-- Header per utenti non admin -->
-  <ng-container *ngIf="!isAdmin">
-    <app-header (guestAccessAttempt)="showGuestModal = true"></app-header>
-  </ng-container>
+  <!-- Header (Admins see it on mobile/tablet only, standard users see it always) -->
+  <app-header [class.lg:hidden]="isAdmin" (guestAccessAttempt)="showGuestModal = true"></app-header>
 
   <!-- Main Content Area -->
-  <div class="flex flex-1 pt-14 sm:pt-16 md:pt-0">
+  <div class="flex flex-1 pt-14 sm:pt-16 lg:pt-0">
     <!-- Sidebar per admin -->
     <app-sidebar *ngIf="isAdmin" (guestAccessAttempt)="showGuestModal = true"></app-sidebar>
     
@@ -16,10 +14,10 @@
             'ml-sidebar-collapsed': isAdmin && isSidebarCollapsed
           }">
       <!-- Header Section per admin -->
-      <div *ngIf="isAdmin" class="px-8 py-6 bg-cover bg-center border-b border-gray-200">
+      <div *ngIf="isAdmin" class="hidden lg:block px-4 sm:px-8 py-4 sm:py-6 bg-cover bg-center border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="space-y-1">
-            <h1 class="text-2xl font-semibold text-gray-900">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">
               {{ 'DASHBOARD.WELCOME_ADMIN' | translate }}, {{ currentUser?.name }}
             </h1>
             <p class="text-sm text-gray-500">
@@ -57,7 +55,7 @@
 
       <!-- Content for non-admin users -->
       <div *ngIf="!isAdmin"
-        class="flex-1 px-8 py-6 space-y-6 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
+        class="flex-1 px-4 sm:px-8 py-6 space-y-6 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
         <ng-container *ngIf="isHomeRoute()">
           <app-prenotazione-posizione></app-prenotazione-posizione>
         </ng-container>
@@ -70,7 +68,7 @@
 
       <!-- Dashboard Content for admin -->
       <div *ngIf="isAdmin"
-        class="flex-1 px-8 py-6 space-y-8 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
+        class="flex-1 px-4 sm:px-8 py-6 space-y-8 overflow-auto bg-gradient-to-br from-expriviaBlue to-expriviaBlue/70">
         <!-- Dashboard Overview -->
         <ng-container *ngIf="isHomeRoute()">
           <!-- Welcome Header -->

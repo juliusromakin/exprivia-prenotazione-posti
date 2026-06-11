@@ -72,6 +72,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   // Filter properties
   statusFilter: string = 'attive'; // Default to active
+  showReservationsOnMobile = false;
 
   // Admin and user selection properties
   isAdmin = false;
@@ -123,9 +124,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       selectedDate: [null, Validators.required],
       roomType: ["", Validators.required],
       roomId: [null, Validators.required],
-      slotDuration: ["", Validators.required],
+      slotDuration: [null, Validators.required],
       timeSlot: ["", Validators.required],
-      workspaceId: ["", Validators.required],
+      workspaceId: [null, Validators.required],
       userId: [null]
     });
   }

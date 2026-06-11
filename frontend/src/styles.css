@@ -163,11 +163,13 @@ body {
   }
 }
 
-.ml-sidebar-expanded {
-  margin-left: 256px !important;
-}
-.ml-sidebar-collapsed {
-  margin-left: 72px !important;
+@media (min-width: 1024px) {
+  .ml-sidebar-expanded {
+    margin-left: 256px !important;
+  }
+  .ml-sidebar-collapsed {
+    margin-left: 72px !important;
+  }
 }
 
 /* Custom Language Menu */

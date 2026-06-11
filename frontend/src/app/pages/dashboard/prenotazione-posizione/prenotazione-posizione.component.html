@@ -34,48 +34,208 @@
     </div>
 
     <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="md:col-span-2">
-          <div class="bg-gray-50 rounded-lg p-4" [ngClass]="{'opacity-50 pointer-events-none': isStepDisabled('date')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.DATE' | translate }}</h4>
-            <div class="max-w-[100vw] overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- ================= LEFT COLUMN / MOBILE FLOW ================= -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- STEP 1: City and Location Selection (Always visible at top) -->
+          <div class="bg-white rounded-xl shadow-sm p-4 sm:p-5 border-2 transition-all duration-300"
+               [ngClass]="!selectedBuildingId ? 'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]' : 'border-gray-100'">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-3 bg-[var(--color-expriviaBlue)]/5 rounded-lg border border-[var(--color-expriviaBlue)]/10">
+                <label class="text-xs font-bold text-[var(--color-expriviaBlue)] mb-1.5 flex items-center">
+                  <i class="fas fa-city mr-1.5 text-[var(--color-expriviaOrange)] text-sm"></i> 
+                  {{ 'BOOKING.STEPS.CITY' | translate }}
+                </label>
+                <select [(ngModel)]="selectedCity" (change)="onCityChange()" [ngModelOptions]="{standalone: true}"
+                  class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white transition-shadow">
+                  <option value="">{{ 'GESTIONE_SEDI.LOCATION_MODAL.SELECT_CITY' | translate }}</option>
+                  <option *ngFor="let city of availableCities" [value]="city">{{ city }}</option>
+                </select>
+              </div>
+
+              <div class="p-3 bg-[var(--color-expriviaBlue)]/5 rounded-lg border border-[var(--color-expriviaBlue)]/10 transition-opacity duration-300" [ngClass]="{'opacity-50': isStepDisabled('location')}">
+                <label class="text-xs font-bold text-[var(--color-expriviaBlue)] mb-1.5 flex items-center">
+                  <i class="fas fa-map-marker-alt mr-1.5 text-[var(--color-expriviaOrange)] text-sm"></i> 
+                  {{ 'BOOKING.STEPS.LOCATION' | translate }}
+                </label>
+                <select [(ngModel)]="selectedBuildingId" (change)="onBuildingChange()" [ngModelOptions]="{standalone: true}"
+                  [disabled]="isStepDisabled('location')"
+                  class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100 transition-shadow">
+                  <option [value]="null">{{ 'PLANIMETRIA_EDITOR.SELECT_SEDE' | translate }}</option>
+                  <option *ngFor="let b of availableBuildings" [value]="b.id">{{ b.sedeName }} - {{ b.address }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Calendar Block (Always visible) -->
+          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border-2 transition-all duration-300"
+               [ngClass]="(selectedBuildingId && state.selectedDates.length === 0) ? 'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]' : 'border-transparent'">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+              <i class="fas fa-calendar-alt text-[var(--color-expriviaBlue)] mr-2"></i>
+              {{ 'BOOKING.STEPS.DATE' | translate }}
+            </h4>
+            
+            <!-- Calendar Active State -->
+            <div *ngIf="!isStepDisabled('date'); else selectLocationPlaceholder" 
+                 class="max-w-[100vw] overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 animate-in fade-in duration-300">
               <app-calendar [selectedDates]="state.selectedDates" (dateSelectionChange)="onDateSelectionChange($event)"
                 (monthChange)="onMonthChange($event)">
               </app-calendar>
             </div>
+
+            <!-- Calendar Disabled Empty State -->
+            <ng-template #selectLocationPlaceholder>
+              <div class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-lg bg-white min-h-[220px] transition-all duration-300">
+                <div class="w-14 h-14 rounded-full bg-[var(--color-expriviaBlue)]/10 flex items-center justify-center mb-3">
+                  <i class="fas fa-calendar-minus text-2xl text-[var(--color-expriviaBlue)] animate-pulse"></i>
+                </div>
+                <p class="text-sm font-semibold text-gray-700 text-center">{{ 'BOOKING.CALENDAR.SELECT_LOCATION_FIRST' | translate }}</p>
+                <p class="text-xs text-gray-500 mt-1.5 text-center max-w-sm">Scegli una città ed una sede dai selettori in alto per sbloccare le date del calendario.</p>
+              </div>
+            </ng-template>
           </div>
 
-          <div class="bg-gray-50 rounded-lg p-4 mt-4" [ngClass]="{'opacity-50 pointer-events-none': isStepDisabled('workspace')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-1">{{ 'BOOKING.STEPS.WORKSPACE' | translate }}</h4>
-            <p *ngIf="!bookingForm.get('timeSlot')?.value" class="text-xs text-gray-400 mb-2">
+          <!-- ================= MOBILE ONLY CONTROLS (Sequential) ================= -->
+          <div class="block lg:hidden space-y-6">
+            <!-- Mobile Step 3: Time Selection -->
+            <div class="bg-gray-50 rounded-xl p-4 border-2 transition-all duration-300" 
+                 [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': state.selectedDates.length > 0 && !bookingForm.get('timeSlot')?.value, 'border-transparent opacity-50': isStepDisabled('date')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-clock text-[var(--color-expriviaBlue)] mr-2"></i>
+                {{ 'BOOKING.STEPS.TIME' | translate }}
+              </h4>
+              <div *ngIf="state.selectedDates.length === 0" class="text-sm text-gray-500 italic p-2">
+                {{ 'BOOKING.TIME.SELECT_DATE_FIRST' | translate }}
+              </div>
+              <div *ngIf="state.selectedDates.length > 0" class="space-y-4">
+                <div>
+                  <label for="slotDurationMobile" class="block text-xs font-bold text-gray-600 mb-1.5">{{
+                    'BOOKING.TIME.DURATION' | translate }}</label>
+                  <select id="slotDurationMobile" formControlName="slotDuration"
+                    [attr.disabled]="isStepDisabled('date') ? true : null"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
+                    <option [value]="null">{{ 'BOOKING.TIME.SELECT_DURATION' | translate }}</option>
+                    <option *ngFor="let duration of availableDurations" [value]="duration">
+                      {{ getDurationLabel(duration) }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="bookingForm.get('slotDuration')?.value && state.availableTimeSlots.length > 0">
+                  <label class="block text-xs font-bold text-gray-600 mb-2">Orari Disponibili</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" *ngFor="let slot of state.availableTimeSlots"
+                      (click)="bookingForm.get('timeSlot')?.setValue(slot.startTime + ' - ' + slot.endTime)" 
+                      [ngClass]="{
+                        'bg-[var(--color-expriviaBlue)] text-white font-semibold shadow-sm': bookingForm.get('timeSlot')?.value === (slot.startTime + ' - ' + slot.endTime),
+                        'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50': bookingForm.get('timeSlot')?.value !== (slot.startTime + ' - ' + slot.endTime)
+                      }" class="px-3 py-2 text-xs rounded-lg transition-all duration-200 shadow-sm">
+                      {{ slot.startTime + ' - ' + slot.endTime }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Step 4: Room Type & Room Selection -->
+            <div class="bg-gray-50 rounded-xl p-4 border-2 transition-all duration-300" 
+                 [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': bookingForm.get('timeSlot')?.value && !bookingForm.get('roomId')?.value, 'border-transparent opacity-50': isStepDisabled('roomType')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-door-open text-[var(--color-expriviaBlue)] mr-2"></i>
+                Selezione Tipologia e Spazio
+              </h4>
+              <div *ngIf="!bookingForm.get('timeSlot')?.value" class="text-sm text-gray-500 italic p-2">
+                Seleziona prima una data ed un orario.
+              </div>
+              
+              <div *ngIf="bookingForm.get('timeSlot')?.value" class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 mb-1.5">{{ 'BOOKING.STEPS.ROOM_TYPE' | translate }}</label>
+                  <select formControlName="roomType" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
+                    <option value="">{{ 'BOOKING.ROOM_TYPE.SELECT_HINT' | translate }}</option>
+                    <option *ngFor="let type of roomTypes" [value]="type.value">
+                      {{ type.label }}
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 mb-1.5">{{ 'BOOKING.STEPS.ROOM' | translate }}</label>
+                  <select formControlName="roomId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
+                    <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
+                    <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
+                      {{ room.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Equipment Section -->
+              <div *ngIf="isMeetingRoomSelected() && bookingForm.get('timeSlot')?.value" class="mt-4 animate-in fade-in slide-in-from-top duration-300">
+                <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
+                  <i class="fas fa-tools mr-2 text-[var(--color-expriviaBlue)]"></i>
+                  {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.EQUIPMENT' | translate }}
+                </h5>
+                
+                <div *ngIf="selectedRoom?.equipment && selectedRoom!.equipment!.length > 0" class="flex flex-wrap gap-2">
+                  <div *ngFor="let eq of selectedRoom!.equipment" 
+                    class="flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-xs text-gray-700">
+                    <i class="fas" [ngClass]="{
+                      'fa-video': eq.name === 'Proiettore' || eq.name === 'Monitor',
+                      'fa-keyboard': eq.name === 'Tastiera',
+                      'fa-mouse': eq.name === 'Mouse',
+                      'fa-box': eq.name !== 'Proiettore' && eq.name !== 'Monitor' && eq.name !== 'Tastiera' && eq.name !== 'Mouse'
+                    }" class="mr-2 text-[var(--color-expriviaBlue)]"></i>
+                    <span class="font-medium mr-1">{{ eq.quantity }}x</span>
+                    <span>{{ eq.name }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: Planimetria / Postazione Map Selection (Always visible in this column) -->
+          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border-2 transition-all duration-300" 
+               [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': bookingForm.get('roomId')?.value && !bookingForm.get('workspaceId')?.value, 'border-transparent opacity-50 pointer-events-none': isStepDisabled('workspace')}">
+            <h4 class="text-sm font-semibold text-gray-700 mb-1 flex items-center">
+              <i class="fas fa-map-marked-alt text-[var(--color-expriviaBlue)] mr-2"></i>
+              {{ 'BOOKING.STEPS.WORKSPACE' | translate }}
+            </h4>
+            <p *ngIf="!bookingForm.get('timeSlot')?.value" class="text-xs text-gray-400 mb-3">
               <i class="fas fa-info-circle mr-1"></i>{{ 'BOOKING.WORKSPACE.MAP_INFO' | translate }}
             </p>
             <p *ngIf="bookingForm.get('timeSlot')?.value && bookingForm.get('workspaceId')?.value"
-              class="text-xs text-green-600 font-medium mb-2">
+              class="text-xs text-green-600 font-semibold mb-3">
               <i class="fas fa-check-circle mr-1"></i>
               {{ 'BOOKING.WORKSPACE.SELECTED_INFO' | translate }} {{
               getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
             </p>
 
-                        <ng-container *ngIf="selectedBuildingId; else noPlanimetriaPlaceholder">
-              <!-- I pulsanti dei piani rimangono all'esterno: sempre visibili se l'edificio è selezionato -->
+            <ng-container *ngIf="selectedBuildingId; else noPlanimetriaPlaceholder">
+              <!-- Floor buttons -->
               <div *ngIf="state.floors.length > 1" class="flex flex-wrap gap-2 mb-4">
                 <button *ngFor="let floor of state.floors" type="button" (click)="onFloorChange(floor.id)"
-                  [class.bg-blue-600]="state.selectedFloorId === floor.id"
+                  [class.bg-[var(--color-expriviaBlue)]]="state.selectedFloorId === floor.id"
                   [class.text-white]="state.selectedFloorId === floor.id"
                   [class.bg-white]="state.selectedFloorId !== floor.id"
                   [class.text-gray-700]="state.selectedFloorId !== floor.id"
-                  class="px-4 py-2 text-sm font-medium border border-gray-200 rounded-lg shadow-sm transition-all hover:border-blue-400">
+                  class="px-4 py-2 text-sm font-medium border border-gray-200 rounded-lg shadow-sm transition-all hover:border-[var(--color-expriviaBlue)]">
                   {{ floor.name }}
                 </button>
               </div>
 
-              <!-- Solo la mappa ed il suo segnaposto rosso vengono condizionati dall'immagine -->
+              <!-- Map container -->
               <ng-container *ngIf="currentFloorImage; else emptyPlanimetria">
-                <app-planimetria-inline [rooms]="currentFloorRooms" [availableWorkspaces]="$any(currentFloorWorkspaces)"
-                  [backgroundImage]="currentFloorImage" [selectedWorkspaceId]="$any(getSelectedWorkspaceId())"
-                  (workspaceSelected)="onWorkspaceSelectedFromPlanimetria($event)">
-                </app-planimetria-inline>
+                <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                  <app-planimetria-inline [rooms]="currentFloorRooms" [availableWorkspaces]="$any(currentFloorWorkspaces)"
+                    [backgroundImage]="currentFloorImage" [selectedWorkspaceId]="$any(getSelectedWorkspaceId())"
+                    (workspaceSelected)="onWorkspaceSelectedFromPlanimetria($event)">
+                  </app-planimetria-inline>
+                </div>
               </ng-container>
               
               <ng-template #emptyPlanimetria>
@@ -86,242 +246,328 @@
                 </div>
               </ng-template>
             </ng-container>
-
             
             <ng-template #noPlanimetriaPlaceholder>
-              <div class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50 text-gray-400 min-h-[300px]">
+              <div class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50 text-gray-400 min-h-[250px]">
                 <i class="fas fa-map-marked-alt text-4xl mb-3 text-gray-300 animate-pulse"></i>
                 <p class="text-sm font-medium">{{ 'BOOKING.WORKSPACE.SELECT_LOCATION_HINT' | translate }}</p>
               </div>
             </ng-template>
-          </div>
-        </div>
 
-        <div class="flex flex-col gap-4">
-          <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 shadow-sm">
-            <label class="text-xs font-semibold text-blue-800 mb-1.5 flex items-center">
-              <i class="fas fa-city mr-1.5"></i> {{ 'BOOKING.STEPS.CITY' | translate }}
-            </label>
-            <select [(ngModel)]="selectedCity" (change)="onCityChange()" [ngModelOptions]="{standalone: true}"
-              class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
-              <option value="">{{ 'GESTIONE_SEDI.LOCATION_MODAL.SELECT_CITY' | translate }}</option>
-              <option *ngFor="let city of availableCities" [value]="city">{{ city }}</option>
-            </select>
-          </div>
-          <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 shadow-sm" [ngClass]="{'opacity-50': isStepDisabled('location')}">
-            <label class="text-xs font-semibold text-blue-800 mb-1.5 flex items-center">
-              <i class="fas fa-map-marker-alt mr-1.5"></i> {{ 'BOOKING.STEPS.LOCATION' | translate }}
-            </label>
-            <select [(ngModel)]="selectedBuildingId" (change)="onBuildingChange()" [ngModelOptions]="{standalone: true}"
-              [disabled]="isStepDisabled('location')"
-              class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-100">
-              <option [value]="null">{{ 'PLANIMETRIA_EDITOR.SELECT_SEDE' | translate }}</option>
-              <option *ngFor="let b of availableBuildings" [value]="b.id">{{ b.sedeName }} - {{ b.address }}</option>
-            </select>
-          </div>
-          <div class="p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.CALENDAR.SELECTED_DATE' | translate }}</h4>
-            <div class="flex flex-col gap-2 min-h-[48px] max-h-[200px]">
-              <div *ngIf="state.selectedDates.length === 0"
-                class="flex items-center justify-center h-full text-gray-400 text-sm">
-                {{ 'BOOKING.CALENDAR.SELECT_DATE_HINT' | translate }}
-              </div>
-              <div *ngIf="state.selectedDates.length === 1"
-                class="flex items-center text-sm text-gray-600 py-2 px-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                <span>{{ formatDate(state.selectedDates[0], 'EEEE d MMMM yyyy') }}</span>
-              </div>
+            <!-- Manual dropdown fallback list (Mobile view) -->
+            <div *ngIf="!isMeetingRoom() && bookingForm.get('roomId')?.value" class="block lg:hidden mt-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+              <label class="block text-xs font-bold text-gray-600 mb-1.5">Selezione Manuale Alternativa</label>
+              <select formControlName="workspaceId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
+                <option [value]="null">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
+                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
+                  {{ workspace.name }}
+                </option>
+              </select>
             </div>
           </div>
 
-          <div *ngIf="isAdmin" class="p-4 bg-blue-50 rounded-lg border border-blue-200" [ngClass]="{'opacity-50': isStepDisabled('date')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">
-              <i class="fas fa-user-cog text-blue-600 mr-2"></i>
-              {{ 'BOOKING.ADMIN.SELECT_USER' | translate }}
-            </h4>
-            <div class="relative">
-              <input type="text" [(ngModel)]="userSearchTerm" (ngModelChange)="filterUsers()"
-                [disabled]="isStepDisabled('date')"
-                (focus)="showUserDropdown = true" (blur)="onUserInputBlur()"
-                [placeholder]="'BOOKING.ADMIN.SEARCH_USER' | translate"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-                [ngModelOptions]="{standalone: true}">
-              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-                <button *ngIf="userSearchTerm" type="button" (click)="clearUserSearch()"
-                  class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                  <i class="fas fa-times text-sm"></i>
-                </button>
-                <i class="fas fa-search text-gray-400"></i>
-              </div>
-            </div>
-            <div *ngIf="showUserDropdown && filteredUsers.length > 0"
-              class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              <div *ngFor="let user of filteredUsers; trackBy: trackByUser" (click)="selectUser(user)"
-                class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                <div class="font-medium text-gray-900 truncate">
-                  {{ user.name }} {{ user.lastName }}
-                </div>
-                <div class="text-sm text-gray-500 truncate">
-                  {{ user.email }}
-                </div>
-              </div>
-            </div>
-
-            <div *ngIf="userSearchTerm.trim() !== '' && filteredUsers.length === 0"
-              class="text-red-500 text-xs mt-1.5 flex items-center gap-1 animate-in fade-in duration-200">
-              <i></i>
-              <span>{{ 'BOOKING.ADMIN.USER_NOT_FOUND' | translate}}</span>
-            </div>
-
-            <div *ngIf="userSearchTerm.trim() !== '' && !selectedUser && filteredUsers.length > 0" 
-              class="text-amber-600 text-xs mt-1.5 flex items-center gap-1 animate-in fade-in duration-200">
-              <i class="fas fa-info-circle"></i>
-              <span>{{ 'BOOKING.ADMIN.PLEASE_SELECT_USER' | translate }}</span>
-            </div>
-          </div>
-
-          <div class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('date')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.TIME' | translate }}</h4>
-            <div *ngIf="state.selectedDates.length === 0" class="text-sm text-gray-500 mb-2">
-              {{ 'BOOKING.TIME.SELECT_DATE_FIRST' | translate }}
-            </div>
-            <div *ngIf="state.selectedDates.length > 0">
-              <div class="mb-3">
-                <label for="slotDuration" class="block text-xs font-medium text-gray-600 mb-1">{{
-                  'BOOKING.TIME.DURATION' | translate }}</label>
-                <select id="slotDuration" formControlName="slotDuration"
-                  [attr.disabled]="isStepDisabled('date') ? true : null"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
-                  <option value="">{{ 'BOOKING.TIME.SELECT_DURATION' | translate }}</option>
-                  <option *ngFor="let duration of availableDurations" [value]="duration">
-                    {{ getDurationLabel(duration) }}
-                  </option>
-                </select>
-              </div>
-              <div *ngIf="bookingForm.get('slotDuration')?.value && state.availableTimeSlots.length > 0">
-                <div class="grid grid-cols-2 gap-2">
-                  <button type="button" *ngFor="let slot of state.availableTimeSlots"
-                    (click)="bookingForm.get('timeSlot')?.setValue(slot.startTime + ' - ' + slot.endTime)" [ngClass]="{
-                      'bg-blue-600 text-white': bookingForm.get('timeSlot')?.value === (slot.startTime + ' - ' + slot.endTime),
-                      'bg-white text-gray-700 border border-gray-300': bookingForm.get('timeSlot')?.value !== (slot.startTime + ' - ' + slot.endTime)
-                    }" class="px-2 py-1 text-xs rounded transition-colors duration-200">
-                    {{ slot.startTime + ' - ' + slot.endTime }}
+          <!-- Mobile Only User Selector & Booking Submit Button (at the bottom of page) -->
+          <div class="block lg:hidden space-y-4">
+            <!-- Mobile Admin User Selector -->
+            <div *ngIf="isAdmin" class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-user-cog text-[var(--color-expriviaBlue)] mr-2"></i>
+                {{ 'BOOKING.ADMIN.SELECT_USER' | translate }}
+              </h4>
+              <div class="relative">
+                <input type="text" [(ngModel)]="userSearchTerm" (ngModelChange)="filterUsers()"
+                  (focus)="showUserDropdown = true" (blur)="onUserInputBlur()"
+                  [placeholder]="'BOOKING.ADMIN.SEARCH_USER' | translate"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent disabled:bg-gray-100 transition-all"
+                  [ngModelOptions]="{standalone: true}">
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                  <button *ngIf="userSearchTerm" type="button" (click)="clearUserSearch()"
+                    class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i class="fas fa-times text-sm"></i>
                   </button>
+                  <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <div *ngIf="showUserDropdown && filteredUsers.length > 0"
+                  class="absolute z-50 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-x-hidden py-1">
+                  <div *ngFor="let user of filteredUsers; trackBy: trackByUser" (click)="selectUser(user)"
+                    class="px-4 py-2.5 hover:bg-[var(--color-expriviaBlue)]/5 hover:border-l-4 hover:border-l-[var(--color-expriviaOrange)] cursor-pointer border-b border-gray-50 last:border-b-0 transition-all duration-150 flex flex-col gap-0.5">
+                    <div class="font-semibold text-gray-800 text-sm">
+                      {{ user.name }} {{ user.lastName }}
+                    </div>
+                    <div class="text-xs text-gray-400 font-normal">
+                      {{ user.email }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.ROOM_TYPE' | translate }}</h4>
-            <select formControlName="roomType" [attr.disabled]="isStepDisabled('roomType') ? true : null"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
-              <option value="">{{ 'BOOKING.ROOM_TYPE.SELECT_HINT' | translate }}</option>
-              <option *ngFor="let type of roomTypes" [value]="type.value">
-                {{ type.label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.ROOM' | translate }}</h4>
-            <select formControlName="roomId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
-              <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
-              <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
-                {{ room.name }}
-              </option>
-            </select>
-
-            <!-- Equipment Section -->
-            <div *ngIf="isMeetingRoomSelected()" class="mt-4 animate-in fade-in slide-in-from-top duration-300">
-              <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
-                <i class="fas fa-tools mr-2 text-blue-500"></i>
-                {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.EQUIPMENT' | translate }}
-              </h5>
-              
-              <div *ngIf="selectedRoom?.equipment && selectedRoom!.equipment!.length > 0" class="flex flex-wrap gap-2">
-                <div *ngFor="let eq of selectedRoom!.equipment" 
-                  class="flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm text-gray-700">
-                  <i class="fas" [ngClass]="{
-                    'fa-video': eq.name === 'Proiettore' || eq.name === 'Monitor',
-                    'fa-keyboard': eq.name === 'Tastiera',
-                    'fa-mouse': eq.name === 'Mouse',
-                    'fa-box': eq.name !== 'Proiettore' && eq.name !== 'Monitor' && eq.name !== 'Tastiera' && eq.name !== 'Mouse'
-                  }" class="mr-2 text-blue-600"></i>
-                  <span class="font-medium mr-1">{{ eq.quantity }}x</span>
-                  <span>{{ eq.name }}</span>
+            <!-- Mobile Submit Button Card -->
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <!-- Brief Selection Summary on Mobile -->
+              <div *ngIf="bookingForm.get('workspaceId')?.value" class="text-xs text-gray-600 mb-3 bg-white p-3 rounded-lg border border-gray-100">
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                  <span>Sede:</span>
+                  <span class="font-bold text-gray-800">{{ selectedCity }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                  <span>Data:</span>
+                  <span class="font-bold text-gray-800 capitalize">{{ formatDate(state.selectedDates[0], 'dd/MM/yyyy') }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                  <span>Orario:</span>
+                  <span class="font-bold text-gray-800">{{ bookingForm.get('timeSlot')?.value }}</span>
+                </div>
+                <div class="flex justify-between py-1">
+                  <span>Postazione:</span>
+                  <span class="font-bold text-[var(--color-expriviaOrange)]">
+                    {{ isMeetingRoom() ? selectedRoom?.name : getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
+                  </span>
                 </div>
               </div>
-              
-              <div *ngIf="!selectedRoom?.equipment || selectedRoom!.equipment!.length === 0" 
-                class="flex items-center gap-2 p-3 bg-white border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 italic">
-                <i class="fas fa-info-circle text-gray-400"></i>
-                {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.NO_EQUIPMENT' | translate }}
-              </div>
-            </div>
-          </div>
 
-          <div *ngIf="!isMeetingRoom()" class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ 'BOOKING.STEPS.WORKSPACE' | translate }}</h4>
-            <select formControlName="workspaceId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
-              <option value="">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
-              <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
-                {{ workspace.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="p-4 bg-gray-50 rounded-lg" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">
-              {{ (isMeetingRoom() ? 'RESERVATIONS.TABLE.ROOM' : 'BOOKING.WORKSPACE.SELECTED') | translate }}
-            </h4>
-            
-            <div *ngIf="!bookingForm.get('workspaceId')?.value" class="text-sm text-gray-500">
-              {{ 'BOOKING.WORKSPACE.SELECT_FROM_MAP' | translate }}
+              <button type="submit" 
+                [disabled]="isStepDisabled('submit') || state.isLoading"
+                class="w-full bg-[var(--color-expriviaOrange)] text-white hover:bg-[var(--color-expriviaOrange600)] disabled:bg-gray-400 disabled:opacity-50 font-bold py-3 px-4 rounded-lg shadow-md transition-all text-sm flex items-center justify-center space-x-2">
+                <i class="fas" [ngClass]="state.isLoading ? 'fa-spinner fa-spin' : 'fa-check-circle'"></i>
+                <span>
+                  {{ state.isLoading ? ('BOOKING.SUBMIT.PROCESSING' | translate) : ('BOOKING.SUBMIT.BOOK_NOW' | translate) }}
+                </span>
+              </button>
             </div>
-            
-            <div *ngIf="bookingForm.get('workspaceId')?.value"
-              class="flex items-center text-sm text-green-700 font-medium bg-green-50 rounded-lg px-3 py-2">
-              <i class="fas fa-check-circle mr-2"></i>
-              
-              <span *ngIf="isMeetingRoom(); else standardWorkspaceName">
-                {{ selectedRoom?.name }}
-              </span>
-              <ng-template #standardWorkspaceName>
-                {{ getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
-              </ng-template>
-            </div>
-          </div>
-
-          <div class="p-4 bg-gray-50 rounded-lg">
-            <button type="submit" [disabled]="isStepDisabled('submit') || state.isLoading"
-              class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-              {{ state.isLoading ? ('BOOKING.SUBMIT.PROCESSING' | translate) : ('BOOKING.SUBMIT.BOOK_NOW' | translate) }}
-            </button>
           </div>
         </div>
+
+        <!-- ================= RIGHT COLUMN / DESKTOP ONLY SIDEBAR ================= -->
+        <div class="hidden lg:block lg:col-span-1">
+          <div class="lg:sticky lg:top-6 space-y-4">
+            
+            <!-- Desktop Step: Selected Date Preview -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ 'BOOKING.CALENDAR.SELECTED_DATE' | translate }}</h4>
+              <div class="flex flex-col gap-2 min-h-[48px] justify-center">
+                <div *ngIf="state.selectedDates.length === 0" class="text-gray-400 text-sm italic">
+                  {{ 'BOOKING.CALENDAR.SELECT_DATE_HINT' | translate }}
+                </div>
+                <div *ngIf="state.selectedDates.length === 1"
+                  class="flex items-center text-sm text-gray-700 py-2 px-3 bg-gray-55 rounded-lg border border-gray-150 shadow-sm font-medium">
+                  <i class="fas fa-calendar-check text-[var(--color-expriviaOrange)] mr-2"></i>
+                  <span class="capitalize">{{ formatDate(state.selectedDates[0], 'EEEE d MMMM yyyy') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Step: Admin Select User -->
+            <div *ngIf="isAdmin" class="bg-white rounded-xl shadow-sm p-4 border border-gray-200" [ngClass]="{'opacity-50': isStepDisabled('date')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-user-cog text-[var(--color-expriviaBlue)] mr-2"></i>
+                {{ 'BOOKING.ADMIN.SELECT_USER' | translate }}
+              </h4>
+              <div class="relative">
+                <input type="text" [(ngModel)]="userSearchTerm" (ngModelChange)="filterUsers()"
+                  [disabled]="isStepDisabled('date')"
+                  (focus)="showUserDropdown = true" (blur)="onUserInputBlur()"
+                  [placeholder]="'BOOKING.ADMIN.SEARCH_USER' | translate"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent disabled:bg-gray-100 transition-all"
+                  [ngModelOptions]="{standalone: true}">
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                  <button *ngIf="userSearchTerm" type="button" (click)="clearUserSearch()"
+                    class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i class="fas fa-times text-sm"></i>
+                  </button>
+                  <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <div *ngIf="showUserDropdown && filteredUsers.length > 0"
+                  class="absolute z-50 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-x-hidden py-1 transition-all duration-200">
+                  <div *ngFor="let user of filteredUsers; trackBy: trackByUser" (click)="selectUser(user)"
+                    class="px-4 py-2.5 hover:bg-[var(--color-expriviaBlue)]/5 hover:border-l-4 hover:border-l-[var(--color-expriviaOrange)] cursor-pointer border-b border-gray-50 last:border-b-0 transition-all duration-150 flex flex-col gap-0.5">
+                    <div class="font-semibold text-gray-800 text-sm">
+                      {{ user.name }} {{ user.lastName }}
+                    </div>
+                    <div class="text-xs text-gray-400 font-normal">
+                      {{ user.email }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Step: Time Selection -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 transition-all duration-300" 
+                 [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': state.selectedDates.length > 0 && !bookingForm.get('timeSlot')?.value, 'border-transparent opacity-50': isStepDisabled('date')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ 'BOOKING.STEPS.TIME' | translate }}</h4>
+              <div *ngIf="state.selectedDates.length === 0" class="text-sm text-gray-400 italic mb-2">
+                {{ 'BOOKING.TIME.SELECT_DATE_FIRST' | translate }}
+              </div>
+              <div *ngIf="state.selectedDates.length > 0" class="space-y-3">
+                <div>
+                  <label for="slotDurationDesktop" class="block text-xs font-semibold text-gray-500 mb-1">{{
+                    'BOOKING.TIME.DURATION' | translate }}</label>
+                  <select id="slotDurationDesktop" formControlName="slotDuration"
+                    [attr.disabled]="isStepDisabled('date') ? true : null"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
+                    <option [value]="null">{{ 'BOOKING.TIME.SELECT_DURATION' | translate }}</option>
+                    <option *ngFor="let duration of availableDurations" [value]="duration">
+                      {{ getDurationLabel(duration) }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="bookingForm.get('slotDuration')?.value && state.availableTimeSlots.length > 0">
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" *ngFor="let slot of state.availableTimeSlots"
+                      (click)="bookingForm.get('timeSlot')?.setValue(slot.startTime + ' - ' + slot.endTime)" [ngClass]="{
+                        'bg-[var(--color-expriviaBlue)] text-white font-semibold': bookingForm.get('timeSlot')?.value === (slot.startTime + ' - ' + slot.endTime),
+                        'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50': bookingForm.get('timeSlot')?.value !== (slot.startTime + ' - ' + slot.endTime)
+                      }" class="px-2 py-1.5 text-xs rounded-lg transition-colors shadow-sm">
+                      {{ slot.startTime + ' - ' + slot.endTime }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Step: Room Type selection -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 transition-all duration-300" 
+                 [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': bookingForm.get('timeSlot')?.value && !bookingForm.get('workspaceId')?.value, 'border-transparent opacity-50': isStepDisabled('roomType')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ 'BOOKING.STEPS.ROOM_TYPE' | translate }}</h4>
+              <select formControlName="roomType" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
+                <option value="">{{ 'BOOKING.ROOM_TYPE.SELECT_HINT' | translate }}</option>
+                <option *ngFor="let type of roomTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Desktop Step: Room selection -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 transition-all duration-300" [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': bookingForm.get('timeSlot')?.value && !bookingForm.get('workspaceId')?.value, 'border-transparent opacity-50': isStepDisabled('roomType')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ 'BOOKING.STEPS.ROOM' | translate }}</h4>
+              <select formControlName="roomId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
+                <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
+                <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
+                  {{ room.name }}
+                </option>
+              </select>
+
+              <!-- Equipment Section (Desktop) -->
+              <div *ngIf="isMeetingRoomSelected() && bookingForm.get('timeSlot')?.value" class="mt-4 animate-in fade-in slide-in-from-top duration-300">
+                <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
+                  <i class="fas fa-tools mr-2 text-[var(--color-expriviaBlue)]"></i>
+                  {{ 'PLANIMETRIA_EDITOR.SIDE_PANEL.EQUIPMENT' | translate }}
+                </h5>
+                
+                <div *ngIf="selectedRoom?.equipment && selectedRoom!.equipment!.length > 0" class="flex flex-wrap gap-2">
+                  <div *ngFor="let eq of selectedRoom!.equipment" 
+                    class="flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-[11px] text-gray-700">
+                    <span class="font-medium mr-1">{{ eq.quantity }}x</span>
+                    <span>{{ eq.name }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Step: Workspace manual selection -->
+            <div *ngIf="!isMeetingRoom()" class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 transition-all duration-300" [ngClass]="{'border-[var(--color-expriviaOrange)]/30 shadow-[0_0_12px_rgba(233,80,14,0.06)]': bookingForm.get('timeSlot')?.value && !bookingForm.get('workspaceId')?.value, 'border-transparent opacity-50': isStepDisabled('roomType')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ 'BOOKING.STEPS.WORKSPACE' | translate }}</h4>
+              <select formControlName="workspaceId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
+                <option [value]="null">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
+                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
+                  {{ workspace.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Desktop Step: Selected workspace visual preview -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200" [ngClass]="{'opacity-50': isStepDisabled('roomType')}">
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">
+                {{ (isMeetingRoom() ? 'RESERVATIONS.TABLE.ROOM' : 'BOOKING.WORKSPACE.SELECTED') | translate }}
+              </h4>
+              
+              <div *ngIf="!bookingForm.get('workspaceId')?.value" class="text-sm text-gray-400 italic">
+                {{ 'BOOKING.WORKSPACE.SELECT_FROM_MAP' | translate }}
+              </div>
+              
+              <div *ngIf="bookingForm.get('workspaceId')?.value"
+                class="flex items-center text-sm text-green-700 font-semibold bg-green-50 rounded-lg px-3 py-2 border border-green-150">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span *ngIf="isMeetingRoom(); else standardWorkspaceName">
+                  {{ selectedRoom?.name }}
+                </span>
+                <ng-template #standardWorkspaceName>
+                  {{ getWorkspaceName(bookingForm.get('workspaceId')?.value) }}
+                </ng-template>
+              </div>
+            </div>
+
+            <!-- Desktop Step: Submit Button -->
+            <div class="bg-white rounded-xl p-4 border border-gray-200"
+                 [ngClass]="isFormValid() ? 'border-green-500/40 shadow-[0_0_12px_rgba(34,197,94,0.06)]' : 'border-transparent'">
+              <button type="submit" [disabled]="isStepDisabled('submit') || state.isLoading"
+                class="w-full bg-[var(--color-expriviaOrange)] text-white hover:bg-[var(--color-expriviaOrange600)] disabled:bg-gray-400 disabled:opacity-50 font-bold py-2.5 px-4 rounded-lg shadow-md transition-colors text-sm flex items-center justify-center space-x-2">
+                <i class="fas" [ngClass]="state.isLoading ? 'fa-spinner fa-spin' : 'fa-check-circle'"></i>
+                <span>
+                  {{ state.isLoading ? ('BOOKING.SUBMIT.PROCESSING' | translate) : ('BOOKING.SUBMIT.BOOK_NOW' | translate) }}
+                </span>
+              </button>
+            </div>
+            
+          </div>
+        </div>
+        
       </div>
     </form>
   </div>
 
-  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">{{ 'BOOKING.MY_RESERVATIONS.TITLE' | translate }}</h3>
-      <div class="flex items-center space-x-2">
+  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 transition-all duration-300">
+    <!-- Collapsible Header for Mobile, Standard for Desktop -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+      <div class="flex items-center justify-between w-full sm:w-auto">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center">
+          <i class="fas fa-history mr-2 text-[var(--color-expriviaBlue)]"></i>
+          {{ 'BOOKING.MY_RESERVATIONS.TITLE' | translate }}
+        </h3>
+        <!-- Mobile Toggle Button -->
+        <button type="button" (click)="showReservationsOnMobile = !showReservationsOnMobile"
+          class="md:hidden text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 font-semibold bg-white hover:bg-gray-50 flex items-center gap-1.5 transition-colors shadow-sm">
+          <span>{{ showReservationsOnMobile ? 'Nascondi' : 'Mostra' }}</span>
+          <i class="fas" [ngClass]="showReservationsOnMobile ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+      </div>
+
+      <!-- Action & Filter Buttons -->
+      <div class="flex flex-wrap items-center gap-2" [ngClass]="{'hidden md:flex': !showReservationsOnMobile, 'flex': showReservationsOnMobile}">
         <button *ngIf="getSelectedCount() > 0 && statusFilter !== 'scadute'" type="button"
-          (click)="bulkCancelReservations()" class="px-3 py-1 bg-red-600 text-white text-sm rounded-md">
-          {{ 'BOOKING.MY_RESERVATIONS.CANCEL_SELECTED' | translate }} ({{ getSelectedCount() }})
+          (click)="bulkCancelReservations()" 
+          class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1">
+          <i class="fas fa-trash-alt"></i>
+          <span>{{ 'BOOKING.MY_RESERVATIONS.CANCEL_SELECTED' | translate }} ({{ getSelectedCount() }})</span>
         </button>
 
-        <div class="flex space-x-1">
-          <button (click)="setStatusFilter('tutti')" [class.bg-blue-600]="statusFilter === 'tutti'"
-            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ALL' | translate }}</button>
-          <button (click)="setStatusFilter('attive')" [class.bg-green-600]="statusFilter === 'attive'"
-            class="px-2 py-1 text-xs rounded">{{ 'BOOKING.MY_RESERVATIONS.ACTIVE' | translate }}</button>
-          <button (click)="setStatusFilter('scadute')" [class.bg-gray-600]="statusFilter === 'scadute'"
-            [class.text-white]="statusFilter === 'scadute'" class="px-2 py-1 text-xs rounded">{{
-            'BOOKING.MY_RESERVATIONS.PASSATE' | translate }}</button>
+        <div class="flex bg-gray-100 rounded-lg p-0.5 border border-gray-200">
+          <button type="button" (click)="setStatusFilter('tutti')" 
+            [class.bg-[var(--color-expriviaBlue)]]="statusFilter === 'tutti'"
+            [class.text-white]="statusFilter === 'tutti'"
+            [class.text-gray-600]="statusFilter !== 'tutti'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all">
+            {{ 'BOOKING.MY_RESERVATIONS.ALL' | translate }}
+          </button>
+          <button type="button" (click)="setStatusFilter('attive')" 
+            [class.bg-green-600]="statusFilter === 'attive'"
+            [class.text-white]="statusFilter === 'attive'"
+            [class.text-gray-600]="statusFilter !== 'attive'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all">
+            {{ 'BOOKING.MY_RESERVATIONS.ACTIVE' | translate }}
+          </button>
+          <button type="button" (click)="setStatusFilter('scadute')" 
+            [class.bg-gray-600]="statusFilter === 'scadute'"
+            [class.text-white]="statusFilter === 'scadute'"
+            [class.text-gray-600]="statusFilter !== 'scadute'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all">
+            {{ 'BOOKING.MY_RESERVATIONS.PASSATE' | translate }}
+          </button>
           <button (click)="setStatusFilter('annullate')" [class.bg-red-600]="statusFilter === 'annullate'"
             [class.text-white]="statusFilter === 'annullate'" class="px-2 py-1 text-xs rounded">{{
             'BOOKING.MY_RESERVATIONS.CANCELLED' | translate }}</button>
@@ -329,106 +575,192 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th *ngIf="statusFilter !== 'scadute'" class="p-2"><input type="checkbox" [checked]="isSelectAllChecked"
-                (change)="toggleSelectAll()"></th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.DATE' | translate }}
-            </th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.TIME' | translate }}
-            </th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">
-              {{ 'BOOKING.TABLE.BENEFICIARY' | translate }}
-            </th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.LOCATION_CITY' | translate }}</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.ROOM_WORKSPACE' | translate }}</th>
-            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{ 'BOOKING.TABLE.STATUS' | translate
-              }}</th>
-            <th *ngIf="statusFilter !== 'scadute'" class="p-2 text-left text-xs font-medium text-gray-500 uppercase">{{
-              'BOOKING.TABLE.ACTIONS' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let reservation of paginatedReservations">
-            <td *ngIf="statusFilter !== 'scadute'" class="p-2 text-center">
-              <input *ngIf="canShowCheckbox(reservation)" type="checkbox"
-                [checked]="isReservationSelected(reservation.id!)" (change)="toggleSelectReservation(reservation.id!)">
-            </td>
-            <td class="p-2 text-sm">{{ formatDate(reservation.startDate, 'dd/MM/yyyy') }}</td>
-            <td class="p-2 text-sm">{{ getFormattedTimeRange(reservation.startDate, reservation.endDate) }}</td>
-            <td class="p-2 text-sm">
-              <div *ngIf="reservation.userSummary; else noUser">
-                <div class="font-medium text-gray-900">
-                  {{ reservation.userSummary.name }} {{ reservation.userSummary.lastName }}
+    <!-- Content area: hidden on mobile when collapsed -->
+    <div [ngClass]="{'hidden md:block': !showReservationsOnMobile, 'block': showReservationsOnMobile}" class="mt-6">
+      
+      <!-- DESKTOP VIEW (Table) -->
+      <div class="hidden md:block overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th *ngIf="statusFilter !== 'scadute'" class="p-3 w-10 text-center">
+                <input type="checkbox" [checked]="isSelectAllChecked" (change)="toggleSelectAll()"
+                       class="rounded text-[var(--color-expriviaOrange)] focus:ring-[var(--color-expriviaOrange)]">
+              </th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.DATE' | translate }}</th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.TIME' | translate }}</th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.BENEFICIARY' | translate }}</th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.LOCATION_CITY' | translate }}</th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.ROOM_WORKSPACE' | translate }}</th>
+              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.STATUS' | translate }}</th>
+              <th *ngIf="statusFilter !== 'scadute'" class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let reservation of paginatedReservations" class="hover:bg-gray-50 transition-colors">
+              <td *ngIf="statusFilter !== 'scadute'" class="p-3 text-center">
+                <input *ngIf="canShowCheckbox(reservation)" type="checkbox"
+                  [checked]="isReservationSelected(reservation.id!)" (change)="toggleSelectReservation(reservation.id!)"
+                  class="rounded text-[var(--color-expriviaOrange)] focus:ring-[var(--color-expriviaOrange)]">
+              </td>
+              <td class="p-3 font-medium text-gray-900">{{ formatDate(reservation.startDate, 'dd/MM/yyyy') }}</td>
+              <td class="p-3 text-gray-600">{{ getFormattedTimeRange(reservation.startDate, reservation.endDate) }}</td>
+              <td class="p-3">
+                <div *ngIf="reservation.userSummary; else noUser">
+                  <div class="font-medium text-gray-900">
+                    {{ reservation.userSummary.name }} {{ reservation.userSummary.lastName }}
+                  </div>
+                  <div class="text-xs text-gray-500 truncate max-w-[150px]" [title]="reservation.userSummary.email">
+                    {{ reservation.userSummary.email }}
+                  </div>
                 </div>
-                <div class="text-xs text-gray-500 mt-0.5 truncate max-w-[150px]" [title]="reservation.userSummary.email">
-                  {{ reservation.userSummary.email }}
+                <ng-template #noUser>-</ng-template>
+                <div *ngIf="$any(reservation).bookedBySummary && $any(reservation).bookedBySummary.id !== reservation.userSummary?.id" 
+                     class="text-[10px] text-amber-600 mt-1 flex items-center gap-1 font-semibold bg-amber-50 rounded px-1.5 py-0.5 w-max">
+                  <i class="fas fa-user-edit"></i>
+                  <span>{{ 'BOOKING.TABLE.BOOKED_BY' | translate }}: {{ $any(reservation).bookedBySummary?.name }}</span>
                 </div>
-              </div>
-              <ng-template #noUser>-</ng-template>
-              <div *ngIf="$any(reservation).bookedBySummary && $any(reservation).bookedBySummary.id !== reservation.userSummary?.id" 
-                   class="text-[10px] text-amber-600 mt-1 flex items-center gap-1 font-medium bg-amber-50 rounded px-1.5 py-0.5 w-max">
-                <i class="fas fa-user-edit"></i>
-                <span>{{ 'BOOKING.TABLE.BOOKED_BY' | translate }}: {{ $any(reservation).bookedBySummary?.name }}</span>
-              </div>
-            </td>
-            <td class="p-2 text-sm">
-              <div class="font-medium">{{ reservation.locationName }}</div>
-              <div class="text-xs text-gray-500">{{ reservation.cityName }}</div>
-            </td>
-            <td class="p-2 text-sm">
-              <div class="font-medium">
-                {{ reservation.roomSummary?.name }}
-                <ng-container *ngIf="reservation.roomSummary?.roomType !== 'MeetingRoom' && reservation.roomSummary?.roomType !== 'MEETING_ROOM' && reservation.roomSummary?.roomType !== 'MEETINGROOM'">
-                   / {{ reservation.workspaceSummary?.name }}
-                </ng-container>
-              </div>
-              <div class="text-xs text-gray-500">
-                {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
-              </div>
-            </td>
-            <td class="p-2">
-              <span class="px-2 py-1 text-xs rounded-full" [ngClass]="{
-                  'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
-                  'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
-                  'bg-red-100 text-red-800': reservation.status === 'DENIED'
-                }">
-                {{ reservation.status === 'CONFIRMED' ? ('BOOKING.TABLE.STATUS_CONFIRMED' | translate) :
-                (reservation.status === 'NOT_CONFIRMED' ?
-                ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
-              </span>
+              </td>
+              <td class="p-3">
+                <div class="font-semibold text-gray-800">{{ reservation.locationName }}</div>
+                <div class="text-xs text-gray-500">{{ reservation.cityName }}</div>
+              </td>
+              <td class="p-3">
+                <div class="font-semibold text-gray-800">
+                  {{ reservation.roomSummary?.name }}
+                  <ng-container *ngIf="reservation.roomSummary?.roomType !== 'MeetingRoom' && reservation.roomSummary?.roomType !== 'MEETING_ROOM' && reservation.roomSummary?.roomType !== 'MEETINGROOM'">
+                     / {{ reservation.workspaceSummary?.name }}
+                  </ng-container>
+                </div>
+                <div class="text-xs text-gray-400">
+                  {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
+                </div>
+              </td>
+              <td class="p-3">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full" [ngClass]="{
+                    'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
+                    'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
+                    'bg-red-100 text-red-800': reservation.status === 'DENIED'
+                  }">
+                  {{ reservation.status === 'CONFIRMED' ? ('BOOKING.TABLE.STATUS_CONFIRMED' | translate) :
+                  (reservation.status === 'NOT_CONFIRMED' ?
+                  ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
+                </span>
               <div *ngIf="reservation.status === 'DENIED' && $any(reservation).canceledBySummary?.name && reservation.userSummary?.id !== $any(reservation).canceledBySummary?.id" 
                    class="text-[10px] text-red-600 mt-1 flex items-center gap-1 font-medium bg-red-50 rounded px-1.5 py-0.5 w-max">
                 <i class="fas fa-ban"></i>
                 <span>{{ 'BOOKING.TABLE.CANCELED_BY' | translate }}: {{ $any(reservation).canceledBySummary?.name }}</span>
               </div>
-            </td>
-            <td *ngIf="statusFilter !== 'scadute'" class="p-2">
-              <button *ngIf="canCancelReservation(reservation)" (click)="cancelReservation(reservation)"
-                class="text-xs text-red-600 hover:underline">{{
-                'BOOKING.TABLE.ACTION_CANCEL' | translate }}</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+              </td>
+              <td *ngIf="statusFilter !== 'scadute'" class="p-3">
+                <button *ngIf="canCancelReservation(reservation)" (click)="cancelReservation(reservation)"
+                  
+                  class="text-xs text-red-600 hover:text-red-800 font-bold disabled:opacity-30 transition-colors">
+                  {{ 'BOOKING.TABLE.ACTION_CANCEL' | translate }}
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="paginatedReservations.length === 0">
+              <td [attr.colspan]="statusFilter === 'scadute' ? 6 : 8" class="p-8 text-center text-gray-400 italic">
+                {{ 'RESERVATIONS.TABLE.NO_RESERVATIONS' | translate }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Pagination -->
-    <div *ngIf="totalItems > 0" class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
-      <div class="flex items-center gap-2 text-sm text-gray-700">
-        {{ 'RESERVATIONS.PAGINATION.SHOW' | translate }}
-        <select [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange($event)" class="border rounded px-2 py-1">
-          <option *ngFor="let opt of pageOptions" [value]="opt">{{ opt }}</option>
-        </select>
-        {{ 'RESERVATIONS.PAGINATION.ENTRIES_SHOWING' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'RESERVATIONS.PAGINATION.OF' | translate }} {{ totalItems }})
+      <!-- MOBILE VIEW (Card List) -->
+      <div class="md:hidden space-y-4">
+        <div *ngIf="paginatedReservations.length === 0" class="text-center py-8 text-gray-400 italic text-sm">
+          {{ 'RESERVATIONS.TABLE.NO_RESERVATIONS' | translate }}
+        </div>
+        <div *ngFor="let reservation of paginatedReservations" 
+             class="bg-gray-50 rounded-xl p-4 border border-gray-200 shadow-sm flex flex-col gap-3 relative transition-all duration-200">
+          
+          <!-- Card Header (Status & Select/Cancel) -->
+          <div class="flex justify-between items-center pb-2.5 border-b border-gray-200/60">
+            <span class="px-2.5 py-1 text-xs font-semibold rounded-full" [ngClass]="{
+                'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
+                'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
+                'bg-red-100 text-red-800': reservation.status === 'DENIED'
+              }">
+              {{ reservation.status === 'CONFIRMED' ? ('BOOKING.TABLE.STATUS_CONFIRMED' | translate) :
+              (reservation.status === 'NOT_CONFIRMED' ?
+              ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
+            </span>
+            
+            <div class="flex items-center gap-2">
+              <input *ngIf="statusFilter !== 'scadute' && canShowCheckbox(reservation)" type="checkbox"
+                [checked]="isReservationSelected(reservation.id!)" (change)="toggleSelectReservation(reservation.id!)"
+                class="rounded text-[var(--color-expriviaOrange)] focus:ring-[var(--color-expriviaOrange)] w-4 h-4">
+              <button *ngIf="statusFilter !== 'scadute'" (click)="cancelReservation(reservation)"
+                [disabled]="!canCancelReservation(reservation)" 
+                class="text-xs text-red-600 hover:text-red-800 font-bold disabled:opacity-30">
+                {{ 'BOOKING.TABLE.ACTION_CANCEL' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Card Details -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span class="text-gray-400 block mb-0.5">Data</span>
+              <span class="font-bold text-gray-800">{{ formatDate(reservation.startDate, 'dd/MM/yyyy') }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block mb-0.5">Orario</span>
+              <span class="font-bold text-gray-800">{{ getFormattedTimeRange(reservation.startDate, reservation.endDate) }}</span>
+            </div>
+            <div class="col-span-2">
+              <span class="text-gray-400 block mb-0.5">Sede</span>
+              <span class="font-bold text-gray-800">{{ reservation.locationName }} ({{ reservation.cityName }})</span>
+            </div>
+            <div class="col-span-2">
+              <span class="text-gray-400 block mb-0.5">Postazione</span>
+              <span class="font-bold text-gray-800">
+                {{ reservation.roomSummary?.name }}
+                <ng-container *ngIf="reservation.roomSummary?.roomType !== 'MeetingRoom' && reservation.roomSummary?.roomType !== 'MEETING_ROOM' && reservation.roomSummary?.roomType !== 'MEETINGROOM'">
+                   / {{ reservation.workspaceSummary?.name }}
+                </ng-container>
+              </span>
+              <span class="text-[10px] text-gray-400 block mt-0.5">
+                {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Beneficiary -->
+          <div *ngIf="reservation.userSummary || $any(reservation).bookedBySummary" 
+               class="bg-white p-2.5 rounded-lg border border-gray-150 mt-1 flex flex-col gap-1 text-[11px]">
+            <div *ngIf="reservation.userSummary" class="flex justify-between items-center">
+              <span class="text-gray-400">Assegnatario:</span>
+              <span class="font-semibold text-gray-800">{{ reservation.userSummary.name }} {{ reservation.userSummary.lastName }}</span>
+            </div>
+            <div *ngIf="$any(reservation).bookedBySummary && $any(reservation).bookedBySummary.id !== reservation.userSummary?.id"
+                 class="text-amber-600 flex items-center gap-1 font-semibold">
+              <i class="fas fa-user-edit text-[10px]"></i>
+              <span>{{ 'BOOKING.TABLE.BOOKED_BY' | translate }}: {{ $any(reservation).bookedBySummary?.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-1">
-        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.PREV' | translate }}</button>
-        <button *ngFor="let p of pageNumbers" (click)="onPageChange(p)" [class.bg-blue-600]="p === currentPage" [class.text-white]="p === currentPage" class="px-3 py-1 border rounded">{{ p }}</button>
-        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">{{ 'RESERVATIONS.PAGINATION.NEXT' | translate }}</button>
+
+      <!-- Pagination -->
+      <div *ngIf="totalItems > 0" class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+        <div class="flex items-center gap-2 text-sm text-gray-700">
+          {{ 'RESERVATIONS.PAGINATION.SHOW' | translate }}
+          <select [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange($event)" class="border rounded px-2 py-1 bg-white">
+            <option *ngFor="let opt of pageOptions" [value]="opt">{{ opt }}</option>
+          </select>
+          {{ 'RESERVATIONS.PAGINATION.ENTRIES_SHOWING' | translate }} {{ getStartIndex() }}-{{ getEndIndex() }} {{ 'RESERVATIONS.PAGINATION.OF' | translate }} {{ totalItems }})
+        </div>
+        <div class="flex items-center gap-1">
+          <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" class="px-3 py-1 border rounded bg-white disabled:opacity-50 text-xs font-semibold">{{ 'RESERVATIONS.PAGINATION.PREV' | translate }}</button>
+          <button *ngFor="let p of pageNumbers" (click)="onPageChange(p)" [class.bg-[var(--color-expriviaBlue)]]="p === currentPage" [class.text-white]="p === currentPage" [class.bg-white]="p !== currentPage" class="px-3 py-1 border rounded text-xs font-semibold">{{ p }}</button>
+          <button (click)="goToNextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 border rounded bg-white disabled:opacity-50 text-xs font-semibold">{{ 'RESERVATIONS.PAGINATION.NEXT' | translate }}</button>
+        </div>
       </div>
+
     </div>
   </div>
 </div>

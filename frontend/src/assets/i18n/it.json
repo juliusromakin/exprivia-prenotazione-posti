@@ -28,6 +28,9 @@
     "GO_DASHBOARD_ADMIN": "Vai alla Dashboard",
     "FEATURES_TITLE": "Funzionalità Principali",
     "FEATURES_SUBTITLE": "Scopri come il nostro sistema può semplificare la gestione degli spazi di lavoro",
+    "UNAUTHORIZED_WARNING": "Non sei ancora autorizzato. Attendi che un amministratore approvi il tuo account.",
+    "DISCOVER_FEATURES": "Scopri le funzionalità",
+    "LOGIN_NOW": "Accedi ora",
     "FEATURE_1": {
       "TITLE": "Prenotazioni Facili",
       "DESC": "Prenota il tuo spazio di lavoro in pochi click, con un'interfaccia intuitiva e veloce.",
@@ -325,6 +328,7 @@
       "STATUS_CONFIRMED": "Confermata",
       "STATUS_PENDING": "In Attesa",
       "STATUS_DENIED": "Rifiutata",
+      "ACTION_CANCEL": "Annulla",
       "NO_RESERVATIONS": "Nessuna prenotazione trovata."
     },
     "PAGINATION": {
@@ -431,17 +435,18 @@
     "TITLE": "Nuova Prenotazione",
     "STEP": "Step",
     "STEPS": {
-      "DATE": "1. Seleziona una data",
+      "DATE": "Seleziona una data",
       "CITY": "Città",
       "LOCATION": "Sede",
-      "ROOM_TYPE": "2. Seleziona tipo sala",
-      "TIME": "3. Seleziona orario",
+      "ROOM_TYPE": "Seleziona tipo sala",
+      "TIME": "Seleziona orario",
       "ROOM": "Sala",
-      "WORKSPACE": "4. Seleziona una postazione dalla mappa"
+      "WORKSPACE": "Seleziona una postazione dalla mappa"
     },
     "CALENDAR": {
       "SELECT_DATE_HINT": "Seleziona una data dal calendario",
-      "SELECTED_DATE": "Data Selezionata"
+      "SELECTED_DATE": "Data Selezionata",
+      "SELECT_LOCATION_FIRST": "Seleziona una sede per sbloccare il calendario"
     },
     "ROOM_TYPE": {
       "SELECT_HINT": "Seleziona tipo sala"

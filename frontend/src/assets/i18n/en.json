@@ -28,6 +28,9 @@
     "GO_DASHBOARD_ADMIN": "Go to Dashboard",
     "FEATURES_TITLE": "Key Features",
     "FEATURES_SUBTITLE": "Discover how our system can simplify your workspace management",
+    "UNAUTHORIZED_WARNING": "You are not authorized yet. Please wait for an administrator to approve your account.",
+    "DISCOVER_FEATURES": "Discover features",
+    "LOGIN_NOW": "Log in now",
     "FEATURE_1": {
       "TITLE": "Easy Bookings",
       "DESC": "Book your workspace in a few clicks, with an intuitive and fast interface.",
@@ -324,6 +327,7 @@
       "STATUS_CONFIRMED": "Confirmed",
       "STATUS_PENDING": "Pending",
       "STATUS_DENIED": "Denied",
+      "ACTION_CANCEL": "Cancel",
       "NO_RESERVATIONS": "No reservations found."
     },
     "PAGINATION": {
@@ -430,17 +434,18 @@
     "TITLE": "New Reservation",
     "STEP": "Step",
     "STEPS": {
-      "DATE": "1. Select a date",
+      "DATE": "Select a date",
       "CITY": "City",
       "LOCATION": "Location",
-      "ROOM_TYPE": "2. Select Room Type",
-      "TIME": "3. Select Time",
+      "ROOM_TYPE": "Select Room Type",
+      "TIME": "Select Time",
       "ROOM": "Room",
-      "WORKSPACE": "4. Select a workspace from the map"
+      "WORKSPACE": "Select a workspace from the map"
     },
     "CALENDAR": {
       "SELECT_DATE_HINT": "Select a date from the calendar",
-      "SELECTED_DATE": "Selected Date"
+      "SELECTED_DATE": "Selected Date",
+      "SELECT_LOCATION_FIRST": "Select a location to unlock the calendar"
     },
     "ROOM_TYPE": {
       "SELECT_HINT": "Select room type"

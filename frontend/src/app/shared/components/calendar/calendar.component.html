@@ -45,21 +45,16 @@
       aria-labelledby="calendar-title">
       <div *ngFor="let day of getDays()"
         class="relative aspect-square flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg transition-all duration-200"
-        [class.bg-white]="!day.isToday" 
-        [class.bg-blue-50]="day.isToday" 
-        [class.ring-2]="day.isToday" 
-        [class.ring-blue-500]="day.isToday" 
-        [class.bg-blue-100]="day.isSelected"
-        [class.ring-2]="day.isSelected" 
-        [class.ring-blue-600]="day.isSelected" 
-        [class.bg-red-50]="day.isWeekend"
-        [class.text-red-600]="day.isWeekend" 
-        [class.cursor-pointer]="!day.isDisabled && !day.isWeekend"
-        [class.hover:bg-gray-50]="!day.isDisabled && !day.isWeekend"
-        [class.hover:scale-105]="!day.isDisabled && !day.isWeekend"
-        [class.hover:shadow-md]="!day.isDisabled && !day.isWeekend"
-        [class.hover:z-10]="!day.isDisabled && !day.isWeekend"
-        [class.disabled]="day.isDisabled"
+        [ngClass]="{
+          'bg-white': !day.isToday && !day.isSelected,
+          'bg-[var(--color-expriviaBlue)]/5 border-2 border-[var(--color-expriviaBlue)] text-[var(--color-expriviaBlue)] font-bold': day.isToday && !day.isSelected,
+          'border-2 border-[var(--color-expriviaBlue)]': day.isToday && day.isSelected,
+          'bg-expriviaOrange text-white font-semibold shadow-md shadow-expriviaOrange/35 hover:bg-expriviaOrange600': day.isSelected,
+          'bg-red-50 text-red-600': day.isWeekend,
+          'cursor-pointer hover:scale-105 hover:shadow-md hover:z-10': !day.isDisabled && !day.isWeekend,
+          'hover:bg-gray-50': !day.isDisabled && !day.isWeekend && !day.isSelected,
+          'disabled': day.isDisabled
+        }"
         (click)="onDateClick(day)"
         [attr.aria-selected]="day.isSelected" 
         [attr.aria-disabled]="day.isDisabled || day.isWeekend" 
