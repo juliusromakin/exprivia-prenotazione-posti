@@ -219,7 +219,7 @@
                         <!-- Griglia Pulsanti Piani -->
                         <div
                           class="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
-                          <button *ngFor="let floor of getFloorsArray(item.nPiani)"
+                          <button *ngFor="let floor of item.floorsArray"
                             (click)="openPlanimetriaModal(item.originalEdificio, floor)"
                             class="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-300 hover:border-blue-600 hover:bg-blue-600 transition-all shadow-md hover:shadow-xl cursor-pointer active:scale-95">
                             <div
@@ -412,9 +412,9 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <ng-container *ngIf="p.isActive !== false; else disabledBadge">
-                    <span [class]="isFutureDate(p.publishDate) ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
+                    <span [class]="p.isFuture ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
                       class="px-3 py-1 text-[10px] font-semibold rounded-full uppercase">
-                      {{ isFutureDate(p.publishDate) ? 'Programmato' : 'Attivo' }}
+                      {{ p.isFuture ? 'Programmato' : 'Attivo' }}
                     </span>
                   </ng-container>
                   <ng-template #disabledBadge>
@@ -436,8 +436,14 @@
                       
                       <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                         (click)="goToPlanimetriaManagement(p.id)">
-                        <lucide-icon name="edit" class="w-4 h-4 text-blue-500"></lucide-icon>
-                        Modifica
+                        <lucide-icon name="map" class="w-4 h-4 text-blue-500"></lucide-icon>
+                        Modifica Planimetria
+                      </button>
+
+                      <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        (click)="openEditPlanModal(p)">
+                        <lucide-icon name="edit" class="w-4 h-4 text-orange-500"></lucide-icon>
+                        Cambia nome/data
                       </button>
 
                       <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
@@ -702,6 +708,81 @@
     (confirm)="confirmDelete()"
     (cancel)="closeDeleteConfirmation()"
   ></app-confirmation-modal>
+</div>
+
+<!-- Modale Edit Nome/Data Planimetria -->
+<div *ngIf="showEditPlanModal" class="fixed inset-0 z-[110] flex items-start pt-24 justify-center p-4">
+  <div class="absolute inset-0 bg-slate-900/60" (click)="closeEditPlanModal()"></div>
+  <div class="relative bg-white border border-slate-100 rounded-2xl p-6 w-full max-w-md shadow-2xl animate-in slide-in-from-top-4 duration-200">
+      
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+              <lucide-icon name="edit" class="w-5 h-5 text-orange-600"></lucide-icon>
+          </div>
+          <div>
+              <h3 class="text-lg font-bold text-slate-900">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.EDIT_DETAILS' | translate }}</h3>
+              <p class="text-slate-500 text-xs">{{ 'GESTIONE_SEDI.PLANIMETRIA_MODAL.EDIT_DETAILS_DESC' | translate }}</p>
+          </div>
+      </div>
+
+      <div class="space-y-4">
+          <!-- Nome Planimetria -->
+          <div>
+              <label class="block text-slate-700 text-xs font-semibold uppercase mb-1.5">
+                  {{ 'PLANIMETRIA_EDITOR.MODAL.PLAN_NAME' | translate }} <span class="text-orange-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="editingPlanName" [ngModelOptions]="{updateOn: 'blur'}"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all">
+          </div>
+
+          <!-- Data Inizio -->
+          <div>
+              <label class="block text-slate-700 text-xs font-semibold uppercase mb-1.5">
+                  {{ 'PLANIMETRIA_EDITOR.VALIDITY_MODAL.START_DATE' | translate }} <span class="text-orange-500">*</span>
+              </label>
+              <mat-form-field appearance="outline" class="w-full planimetria-datepicker">
+                  <input matInput [matDatepicker]="pickerModalFromEdit" [(ngModel)]="editingPlanValidFrom"
+                         placeholder="gg/mm/aaaa" readonly>
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerModalFromEdit"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerModalFromEdit></mat-datepicker>
+              </mat-form-field>
+          </div>
+
+          <!-- Data Fine -->
+          <div>
+              <label class="block text-slate-700 text-xs font-semibold uppercase mb-1.5">{{ 'PLANIMETRIA_EDITOR.VALIDITY_MODAL.END_DATE' | translate }}</label>
+              <mat-form-field appearance="outline" class="w-full planimetria-datepicker">
+                  <input matInput [matDatepicker]="pickerModalToEdit" [(ngModel)]="editingPlanValidTo"
+                         [disabled]="editingPlanEndless"
+                         placeholder="gg/mm/aaaa" readonly>
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerModalToEdit"
+                      [disabled]="editingPlanEndless"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerModalToEdit></mat-datepicker>
+              </mat-form-field>
+          </div>
+
+          <!-- Checkbox Fine Indeterminata -->
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" [(ngModel)]="editingPlanEndless"
+                     (ngModelChange)="onEditPlanEndlessChange()"
+                     class="w-4 h-4 rounded accent-orange-500 cursor-pointer">
+              <span class="text-slate-700 text-sm font-medium">{{ 'PLANIMETRIA_EDITOR.VALIDITY_MODAL.ENDLESS' | translate }}</span>
+          </label>
+      </div>
+
+      <div class="flex gap-3 mt-7">
+          <button (click)="closeEditPlanModal()"
+              class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-all">
+              {{ 'PLANIMETRIA_EDITOR.VALIDITY_MODAL.CANCEL' | translate }}
+          </button>
+          <button (click)="salvaDettagliPlan()"
+              class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md">
+              <lucide-icon name="save" class="w-4 h-4"></lucide-icon>
+              {{ 'PLANIMETRIA_EDITOR.VALIDITY_MODAL.SAVE' | translate }}
+          </button>
+      </div>
+  </div>
 </div>
 
 <p-toast></p-toast>

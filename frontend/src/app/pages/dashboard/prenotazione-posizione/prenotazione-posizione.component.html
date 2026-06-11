@@ -569,7 +569,10 @@
             {{ 'BOOKING.MY_RESERVATIONS.PASSATE' | translate }}
           </button>
           <button (click)="setStatusFilter('annullate')" [class.bg-red-600]="statusFilter === 'annullate'"
-            [class.text-white]="statusFilter === 'annullate'" class="px-2 py-1 text-xs rounded">{{
+            [class.bg-gray-600]="statusFilter === 'annullate'"
+            [class.text-white]="statusFilter === 'annullate'"
+            [class.text-gray-600]="statusFilter !== 'annullate'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all">{{
             'BOOKING.MY_RESERVATIONS.CANCELLED' | translate }}</button>
         </div>
       </div>
@@ -592,8 +595,8 @@
               <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.BENEFICIARY' | translate }}</th>
               <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.LOCATION_CITY' | translate }}</th>
               <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.ROOM_WORKSPACE' | translate }}</th>
-              <th class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.STATUS' | translate }}</th>
-              <th *ngIf="statusFilter !== 'scadute'" class="p-3 text-left font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
+              <th class="p-3 text-center font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.STATUS' | translate }}</th>
+              <th *ngIf="statusFilter !== 'scadute'" class="p-3 text-center font-semibold text-gray-500 uppercase text-xs">{{ 'BOOKING.TABLE.ACTIONS' | translate }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -654,7 +657,7 @@
                   </div>
                 </div>
               </td>
-              <td *ngIf="statusFilter !== 'scadute'" class="p-3">
+              <td *ngIf="statusFilter !== 'scadute'" class="p-3 text-center">
                 <button *ngIf="canCancelReservation(reservation)" (click)="cancelReservation(reservation)"
                   
                   class="text-xs text-red-600 hover:text-red-800 font-bold disabled:opacity-30 transition-colors">

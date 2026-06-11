@@ -99,6 +99,38 @@ public class FloorPlanService {
     }
 
     @Transactional
+    public FloorPlanSummaryDTO updateFloorPlanDetails(Integer id, FloorPlanSummaryDTO request) {
+        FloorPlan plan = floorPlanRepository.findById(id)
+                .orElseThrow(() -> new AppException("FLOOR_PLAN_NOT_FOUND", "FloorPlan not found", Map.of("id", id), HttpStatus.NOT_FOUND));
+
+        boolean datesChanged = false;
+        if (request.getValidFrom() != null && !request.getValidFrom().equals(plan.getValidFrom())) {
+            plan.setValidFrom(request.getValidFrom());
+            datesChanged = true;
+        }
+        
+        // request.getValidTo() can be null (meaning endless)
+        if ((request.getValidTo() == null && plan.getValidTo() != null) || 
+            (request.getValidTo() != null && !request.getValidTo().equals(plan.getValidTo()))) {
+            plan.setValidTo(request.getValidTo());
+            datesChanged = true;
+        }
+
+        if (request.getName() != null) {
+            plan.setName(request.getName());
+        }
+
+        plan = floorPlanRepository.save(plan);
+
+        if (datesChanged && plan.getIsActive()) {
+            synchronizeActivePlansIntervals(plan.getFloor(), plan);
+            plan = floorPlanRepository.save(plan);
+        }
+
+        return floorPlanMapper.toSummaryDto(plan);
+    }
+
+    @Transactional
     public FloorPlanDTO savePlanimetry(FloorPlanDTO floorPlanDTO) {
         Floor floor = floorRepository.findById(floorPlanDTO.getFloorId())
                 .orElseThrow(() -> new AppException("FLOOR_NOT_FOUND", "Floor not found", Map.of("id", floorPlanDTO.getFloorId()), HttpStatus.NOT_FOUND));

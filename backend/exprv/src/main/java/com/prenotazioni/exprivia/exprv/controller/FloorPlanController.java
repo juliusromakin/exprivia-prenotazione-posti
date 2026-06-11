@@ -42,6 +42,12 @@ public class FloorPlanController {
         return ResponseEntity.ok(floorPlanService.toggleFloorPlanStatus(id));
     }
 
+    @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_UPDATE')")
+    @PutMapping("/{id}/details")
+    public ResponseEntity<FloorPlanSummaryDTO> updateDetails(@PathVariable Integer id, @RequestBody FloorPlanSummaryDTO request) {
+        return ResponseEntity.ok(floorPlanService.updateFloorPlanDetails(id, request));
+    }
+
     @PreAuthorize("hasAuthority('ACTION_FLOORPLAN_READ')")
     @GetMapping("/building/{buildingId}/all")
     public ResponseEntity<List<FloorPlanDTO>> getAllFloorPlansByBuilding(@PathVariable Integer buildingId) {

@@ -72,7 +72,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
 
   // Filter properties
   statusFilter: string = 'attive'; // Default to active
-  showReservationsOnMobile = false;
+  public showReservationsOnMobile: boolean = false;
 
   // Admin and user selection properties
   isAdmin = false;

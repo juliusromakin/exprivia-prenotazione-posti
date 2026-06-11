@@ -176,7 +176,8 @@
       "LOADING": "Caricamento planimetrie...",
       "NO_PLANS": "Nessuna planimetria salvata trovata.",
       "DEFAULT_FLOOR": "Piano",
-      "ROOMS_COUNT": "{{count}} stanz{{suffix}} posizionat{{suffix}}"
+      "ROOMS_COUNT": "{{count}} stanz{{suffix}} posizionat{{suffix}}",
+      "CLONE": "Clona"
     },
     "DESK_PROMPT": {
       "TITLE_SINGLE": "Numero Postazione",
@@ -787,11 +788,15 @@
         "CONFIRM_DELETE": "Sei sicuro di voler eliminare definitivamente la planimetria \"{{ name }}\"? Questa azione non può essere annullata.",
         "SUCCESS_TITLE": "Successo",
         "DELETE_SUCCESS": "Planimetria eliminata definitivamente",
+        "UPDATE_SUCCESS": "Planimetria aggiornata con successo",
+        "FILL_REQUIRED": "Compila tutti i campi obbligatori",
         "ENABLED": "Planimetria abilitata correttamente",
         "DISABLED": "Planimetria disabilitata correttamente",
         "ERROR_TITLE": "Errore",
         "DELETE_ERROR": "Impossibile eliminare la planimetria"
-      }
+      },
+      "EDIT_DETAILS": "Modifica Dettagli Planimetria",
+      "EDIT_DETAILS_DESC": "Cambia il nome e il periodo di validità di questa planimetria."
     },
     "BUILDING_MODAL": {
       "TITLE": "Modifica Edificio",

@@ -12,6 +12,10 @@ import { LocationService } from '../../../core/services/location.service';
 import { PlanimetriaService, FloorDTO, FloorPlanSummaryDTO } from '../../../core/services/planimetria.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ConfirmationModalComponent, ConfirmationModalData } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 interface Edificio {
   id?: number;
@@ -46,7 +50,11 @@ interface Sede {
     TranslateModule,
     LucideAngularModule,
     ToastModule,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [
   ],
@@ -141,6 +149,73 @@ export class GestioneSediComponent implements OnInit {
     };
     this.showDeleteConfirmation = true;
     this.cdr.detectChanges();
+  }
+
+  // Edit Plan Details Properties
+  showEditPlanModal = false;
+  editingPlanId: number | null = null;
+  editingPlanName = '';
+  editingPlanValidFrom: Date | null = null;
+  editingPlanValidTo: Date | null = null;
+  editingPlanEndless = false;
+
+  openEditPlanModal(plan: any): void {
+    this.activeMenuIndex = null;
+    this.editingPlanId = plan.id;
+    this.editingPlanName = plan.name || '';
+    this.editingPlanValidFrom = plan.validFrom ? new Date(plan.validFrom) : null;
+    this.editingPlanValidTo = plan.validTo ? new Date(plan.validTo) : null;
+    this.editingPlanEndless = !plan.validTo;
+    this.showPlanimetriaModal = false;
+    this.showEditPlanModal = true;
+  }
+
+  closeEditPlanModal(): void {
+    this.showEditPlanModal = false;
+    this.editingPlanId = null;
+    if (this.selectedBuilding && this.selectedFloor) {
+      this.showPlanimetriaModal = true;
+    }
+  }
+
+  onEditPlanEndlessChange(): void {
+    if (this.editingPlanEndless) {
+        this.editingPlanValidTo = null;
+    }
+  }
+
+  salvaDettagliPlan(): void {
+    if (!this.editingPlanId) return;
+    if (!this.editingPlanName || !this.editingPlanValidFrom) {
+        this.toastService.showWarning(
+            this.translate.instant('COMMON.ATTENTION'),
+            this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.FILL_REQUIRED') || 'Compila tutti i campi obbligatori'
+        );
+        return;
+    }
+
+    const payload = {
+        name: this.editingPlanName,
+        validFrom: this.editingPlanValidFrom.toISOString().split('T')[0],
+        validTo: this.editingPlanEndless || !this.editingPlanValidTo ? null : this.editingPlanValidTo.toISOString().split('T')[0]
+    };
+
+    this.planimetriaService.aggiornaDettagliPlanimetria(this.editingPlanId, payload).subscribe({
+        next: () => {
+            this.toastService.showSuccess(
+                this.translate.instant('COMMON.SUCCESS'),
+                this.translate.instant('GESTIONE_SEDI.PLANIMETRIA_MODAL.MESSAGES.UPDATE_SUCCESS') || 'Planimetria aggiornata'
+            );
+            this.closeEditPlanModal();
+            if (this.selectedBuilding && this.selectedFloor) {
+                const buildingCopy = { ...this.selectedBuilding };
+                this.openPlanimetriaModal(buildingCopy, this.selectedFloor);
+            }
+        },
+        error: (err) => {
+            this.toastService.handleError(err, this.translate.instant('COMMON.ERROR'));
+        }
+    });
   }
 
   onDeleteBuilding(event: Event, ed: Edificio): void {
@@ -328,6 +403,7 @@ export class GestioneSediComponent implements OnInit {
               sedeName: loc.name,
               city: loc.city,
               nPiani: ed.numFloors,
+              floorsArray: Array.from({ length: ed.numFloors }, (_, i) => i + 1),
               enabled: loc.enabled,
               originalEdificio: { ...ed, locationId: loc.id, sedeName: loc.name },
               originalLoc: loc
@@ -441,10 +517,6 @@ export class GestioneSediComponent implements OnInit {
     this.expandedRowIndex = this.expandedRowIndex === index ? null : index;
   }
 
-  getFloorsArray(num: number): number[] {
-    return Array.from({ length: num }, (_, i) => i + 1);
-  }
-
   openPlanimetriaModal(building: Edificio, floor: number): void {
     this.selectedBuilding = { ...building };
     this.selectedFloor = floor;
@@ -462,7 +534,10 @@ export class GestioneSediComponent implements OnInit {
             this.planimetriaService.getFloorPlans(targetFloor.id).subscribe({
               next: (plans: FloorPlanSummaryDTO[]) => {
                 if (this.selectedBuilding) {
-                  this.selectedBuilding.planimetrie = plans;
+                  this.selectedBuilding.planimetrie = plans.map(p => ({
+                    ...p,
+                    isFuture: this.isFutureDate(p.publishDate)
+                  }));
                   this.cdr.detectChanges();
                 }
               }

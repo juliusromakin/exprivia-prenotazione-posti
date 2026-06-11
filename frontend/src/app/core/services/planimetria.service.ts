@@ -50,6 +50,7 @@ export interface FloorPlanSummaryDTO {
     publishDate?: string | Date;
     validTo?: string | Date;
     isActive?: boolean;
+    isFuture?: boolean;
 }
 
 @Injectable({
@@ -122,5 +123,10 @@ export class PlanimetriaService {
     /** Elimina definitivamente una planimetria. */
     deleteFloorPlan(id: number): Observable<void> {
         return from(this.axiosService.delete<void>(`${this.floorPlanUrl}/${id}`));
+    }
+
+    /** Aggiorna solo i dettagli (nome, date) di una planimetria. */
+    aggiornaDettagliPlanimetria(id: number, payload: any): Observable<FloorPlanSummaryDTO> {
+        return from(this.axiosService.put<FloorPlanSummaryDTO>(`${this.floorPlanUrl}/${id}/details`, payload));
     }
 }

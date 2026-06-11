@@ -407,6 +407,58 @@ export class AmministrazionePlanimetrieComponent implements OnInit {
         }
     }
 
+    clonaPlanimetria(piano: Planimetria): void {
+        // Chiudi il modale
+        this.showPlanimetriaModal = false;
+        
+        // Imposta i dati base come se fosse una selezione normale
+        this.selectedFloorId = piano.floorId ?? null;
+        // MA resettiamo il selectedFloorPlanId così che al salvataggio venga creata una nuova
+        this.selectedFloorPlanId = null;
+        
+        // Aggiungi (Copia) al nome
+        this.planName = (piano.name || 'Planimetria') + ' (Copia)';
+        
+        // Resetta le date per forzare la scelta
+        this.validFrom = null;
+        this.validTo = null;
+        this.fineIndeterminata = false; // o true a seconda di come vogliamo gestire, ma costringendo a scegliere è meglio
+
+        console.log('[Planimetria] Clonazione FloorPlan iniziato da:', piano);
+
+        // Prepara l'immagine
+        this.imageUrl = piano.imagePath && piano.imagePath !== 'Planimetria.png'
+            ? (piano.imagePath.startsWith('data:') || piano.imagePath.includes('/') ? piano.imagePath : `${this.apiBase}/api/images/${piano.imagePath}`) 
+            : 'Planimetria.png';
+        this.cdr.detectChanges();
+
+        // Carica la planimetria sul canvas esattamente come fa selezionaPlanimetria
+        if (this.buildingId) {
+            this.planimetriaService.getFloorsByEdificio(this.buildingId).subscribe({
+                next: (floors: FloorDTO[]) => {
+                    const floor = floors.find((f: FloorDTO) => f.id === piano.floorId) ?? { id: piano.floorId, rooms: [], workspaces: [] };
+                    setTimeout(() => {
+                        this.initCanvas(this.imageUrl!);
+                        setTimeout(() => {
+                            this.caricaPlanimetriaSelezionata(floor, piano);
+                        }, 150);
+                    }, 0);
+                },
+                error: () => {
+                    setTimeout(() => {
+                        this.initCanvas(this.imageUrl!);
+                        setTimeout(() => this.caricaPlanimetriaSelezionata({}, piano), 150);
+                    }, 0);
+                }
+            });
+        } else {
+            setTimeout(() => {
+                this.initCanvas(this.imageUrl!);
+                setTimeout(() => this.caricaPlanimetriaSelezionata({}, piano), 150);
+            }, 0);
+        }
+    }
+
     /** Costruisce un Planimetria "di default" usando le stanze logiche del FloorDTO */
     private buildPianoDaFloorDTO(floor: FloorDTO): Planimetria {
         const rooms = floor.rooms ?? [];
