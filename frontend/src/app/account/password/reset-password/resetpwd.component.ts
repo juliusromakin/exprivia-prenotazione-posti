@@ -11,6 +11,8 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { ResetPasswordService } from "./resetpwd.service";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { AnimatedBackgroundComponent } from "@/app/shared/components/animated-background/animated-background.component";
+import { HeaderComponent } from "@/app/layout/header/header.component";
 
 // Validator corretto
 export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -32,7 +34,9 @@ export function passwordMatchValidator(control: AbstractControl): ValidationErro
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    TranslateModule
+    TranslateModule,
+    AnimatedBackgroundComponent,
+    HeaderComponent
   ],
   templateUrl: './resetpwd.component.html'
 })

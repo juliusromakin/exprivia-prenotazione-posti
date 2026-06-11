@@ -15,6 +15,7 @@ import { HeaderComponent } from '../../layout/header/header.component';
 import { ToastModule } from 'primeng/toast';
 import { ToastService } from '../../shared/services/toast.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AnimatedBackgroundComponent } from '../../shared/components/animated-background/animated-background.component';
 
 
 @Component({
@@ -32,7 +33,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatIconModule,
     HeaderComponent,
     ToastModule,
-    TranslateModule
+    TranslateModule,
+    AnimatedBackgroundComponent
   ],
   providers: [],
   styleUrls: ['../../shared/styles/toast.styles.css', './register.component.css'],
@@ -50,6 +52,26 @@ export class RegisterComponent {
   hideConfirmPwd = true;
   isLoading = false;
   errorMessage: string | null = null;
+
+  // Parallax animation variables
+  translateX = 0;
+  translateY = 0;
+
+  onMouseMove(event: MouseEvent) {
+    const container = event.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const x = event.clientX - rect.left - rect.width / 2;
+    const y = event.clientY - rect.top - rect.height / 2;
+    
+    // Move the image slightly based on mouse position
+    this.translateX = -(x / 25);
+    this.translateY = -(y / 25);
+  }
+
+  onMouseLeave() {
+    this.translateX = 0;
+    this.translateY = 0;
+  }
 
   constructor(
     private registerService: RegisterService,

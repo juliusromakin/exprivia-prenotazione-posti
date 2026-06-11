@@ -1,8 +1,18 @@
-<app-header></app-header>
+<!-- Container principale con sfondo animato -->
+<app-animated-background></app-animated-background>
+<app-header class="relative z-10"></app-header>
 
-<main class="flex min-h-screen items-center justify-center px-4 py-12">
-  <div class="w-full max-w-md p-8 shadow-lg bg-white flex flex-col rounded-xl">
-    <div class="text-center">
+<main class="flex min-h-screen items-center justify-center px-4 py-12 relative z-10">
+  <div class="bg-white/90 backdrop-blur-sm rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] flex w-full max-w-md flex-col p-8 overflow-hidden relative">
+    
+    <!-- Freccia per tornare al login -->
+    <a routerLink="/login" 
+       class="absolute top-6 left-6 text-gray-400 hover:text-[var(--color-expriviaOrange)] transition-colors duration-300"
+       [attr.aria-label]="'AUTH.COMMON.BACK_TO_LOGIN' | translate">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+
+    <div class="text-center mt-2">
     <div class="relative inline-block">
         <img src="LogoExprivia.svg" alt="Exprivia Logo"
           class="h-12 mx-auto mb-4 transform hover:scale-110 transition-transform duration-300">

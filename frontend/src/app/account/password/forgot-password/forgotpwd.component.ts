@@ -8,10 +8,12 @@ import { RouterModule, Router } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatIconModule } from "@angular/material/icon";
 import { ForgotPasswordService } from "./forgotpwd.service";
 import { LucideAngularModule } from "lucide-angular";
 import { authAnimations } from "@/app/shared/animations/auth.animations";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { AnimatedBackgroundComponent } from "@/app/shared/components/animated-background/animated-background.component";
 
 @Component({
   selector: 'app-forgotpwd',
@@ -25,9 +27,11 @@ import { TranslateModule, TranslateService } from "@ngx-translate/core";
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatIconModule,
     LucideAngularModule,
     HeaderComponent,
-    TranslateModule
+    TranslateModule,
+    AnimatedBackgroundComponent
   ],
   animations: [
       authAnimations.fadeIn,

@@ -1,8 +1,10 @@
-<app-header></app-header>
-<div class="min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] flex w-full max-w-4xl overflow-hidden">
-    <!-- Sinistra: Form di registrazione -->
-    <div class="w-full md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+<!-- Container principale con sfondo animato -->
+<app-animated-background></app-animated-background>
+<app-header class="relative z-10"></app-header>
+<div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+  <div class="bg-white/90 backdrop-blur-sm rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] flex w-full max-w-2xl overflow-hidden">
+    <!-- Centro: Form di registrazione -->
+    <div class="w-full p-6 sm:p-8 md:p-10 flex flex-col justify-center">
       <div class="text-center">
         <div class="relative inline-block">
           <img src="LogoExprivia.svg" alt="Exprivia Logo"
@@ -159,11 +161,6 @@
           </a>
         </div>
       </form>
-    </div>
-
-    <!-- Destra: Immagine decorativa -->
-    <div class="hidden md:block w-1/2 relative">
-      <div class="absolute inset-0 bg-[url('assets/images/registration.avif')] bg-cover bg-center"></div>
     </div>
   </div>
 </div>
