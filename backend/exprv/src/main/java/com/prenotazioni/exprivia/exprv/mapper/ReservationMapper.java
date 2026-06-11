@@ -33,6 +33,8 @@ public interface ReservationMapper {
     @Mapping(source = "workspace.room.floor.building.location.name", target = "locationName")
     @Mapping(source = "bookedBy.id", target = "bookedById")
     @Mapping(source = "bookedBy", target = "bookedBySummary")
+    @Mapping(source = "canceledBy.id", target = "canceledById")
+    @Mapping(source = "canceledBy", target = "canceledBySummary")
     ReservationDTO toDto(Reservation reservation);
 
     default UserSummaryDTO toUserSummaryDto(User user) {
@@ -69,6 +71,7 @@ public interface ReservationMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "reservationDuration", ignore = true)
     @Mapping(target = "bookedBy", ignore = true)
+    @Mapping(target = "canceledBy", ignore = true)
     Reservation toEntity(ReservationDTO reservationDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -78,6 +81,7 @@ public interface ReservationMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "reservationDuration", ignore = true)
     @Mapping(target = "bookedBy", ignore = true)
+    @Mapping(target = "canceledBy", ignore = true)
     void updateReservationFromDto(ReservationDTO reservationDTO, @MappingTarget Reservation reservation);
 
 }

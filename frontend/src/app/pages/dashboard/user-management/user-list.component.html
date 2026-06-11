@@ -96,27 +96,32 @@
 
           <!-- Role Filter -->
           <div class="flex gap-2">
-            <button [class.bg-blue-50]="currentFilter === 'all'" (click)="filterByRole('all')"
-              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
+            <button (click)="filterByRole('all')"
+              [ngClass]="currentFilter === 'all' ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'"
+              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
               <lucide-icon name="users" class="w-4 h-4"></lucide-icon>
               {{ 'USER_MANAGEMENT.FILTER_ALL' | translate }}
             </button>
-            <button [class.bg-purple-50]="currentFilter === 'admin'" (click)="filterByRole('admin')"
-              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
+            <button (click)="filterByRole('admin')"
+              [ngClass]="currentFilter === 'admin' ? 'bg-purple-600 text-white shadow-md ring-2 ring-purple-200' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'"
+              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
               <lucide-icon name="shield" class="w-4 h-4"></lucide-icon>
               {{ 'USER_MANAGEMENT.ADMINISTRATORS' | translate }}
             </button>
-            <button [class.bg-green-50]="currentFilter === 'user'" (click)="filterByRole('user')"
-              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
+            <button (click)="filterByRole('user')"
+              [ngClass]="currentFilter === 'user' ? 'bg-green-600 text-white shadow-md ring-2 ring-green-200' : 'bg-green-50 text-green-600 hover:bg-green-100'"
+              class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
               <lucide-icon name="user" class="w-4 h-4"></lucide-icon>
               {{ 'USER_MANAGEMENT.EMPLOYEES' | translate }}
             </button>
-            <button [class.bg-red-50]="currentFilter === 'inactive'" (click)="filterByRole('inactive')"
-              class="relative px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
-              <i class="fas fa-user-clock text-red-600"></i>
+            <button (click)="filterByRole('inactive')"
+              [ngClass]="currentFilter === 'inactive' ? 'bg-red-600 text-white shadow-md ring-2 ring-red-200' : 'bg-red-50 text-red-600 hover:bg-red-100'"
+              class="relative px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
+              <i class="fas fa-user-clock"></i>
               {{ 'USER_MANAGEMENT.PENDING_ACTIVATION' | translate }}
               <span *ngIf="getInactiveCount() > 0" 
-                class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-pulse">
+                [ngClass]="currentFilter === 'inactive' ? 'bg-white text-red-600' : 'bg-red-600 text-white'"
+                class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold shadow-lg animate-pulse">
                 {{ getInactiveCount() }}
               </span>
             </button>
@@ -172,15 +177,15 @@
               <!-- Status -->
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <!-- Inattivo (Disabilitato) -->
-                <span *ngIf="!user.enabled" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                <span *ngIf="!user.enabled" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-900">
                   {{ 'USER_MANAGEMENT.TABLE.STATUS_INACTIVE' | translate }}
                 </span>
                 <!-- In attesa (Abilitato ma GUEST) -->
-                <span *ngIf="user.enabled && user.badges.includes('ROLE_GUEST')" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                <span *ngIf="user.enabled && user.badges.includes('ROLE_GUEST')" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-200 text-yellow-900">
                   {{ 'USER_MANAGEMENT.TABLE.STATUS_PENDING' | translate }}
                 </span>
                 <!-- Attivo (Abilitato e NON GUEST) -->
-                <span *ngIf="user.enabled && !user.badges.includes('ROLE_GUEST')" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                <span *ngIf="user.enabled && !user.badges.includes('ROLE_GUEST')" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-200 text-green-900">
                   {{ 'USER_MANAGEMENT.TABLE.STATUS_ACTIVE' | translate }}
                 </span>
               </td>
@@ -189,10 +194,10 @@
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <span [class]="
                     user.badges.includes('ROLE_ADMIN')
-                      ? 'bg-purple-100 text-purple-800'
+                      ? 'bg-purple-200 text-purple-900'
                       : user.badges.includes('ROLE_GUEST')
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-yellow-200 text-yellow-900'
+                      : 'bg-blue-200 text-blue-900'
                   " class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{
                   user.badges.includes('ROLE_ADMIN')

@@ -38,10 +38,10 @@
 
         <!-- Status Filter -->
         <div class="flex flex-wrap gap-2">
-          <button (click)="setStatusFilter('all')" [class.bg-blue-600]="statusFilter === 'all'" [class.text-white]="statusFilter === 'all'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_ALL' | translate }} ({{ getStatusFilterCount('all') }})</button>
-          <button (click)="setStatusFilter('active')" [class.bg-green-600]="statusFilter === 'active'" [class.text-white]="statusFilter === 'active'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_ACTIVE' | translate }} ({{ getStatusFilterCount('active') }})</button>
-          <button (click)="setStatusFilter('expired')" [class.bg-orange-600]="statusFilter === 'expired'" [class.text-white]="statusFilter === 'expired'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_EXPIRED' | translate }} ({{ getStatusFilterCount('expired') }})</button>
-          <button (click)="setStatusFilter('cancelled')" [class.bg-red-600]="statusFilter === 'cancelled'" [class.text-white]="statusFilter === 'cancelled'" class="px-3 py-1.5 text-sm rounded-full bg-gray-100">{{ 'RESERVATIONS.FILTER_CANCELLED' | translate }} ({{ getStatusFilterCount('cancelled') }})</button>
+          <button (click)="setStatusFilter('all')" [class.bg-blue-800]="statusFilter === 'all'" [class.text-white]="statusFilter === 'all'" [class.bg-gray-100]="statusFilter !== 'all'" [class.text-gray-700]="statusFilter !== 'all'" class="px-3 py-1.5 text-sm rounded-full">{{ 'RESERVATIONS.FILTER_ALL' | translate }} ({{ getStatusFilterCount('all') }})</button>
+          <button (click)="setStatusFilter('active')" [class.bg-green-600]="statusFilter === 'active'" [class.text-white]="statusFilter === 'active'" [class.bg-gray-100]="statusFilter !== 'active'" [class.text-gray-700]="statusFilter !== 'active'" class="px-3 py-1.5 text-sm rounded-full">{{ 'RESERVATIONS.FILTER_ACTIVE' | translate }} ({{ getStatusFilterCount('active') }})</button>
+          <button (click)="setStatusFilter('expired')" [class.bg-orange-600]="statusFilter === 'expired'" [class.text-white]="statusFilter === 'expired'" [class.bg-gray-100]="statusFilter !== 'expired'" [class.text-gray-700]="statusFilter !== 'expired'" class="px-3 py-1.5 text-sm rounded-full">{{ 'RESERVATIONS.FILTER_EXPIRED' | translate }} ({{ getStatusFilterCount('expired') }})</button>
+          <button (click)="setStatusFilter('cancelled')" [class.bg-red-600]="statusFilter === 'cancelled'" [class.text-white]="statusFilter === 'cancelled'" [class.bg-gray-100]="statusFilter !== 'cancelled'" [class.text-gray-700]="statusFilter !== 'cancelled'" class="px-3 py-1.5 text-sm rounded-full">{{ 'RESERVATIONS.FILTER_CANCELLED' | translate }} ({{ getStatusFilterCount('cancelled') }})</button>
         </div>
       </div>
       
@@ -106,10 +106,15 @@
                 }">
                 {{ reservation.status === 'CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_CONFIRMED' | translate) : (reservation.status === 'NOT_CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_PENDING' | translate) : ('RESERVATIONS.TABLE.STATUS_DENIED' | translate)) }}
               </span>
+              <div class="flex items-center gap-3">
+                <div *ngIf="reservation.status === 'DENIED' && $any(reservation).canceledBySummary?.name && reservation.userSummary?.id !== $any(reservation).canceledBySummary?.id" class="text-xs text-red-600 mt-1">
+                  {{ 'BOOKING.TABLE.CANCELED_BY' | translate }}: {{ $any(reservation).canceledBySummary?.name }}
+                </div>
+              </div>
             </td>
-            <td class="px-4 py-4 text-sm">
-              <button (click)="deleteReservation(reservation)" class="text-red-600 hover:text-red-800">
-                <i class="fas fa-trash"></i>
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button *ngIf="canBeCanceled(reservation)" (click)="deleteReservation(reservation)" class="text-red-600 hover:text-red-800 underline text-sm font-medium">
+                {{ 'RESERVATIONS.TABLE.ACTION_CANCEL' | translate }}
               </button>
             </td>
           </tr>
@@ -206,9 +211,9 @@
   [isLoading]="isLoading"
   [type]="'warning'"
   [data]="{ 
-    title: 'RESERVATIONS.MESSAGES.CONFIRM_DELETE_TITLE' | translate, 
+    title: 'RESERVATIONS.MESSAGES.CONFIRM_CANCEL_TITLE' | translate, 
     message: getReservationDeleteConfirmationMessage(),
-    confirmButtonText: 'RESERVATIONS.MESSAGES.CONFIRM' | translate,
+    confirmButtonText: 'RESERVATIONS.MESSAGES.CONFIRM_CANCEL_BTN' | translate,
     cancelButtonText: 'RESERVATIONS.MESSAGES.CANCEL' | translate
   }"
   (confirm)="confirmDelete()"

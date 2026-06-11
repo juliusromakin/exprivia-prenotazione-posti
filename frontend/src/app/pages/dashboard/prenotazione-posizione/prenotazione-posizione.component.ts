@@ -1026,7 +1026,12 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   trackByUser(index: number, user: User): any { return user.id; }
 
   canCancelReservation(r: Reservation): boolean {
-    return r.status !== ReservationStatus.DENIED && new Date(r.endDate) > new Date();
+    if (r.status === 'DENIED') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const reservationDate = new Date(r.startDate);
+    reservationDate.setHours(0, 0, 0, 0);
+    return reservationDate.getTime() >= today.getTime();
   }
 
   cancelReservation(r: Reservation): void {
@@ -1040,7 +1045,13 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   confirmBulkCancel(): void {
-    const requests = this.reservationsToCancel.map(r => this.reservationService.deleteReservation(r.id!));
+    const requests = this.reservationsToCancel.map(r => {
+      const updatedReservation: Reservation = {
+        ...r,
+        status: ReservationStatus.DENIED
+      };
+      return this.reservationService.updateReservation(r.id!, updatedReservation);
+    });
     this.state.isLoading = true;
     forkJoin(requests).subscribe({
       next: () => {

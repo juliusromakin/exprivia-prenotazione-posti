@@ -24,6 +24,8 @@ public class ReservationDTO {
     private UserSummaryDTO userSummary;
     private Integer bookedById;
     private UserSummaryDTO bookedBySummary;
+    private Integer canceledById;
+    private UserSummaryDTO canceledBySummary;
     private String durationName;
 
     private WorkspaceDTO workspaceSummary;

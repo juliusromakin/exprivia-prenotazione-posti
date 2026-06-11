@@ -26,9 +26,12 @@ export interface Reservation {
     status: ReservationStatus;
     userId: number;
     workspaceId: number;
+    bookedById?: number;
+    bookedBySummary?: UserSummary;
+    canceledById?: number;
+    canceledBySummary?: UserSummary;
     durationName?: string;
     userSummary?: UserSummary;
-    bookedBySummary?: UserSummary;
     workspaceSummary?: WorkspaceSummary;
     roomSummary?: RoomSummary;
     cityName?: string;

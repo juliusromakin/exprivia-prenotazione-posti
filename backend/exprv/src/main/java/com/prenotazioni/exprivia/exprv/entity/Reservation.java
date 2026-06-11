@@ -63,6 +63,10 @@ public class Reservation {
     private User bookedBy;
 
     @ManyToOne
+    @JoinColumn(name = "canceled_by_user_id")
+    private User canceledBy;
+
+    @ManyToOne
     @JoinColumn(name = "duration_name")
     private ReservationDuration reservationDuration;
 }

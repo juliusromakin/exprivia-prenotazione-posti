@@ -354,11 +354,16 @@
     "MESSAGES": {
       "CONFIRM_DELETE_TITLE": "Confirm Deletion",
       "CONFIRM_DELETE_MSG": "Are you sure you want to delete the reservation for {{date}}?",
+      "CONFIRM_CANCEL_TITLE": "Confirm Cancellation",
+      "CONFIRM_CANCEL_MSG": "Are you sure you want to cancel the reservation for {{date}}?",
+      "CONFIRM_CANCEL_BTN": "Cancel Reservation",
       "CONFIRM": "Delete",
-      "CANCEL": "Cancel",
+      "CANCEL": "Close",
       "ERROR_LOADING": "Unable to load reservations",
       "DELETE_SUCCESS": "Reservation deleted successfully",
       "DELETE_ERROR": "Failed to delete reservation",
+      "CANCEL_SUCCESS": "Reservation cancelled successfully",
+      "CANCEL_ERROR": "Failed to cancel reservation",
       "EXPORT_DAILY_SUCCESS": "Daily report exported successfully",
       "EXPORT_DAILY_ERROR": "Failed to export daily report",
       "EXPORT_SUCCESS": "File exported successfully",
@@ -475,7 +480,8 @@
       "CANCEL_SELECTED": "Cancel",
       "ALL": "All",
       "ACTIVE": "Active",
-      "PASSATE": "Past"
+      "PASSATE": "Past",
+      "CANCELLED": "Canceled"
     },
     "TABLE": {
       "DATE": "Date",
@@ -491,8 +497,9 @@
       "STATUS_PENDING": "Pending",
       "STATUS_DENIED": "Denied",
       "ACTION_CANCEL": "Cancel",
-      "BENEFICIARY": "Beneficiary",
-      "BOOKED_BY": "Booked by"
+      "BENEFICIARY": "User",
+      "BOOKED_BY": "Booked by",
+      "CANCELED_BY": "Canceled by"
     },
     "MESSAGES": {
       "LOADING_ERROR_TITLE": "Loading Error",

@@ -81,33 +81,37 @@ public class ReservationService {
         if (reservationDTO.getEndDate().isBefore(reservationDTO.getStartDate())) {
             throw new AppException("INVALID_DATE_RANGE", "End date must be after start date", HttpStatus.BAD_REQUEST);
         }
-        if (reservationDTO.getStartDate().isBefore(java.time.LocalDateTime.now())) {
-            throw new AppException("RESERVATIONS_PAST_NOT_ALLOWED", "Reservations in the past are not allowed", HttpStatus.BAD_REQUEST);
-        }
-        java.time.DayOfWeek day = reservationDTO.getStartDate().getDayOfWeek();
-        if (day == java.time.DayOfWeek.SATURDAY || day == java.time.DayOfWeek.SUNDAY) {
-            throw new AppException("WEEKEND_RESERVATIONS_NOT_ALLOWED", "Reservations are only allowed on business days", HttpStatus.BAD_REQUEST);
-        }
-        List<Reservation> overlapping = reservationRepository
-                .findOverlappingBookings(
-                        reservationDTO.getStartDate(),
-                        reservationDTO.getEndDate(),
-                        reservationDTO.getWorkspaceId(),
-                        excludeReservationId);
+        if (reservationDTO.getStatus() != ReservationStatus.DENIED) {
+            if (reservationDTO.getStartDate().isBefore(java.time.LocalDateTime.now())) {
+                throw new AppException("RESERVATIONS_PAST_NOT_ALLOWED", "Reservations in the past are not allowed", HttpStatus.BAD_REQUEST);
+            }
+            
+            java.time.DayOfWeek day = reservationDTO.getStartDate().getDayOfWeek();
+            if (day == java.time.DayOfWeek.SATURDAY || day == java.time.DayOfWeek.SUNDAY) {
+                throw new AppException("WEEKEND_RESERVATIONS_NOT_ALLOWED", "Reservations are only allowed on business days", HttpStatus.BAD_REQUEST);
+            }
+            
+            List<Reservation> overlapping = reservationRepository
+                    .findOverlappingBookings(
+                            reservationDTO.getStartDate(),
+                            reservationDTO.getEndDate(),
+                            reservationDTO.getWorkspaceId(),
+                            excludeReservationId);
 
-        List<Reservation> overlappingByUser = reservationRepository
-                .findOverlappingBookingsByUser(
-                        reservationDTO.getStartDate(),
-                        reservationDTO.getEndDate(),
-                        reservationDTO.getUserId(),
-                        excludeReservationId);
+            List<Reservation> overlappingByUser = reservationRepository
+                    .findOverlappingBookingsByUser(
+                            reservationDTO.getStartDate(),
+                            reservationDTO.getEndDate(),
+                            reservationDTO.getUserId(),
+                            excludeReservationId);
 
-        if (!overlappingByUser.isEmpty()) {
-            throw new AppException("USER_ALREADY_HAS_RESERVATION", "User has already made a reservation at this time", HttpStatus.CONFLICT);
-        }
+            if (!overlappingByUser.isEmpty()) {
+                throw new AppException("USER_ALREADY_HAS_RESERVATION", "User has already made a reservation at this time", HttpStatus.CONFLICT);
+            }
 
-        if (!overlapping.isEmpty()) {
-            throw new AppException("WORKSPACE_OCCUPIED", "The workspace is already occupied at this time", HttpStatus.CONFLICT);
+            if (!overlapping.isEmpty()) {
+                throw new AppException("WORKSPACE_OCCUPIED", "The workspace is already occupied at this time", HttpStatus.CONFLICT);
+            }
         }
     }
 
@@ -189,6 +193,8 @@ public class ReservationService {
                                 Map.of("id", id),
                                 HttpStatus.NOT_FOUND));
 
+        ReservationStatus oldStatus = existingReservation.getStatus();
+
         reservationMapper.updateReservationFromDto(reservationDTO, existingReservation);
 
         verifyOwnershipOrAny(existingReservation.getUser().getEmail(), "ACTION_RESERVATION_UPDATE_ANY");
@@ -212,7 +218,12 @@ public class ReservationService {
 
         validateReservationDTO(reservationDTO, id);
 
-        ReservationStatus oldStatus = existingReservation.getStatus();
+        if (oldStatus != ReservationStatus.DENIED && existingReservation.getStatus() == ReservationStatus.DENIED) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = userRepository.findByEmail(auth.getName()).orElse(null);
+            existingReservation.setCanceledBy(currentUser);
+        }
+
         Reservation savedReservation = reservationRepository.save(existingReservation);
 
         // Se lo stato è cambiato in DENIED, invia email

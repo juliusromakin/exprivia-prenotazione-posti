@@ -139,18 +139,45 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
     this.showDeleteConfirmation = true;
   }
 
+  canBeCanceled(reservation: Reservation): boolean {
+    if (reservation.status === 'DENIED') return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const reservationDate = new Date(reservation.startDate);
+    reservationDate.setHours(0, 0, 0, 0);
+    
+    return reservationDate.getTime() >= today.getTime();
+  }
+
   confirmDelete(): void {
     if (!this.reservationToDelete?.id) return;
     this.isLoading = true;
-    this.reservationService.deleteReservation(this.reservationToDelete.id)
+
+    // Cambiamo lo stato in DENIED (Annullata)
+    const updatedReservation: Reservation = {
+      ...this.reservationToDelete,
+      status: ReservationStatus.DENIED
+    };
+
+    this.reservationService.updateReservation(this.reservationToDelete.id, updatedReservation)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
+        next: (savedReservation) => {
           this.toastService.showSuccess(
             this.translate.instant('RESERVATIONS.MESSAGES.SUCCESS'),
-            this.translate.instant('RESERVATIONS.MESSAGES.DELETE_SUCCESS')
+            this.translate.instant('RESERVATIONS.MESSAGES.CANCEL_SUCCESS')
           );
-          this.reservations = this.reservations.filter(r => r.id !== this.reservationToDelete?.id);
+          
+          const index = this.reservations.findIndex(r => r.id === this.reservationToDelete?.id);
+          if (index !== -1) {
+            this.reservations[index] = {
+              ...savedReservation,
+              startDate: new Date(savedReservation.startDate),
+              endDate: new Date(savedReservation.endDate)
+            };
+          }
           this.applySorting();
           this.isLoading = false;
           this.closeDeleteConfirmation();
@@ -158,7 +185,7 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
         error: () => {
           this.toastService.showError(
             this.translate.instant('RESERVATIONS.MESSAGES.ERROR'),
-            this.translate.instant('RESERVATIONS.MESSAGES.DELETE_ERROR')
+            this.translate.instant('RESERVATIONS.MESSAGES.CANCEL_ERROR') || 'Errore durante l\'annullamento'
           );
           this.isLoading = false;
           this.closeDeleteConfirmation();
@@ -394,6 +421,6 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
 
   getReservationDeleteConfirmationMessage(): string {
     if (!this.reservationToDelete) return '';
-    return this.translate.instant('RESERVATIONS.MESSAGES.CONFIRM_DELETE_MSG', { date: this.formatDate(this.reservationToDelete.startDate, 'dd/MM/yyyy') });
+    return this.translate.instant('RESERVATIONS.MESSAGES.CONFIRM_CANCEL_MSG', { date: this.formatDate(this.reservationToDelete.startDate, 'dd/MM/yyyy') });
   }
 }

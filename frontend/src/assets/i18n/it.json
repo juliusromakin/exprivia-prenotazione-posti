@@ -304,10 +304,10 @@
     "REFRESH": "Aggiorna",
     "REFRESHING": "Aggiornamento...",
     "SEARCH_PLACEHOLDER": "Cerca utente, sala, postazione...",
-    "FILTER_ALL": "Tutti",
+    "FILTER_ALL": "Tutte",
     "FILTER_ACTIVE": "Attive",
     "FILTER_EXPIRED": "Scadute",
-    "FILTER_CANCELLED": "Cancellate",
+    "FILTER_CANCELLED": "Annullate",
     "EXPORT": "Esporta",
     "NEW_RESERVATION": "Nuova Prenotazione",
     "TABLE": {
@@ -355,11 +355,16 @@
     "MESSAGES": {
       "CONFIRM_DELETE_TITLE": "Conferma Eliminazione",
       "CONFIRM_DELETE_MSG": "Sei sicuro di voler eliminare la prenotazione del {{date}}?",
+      "CONFIRM_CANCEL_TITLE": "Conferma Annullamento",
+      "CONFIRM_CANCEL_MSG": "Sei sicuro di voler annullare la prenotazione del {{date}}?",
+      "CONFIRM_CANCEL_BTN": "Annulla Prenotazione",
       "CONFIRM": "Elimina",
-      "CANCEL": "Annulla",
+      "CANCEL": "Chiudi",
       "ERROR_LOADING": "Impossibile caricare le prenotazioni",
       "DELETE_SUCCESS": "Prenotazione eliminata con successo",
       "DELETE_ERROR": "Errore durante l'eliminazione della prenotazione",
+      "CANCEL_SUCCESS": "Prenotazione annullata con successo",
+      "CANCEL_ERROR": "Errore durante l'annullamento della prenotazione",
       "EXPORT_DAILY_SUCCESS": "Report giornaliero esportato con successo",
       "EXPORT_DAILY_ERROR": "Errore durante l'esportazione del report",
       "EXPORT_SUCCESS": "File esportato con successo",
@@ -476,7 +481,8 @@
       "CANCEL_SELECTED": "Annulla",
       "ALL": "Tutte",
       "ACTIVE": "Attive",
-      "PASSATE": "Passate"
+      "PASSATE": "Passate",
+      "CANCELLED": "Annullate"
     },
     "TABLE": {
       "DATE": "Data",
@@ -494,7 +500,8 @@
       "STATUS_DENIED": "Rifiutata",
       "ACTION_CANCEL": "Annulla",
       "BENEFICIARY": "Utente",
-      "BOOKED_BY": "Prenotato da"
+      "BOOKED_BY": "Prenotato da",
+      "CANCELED_BY": "Annullato da"
     },
     "MESSAGES": {
       "LOADING_ERROR_TITLE": "Errore di Caricamento",
