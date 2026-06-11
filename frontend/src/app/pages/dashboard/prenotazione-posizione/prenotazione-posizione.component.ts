@@ -370,7 +370,21 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
       .subscribe(duration => {
         this.bookingForm.patchValue({ timeSlot: "", workspaceId: "" });
         if (duration && (this.bookingForm.get('selectedDate')?.value || this.state.selectedDates.length > 0)) {
-          this.generateTimeSlotsForDuration(duration, this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0]);
+          const selectedDate = this.bookingForm.get('selectedDate')?.value || this.state.selectedDates[0];
+          this.generateTimeSlotsForDuration(duration, selectedDate);
+          
+          if (duration === 'Full Day') {
+            const defaultSlotStr = '09:00 - 18:00';
+            const hasDefaultSlot = this.state.availableTimeSlots.some(
+              slot => `${slot.startTime} - ${slot.endTime}` === defaultSlotStr
+            );
+            if (hasDefaultSlot) {
+              this.bookingForm.patchValue({ timeSlot: defaultSlotStr });
+            } else if (this.state.availableTimeSlots.length > 0) {
+              const firstSlot = this.state.availableTimeSlots[0];
+              this.bookingForm.patchValue({ timeSlot: `${firstSlot.startTime} - ${firstSlot.endTime}` });
+            }
+          }
         } else {
           this.state.availableTimeSlots = [];
         }
@@ -593,6 +607,11 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     const selected = dates && dates.length > 0 ? [dates[0]] : [];
     this.state.selectedDates = [...selected];
     this.bookingForm.patchValue({ selectedDate: selected[0] });
+    
+    if (selected[0]) {
+      this.bookingForm.patchValue({ slotDuration: 'Full Day' });
+    }
+    
     this.state.availableWorkspaces = this.state.availableWorkspaces.map(p => ({ ...p, isAvailable: undefined }));
 
     // Reload booking info to fetch the correct floor plan for the selected date

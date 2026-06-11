@@ -125,7 +125,15 @@ export class LoginComponent implements OnInit, OnDestroy {
             if (user) {
               let returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'];
               
-              if (!returnUrl) {
+              if (user.badges?.includes('ROLE_ADMIN')) {
+                if (!returnUrl || returnUrl === '/') {
+                  returnUrl = '/dashboard';
+                }
+              } else if (user.badges?.includes('ROLE_USER') || user.badges?.includes('ACTION_RESERVATION_CREATE_OWN')) {
+                if (!returnUrl || returnUrl === '/') {
+                  returnUrl = '/dashboard/workspace-booking';
+                }
+              } else if (!returnUrl) {
                 returnUrl = '/';
               }
               

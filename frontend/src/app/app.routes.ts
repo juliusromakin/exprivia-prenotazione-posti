@@ -32,11 +32,11 @@ const redirectAuthenticatedToWorkspaceBooking = () => {
 
     // Reindirizza in base al ruolo e permessi
     if (authService.hasAnybadge(['ROLE_ADMIN'])) {
-      return router.createUrlTree(["/"]);
+      return router.createUrlTree(["/dashboard"]);
     }
 
-    // Se ha il permesso di prenotare, vai alla pagina di prenotazione
-    if (authService.hasAnybadge(['ACTION_RESERVATION_CREATE_OWN'])) {
+    // Se ha il permesso di prenotare o è un utente standard, vai alla pagina di prenotazione
+    if (authService.hasAnybadge(['ACTION_RESERVATION_CREATE_OWN', 'ROLE_USER'])) {
       return router.createUrlTree(["/dashboard/workspace-booking"]);
     }
 
