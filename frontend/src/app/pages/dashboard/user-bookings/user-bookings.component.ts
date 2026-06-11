@@ -182,11 +182,8 @@ export class UserBookingsComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.closeDeleteConfirmation();
         },
-        error: () => {
-          this.toastService.showError(
-            this.translate.instant('RESERVATIONS.MESSAGES.ERROR'),
-            this.translate.instant('RESERVATIONS.MESSAGES.CANCEL_ERROR') || 'Errore durante l\'annullamento'
-          );
+        error: (err) => {
+          this.toastService.handleError(err, 'RESERVATIONS.MESSAGES.ERROR');
           this.isLoading = false;
           this.closeDeleteConfirmation();
         }

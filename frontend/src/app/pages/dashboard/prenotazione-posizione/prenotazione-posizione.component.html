@@ -18,10 +18,10 @@
         <span class="text-sm text-gray-500">{{ 'BOOKING.STEP' | translate }}</span>
         <div class="flex space-x-1">
           <div class="w-2 h-2 rounded-full"
-            [ngClass]="{'bg-blue-600': state.selectedDates.length > 0, 'bg-gray-300': state.selectedDates.length === 0}">
+            [ngClass]="{'bg-blue-600': selectedBuildingId, 'bg-gray-300': !selectedBuildingId}">
           </div>
           <div class="w-2 h-2 rounded-full"
-            [ngClass]="{'bg-blue-600': bookingForm.get('roomType')?.value, 'bg-gray-300': !bookingForm.get('roomType')?.value}">
+            [ngClass]="{'bg-blue-600': state.selectedDates.length > 0, 'bg-gray-300': state.selectedDates.length === 0}">
           </div>
           <div class="w-2 h-2 rounded-full"
             [ngClass]="{'bg-blue-600': bookingForm.get('timeSlot')?.value, 'bg-gray-300': !bookingForm.get('timeSlot')?.value}">
@@ -167,8 +167,8 @@
                   <select formControlName="roomId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
                     <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
-                    <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
-                      {{ room.name }}
+                    <option *ngFor="let room of roomsForSelectedType" [value]="room.id" [disabled]="!isRoomAvailable(room)">
+                      {{ room.name }}{{ isRoomAvailable(room) ? '' : ' (Non disponibile)' }}
                     </option>
                   </select>
                 </div>
@@ -260,8 +260,8 @@
               <select formControlName="workspaceId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] focus:border-transparent bg-white disabled:bg-gray-100">
                 <option [value]="null">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
-                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
-                  {{ workspace.name }}
+                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id" [disabled]="bookingForm.get('timeSlot')?.value && workspace.isAvailable === false">
+                  {{ workspace.name }}{{ (bookingForm.get('timeSlot')?.value && workspace.isAvailable === false) ? ' (Occupato)' : '' }}
                 </option>
               </select>
             </div>
@@ -300,6 +300,12 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <!-- User not found message (Mobile) -->
+              <div *ngIf="userSearchTerm && filteredUsers.length === 0 && !selectedUser"
+                class="mt-2 flex items-center gap-2 text-red-600 text-xs font-semibold bg-red-50 border border-red-200 rounded-lg px-3 py-2 animate-in fade-in duration-200">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ 'BOOKING.ADMIN.USER_NOT_FOUND' | translate }}</span>
               </div>
             </div>
 
@@ -391,6 +397,12 @@
                   </div>
                 </div>
               </div>
+              <!-- User not found message (Desktop) -->
+              <div *ngIf="userSearchTerm && filteredUsers.length === 0 && !selectedUser"
+                class="mt-2 flex items-center gap-2 text-red-600 text-xs font-semibold bg-red-50 border border-red-200 rounded-lg px-3 py-2 animate-in fade-in duration-200">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ 'BOOKING.ADMIN.USER_NOT_FOUND' | translate }}</span>
+              </div>
             </div>
 
             <!-- Desktop Step: Time Selection -->
@@ -446,8 +458,8 @@
               <select formControlName="roomId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
                 <option [value]="null">{{ 'RESERVATIONS.TABLE.ROOM' | translate }}</option>
-                <option *ngFor="let room of roomsForSelectedType" [value]="room.id">
-                  {{ room.name }}
+                <option *ngFor="let room of roomsForSelectedType" [value]="room.id" [disabled]="!isRoomAvailable(room)">
+                  {{ room.name }}{{ isRoomAvailable(room) ? '' : ' (Non disponibile)' }}
                 </option>
               </select>
 
@@ -474,8 +486,8 @@
               <select formControlName="workspaceId" [attr.disabled]="isStepDisabled('roomType') ? true : null"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-expriviaOrange)] bg-white disabled:bg-gray-100">
                 <option [value]="null">{{ 'RESERVATIONS.TABLE.WORKSPACE' | translate }}</option>
-                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id">
-                  {{ workspace.name }}
+                <option *ngFor="let workspace of workstationsForSelectedRoom" [value]="workspace.id" [disabled]="bookingForm.get('timeSlot')?.value && workspace.isAvailable === false">
+                  {{ workspace.name }}{{ (bookingForm.get('timeSlot')?.value && workspace.isAvailable === false) ? ' (Occupato)' : '' }}
                 </option>
               </select>
             </div>
@@ -639,8 +651,8 @@
                   {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
                 </div>
               </td>
-              <td class="p-3 text-center">
-                <div class="flex flex-col items-center gap-1.5">
+              <td class="p-3">
+                <div class="flex flex-col items-start gap-1.5">
                   <span class="px-2.5 py-1 text-xs font-semibold rounded-full w-max" [ngClass]="{
                       'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
                       'bg-yellow-100 text-yellow-800': reservation.status === 'NOT_CONFIRMED',
@@ -651,7 +663,7 @@
                     ('BOOKING.TABLE.STATUS_PENDING' | translate) : ('BOOKING.TABLE.STATUS_DENIED' | translate)) }}
                   </span>
                   <div *ngIf="reservation.status === 'DENIED' && $any(reservation).canceledBySummary?.name && reservation.userSummary?.id !== $any(reservation).canceledBySummary?.id" 
-                       class="text-[10px] text-red-600 flex items-center gap-1 font-medium bg-red-50 rounded px-1.5 py-0.5 w-max mx-auto">
+                       class="text-[10px] text-red-600 flex items-center gap-1 font-medium bg-red-50 rounded px-1.5 py-0.5 w-max">
                     <i class="fas fa-user-times"></i>
                     <span>{{ 'BOOKING.TABLE.CANCELED_BY' | translate }}: {{ $any(reservation).canceledBySummary?.name }}</span>
                   </div>

@@ -21,8 +21,7 @@ export interface DialogData {
   ],
   template: `
     <!-- Modal Overlay -->
-    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 99999; display: flex; align-items: center; justify-content: center;"
-         (click)="onCancel()">
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 99999; display: flex; align-items: center; justify-content: center;">
       
       <div class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-300 w-full max-w-3xl mx-4" 
            (click)="$event.stopPropagation()">

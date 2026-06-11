@@ -85,26 +85,14 @@ export class ReservationService {
      * Crea una nuova prenotazione
      */
     createReservation(reservation: ReservationRequest): Observable<Reservation> {
-        return from(this.axiosService.post<Reservation>(this.BASE_URL, reservation)).pipe(
-            catchError(error => {
-                console.error('Error creating reservation:', error);
-                const message = error.response?.data?.message || 'Unable to create reservation';
-                return throwError(() => new Error(message));
-            })
-        );
+        return from(this.axiosService.post<Reservation>(this.BASE_URL, reservation));
     }
 
     /**
      * Aggiorna una prenotazione esistente
      */
     updateReservation(id: number, updates: Reservation): Observable<Reservation> {
-        return from(this.axiosService.put<Reservation>(`${this.BASE_URL}/${id}`, updates)).pipe(
-            catchError(error => {
-                console.error('Error updating reservation:', error);
-                const message = error.response?.data?.message || 'Unable to update reservation';
-                return throwError(() => new Error(message));
-            })
-        );
+        return from(this.axiosService.put<Reservation>(`${this.BASE_URL}/${id}`, updates));
     }
 
     /**

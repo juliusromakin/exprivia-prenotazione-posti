@@ -97,8 +97,8 @@
                 {{ getTranslatedRoomType(reservation.roomSummary?.roomType) }}
               </div>
             </td>
-            <td class="px-4 py-4 text-sm text-center">
-              <div class="flex flex-col items-center gap-1.5">
+            <td class="px-4 py-4 text-sm">
+              <div class="flex flex-col items-start gap-1.5">
                 <span class="px-2 py-1 text-xs rounded-full font-semibold w-max"
                   [ngClass]="{
                     'bg-green-100 text-green-800': reservation.status === 'CONFIRMED',
@@ -108,13 +108,13 @@
                   {{ reservation.status === 'CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_CONFIRMED' | translate) : (reservation.status === 'NOT_CONFIRMED' ? ('RESERVATIONS.TABLE.STATUS_PENDING' | translate) : ('RESERVATIONS.TABLE.STATUS_DENIED' | translate)) }}
                 </span>
                 <div *ngIf="reservation.status === 'DENIED' && $any(reservation).canceledBySummary?.name && reservation.userSummary?.id !== $any(reservation).canceledBySummary?.id" 
-                     class="text-[10px] text-red-600 flex items-center gap-1 font-medium bg-red-50 rounded px-1.5 py-0.5 w-max mx-auto">
+                     class="text-[10px] text-red-600 flex items-center gap-1 font-medium bg-red-50 rounded px-1.5 py-0.5 w-max">
                   <i class="fas fa-user-times"></i>
                   <span>{{ 'BOOKING.TABLE.CANCELED_BY' | translate }}: {{ $any(reservation).canceledBySummary?.name }}</span>
                 </div>
               </div>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
+            <td class="px-4 py-4 whitespace-nowrap text-left text-sm font-medium">
               <button *ngIf="canBeCanceled(reservation)" (click)="deleteReservation(reservation)" class="text-red-600 hover:text-red-800 underline text-sm font-medium">
                 {{ 'RESERVATIONS.TABLE.ACTION_CANCEL' | translate }}
               </button>

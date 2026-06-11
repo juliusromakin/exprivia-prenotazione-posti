@@ -174,8 +174,9 @@ body {
 
 /* Custom Language Menu */
 .lang-menu-panel {
-  min-width: 84px !important;
-  max-width: 100px !important;
+  min-width: 92px !important;
+  width: 92px !important;
+  max-width: 92px !important;
 }
 
 .lang-menu-panel .mat-mdc-menu-content {
@@ -185,4 +186,56 @@ body {
 .lang-menu-panel .mat-mdc-menu-item {
   min-height: 36px !important;
   padding: 0 8px !important;
+}
+
+/* Custom Profile Menu */
+.profile-menu-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
+  position: relative !important;
+  overflow: visible !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+.profile-menu-header {
+  position: relative !important;
+  z-index: 10 !important;
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+
+/* Triangolo bianco puntato verso l'alto (agganciato all'header interno) */
+.profile-menu-header::before {
+  content: '';
+  position: absolute;
+  top: -8px; /* Si sovrappone perfettamente al bordo superiore del menu */
+  right: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #ffffff; /* Bianco puro */
+  z-index: 1001; /* Sovrasta il menu padre */
+}
+
+.profile-menu-panel .mat-mdc-menu-content {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  overflow: visible !important; /* Permette alla freccia del figlio di essere visibile */
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+.profile-menu-panel .mat-mdc-menu-item {
+  min-height: 44px !important;
+  padding: 0 16px !important;
+  background-color: transparent !important;
+}
+
+/* Arrotondamento per l'ultimo elemento per evitare sbavature, dato che non c'è più overflow hidden sul content */
+.profile-menu-panel .mat-mdc-menu-item:last-child {
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
 }

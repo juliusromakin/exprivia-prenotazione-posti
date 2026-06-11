@@ -46,8 +46,7 @@
 }
 
 .legend-dot.unavailable {
-  background: #ef4444;
-  opacity: .75;
+  background: #9ca3af;
 }
 
 .legend-dot.selected {
@@ -240,9 +239,8 @@
 }
 
 .floor-plan-marker.unavailable {
-  background: #ef4444;
+  background: #9ca3af;
   cursor: not-allowed;
-  opacity: .75;
 }
 
 .floor-plan-marker.selected {

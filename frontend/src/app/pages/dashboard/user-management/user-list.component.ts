@@ -162,11 +162,9 @@ export class UserListComponent implements OnInit, OnDestroy {
       }
       this.closeModal();
     } catch (error) {
-      this.toastService.showError(
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.OPERATION_ERROR'),
-        this.modalData.user.id 
-          ? this.translate.instant('USER_MANAGEMENT.MESSAGES.UPDATE_ERROR') 
-          : this.translate.instant('USER_MANAGEMENT.MESSAGES.CREATE_ERROR')
+      this.toastService.handleError(
+        error,
+        'USER_MANAGEMENT.MESSAGES.OPERATION_ERROR'
       );
     } finally {
       this.isModalLoading = false;
@@ -203,10 +201,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       );
       this.closeDeleteConfirmation();
     } catch (error) {
-      this.toastService.showError(
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.DELETE_ERROR'),
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.DELETE_ERROR_DESC')
-      );
+      this.toastService.handleError(error, 'USER_MANAGEMENT.MESSAGES.DELETE_ERROR');
       this.closeDeleteConfirmation();
     }
   }
@@ -407,9 +402,9 @@ export class UserListComponent implements OnInit, OnDestroy {
         );
       }
     } catch (error) {
-      this.toastService.showError(
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_TITLE'),
-        this.translate.instant('USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_DESC')
+      this.toastService.handleError(
+        error,
+        'USER_MANAGEMENT.MESSAGES.ACTIVATION_ERROR_TITLE'
       );
     }
   }

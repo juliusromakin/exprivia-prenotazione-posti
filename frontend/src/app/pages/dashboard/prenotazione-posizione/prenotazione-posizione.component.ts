@@ -122,7 +122,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   ) {
     this.bookingForm = this.fb.group({
       selectedDate: [null, Validators.required],
-      roomType: ["", Validators.required],
+      roomType: ["OFFICE", Validators.required],
       roomId: [null, Validators.required],
       slotDuration: [null, Validators.required],
       timeSlot: ["", Validators.required],
@@ -453,35 +453,23 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     const type = this.bookingForm.get('roomType')?.value;
     if (!type) return [];
 
-    let rooms = this.state.rooms.filter(r =>
+    return this.state.rooms.filter(r =>
       r.roomType === type ||
       (typeof r.roomType === 'string' && r.roomType.toUpperCase() === String(type).toUpperCase())
     );
+  }
 
-    // Se è selezionato un orario, mostra solo le stanze con almeno una postazione disponibile
+  isRoomAvailable(room: Room): boolean {
     const timeSlot = this.bookingForm.get('timeSlot')?.value;
-    if (timeSlot) {
-      rooms = rooms.filter(room =>
-        this.state.availableWorkspaces.some(w => w.roomId === room.id && w.isAvailable === true)
-      );
-    }
-
-    return rooms;
+    if (!timeSlot) return true;
+    return this.state.availableWorkspaces.some(w => w.roomId === room.id && w.isAvailable === true);
   }
 
   get workstationsForSelectedRoom(): any[] {
     const roomId = this.bookingForm.get('roomId')?.value;
     if (!roomId) return [];
 
-    let workspaces = this.state.availableWorkspaces.filter(w => w.roomId === Number(roomId));
-
-    // Se è selezionato un orario, mostra solo le postazioni effettivamente disponibili
-    const timeSlot = this.bookingForm.get('timeSlot')?.value;
-    if (timeSlot) {
-      workspaces = workspaces.filter(w => w.isAvailable === true);
-    }
-
-    return workspaces;
+    return this.state.availableWorkspaces.filter(w => w.roomId === Number(roomId));
   }
 
   get selectedRoom(): Room | undefined {
@@ -686,9 +674,9 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
           this.state.isLoading = false;
         },
         error: (err) => {
-          this.toastService.showError(
-            this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_TITLE'),
-            err.message || this.translate.instant('BOOKING.MESSAGES.CREATE_ERROR_DESC')
+          this.toastService.handleError(
+            err,
+            'BOOKING.MESSAGES.CREATE_ERROR_TITLE'
           );
           this.state.isLoading = false;
         }
@@ -697,7 +685,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
   }
 
   private resetForm(): void {
-    this.bookingForm.reset({ roomType: "" });
+    this.bookingForm.reset({ roomType: "OFFICE" });
     this.state.selectedDates = [];
     this.state.availableTimeSlots = [];
 
@@ -749,7 +737,7 @@ export class PrenotazionePosizioneComponent implements OnInit, OnDestroy {
     if (!floorId) return;
     this.state.selectedFloorId = Number(floorId);
     this.updateFilteredData();
-    this.bookingForm.patchValue({ workspaceId: "", roomId: null, roomType: "" });
+    this.bookingForm.patchValue({ workspaceId: "", roomId: null, roomType: "OFFICE" });
     this.loadRoomTypesByFloor(this.state.selectedFloorId);
     this.cdr.detectChanges();
   }
